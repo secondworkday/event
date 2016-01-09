@@ -1,0 +1,6 @@
+[submodule "MSUtility"]
+	path = MSUtility
+	url = https://mercersoftware.repositoryhosting.com/git/mercersoftware/msutility-git.git
+[submodule "MSWebUtility"]
+	path = MSWebUtility
+	url = https://mercersoftware.repositoryhosting.com/git/mercersoftware/mswebutility-git.git
