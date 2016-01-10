@@ -1,0 +1,154 @@
+<!-- 
+  Sign In
+ -->
+
+<md-content class="main-content signin">
+  <h1>Sign In</h1>
+  <p>Sign in to TORQ</p>
+  <hr>
+
+  <!-- Sign in -->
+  <p>Username</p>
+  <p>Password</p>
+  <p>Sign In</p>
+
+</md-content>
+
+
+<!-- Push down old -->
+<div class="giant-space"></div>
+
+
+
+
+<div class="container">
+    <div class="sign-in-image-container" style="text-align:center; margin-bottom:30px;">
+        <img style="width:166px; height:55px;" src="../images/rads-logo-dark-medium.jpg" />
+    </div>
+    <div style="width: 280px; margin-left: auto; margin-right: auto;">
+        <!-- Dialog validation error feedback -->
+        <div ng-if="errorMessage" class="alert alert-error" style="color:gold;">
+            <strong>Oh Snap!</strong>
+            {{errorMessage}}
+        </div>
+
+        <!-- Sign in input controls -->
+        <div class="form-group">
+            <label class="sr-only" for="signInEmail">Email address</label>
+            <input type="email" id="signInEmail" ng-model="credentials.email" class="form-control" placeholder="Email" style="border: none;">
+        </div>
+        <div class="form-group">
+            <label class="sr-only" for="signInPassword">Password</label>
+            <input type="password" id="signInPassword" ng-model="credentials.password" class="form-control" placeholder="Password" style="border: none;">
+        </div>
+        <div class="form-group">
+            <label class="checkbox-inline" style="color:white;">
+                <input type="checkbox" ng-model="credentials.rememberMe">
+                Remember Me
+            </label>
+        </div>
+
+        <!-- Sign in button -->
+        <button ng-click="signIn(credentials)" class="btn btn-default btn-block sign-in-button" style="">Sign In</button>
+        <div style="text-align:center; padding-top:40px;">
+            <a href="" class="forgot-password-link" type="button" title="{{popover.title}}" data-content="{{popover.content}}" data-template="/signin/reset-password-popover.html" data-animation="am-flip-x" bs-popover ng-controller="ResetPasswordController">
+                <small style="color:white;">Forgot your password?</small>
+            </a>
+        </div>
+
+        <!-- Demo -->
+        <div style="text-align:center; padding-top:5px;">
+            <a href="" ng-click="demo=!demo" style="text-decoration:none;">
+                <small style="color:white;">Demo</small>
+            </a>
+        </div>
+
+
+        <div ng-if="demo" ng-repeat="tenant in tenants" style="text-align: center; color:white;">
+            <hr />
+            <p style="color:gray; font-size:small">Tenant: {{tenant.name}}</p>
+            <h4>Sign in as Guest</h4>
+            <div ng-repeat="role in roles">
+                <p style="margin-bottom:5px;">{{role.name}}</p>
+                <ul class="list-inline">
+                    <li ng-repeat="user in tenant.users | filter:role.filter" ng-click="signIn({'email': user.email, 'rememberMe':'false'})">
+                        <a href="">
+                            <img style=" display: block; width: 40px; height: 40px; background: #E6E7ED; -moz-border-radius: 20px; -webkit-border-radius: 20px; background-position: 50% 50%; background-repeat: no-repeat; " ng-src="{{user.profilePhotoUrl}}">
+                            <span ng-if="!user.profilePhotoUrl">{{user.email}}</span>
+
+                        </a>
+                    </li>
+                </ul>
+                
+            </div>
+        </div>
+        <!-- End Demo -->
+
+        <!--
+            <div class="form-signin">
+                <div ng-if="errorMessage" class="alert alert-error">
+                    <strong>Oh Snap!</strong>
+                    {{errorMessage}}
+                </div>
+
+                <h3>Sign in</h3>
+
+                <form role="form">
+                    <div class="form-group">
+                        <label for="signInEmail">Email address</label>
+                        <input type="email" id="signInEmail" ng-model="credentials.email" class="form-control" placeholder="email address">
+                    </div>
+                    <div class="form-group">
+                        <label for="signInPassword">Password</label>
+                        <input type="password" id="signInPassword" ng-model="credentials.password" class="form-control" placeholder="password">
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" ng-model="credentials.rememberMe">
+                            Remember Me?
+                        </label>
+                    </div>
+                    <button type="button" class="btn btn-default btn-xs" title="{{popover.title}}" data-content="{{popover.content}}" data-template="/signin/reset-password-popover.html" data-animation="am-flip-x" bs-popover ng-controller="ResetPasswordController">
+                        <small>Reset Forgotten Password</small>
+                    </button>
+
+                    <button ng-click="signIn(credentials)" class="btn btn-default btn-block">Sign In</button>
+
+                </form>
+
+                <br />
+                <p>
+                    or
+                    <div id="signinButton">
+                        <span class="g-signin"
+                              data-scope="https://www.googleapis.com/auth/plus.login"
+                              data-requestvisibleactions="http://schemas.google.com/AddActivity"
+                              data-clientid="344186189901-s0biv97rfrblkilmaesur4ug8vca73dj.apps.googleusercontent.com"
+                              data-accesstype="offline"
+                              data-callback="onSignInCallback"
+                              data-theme="dark"
+                              data-cookiepolicy="single_host_origin">
+                            <a href=""> sign in with your @radsinc.com email account</a>
+                        </span>
+                    </div>
+                <p>
+                    or
+                    <button type="button" class="btn btn-default btn-xs" title="{{popover.title}}" data-content="{{popover.content}}" data-template="/signin/reset-password-popover.html" data-animation="am-flip-x" bs-popover ng-controller="ResetPasswordController">
+                        <small>Reset Forgotten Password</small>
+                    </button>
+                </p>
+
+
+            <div ng-if="false" class="text-center">
+                <br>
+                <p>Or sign in using</p>
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-facebook-square"></i>Facebook</button>
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-linkedin-square"></i>LinkedIn</button>
+            </div>
+
+        </div>
+        -->
+
+        
+    </div> 
+</div>

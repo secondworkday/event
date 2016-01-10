@@ -1,0 +1,207 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="AngularJS-SignalR.Master.cs" Inherits="WebApp.AngularJS_SignalR" %>
+
+<%@ Register Namespace="MS.WebUtility" Assembly="MS.WebUtility" TagPrefix="util" %>
+<%--Remember to Register additional assemblies here or in web.config--%>
+
+<!DOCTYPE html>
+
+<html lang="en" ng-app="myApp">
+<head runat="server">
+
+    <meta charset="utf-8">  <!-- it's important for d3.js -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+
+
+    <!-- Bootstrap -->
+<%if (includeAngularUI || includeAngularStrap || includeAngularStrapTypeahead) { %>
+    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/Content/bootstrap.css")%>">
+<% } %>
+
+
+    <!-- Angular-Material -->
+<%if (includeAngularMaterial) { %>
+    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/Content/angular-material/angular-material.css")%>">
+    <!-- extra, overriding theme files -->
+    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/scripts/angular-material/themes/indigo-theme.css")%>">
+    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/scripts/angular-material/themes/green-theme.css")%>">
+<% } %>
+
+<%if (includeAngularMaterialCdnLatest) { %>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-material/0.10.0-rc2/angular-material.css">
+    <!-- extra, overriding theme files -->
+    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/scripts/angular-material/themes/indigo-theme.css")%>">
+    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/scripts/angular-material/themes/green-theme.css")%>">
+<% } %>
+
+
+<%if (this.includeD3) { %>
+    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/Content/nv.d3.css")%>">
+<% } %>
+
+
+<%if (includePlayingCards) { %>
+    <link rel="stylesheet" href="/js/angular-playing-cards/angular-playing-cards.css">
+<% } %>
+
+
+
+    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/Content/font-awesome.min.css")%>">
+
+    <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Roboto:400,300,500,700,400italic,300italic'>
+
+    <asp:ContentPlaceHolder ID="css" runat="server"></asp:ContentPlaceHolder>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- http://momentjs.com/ -->
+    <script src="<%=VersionedUri.MapPath("/Scripts/moment.min.js")%>"></script>
+    <!-- http://code.google.com/p/x2js/ -->
+    <script src="<%=VersionedUri.MapPath("/js/xml2json.min.js")%>"></script>
+    <script src="<%=VersionedUri.MapPath("/Scripts/json2.min.js")%>"></script>
+    <script src="<%=VersionedUri.MapPath("/Scripts/jquery-2.1.4.js")%>"></script>
+    <script src="<%=VersionedUri.MapPath("/Scripts/jquery.signalR-2.2.0.js")%>"></script>
+    <script src="/signalr/hubs"></script>
+
+
+    <script src="<%=VersionedUri.MapPath("/Scripts/angular.js")%>"></script>
+    <script src="<%=VersionedUri.MapPath("/Scripts/angular-animate.min.js")%>"></script>
+    <script src="<%=VersionedUri.MapPath("/Scripts/angular-aria.min.js")%>"></script>
+
+    <script src="<%=VersionedUri.MapPath("/Scripts/angular-sanitize.js")%>"></script>
+    <script src="<%=VersionedUri.MapPath("/Scripts/angular-ui-router.js")%>"></script>
+
+<%if (includeAngularMaterial) { %>
+    <script src="<%=VersionedUri.MapPath("/scripts/angular-material.js")%>"></script>
+<% } %>
+
+<%if (includeAngularMaterialCdnLatest) { %>
+    <!-- <script src="< % =VersionedUri.MapPath("/scripts/hammerjs/hammer.min.js")%>"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material/0.10.0-rc2/angular-material.js"></script>
+<% } %>
+
+
+<%if (this.includeD3) { %>
+    <script src="<%=VersionedUri.MapPath("/scripts/d3/d3.js")%>"></script>
+    <script src="<%=VersionedUri.MapPath("/scripts/nv.d3.js")%>"></script>
+    <script src="<%=VersionedUri.MapPath("/scripts/angular-nvd3.js")%>"></script>
+<% } %>
+
+
+    <%-- https://github.com/gajus/angular-swing --%>
+    <script src="<%=VersionedUri.MapPath("/js/angular-swing.js")%>"></script>
+    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/js/angular-swing.card-stack.css")%>">
+
+
+
+
+
+    <%-- https://github.com/mkwidzinska/editablespan --%>
+    <script src="<%=VersionedUri.MapPath("/js/mk-editable-span.js")%>"></script>
+    <!-- http://ngmodules.org/modules/ngInfiniteScroll -->
+    <script src="<%=VersionedUri.MapPath("/js/ng-infinite-scroll-1.2.0.js")%>"></script>
+    <!-- https://github.com/urish/angular-moment -->
+    <script src="<%=VersionedUri.MapPath("/Scripts/angular-moment.js")%>"></script>
+
+    <%-- http://mbenford.github.io/ngTagsInput/--%>
+    <script src="<%=VersionedUri.MapPath("/Scripts/ng-tags-input/ng-tags-input.min.js")%>"></script>
+
+    <%-- http://vitalets.github.io/angular-xeditable/--%>
+    <script src="<%=VersionedUri.MapPath("/Scripts/angular-xeditable/xeditable.min.js")%>"></script>
+
+    <!-- https://github.com/nervgh/angular-file-upload -->
+    <script src="<%=VersionedUri.MapPath("/Scripts/angular-file-upload.min.js")%>"></script>
+
+
+    <%-- AngularStrap http://mgcrea.github.io/angular-strap/ --%>
+<%if (includeAngularStrap || includeAngularStrapTypeahead) { %>
+    <script src="<%=VersionedUri.MapPath("/Scripts/angular-strap.js")%>"></script>
+    <script src="<%=VersionedUri.MapPath("/Scripts/angular-strap.tpl.js")%>"></script>
+<% } %>
+
+<%if (includeAngularUI) { %>
+    <script src="<%=VersionedUri.MapPath("/Scripts/angular-ui.js")%>"></script>
+    <script src="<%=VersionedUri.MapPath("/Scripts/angular-ui/ui-bootstrap-tpls.js")%>"></script>
+<% } %>
+
+<%if (includePlayingCards) { %>
+    <script src="<%=VersionedUri.MapPath("/js/angular-playing-cards/angular-playing-cards.js")%>"></script>
+<% } %>
+
+
+    <script>
+        var app = angular.module('myApp',
+            ['ui.router', 'ngAnimate', 'ngSanitize',
+
+                // Angular-Material
+<%if (includeAngularMaterial || includeAngularMaterialCdnLatest) { %>
+                'ngMaterial',
+<% } %>
+
+                // D3
+<%if (this.includeD3) { %>
+                'nvd3',
+<% } %>
+
+
+
+                // AngularStrap
+<%if (this.includeAngularStrap) { %>
+                'mgcrea.ngStrap',
+<% } %>
+<%if (includeAngularStrapTypeahead) { %>
+                'mgcrea.ngStrap.typeahead',
+<% } %>
+
+                // AngularUI
+<%if (includeAngularUI) { %>
+                'ui', 'ui.bootstrap',
+<% } %>
+
+<%if (includePlayingCards) { %>
+                'ngPlayingCards',
+<% } %>
+
+
+                'gajus.swing',
+                'mk.editablespan',
+                'infinite-scroll',
+                'angularMoment',
+                'ngTagsInput',
+                'xeditable',
+                'angularFileUpload'])
+        ;
+
+      app.constant('SYSTEM_INFO', <%=sysinfoObjectJson%>);
+      app.constant('SIGNIN_INFO', <%=signinPageCustomObjectJson%>);
+      app.constant('USER_STATE', <%=userStateObjectJson%>);
+
+    </script>
+
+    <script src="<%=VersionedUri.MapPath("/js/ms-utility.js")%>"></script>
+
+    <!-- Angular-Material -->
+<%if (includeAngularMaterial || includeAngularMaterialCdnLatest) { %>
+    <!-- Angular specific version of the UI Services -->
+    <script src="<%=VersionedUri.MapPath("/js/ms-utility.ui-material.js")%>"></script>
+<% } %>
+
+
+
+    <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
+</head>
+
+<body ui-view ng-controller="SpaController" >
+    <form id="form1" runat="server">
+    <div>
+        <asp:ContentPlaceHolder ID="body" runat="server"></asp:ContentPlaceHolder>
+    </div>
+    </form>
+</body>
+</html>

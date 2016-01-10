@@ -1,0 +1,91 @@
+<div layout="column" flex style="height: 100%;">
+  <md-content
+    layout="column"
+    flex
+    style="margin:2%; height:100%; padding:2%;">
+    <div
+      style="margin-top: 150px; text-align: center;">
+      <h1>Welcome</h1>
+
+<pre>{{createUserAuthToken | json}}</pre>
+
+      <p>Thank you for accepting your invitation!</p>
+      <p style="font-size: 1rem; font-style:italic; color: #e3e3e3;">(Your special code {{createUserAuthCode}} has now been used)</p>
+      <br/>
+      <br/>
+      <p>Please enter your name and create a password to continue.</p>
+    </div>
+    <div
+      style="width:50%; margin:0 auto;">
+      <form name="createAccountForm">
+        <div layout layout-sm="column">
+          <md-input-container flex>
+            <label>First Name</label>
+            <input ng-model="formData.firstName">
+          </md-input-container>
+          <md-input-container flex>
+            <label>Last Name</label>
+            <input ng-model="formData.lastName">
+          </md-input-container>
+        </div>
+        <div layout layout-sm="column">
+          <md-input-container flex>
+            <label>Password</label>
+            <input type="password" ng-model="formData.password">
+          </md-input-container>
+        </div>
+        <div style="text-align:right;">
+          <md-button ng-click="createUser()" class="md-raised md-primary">Create Account</md-button>
+        </div>
+      </form>
+    </div>
+
+  </md-content>
+</div>
+
+
+
+
+<!-- hiding old stuff -->
+<div class="u-hide">
+  <md-content class="main-content signin">
+    <h1>Welcome</h1>
+    <p>Create your account</p>
+    <hr>
+    <!-- Sign in -->
+    <p>Username</p>
+    <p>Password</p>
+    <p>Sign In</p>
+    AuthCode: {{createUserAuthCode}}<br />
+    AuthTokenData: {{createUserAuthToken}}
+  </md-content>
+  <div class="container">
+      <div class="sign-in-image-container" style="text-align:center; margin-bottom:30px;">
+          <img style="width:166px; height:55px;" src="../images/rads-logo-dark-medium.jpg" />
+      </div>
+      <div style="width: 280px; margin-left: auto; margin-right: auto;">
+      <!-- Dialog validation error feedback -->
+      <div ng-if="errorMessage" class="alert alert-error" style="color:gold;">
+          <strong>Oh Snap!</strong>
+          {{errorMessage}}
+      </div>
+      <!-- Sign in input controls -->
+      <div class="form-group">
+          <label class="sr-only" for="signInEmail">Email address</label>
+          <input type="email" id="signInEmail" ng-model="formData.email" class="form-control" placeholder="Email" style="border: none;">
+      </div>
+      <div class="form-group">
+          <label class="sr-only" for="signInPassword">Password</label>
+          <input type="password" id="signInPassword" ng-model="formData.password" class="form-control" placeholder="Password" style="border: none;">
+      </div>
+      <div class="form-group">
+          <label class="checkbox-inline" style="color:white;">
+              <input type="checkbox" ng-model="formData.rememberMe">
+              Remember Me
+          </label>
+      </div>
+        <!-- Sign in button -->
+        <button ng-click="createUser()" class="btn btn-default btn-block sign-in-button" style="">Create Account and Sign In Right Now Like</button>
+      </div>
+  </div>
+</div>
