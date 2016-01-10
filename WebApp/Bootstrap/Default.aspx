@@ -22,6 +22,8 @@
                   templateUrl: "<%=VersionedUri.MapPath("/bootstrap/bootstrap.html")%>",
                   controller: "BootstrapController",
                   data: <%=SiteConfigData%>
+                  // auth data specified in SiteConfigData -- would we be better calling it public.bootstrat?
+                  //data: { allowedRoles: [AUTHORIZATION_ROLES.anonymous] }
               })
             ;
         }]);

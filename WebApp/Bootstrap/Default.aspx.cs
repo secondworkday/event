@@ -48,6 +48,11 @@ namespace WebApp.Bootstrap
 
             this.SiteConfigData = new {
 
+
+                //data: { allowedRoles: [AUTHORIZATION_ROLES.anonymous] }
+                allowedRoles = new string[] { "Anonymous" },
+
+
                 //** Values from the running application
 
                 serverStart = utilityContext.ServerStart.ToNowRelativeString(timeZoneInfo, DateTimeDisplayFormat.AbbreviationTimeZone),
