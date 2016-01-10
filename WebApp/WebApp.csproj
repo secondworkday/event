@@ -19,6 +19,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -202,6 +203,8 @@
     <None Include="Properties\PublishProfiles\dev.socialventuresoftware.org.pubxml" />
     <Content Include="Resource.ashx" />
     <Content Include="System\Impersonate.ashx" />
+    <Content Include="templates\OSB-Reminder-Form.docx" />
+    <Content Include="templates\Table Template.xlsx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
