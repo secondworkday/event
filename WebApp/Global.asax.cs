@@ -27,8 +27,8 @@ namespace WebApp
             // (Referencing a resource causes it to be loaded and therefore registered. We do this here for our Library generated EPCategories that the library framework isn't aware of.)
             var foo = SharedEPCategory.StandardReportTitle;
 
-            var appInfo = AppInfo.Create("torq", "torqworks.com");
-            appInfo.SetProductName("TORQ");
+            var appInfo = AppInfo.Create("osb", "osb.socialventuresoftware.org");
+            appInfo.SetProductName("OSB");
             appInfo.SetDevelopmentDomainName(".torqlab.com");
             appInfo.SetProductionSiteDomainName("torq3.torqworks.com");
             appInfo.SetEmailSignature("The TORQ Team");
