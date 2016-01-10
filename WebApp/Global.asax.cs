@@ -25,7 +25,8 @@ namespace WebApp
         void Application_Start(object sender, EventArgs e)
         {
             // (Referencing a resource causes it to be loaded and therefore registered. We do this here for our Library generated EPCategories that the library framework isn't aware of.)
-            var foo = SharedEPCategory.StandardReportTitle;
+            //var foo = SharedEPCategory..StandardReportTitle;
+            var foo = SharedEPCategory.AppAssignedCategory;
 
             var appInfo = AppInfo.Create("osb", "osb.socialventuresoftware.org");
             appInfo.SetProductName("OSB");
@@ -51,7 +52,8 @@ namespace WebApp
                     }
                     catch (Exception ex)
                     {
-                        TorqContext.Current.EventLog.LogException(ex);
+                        //!! wait - I don't think SiteContext.Current is setup yet is it?
+                        SiteContext.Current.EventLog.LogException(ex);
                     }
                 });
 
@@ -127,23 +129,7 @@ namespace WebApp
 
                 var connectionManager = GlobalHost.ConnectionManager;
 
-                var siteContext = TorqContext.Create(appInfo, rootPath, appDataPath, connectionManager, AppDC.DataContextFactory, CachedTorqReferenceDataContext.DataContextFactory);
-
-                var oldCache = TenantGroup.GetCachedTenantGroupInfo().FirstOrDefault();
-                Debug.Assert(oldCache == null || oldCache is TenantGroupInfo);
-
-                // The utility layer maintains a TenantGroupInfo cache - to allow fast lookup of tenant information.
-                // We use an ExtendedTenant class, so setup that to be kept in the TenantGroupInfo cache.
-                var tenantGroupInfoPeriodicRefreshCache = PeriodicRefreshCache<TenantGroupInfoCollection>.Create("tenantGroupInfo", TimeSpan.FromSeconds(60), siteContext, ClientInfo.Create);
-
-                var refreshCache = tenantGroupInfoPeriodicRefreshCache.Refresh().FirstOrDefault();
-                Debug.Assert(refreshCache == null || refreshCache is ClientInfo);
-
-                // Switch over to run our specialized PeriodicRefreshCache
-                TenantGroup.SetTenantGroupInfoPeriodicRefreshCache(tenantGroupInfoPeriodicRefreshCache);
-
-                var newCache = TenantGroup.GetCachedTenantGroupInfo().FirstOrDefault();
-                Debug.Assert(newCache == null || newCache is ClientInfo);
+                var siteContext = SiteContext.Create(appInfo, rootPath, appDataPath, connectionManager, AppDC.DataContextFactory);
 
                 return siteContext;
             });
@@ -156,17 +142,6 @@ namespace WebApp
         // This routine extends the MS.Utility provided "Permission" check infrastructure to include Application layer permissions
         private bool permissionCheckHandler(Identity authorizedBy, MS.Utility.Permission permission, params object[] parameters)
         {
-            if (permission == Torq.Library.Permission.SharedProjectAccess)
-            {
-                return true;
-            }
-
-            if (permission == Torq.Library.Permission.AccessPepProjects)
-            {
-                //!! what's the correct check?
-                return true;
-            }
-
             // better safe than sorry...
             return false;
         }

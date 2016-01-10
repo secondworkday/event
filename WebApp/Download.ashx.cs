@@ -10,8 +10,7 @@ using MS.Utility;
 using MS.TemplateReports;
 using MS.WebUtility;
 
-using Torq.Library;
-using Torq.Library.Domain;
+using App.Library;
 
 namespace WebApp
 {
@@ -19,7 +18,7 @@ namespace WebApp
     {
         public void ProcessRequest(HttpContext context)
         {
-            var siteContext = TorqContext.Current;
+            var siteContext = SiteContext.Current;
             HttpRequest request = context.Request;
             HttpResponse response = context.Response;
 
@@ -50,7 +49,7 @@ namespace WebApp
                         var usersRowData = User.GetExportRows(appDC);
                         response.SendCsvFileToBrowser("Users.csv", usersRowData);
                         return;
-
+#if false
                     case "clients":
                         var clientsRowData = Client.GetExportRows(appDC, searchExpression);
                         response.SendCsvFileToBrowser("Clients.csv", clientsRowData);
@@ -72,14 +71,15 @@ namespace WebApp
                         }
                         //!! next gen hmm probably need some form of error page or something to handle exports gone wrong
                         return;
+#endif
                     default:
                         Debug.Fail("Unexpected type: " + type);
                         return;
                 }
             }
         }
-
-        private void exportProjectReport(HttpResponse response, AppDC appDC, TorqContext siteContext, int projectID, ReportFormat reportFormat)
+#if false
+        private void exportProjectReport(HttpResponse response, AppDC appDC, SiteContext siteContext, int projectID, ReportFormat reportFormat)
         {
             var reportGenerator = Project.GetReportGenerator(appDC, siteContext, projectID, reportFormat);
 
@@ -95,7 +95,7 @@ namespace WebApp
                 response.DownloadToBrowser("ProjectReport" + reportGenerator.ReportFileExtension, reportGenerator.ReportContentType, reportStream);
             }
         }
-
+#endif
         public bool IsReusable
         {
             get { return true; }

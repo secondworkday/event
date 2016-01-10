@@ -23,9 +23,12 @@
     <!-- Angular-Material -->
 <%if (includeAngularMaterial) { %>
     <link rel="stylesheet" href="<%=VersionedUri.MapPath("/Content/angular-material/angular-material.css")%>">
-    <!-- extra, overriding theme files -->
+
+    <!-- extra, overriding theme files 
     <link rel="stylesheet" href="<%=VersionedUri.MapPath("/scripts/angular-material/themes/indigo-theme.css")%>">
     <link rel="stylesheet" href="<%=VersionedUri.MapPath("/scripts/angular-material/themes/green-theme.css")%>">
+    -->
+
 <% } %>
 
 <%if (includeAngularMaterialCdnLatest) { %>
@@ -94,9 +97,11 @@
 <% } %>
 
 
+<%if (this.includeAngularSwing) { %>
     <%-- https://github.com/gajus/angular-swing --%>
     <script src="<%=VersionedUri.MapPath("/js/angular-swing.js")%>"></script>
     <link rel="stylesheet" href="<%=VersionedUri.MapPath("/js/angular-swing.card-stack.css")%>">
+<% } %>
 
 
 
@@ -169,7 +174,12 @@
 <% } %>
 
 
+                // D3
+<%if (this.includeAngularSwing) { %>
                 'gajus.swing',
+<% } %>
+
+
                 'mk.editablespan',
                 'infinite-scroll',
                 'angularMoment',

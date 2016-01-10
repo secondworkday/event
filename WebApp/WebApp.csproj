@@ -142,21 +142,66 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Bootstrap\bootstrap.html" />
+    <Content Include="Bootstrap\bootstrap.js" />
+    <Content Include="Bootstrap\Default.aspx" />
+    <Content Include="Content\angular-material\angular-material.css" />
+    <Content Include="Content\angular-material\angular-material.min.css" />
+    <Content Include="Content\font-awesome.css" />
+    <Content Include="Content\font-awesome.min.css" />
     <Content Include="default.html" />
     <Content Include="Global.asax" />
+    <Content Include="Spas\Material.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AngularJS-SignalR.Master.cs">
+      <DependentUpon>AngularJS-SignalR.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AngularJS-SignalR.Master.designer.cs">
+      <DependentUpon>AngularJS-SignalR.Master</DependentUpon>
+    </Compile>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Bootstrap\Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Bootstrap\Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Download.ashx.cs">
+      <DependentUpon>Download.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resource.ashx.cs">
+      <DependentUpon>Resource.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Settings.cs" />
+    <Compile Include="SiteHub.cs" />
+    <Compile Include="Spas\Material.aspx.cs">
+      <DependentUpon>Material.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Spas\Material.aspx.designer.cs">
+      <DependentUpon>Material.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Startup.cs" />
+    <Compile Include="System\Impersonate.ashx.cs">
+      <DependentUpon>Impersonate.ashx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="Download.ashx" />
+    <Content Include="AngularJS-SignalR.Master" />
     <None Include="Properties\PublishProfiles\dev.socialventuresoftware.org.pubxml" />
+    <Content Include="Resource.ashx" />
+    <Content Include="System\Impersonate.ashx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database EntityNamespace="App.Library" ContextNamespace="App.Library" Class="AppDC" BaseType="MS.WebUtility.WebUtilityDC" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+
+  <Table Name="dbo.ExtendedTenantGroup" Member="ExtendedTenantGroups">
+    <Type Name="ExtendedTenantGroup">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Address1" Type="System.String" DbType="nvarchar(100)" CanBeNull="true" />
+      <Column Name="Address2" Type="System.String" DbType="nvarchar(100)" CanBeNull="true" />
+      <Column Name="City" Type="System.String" DbType="nvarchar(100)" CanBeNull="true" />
+      <Column Name="State" Type="System.String" DbType="nvarchar(10)" CanBeNull="true" />
+      <Column Name="Zip" Type="System.String" DbType="nvarchar(10)" CanBeNull="true" />
+      <Column Name="Phone" Type="System.String" DbType="nvarchar(20)" CanBeNull="true" />
+      <Column Name="Website" Type="System.String" DbType="nvarchar(100)" CanBeNull="true" />
+      <Column Name="NumberOfSeatsContracted" Type="System.Int32" CanBeNull="false" />
+      <Column Name="ConcurrentSeatsContracted" Type="System.Int32" CanBeNull="true" />
+      <Column Name="ClientSettings" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true" />
+      <Association Name="Client_ClientLaborMarketArea" Member="ClientLaborMarketAreas" ThisKey="ID" OtherKey="ClientID" Type="ClientLaborMarketArea" />
+      <Association Name="Client_ClientCustomization" Member="ClientCustomizations" ThisKey="ID" OtherKey="ClientId" Type="ClientCustomization" />
+    </Type>
+  </Table>
+
+  <Table Name="dbo.ExtendedUser" Member="ExtendedUsers">
+    <Type Name="ExtendedUser">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="PreferredState" Type="System.String" DbType="nvarchar(10)" CanBeNull="true" />
+      <Column Name="PreferredLaborMarketArea" Type="System.String" DbType="nvarchar(10)" CanBeNull="true" />
+      <Column Name="Title" Type="System.String" DbType="nvarchar(100)" CanBeNull="true" />
+      <Column Name="Organization" Type="System.String" DbType="nvarchar(100)" CanBeNull="true" />
+      <Column Name="Address1" Type="System.String" DbType="nvarchar(100)" CanBeNull="true" />
+      <Column Name="Address2" Type="System.String" DbType="nvarchar(100)" CanBeNull="true" />
+      <Column Name="City" Type="System.String" DbType="nvarchar(100)" CanBeNull="true" />
+      <Column Name="State" Type="System.String" DbType="nvarchar(10)" CanBeNull="true" />
+      <Column Name="Zip" Type="System.String" DbType="nvarchar(10)" CanBeNull="true" />
+      <Column Name="Phone" Type="System.String" DbType="nvarchar(20)" CanBeNull="true" />
+      <Column Name="PhoneExtension" Type="System.String" DbType="nvarchar(10)" CanBeNull="true" />
+      <Column Name="SecureProperties" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true" />
+      <Column Name="CustomProperties" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true" />
+    </Type>
+  </Table>
+
+  <Table Name="dbo.ParticipantGroup" Member="ParticipantGroups">
+    <Type Name="ParticipantGroup" >
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ScopeType" Type="global::MS.Utility.ExtendedPropertyScopeType" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ScopeID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+
+      <Column Name="CreatedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+
+      <Column Name="Name" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
+      <Column Name="Overview" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true"/>
+
+      <Association Name="ParticipantGroup_Participant" Member="Participants" ThisKey="ID" OtherKey="ParticipantGroupID" Type="Participant" />
+    </Type>
+  </Table>
+
+
+  <Table Name="dbo.Participant" Member="Participants">
+    <Type Name="Participant">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ScopeType" Type="global::MS.Utility.ExtendedPropertyScopeType" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ScopeID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+
+      <Column Name="CreatedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+
+      <Column Name="Grade" Type="System.UInt32" DbType="Int" CanBeNull="true" />
+
+      <Column Name="Name" Type="System.String" DbType="nvarchar(256)" CanBeNull="true"/>
+      <Column Name="Overview" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true"/>
+
+      <Column Name="ParticipantGroupID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="ParticipantGroup_Participant" Member="ParticipantGroup" ThisKey="ParticipantGroupID" OtherKey="ID" Type="ParticipantGroup" IsForeignKey="true" />
+
+    </Type>
+  </Table>
+
+</Database>

@@ -11,7 +11,7 @@ using System.Net;
 using MS.Utility;
 using MS.WebUtility;
 
-using Torq.Library;
+using App.Library;
 
 namespace WebApp
 {
@@ -22,7 +22,7 @@ namespace WebApp
     {
         public override async Task ProcessRequestAsync(HttpContext context)
         {
-            var siteContext = TorqContext.Current;
+            var siteContext = SiteContext.Current;
             HttpRequest request = context.Request;
             HttpResponse response = context.Response;
 

@@ -12,8 +12,7 @@ using MS.Utility;
 using MS.WebUtility;
 using MS.WebUtility.Authentication;
 
-using Torq.Library;
-using Torq.Library.Domain;
+using App.Library;
 
 namespace WebApp
 {
@@ -222,7 +221,7 @@ namespace WebApp
                 }
                 catch (Exception ex)
                 {
-                    TorqContext.Current.EventLog.LogException(ex);
+                    SiteContext.Current.EventLog.LogException(ex);
                     return HubResult.Error;
                 }
             });

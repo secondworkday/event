@@ -43,9 +43,6 @@ namespace WebApp.Bootstrap
             Debug.Assert(master != null);
 
             master.includeAngularMaterial = true;
-            //!! temporarily switching to the CDN until 0.9.0 is available in nuget
-            master.includeAngularMaterial = false;
-            master.includeAngularMaterialCdnLatest = true;
 
             TimeZoneInfo timeZoneInfo = TimeZones.Parse("Pacific");
 

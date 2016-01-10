@@ -16,9 +16,13 @@ namespace App.Library
 {
     public enum AppRole
     {
-        HRManager,
-        HRRecruiter,
-        HRAssistant,
+        EventManager,
+        EventVolunteer,
+        ParticipantNominator,
+
+        //!! not sure if we need this
+        AccountAdmin,
+        GroupAdmin,
     }
 
     partial class AppDC

@@ -29,10 +29,10 @@ namespace App.Library
         public static readonly EPCategory AppAssignedCategory = EPCategory.CreateMultiple("AppAssigned", 1);
 
 
-        public static readonly EPCategory VideoTagsCategory = EPCategory.CreateSingle<Video>("Quality");
+        //public static readonly EPCategory VideoTagsCategory = EPCategory.CreateSingle<Video>("Quality");
 
         // NzbPost
-        public static EPCategory NzbPostGroupsCategory = EPCategory.CreateMultiple<NzbPost>("Group");
+        //public static EPCategory NzbPostGroupsCategory = EPCategory.CreateMultiple<NzbPost>("Group");
         // Note: (we track processing via EPCategory_App)
 
 

@@ -28,8 +28,9 @@
     </script>
 
 
-    <!-- Le styles -->
+    <!-- Le styles 
     <link href="/content/bootstrap.css" rel="stylesheet">
+    -->
     <style type="text/css">
 
     </style>

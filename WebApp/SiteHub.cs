@@ -14,11 +14,8 @@ using MS.Utility;
 using MS.WebUtility;
 using MS.WebUtility.Authentication;
 
-using Torq.Library;
-using Torq.Library.Domain;
+using App.Library;
 //using System.Configuration;
-using Torq.Library.Touch;
-using Torq.Library.Education;
 
 namespace WebApp
 {
@@ -28,50 +25,23 @@ namespace WebApp
         /// <summary>
         /// Authenticates based on Context identity, and uses provides routines to handle authenticated and anonymous cases
         /// </summary>
-        protected T standardHeaderXXX<T>(Func<TorqContext, AppDC, T> authenticatedHandler, Func<T> anonymousHandler)
+        protected T standardHeaderXXX<T>(Func<SiteContext, AppDC, T> authenticatedHandler, Func<T> anonymousHandler)
         {
-            return IdentityHeader(BaseHub.AccountsOnlyDataContextFactory<AppDC>, dc => authenticatedHandler(TorqContext.Current, dc), anonymousHandler);
+            return IdentityHeader(BaseHub.AccountsOnlyDataContextFactory<AppDC>, dc => authenticatedHandler(SiteContext.Current, dc), anonymousHandler);
         }
 
-        protected HubResult authTokenHeader(AuthCode authCode, Func<TorqContext, AppDC, AuthToken, HubResult> authTokenHandler)
+        protected HubResult authTokenHeader(AuthCode authCode, Func<SiteContext, AppDC, AuthToken, HubResult> authTokenHandler)
         {
-            return AuthTokenHeader<AppDC>(authCode, (dc, authToken) => authTokenHandler(TorqContext.Current, dc, authToken));
+            return AuthTokenHeader<AppDC>(authCode, (dc, authToken) => authTokenHandler(SiteContext.Current, dc, authToken));
         }
 
         /// <summary>
         /// Authenticates based on Context identity, only processes authenticated case. Anonymous users receive HubResult.Unauthorized
         /// </summary>
-        protected HubResult accountsOnlyHeader(Func<TorqContext, AppDC, HubResult> accountsOnlyHandler)
+        protected HubResult accountsOnlyHeader(Func<SiteContext, AppDC, HubResult> accountsOnlyHandler)
         {
-            return IdentityHeader(BaseHub.AccountsOnlyDataContextFactory<AppDC>, dc => accountsOnlyHandler(TorqContext.Current, dc));
+            return IdentityHeader(BaseHub.AccountsOnlyDataContextFactory<AppDC>, dc => accountsOnlyHandler(SiteContext.Current, dc));
         }
-
-        protected HubResult referenceOnlyHeader(string referenceDatabaseNamePrefix, Func<TorqContext, CachedTorqReferenceDataContext, HubResult> referenceOnlyHandler)
-        {
-            // whip up a little function that 
-            Func<UtilityContext, DateTime, Identity, string, CachedTorqReferenceDataContext> referenceOnlyDataContextFactory =
-                (utilityContext, requestTimestamp, authorizedBy, connectionID) => utilityContext.CreateRuntimeReferenceOnlyDC<CachedTorqReferenceDataContext>(referenceDatabaseNamePrefix, requestTimestamp, authorizedBy);
-
-            return IdentityHeader(referenceOnlyDataContextFactory, dc => referenceOnlyHandler(TorqContext.Current, dc));
-        }
-
-        protected HubResult accountsAndReferenceHeader(string referenceDatabaseNamePrefix, Func<TorqContext, CachedTorqReferenceDataContext, HubResult> standardHandler)
-        {
-            // Establish the official Timestamp for this request. Standard HttpRequests include this, but SignalR requests don't.
-            var requestTimestamp = DateTime.UtcNow;
-            Identity authorizedBy = Context.User.Identity as Identity;
-            var siteContext = TorqContext.Current;
-
-            using (var referenceDC = siteContext.CreateRuntimeReferenceOnlyDC<CachedTorqReferenceDataContext>(referenceDatabaseNamePrefix, requestTimestamp, authorizedBy))
-            {
-                var result = standardHandler(siteContext, referenceDC);
-                return result;
-            }
-        }
-
-
-
-
 
 
 
@@ -155,26 +125,6 @@ namespace WebApp
 #endif
 
 
-        private HubResult standardReferenceOnlyHeader(string referenceDatabaseNamePrefix, Func<TorqContext, CachedTorqReferenceDataContext, HubResult> standardHandler)
-        {
-            // Establish the official Timestamp for this request. Standard HttpRequests include this, but SignalR requests don't.
-            var requestTimestamp = DateTime.UtcNow;
-            Identity authorizedBy = Context.User.Identity as Identity;
-            var siteContext = TorqContext.Current;
-
-            using (var referenceDC = siteContext.CreateRuntimeReferenceOnlyDC<CachedTorqReferenceDataContext>(referenceDatabaseNamePrefix, requestTimestamp, authorizedBy))
-            {
-                var result = standardHandler(siteContext, referenceDC);
-                return result;
-            }
-        }
-
-
-
-
-
-
-
 
         public HubResult CreateTenant(string name, dynamic data)
         {
@@ -233,46 +183,7 @@ namespace WebApp
 
 
 
-        public HubResult SearchCompanyLayTitle(string searchExpressionString, string sortField, int startRowIndex, int maximumRows)
-        {
-            return accountsOnlyHeader((siteContext, dc) =>
-            {
-                var searchExpression = SearchExpression.Create(searchExpressionString);
-                var result = CompanyLayTitle.Search(dc, searchExpression, sortField, startRowIndex, maximumRows);
-                return HubResult.CreateSuccessData(result);
-            });
-        }
-
-
-        public HubResult SetCompanyLayTitleNoMatch(int itemID)
-        {
-            return accountsOnlyHeader((siteContext, dc) =>
-            {
-                return CompanyLayTitle.SetNoMatch(dc, itemID);
-            });
-        }
-
-        public HubResult SetCompanyLayTitleMatch(int itemID, string companyName)
-        {
-            return accountsOnlyHeader((siteContext, dc) =>
-            {
-                return CompanyLayTitle.SetMatch(dc, itemID, companyName);
-            });
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#if false
         public HubResult CreateJobSeeker(dynamic data)
         {
             var demoTenantID = TenantGroup.GetCachedTenantGroupInfo()
@@ -324,8 +235,6 @@ namespace WebApp
             });
         }
 
-
-
         public HubResult CreateDemoJobSeeker()
         {
             var demoTenantID = TenantGroup.GetCachedTenantGroupInfo()
@@ -354,7 +263,7 @@ namespace WebApp
                 return HubResult.CreateSuccessData(new { id = demoCareerProfile.ID, email = userMailAddress.Address });
             });
         }
-
+#endif
 
 
         public HubResult SendUserSignupInvitation(string email, dynamic data)
@@ -384,6 +293,7 @@ namespace WebApp
 
 
 
+#if false
         #region Career Profiles
 
         //!! a career profile ID is a user ID, right?
@@ -903,7 +813,7 @@ namespace WebApp
 
 
         #endregion
-
+#endif
 
 
 
@@ -937,97 +847,6 @@ namespace WebApp
 
         #endregion
 #endif
-
-
-
-
-
-
-
-
-
-
-        #region Clients
-
-        // Clients is the generic term for Job Seekers - and end user served by TORQ
-        public HubResult GetClients()
-        {
-            return GetClients(0, int.MaxValue);
-        }
-
-        public HubResult GetClients(int startRowIndex, int maximumRows)
-        {
-
-#if false
-            using (var referenceDC = TorqContext.Current.CreateRuntimeReferenceOnlyDC<CachedTorqReferenceDataContext>("torq_reference_v6"))
-            {
-                var zipCodeLma = LaborMarketArea.ParseZipCode(referenceDC, "98077");
-                if (zipCodeLma != null)
-                {
-                }
-            }
-#endif
-
-
-            return accountsOnlyHeader((siteContext, dc) =>
-            {
-                var sortField = "";
-                var result = CareerProfile.Search(dc, SearchExpression.Empty, sortField, startRowIndex, maximumRows);
-
-#if false
-
-                var result = Project.Query(dc, SearchExpression.Empty, sortField, startRowIndex, maximumRows)
-                    .Select(project => new 
-                    {
-                        id = project.ProjectID,
-                        name = project.Name,
-                    })
-                    .ToArray();
-#endif
-                return HubResult.CreateSuccessData(result);
-            });
-        }
-
-        public HubResult SearchClients(string searchExpressionString)
-        {
-            return SearchClients(searchExpressionString, string.Empty, 0, int.MaxValue);
-        }
-
-        public HubResult SearchClients(string searchExpressionString, string sortField, int startRowIndex, int maximumRows)
-        {
-            return accountsOnlyHeader((siteContext, dc) =>
-            {
-                var searchExpression = SearchExpression.Create(searchExpressionString);
-                var result = CareerProfile.Search(dc, searchExpression, sortField, startRowIndex, maximumRows);
-                return HubResult.CreateSuccessData(result);
-            });
-        }
-
-        public HubResult ModifyClientTag(int itemID, string tagName, bool isAssigned)
-        {
-            return accountsOnlyHeader((siteContext, dc) =>
-            {
-                return Client.ModifyTag(dc, itemID, tagName, isAssigned);
-            });
-        }
-
-        public HubResult ModifyClientMyTag(int itemID, string tagName, bool isAssigned)
-        {
-            return accountsOnlyHeader((siteContext, dc) =>
-            {
-                return Client.ModifyMyTag(dc, itemID, tagName, isAssigned);
-            });
-        }
-
-        public HubResult ModifyClientMyFavorite(int itemID, bool isFavorite)
-        {
-            return accountsOnlyHeader((siteContext, dc) =>
-            {
-                return Client.ModifyMyFavorite(dc, itemID, isFavorite);
-            });
-        }
-
-        #endregion
 
 
 
@@ -1144,36 +963,18 @@ namespace WebApp
 
 
 
-        public Task<HubResult> GetExtendedJobPostings(dynamic touch, Newtonsoft.Json.Linq.JArray selection, IProgress<HubProgress> hubProgress)
-        {
-            return JobBoardsTest.GetExtendedJobPostingsAsync(touch, selection, hubProgress);
-        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#if false
         // Kicks of a long running Task and immediately returns. Caller can use VespaTrackJob if interested in progress/outcome.
         // JobDataHubResult
         public HubResult StartAutocoderThroughputTestTask(object parameters)
         {
-            var siteContext = TorqContext.Current;
+            var siteContext = SiteContext.Current;
 
             var hubResult = siteContext.TaskManager.StartNewTask(async (cancelationToken, progress) => await AutoCoderThroughputTest.Run(parameters, cancelationToken, progress));
             return hubResult;
         }
+#endif
 
 #if false
         public async Task<HubResult> VespaTrackTask(int taskID, IProgress<HubProgress> iProgress)
@@ -1200,7 +1001,7 @@ namespace WebApp
 
         public HubResult CancelTask(int taskID)
         {
-            var siteContext = TorqContext.Current;
+            var siteContext = SiteContext.Current;
             return siteContext.TaskManager.CancelTask(taskID);
         }
 
@@ -1210,387 +1011,7 @@ namespace WebApp
 
 
 
-
-
-
-
-        //public HubResult GenerateCsvFile(dynamic touch, Newtonsoft.Json.Linq.JArray selection)
-        //{
-        //    JobBoardsTest test = new JobBoardsTest();
-        //    var result = test.GenerateCsvFile(touch, selection);
-
-        //    return HubResult.CreateSuccessData(result);
-        //}
-
-        public HubResult GetZipCodeInfo(string zipCodeString)
-        {
-            return standardReferenceOnlyHeader("torq_reference_v", (siteContext, referenceDC) =>
-            {
-                var zip = referenceDC.Zips
-                    .Where(z => z.ZIPCode == zipCodeString)
-                    // table contains values 'A', 'D', and 'N'. Not sure what they mean, but 'N' seems to stand for secondary names. Alphabetical ordering seems to suit us
-                    .OrderBy(z => z.CityType)
-                    .FirstOrDefault();
-                if (zip == null)
-                {
-                    return HubResult.CreateError("Unrecognized zip code");
-                }
-
-                var result = new
-                {
-                    zipCode = zip.ZIPCode,
-                    name = string.Format("{0}, {1}",
-                        zip.CityName, zip.StateAbbr),
-                };
-                return HubResult.CreateSuccessData(result);
-            });
-
 #if false
-            var utilityContext = UtilityContext.Current;
-            // (This should get us the most recent reference DB. Hopefully ZipCodes haven't changed from the reference DB being used by the caller)
-            using (var referenceDC = utilityContext.CreateRuntimeReferenceOnlyDC<CachedTorqReferenceDataContext>("torq_reference_v"))
-            {
-                if (!utilityContext.IsProductionServer)
-                {
-                    StackFrame callerStackFrame = new StackFrame(1);
-                    string callerMethodName = "SiteHub: " + callerStackFrame.GetMethod().Name;
-
-                    referenceDC.TrackDatabaseCalls(performanceItem =>
-                    {
-                        var requestItem = RequestItem.Create(callerMethodName, null, performanceItem);
-                        utilityContext.RequestLog.Add(requestItem);
-                    });
-                }
-
-                var zip = referenceDC.Zips
-                    .Where(z => z.ZIPCode == zipCodeString)
-                    // table contains values 'A', 'D', and 'N'. Not sure what they mean, but 'N' seems to stand for secondary names. Alphabetical ordering seems to suit us
-                    .OrderBy(z => z.CityType)
-                    .FirstOrDefault();
-                if (zip == null)
-                {
-                    return HubResult.CreateError("Unrecognized zip code");
-                }
-
-                var result = new
-                {
-                    zipCode = zip.ZIPCode,
-                    name = string.Format("{0}, {1}",
-                        zip.CityName, zip.StateAbbr),
-                };
-                return HubResult.CreateSuccessData(result);
-            }
-#endif
-        }
-
-
-        // ** Occupation AuxiliaryData Related
-        public HubResult GetOccupationAuxiliaryData(string itemCode)
-        {
-            var utilityContext = UtilityContext.Current;
-
-            OccupationCode occupationCode = OccupationCode.Create(itemCode);
-
-            var auxiliaryDataMap = TorqContext.Current.OccupationAuxiliaryData;
-            Debug.Assert(auxiliaryDataMap != null);
-
-            var auxiliaryData = auxiliaryDataMap.GetValueOrDefault(occupationCode.OnetCode, OnetOccupation.AuxiliaryData.NotFound);
-
-            // Ensure even in the NotFound case, we still provide the code
-            auxiliaryData.OnetCode = occupationCode.OnetCode;
-
-            return HubResult.CreateSuccessData(auxiliaryData);
-        }
-
-
-        // ** Occupation Related
-
-        public HubResult SearchOccupations(string searchExpressionString)
-        {
-            return SearchOccupations(searchExpressionString, string.Empty, 0, int.MaxValue);
-        }
-
-        public HubResult SearchOccupations(string searchExpressionString, string sortField, int startRowIndex, int maximumRows)
-        {
-
-            return standardReferenceOnlyHeader("torq_reference_v", (siteContext, referenceDC) =>
-            {
-                var searchExpression = SearchExpression.Create(searchExpressionString);
-
-                var result = OnetOccupation.Search(referenceDC, searchExpression, sortField, startRowIndex, maximumRows);
-                return HubResult.CreateSuccessData(result);
-            });
-        }
-
-
-        public HubResult GetOccupationInfo(string referenceDatabaseNamePrefix, string searchTerm, int limit)
-        {
-            var utilityContext = UtilityContext.Current;
-
-            // (grab the most recent Reference DB)
-            using (var referenceDC = utilityContext.CreateRuntimeReferenceOnlyDC<CachedTorqReferenceDataContext>(referenceDatabaseNamePrefix ?? "torq_reference_v"))
-            {
-                Debug.Assert(referenceDC.TransactionAuthorizedBy != null);
-
-                TorqStopwatch queryTimer = TorqStopwatch.StartNew();
-
-                bool includeMilitary = true;
-                var results = OnetOccupation.LayTitleSearch(referenceDC, OnetOccupation.Set.To, searchTerm, includeMilitary)
-                    .Select(result => new
-                    {
-                        result.DisplayTitle,
-                        result.OccupationCode.Code,
-
-                        code = result.OccupationCode.Code,
-                        title = result.OccupationTitle,
-                        layTitle = result.LayTitle,
-                    })
-                    .Take(limit)
-                    .ToArray();
-
-                queryTimer.Stop();
-                TimeSpan queryTime = queryTimer.Elapsed;
-
-                TorqContext.Current.LogAjaxResults("GetOccupations()", queryTime, "q/limit/count", searchTerm, limit, results.Length);
-
-                return HubResult.CreateSuccessData(results);
-            }
-        }
-
-
-
-
-        public HubResult SetOccupationTitle(string itemCode, string title)
-        {
-            return standardReferenceOnlyHeader("torq_reference_v", (siteContext, referenceDC) =>
-            {
-                OccupationCode occupationCode = OccupationCode.Create(itemCode);
-                return siteContext.OccupationAuxiliaryData.SetTitle(referenceDC, occupationCode, title);
-            });
-        }
-
-        public HubResult SetOccupationDescription(string itemCode, string description)
-        {
-            return standardReferenceOnlyHeader("torq_reference_v", (siteContext, referenceDC) =>
-            {
-                OccupationCode occupationCode = OccupationCode.Create(itemCode);
-                return siteContext.OccupationAuxiliaryData.SetDescription(referenceDC, occupationCode, description);
-            });
-        }
-
-        public HubResult SetOccupationReleaseState(string itemCode, OnetOccupation.ReleaseState releaseState)
-        {
-            return standardReferenceOnlyHeader("torq_reference_v", (siteContext, referenceDC) =>
-            {
-                OccupationCode occupationCode = OccupationCode.Create(itemCode);
-                Debug.Assert(occupationCode != null && occupationCode.HasOnetCode);
-
-                return siteContext.OccupationAuxiliaryData.SetReleaseState(referenceDC, occupationCode, releaseState);
-            });
-        }
-
-        public HubResult SetOccupationHeroImageLicense(string itemCode, string license)
-        {
-            return standardReferenceOnlyHeader("torq_reference_v", (siteContext, referenceDC) =>
-            {
-                OccupationCode occupationCode = OccupationCode.Create(itemCode);
-                return siteContext.OccupationAuxiliaryData.SetHeroImageLicense(referenceDC, occupationCode, license);
-            });
-        }
-
-        public HubResult SetOccupationHeroImageSource(string itemCode, string source)
-        {
-            return standardReferenceOnlyHeader("torq_reference_v", (siteContext, referenceDC) =>
-            {
-                OccupationCode occupationCode = OccupationCode.Create(itemCode);
-                return siteContext.OccupationAuxiliaryData.SetHeroImageSource(referenceDC, occupationCode, source);
-            });
-        }
-
-        public HubResult SetOccupationHeroImageFocalPoint(string itemCode, int x, int y)
-        {
-            return standardReferenceOnlyHeader("torq_reference_v", (siteContext, referenceDC) =>
-            {
-                OccupationCode occupationCode = OccupationCode.Create(itemCode);
-                return siteContext.OccupationAuxiliaryData.SetHeroImageFocusPoint(referenceDC, occupationCode, x, y);
-            });
-        }
-
-
-
-
-
-
-
-
-
-
-
-        public HubResult CreateOccupationBundle(string name, dynamic data)
-        {
-            return accountsOnlyHeader((utilityContext, dc) =>
-            {
-                var epScope = EPScope.Global;
-                return CustomSet.Create(dc, epScope, name, data);
-            });
-        }
-
-        public HubResult DeleteOccupationBundle(int itemID)
-        {
-            return accountsOnlyHeader((siteContext, dc) =>
-            {
-                return CustomSet.Delete(dc, itemID);
-            });
-        }
-
-        public HubResult SearchOccupationBundles(string searchExpressionString, string sortField, int startRowIndex, int maximumRows)
-        {
-            return accountsOnlyHeader((siteContext, dc) =>
-            {
-                var searchExpression = SearchExpression.Create(searchExpressionString);
-
-                //!! add a way to filter just to OccupationBundles, and not any other types of CustomSets we might want to use
-                var result = CustomSet.Search(dc, searchExpression, sortField, startRowIndex, maximumRows);
-                return HubResult.CreateSuccessData(result);
-            });
-        }
-
-        public HubResult ModifyOccupationBundleMember(int itemID, string memberCode, bool isAssigned)
-        {
-            return accountsOnlyHeader((siteContext, dc) =>
-            {
-                CustomSet.ModifySet(dc, itemID, memberCode, isAssigned);
-                return HubResult.Success;
-            });
-        }
-
-
-
-
-
-
-
-
-#if false
-        public HubResult AddCustomSetCode(int setID, string setCode)
-        {
-            return accountsOnlyHeader((siteContext, dc) =>
-            {
-                CustomSet.AddSetCode(dc, setID, setCode);
-
-                return HubResult.Success;
-            });
-        }
-
-        public HubResult RemoveOccupationBundleOccupation(int setID, string setCode)
-        {
-            return accountsOnlyHeader((siteContext, dc) =>
-            {
-                CustomSet.RemoveSetCode(dc, setID, setCode);
-
-                return HubResult.Success;
-            });
-        }
-#endif
-
-
-
-
-
-
-
-        public HubResult GetRandomLayTitle(string searchTerm)
-        {
-            var utilityContext = UtilityContext.Current;
-
-            // (grab the most recent Reference DB)
-            using (var referenceDC = utilityContext.CreateRuntimeReferenceOnlyDC<CachedTorqReferenceDataContext>("torq_reference_v"))
-            {
-                Debug.Assert(referenceDC.TransactionAuthorizedBy != null);
-
-                var randomLayTitle = LayTitle.Query(referenceDC)
-                    .Select(layTitle => new
-                    {
-                        id = layTitle.LayTitleID,
-                        title = layTitle.Title,
-                        onetCode = layTitle.OnetCode,
-                    })
-                    .ChooseRandom();
-
-                return HubResult.CreateSuccessData(randomLayTitle);
-            }
-        }
-
-        public async Task<HubResult> GetAutoCoderOccupationInfo(string searchTerm, int limit)
-        {
-            TorqStopwatch queryTimer = TorqStopwatch.StartNew();
-
-            var provider = BaseExternalProvider.GetName(BaseExternalProvider.Providers.AutoCoder);
-            var results = await TorqContext.Current.GetAutoCoderOccupationsAsync(searchTerm, limit);
-
-
-            queryTimer.Stop();
-            TimeSpan queryTime = queryTimer.Elapsed;
-
-            TorqContext.Current.LogAjaxResults("GetOccupations()", queryTime, "q/limit/count", searchTerm, limit);
-
-            return HubResult.CreateSuccessData(results.Take(limit));
-        }
-
-
-        public async Task<HubResult> LookupOccupation(string referenceDatabaseNamePrefix, string searchTerm, int limit)
-        {
-            var siteContext = TorqContext.Current;
-
-            if (string.IsNullOrEmpty(referenceDatabaseNamePrefix) || !referenceDatabaseNamePrefix.StartsWith("torq_reference_v"))
-            {
-                return HubResult.Error;
-            }
-
-            TorqStopwatch queryTimer = TorqStopwatch.StartNew();
-            try
-            {
-                try
-                {
-                    var results = await siteContext.GetAutoCoderOccupationsAsync(searchTerm, limit);
-                    return HubResult.CreateSuccessData(results.Take(limit));
-                }
-                catch (Exception)
-                {
-                }
-
-                using (var referenceDC = siteContext.CreateRuntimeReferenceOnlyDC<CachedTorqReferenceDataContext>(referenceDatabaseNamePrefix))
-                {
-                    Debug.Assert(referenceDC.TransactionAuthorizedBy != null);
-
-                    bool includeMilitary = true;
-                    var results = OnetOccupation.LayTitleSearch(referenceDC, OnetOccupation.Set.To, searchTerm, includeMilitary)
-                        .Select(result => new
-                        {
-                            result.DisplayTitle,
-                            result.OccupationCode.Code,
-
-                            code = result.OccupationCode.Code,
-                            title = result.OccupationTitle,
-                            layTitle = result.LayTitle,
-                        })
-                        .Take(limit)
-                        .ToArray();
-
-                    return HubResult.CreateSuccessData(results);
-                }
-            }
-            finally
-            {
-                queryTimer.Stop();
-                TimeSpan queryTime = queryTimer.Elapsed;
-                TorqContext.Current.LogAjaxResults("LookupJobTitle()", queryTime, "q/limit/count", searchTerm, limit);
-            }
-        }
-
-
-
-
         public HubResult GetProjects()
         {
             return GetProjects(0, int.MaxValue);
@@ -1696,7 +1117,7 @@ namespace WebApp
                 return Project.EmailReport(dc, itemID, emailType, mailMessageData);
             });
         }
-
+#endif
 
 
 
@@ -1710,47 +1131,6 @@ namespace WebApp
             return "Job complete!";
         }
 
-        public async Task<HubResult> GetTouchOccupations(string occupationCodeString, string zipCodeString, IProgress<string> progress)
-        {
-            Identity authorizedBy = Context.User.Identity as Identity;
-            var siteContext = TorqContext.Current;
-
-            using (var dc = siteContext.CreateDefaultAccountsOnlyDC<AppDC>(DateTime.UtcNow, authorizedBy))
-            {
-                using (var referenceDC = siteContext.CreateRuntimeReferenceOnlyDC<CachedTorqReferenceDataContext>("torq_reference_v"))
-                {
-                    var occupationCode = OccupationCode.FromOnetCode(occupationCodeString);
-
-                    var zip = referenceDC.Zips
-                        .Where(z => z.ZIPCode == zipCodeString)
-                        // table contains values 'A', 'D', and 'N'. Not sure what they mean, but 'N' seems to stand for secondary names. Alphabetical ordering seems to suit us
-                        .OrderBy(z => z.CityType)
-                        .FirstOrDefault();
-                    if (zip == null)
-                    {
-                        //!!!!!return HubResult.CreateError("Unrecognized zip code");
-                    }
-
-                    var zipCodeToLmaCodeItem = LaborMarketArea.ParseZipCode(referenceDC, zipCodeString);
-                    if (zipCodeToLmaCodeItem == null)
-                    {
-                        //!!!!!!return HubResult.CreateError("Unrecognized zip code");
-                    }
-
-                    var zipCodeLma = referenceDC.LaborMarketAreas
-                        .Where(lma => lma.LaborMarketAreaCode == zipCodeToLmaCodeItem.LaborMarketAreaCode)
-                        .FirstOrDefault();
-                    Debug.Assert(zipCodeLma != null);
-
-                    var touchContext = Torq.Library.Touch.TouchContext.Create(siteContext, Context.ConnectionId, progress);
-
-                    await Task.Delay(200);
-
-                    var result = await Torq.Library.Touch.TouchStrategy.SurpriseMe(referenceDC, touchContext, occupationCode, zipCodeLma, zip);
-                    return result;
-                }
-            }
-        }
 
 #if false
         public async Task<HubResult> GetTouchJobs(string occupationCodeString, string zipCodeString, int searchRadius, IProgress<string> progress)
@@ -1793,74 +1173,7 @@ namespace WebApp
 #endif
 
 
-
-        public HubResult SearchIpedsEducationPrograms(string referenceDatabaseNamePrefix, string searchExpressionString, string sortField, int startRowIndex, int maximumRows)
-        {
-            return referenceOnlyHeader(referenceDatabaseNamePrefix, (siteContext, referenceOnlyDC) =>
-            {
-                var searchExpression = SearchExpression.Create(searchExpressionString);
-                var result = Program.Search(referenceOnlyDC, searchExpression, sortField, startRowIndex, maximumRows);
-                return HubResult.CreateSuccessData(result);
-            });
-        }
-
-
-
-        public HubResult GetIpedsEducationPrograms(string occupationCodeString, string zipCodeString, IProgress<string> progress)
-        {
-            var siteContext = TorqContext.Current;
-
-            using (var referenceDC = siteContext.CreateRuntimeReferenceOnlyDC<CachedTorqReferenceDataContext>("torq_reference_v"))
-            {
-                var occupationCode = OccupationCode.Create(occupationCodeString);
-
-                var onetOccupation = OnetOccupation.GetByOnetCode(referenceDC, occupationCodeString);
-                Debug.Assert(onetOccupation != null);
-
-
-                double defaultRadius = 1000;
-
-                var zipCode = referenceDC.Zips
-                    .Where(zip => zip.ZIPCode == zipCodeString)
-                    .FirstOrDefault();
-
-                var state = zipCode.StateAbbr;
-
-                var educationPrograms = School.GetProgramListByOnetCode(referenceDC, onetOccupation, state, zipCodeString, defaultRadius);
-
-                return HubResult.CreateSuccessData(educationPrograms);
-            }
-        }
-
-
-
-        public HubResult GetEducationInfo()
-        {
-            var siteContext = TorqContext.Current;
-
-            using (var referenceDC = siteContext.CreateRuntimeReferenceOnlyDC<CachedTorqReferenceDataContext>("torq_reference_v"))
-            {
-                return StateWioaEducationItems.GetInfo(siteContext, referenceDC);
-            }
-        }
-
-
-        public HubResult GetEducationPrograms(string occupationCodeString, string zipCodeString, IProgress<string> progress)
-        {
-            var siteContext = TorqContext.Current;
-
-            using (var referenceDC = siteContext.CreateRuntimeReferenceOnlyDC<CachedTorqReferenceDataContext>("torq_reference_v"))
-            {
-                var occupationCode = OccupationCode.Create(occupationCodeString);
-
-                //!! 
-                var old = Torq.Library.Education.StateEducationProgramItems.GetEducationPrograms(referenceDC, occupationCode, zipCodeString);
-
-                var educationPrograms = StateWioaEducationProgramItem.GetEducationOptions(referenceDC, occupationCode, zipCodeString);
-                return HubResult.CreateSuccessData(educationPrograms);
-            }
-        }
-
+#if false
         public HubResult SendJobPostingsEmail(string email, Newtonsoft.Json.Linq.JArray jobPostings)
         {
             if (string.IsNullOrEmpty(email))
@@ -1944,7 +1257,7 @@ namespace WebApp
                 return HubResult.Success;
             }
         }
-
+#endif
 
 
 #if false

@@ -21,6 +21,7 @@ namespace WebApp
         public bool includeAngularMaterialCdnLatest = false;
 
         public bool includeD3 = false;
+        public bool includeAngularSwing = false;
 
 
         public bool includePlayingCards = false;

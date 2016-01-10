@@ -85,3 +85,5 @@ UpgradeLog*.XML
 packages/
 # Note: Stash will delete ignored files in untracked directories - so we can't ignore just site.config
 */App_Data
+
+*.scssc
