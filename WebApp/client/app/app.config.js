@@ -13,20 +13,20 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
           allowedRoles: [AUTHORIZATION_ROLES.anonymous]
       }
   })
-  .state('public.home', {
+  .state('app.home', {
       url: '/home',
-      templateUrl: '/client/states/public/home.html'
+      templateUrl: '/client/states/app/home.html'
   })
-  .state('public.account', {
+  .state('app.account', {
       url: '/account',
-      templateUrl: '/client/states/public/account.html'
+      templateUrl: '/client/states/app/account.html'
   })
-  .state('public.system-admin', {
+  .state('app.system-admin', {
       url: '/system-admin',
-      templateUrl: '/client/states/public/system-admin.html'
+      templateUrl: '/client/states/app/system-admin.html'
   })
-  .state('public.users', {
+  .state('app.users', {
       url: '/users',
-      templateUrl: '/client/states/public/users.html'
+      templateUrl: '/client/states/app/users.html'
   });// closes $stateProvider
 }]);
