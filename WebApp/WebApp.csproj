@@ -205,6 +205,7 @@
     <Content Include="System\Impersonate.ashx" />
     <Content Include="templates\OSB-Reminder-Form.docx" />
     <Content Include="templates\Table Template.xlsx" />
+    <Content Include="templates\OSB-Reminder-Form-2.docx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
