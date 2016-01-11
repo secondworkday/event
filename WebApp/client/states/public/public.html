@@ -1,13 +1,8 @@
-<div layout layout-align="center center" id="public" class="V2-public-wrapper" >
-  <div class="V2-public-content" ui-view></div>
-</div>
-
-<div hide-xs layout layout-align="start center" class="V2-footer">
-  <nav>
-    <ul>
-      <li>&copy; 2015 TORQworks</li>
-      <li><a class="md-body-2" href="#">Privacy Policy</a></li>
-      <li><a class="md-body-2" href="#">Terms of Service</a></li>
-    </ul>
+<!-- wrapper for the public facing pages  -->
+<div class="public-wrapper">
+  <nav layout="row" layout-align="end center">
+    <a ui-sref="public.landing">SVS</a>
+    <a ui-sref="public.login">Log In</a>
   </nav>
+  <div ui-view></div>
 </div>
