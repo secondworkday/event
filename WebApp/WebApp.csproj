@@ -19,6 +19,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -315,6 +316,7 @@
     <Content Include="SignIn\ResetPassword.ashx" />
     <Content Include="SignIn\Signout.ashx" />
     <Content Include="SignIn\SiteLogin.ashx" />
+    <Content Include="templates\OSB-Reminder-Form.docx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
