@@ -31,8 +31,8 @@ namespace WebApp
             var appInfo = AppInfo.Create("osb", "osb.socialventuresoftware.org");
             appInfo.SetProductName("OSB");
             appInfo.SetDevelopmentDomainName(".torqlab.com");
-            appInfo.SetProductionSiteDomainName("torq3.torqworks.com");
-            appInfo.SetEmailSignature("The TORQ Team");
+            appInfo.SetProductionSiteDomainName("www.socialventuresoftware.org");
+            appInfo.SetEmailSignature("The Justice League Team");
 
             appInfo.SetOnInitialUserCreatedHandler((utilityDC, user) =>
             {
