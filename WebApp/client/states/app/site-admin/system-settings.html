@@ -1,0 +1,16 @@
+<h2 class="md-title">
+  System Settings
+</h2>
+<md-divider></md-divider>
+<md-content>
+  <div class="md-padding">
+    <p class="md-body-1"><i class="fa fa-warning"></i> You are currently using SYSTEM_NAME which was last updated on LAST_UPDATED</p>
+  </div>
+  <md-list ng-cloak>
+    <md-subheader class="md-no-sticky">Settings</md-subheader>
+    <md-list-item ng-repeat="setting in settings">
+      <p> {{ setting.name }} </p>
+      <md-switch class="md-primary" ng-model="setting.enabled"></md-switch>
+    </md-list-item>
+  </md-list>
+</md-content>

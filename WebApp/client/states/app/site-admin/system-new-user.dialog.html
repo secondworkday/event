@@ -1,0 +1,44 @@
+<md-dialog>
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2 class="md-title">New User</h2>
+      <span flex></span>
+      <md-button ng-click="cancelDialog()" class="md-icon-button" aria-label="Cancel dialog"><i class="fa fa-times"></i></md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content>
+    <form name="form">
+      <div>
+        <p class="md-body-1">
+          To create a new user, just enter an email address, select a tenant, and optionally add a first and last name.
+        </p>
+        <div>
+          <div layout layout-sm="column">
+            <md-input-container flex>
+              <label>Email Address (required)</label>
+              <input ng-model="formData.newUser.email">
+            </md-input-container>
+          </div>
+          <div layout layout-sm="column">
+            <md-input-container flex>
+              <label>First Name</label>
+              <input ng-model="formData.newUser.firstName">
+            </md-input-container>
+            <md-input-container flex>
+              <label>Last Name</label>
+              <input ng-model="formData.newUser.lastName">
+            </md-input-container>
+          </div>
+        </div>
+      </div>
+    </form>
+  </md-dialog-content>
+  <div class="md-actions" layout="row">
+    <md-button ng-click="cancelDialog()">
+      Cancel
+    </md-button>
+    <md-button ng-click="createUser(formData)" class="md-primary" ng-disabled="form.$invalid">
+      Create User
+    </md-button>
+  </div>
+</md-dialog>

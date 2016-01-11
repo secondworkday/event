@@ -1,0 +1,54 @@
+<div>
+  <nav class="tiny-nav">
+    <ul>
+      <li>
+        <a layout layout-align="start center" class="md-body-2">
+          <span>System Admin</span>
+        </a>
+      </li>
+      <li ng-repeat="page in systemAdminPages">
+        <a layout layout-align="start center" class="md-body-2" ui-sref="{{page.uiSref}}">
+          <span ng-class="{'text-blue': page.active}" flex="20"><i class="{{page.icon}} fa-lg"></i></span>
+          <span ng-class="{'text-blue': page.active}">{{page.pageTitle}}</span>
+        </a>
+      </li>
+    </ul>
+    <div class="u-md-space"></div>
+    <ul>
+      <li>
+        <a layout layout-align="start center" class="md-body-2">
+          <span>Ops Admin</span>
+        </a>
+      </li>
+      <li ng-repeat="page in opsAdminPages">
+        <a layout layout-align="start center" class="md-body-2" ui-sref="{{page.uiSref}}">
+          <span ng-class="{'text-blue': page.active}" flex="20"><i class="{{page.icon}} fa-lg"></i></span>
+          <span ng-class="{'text-blue': page.active}">{{page.pageTitle}}</span>
+        </a>
+      </li>
+    </ul>
+    <div class="u-md-space"></div>
+    <ul>
+      <li>
+        <a layout layout-align="start center" class="md-body-2">
+          <span>Database Admin</span>
+        </a>
+      </li>
+      <li ng-repeat="page in databaseAdminPages">
+        <a layout layout-align="start center" class="md-body-2" ui-sref="{{page.uiSref}}">
+          <span ng-class="{'text-blue': page.active}" flex="20"><i class="{{page.icon}} fa-lg"></i></span>
+          <span ng-class="{'text-blue': page.active}">{{page.pageTitle}}</span>
+        </a>
+      </li>
+    </ul>
+    <div class="u-md-space"></div>
+    <ul>
+      <li ng-repeat="page in subPages">
+        <a layout layout-align="start center" class="md-body-2" ui-sref="{{page.uiSref}}">
+          <span ng-class="{'text-blue': page.active}" flex="20"><i class="{{page.icon}} fa-lg"></i></span>
+          <span ng-class="{'text-blue': page.active}">{{page.pageTitle}}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>

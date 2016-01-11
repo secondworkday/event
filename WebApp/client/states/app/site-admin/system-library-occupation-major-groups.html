@@ -1,0 +1,21 @@
+<md-content layout>
+    <div flex="45">
+      <md-list id="masterlist" style="max-height:1800px;overflow:scroll;">
+        <md-subheader class="md-no-sticky">Occupation Major Groups</md-subheader>
+        <md-list-item ng-click="selectItem(occupationMajorGroup)" class="md-2-line" ng-repeat="occupationMajorGroup in occupationMajorGroups">
+          <img ng-src="{{occupationMajorGroup.heroImageUrl || '/images/career-img/occ-img-placeholder.png'}}" class="md-avatar" alt="{{occupationMajorGroup.displayTitle}}" />
+            <div ms-debug-only><pre>{{ occupationMajorGroup | json }}</pre></div>
+            <div ui-sref=".occupation-major-group({occupationMajorGroupCode:occupationMajorGroup.onetCode})" class="md-list-item-text">
+              <h3>{{occupationMajorGroup.title | limitTo: 50}}<span ng-show="occupationMajorGroup.displayTitle.length > 49">...</span></h3>
+              <p>{{occupationMajorGroup.onetCode}} &middot; last modified {{occupationMajorGroup.lastModifiedDate | date:"short"}}</p>
+            </div>
+            <span ng-show="occupationMajorGroup.releaseState === 'Green'" class="md-secondary"><i class="fa fa-circle text-green"></i></span>
+            <span ng-show="occupationMajorGroup.releaseState === 'Yellow'" class="md-secondary"><i class="fa fa-circle text-yellow"></i></span>
+            <span ng-show="occupationMajorGroup.releaseState === 'Red'" class="md-secondary"><i class="fa fa-circle text-red"></i></span>
+            <span ng-hide="occupationMajorGroup.releaseState" class="md-secondary"><i class="fa fa-circle" style="color:rgba(0,0,0,.15);"></i></span>
+        </md-list-item>
+      </md-list>
+    </div>
+    <span flex="5"></span>
+    <div class="md-padding" flex="50" ui-view></div>
+</md-content>

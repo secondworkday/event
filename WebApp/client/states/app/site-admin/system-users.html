@@ -1,0 +1,161 @@
+<div layout>
+  <div flex>
+    <md-input-container class="md-block" flex-gt-sm>
+      <label><i class="fa fa-search"></i> Search for any text, &commat;name, or even &num;tag</label>
+      <input ng-model="searchViewOptions.userSearch">
+    </md-input-container>
+  </div>
+  <div hide-xs>
+    <md-menu md-position-mode="target-right target">
+      <md-button aria-label="Open sort menu" class="md-icon-button" ng-click="$mdOpenMenu()">
+        <i md-menu-origin class="fa fa-sort"></i>
+      </md-button>
+      <md-menu-content width="4">
+        <md-menu-item ng-repeat="sortOption in sortOptions">
+          <md-button ng-click="searchViewOptions.sort = sortOption">
+            {{sortOption.name}}
+          </md-button>
+        </md-menu-item>
+      </md-menu-content>
+    </md-menu>
+    <md-button ng-click="download()" class="md-icon-button" aria-label="download">
+      <i class="fa fa-download"></i>
+    </md-button>
+    <md-button ng-click="showNewSystemUserDialog($event)" class="md-fab md-primary" aria-label="new">
+      <i class="fa fa-plus fa-lg"></i>
+    </md-button>
+  </div>
+</div>
+
+<ms-search-view change-event="updateUsers" search="searchUsers" options="searchViewOptions" user-search="userSearch">
+  <table class="md-data-table u-full-width">
+    <thead>
+      <tr>
+        <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
+        <th class="md-data-table__cell--non-numeric">User</th>
+        <th></th>
+        <th>UserID</th>
+        <th>TenantID</th>
+        <th>30-day Logins</th>
+        <th>Lifetime Logins</th>
+        <th class="md-data-table__cell--non-numeric">Online</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="user in $displayedIndex | objectLookup:$hashMap track by user.id" ui-sref="app.site-admin.system.user.account({userID:user.id})" style="cursor:pointer;">
+        <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ user | json }}</pre></td>
+        <td class="md-data-table__cell--non-numeric">
+          <img ng-src="{{user.profilePhotoUrl || '/images/user-img-placeholder.png'}}" class="mini-user-img" style="margin-bottom:1rem;"/>
+        </td>
+        <td class="md-data-table__cell--non-numeric">
+          <strong>{{ user.displayName }}</strong><br/>
+          <span class="md-caption">{{ user.email }}</span>
+        </td>
+        <td>{{ user.id }}</td>
+        <td>{{ user.tenantID }}</td>
+        <td>
+          9 <span><i class="fa fa-arrow-up text-green"></i></span>
+        </td>
+        <td>
+          99
+        </td>
+        <td class="md-data-table__cell--non-numeric"><i ng-show="user.connectionState=='Online'" class="fa fa-circle text-green"></i></td>
+      </tr>
+    </tbody>
+  </table>
+</ms-search-view>
+
+
+
+
+
+
+
+<!-- <h2 class="md-title">
+  System Users
+</h2>
+<md-divider></md-divider>
+<section>
+  <div layout layout-padding>
+    <div flex>
+      <md-input-container style="margin-top:-1rem;">
+        <label><i class="fa fa-search"></i> Search for any text, &commat;name, or even &num;tag</label>
+        <input ng-model="searchViewOptions.userSearch">
+      </md-input-container>
+    </div>
+    <div style="margin-top:1rem;">
+      <md-menu md-position-mode="target-right target">
+        <md-button aria-label="Open sort menu" class="md-icon-button" ng-click="$mdOpenMenu()">
+          <i md-menu-origin class="fa fa-sort"></i>
+        </md-button>
+        <md-menu-content width="4">
+          <md-menu-item ng-repeat="sortOption in sortOptions">
+            <md-button ng-click="searchViewOptions.sort = sortOption">
+              {{sortOption.name}}
+            </md-button>
+          </md-menu-item>
+          <md-menu-item>
+            <md-button ng-click="DO_SOMETHING()">
+              Last modified
+            </md-button>
+          </md-menu-item>
+          <md-menu-item>
+            <md-button ng-click="DO_SOMETHING()">
+              Last modified by me
+            </md-button>
+          </md-menu-item>
+          <md-menu-item>
+            <md-button ng-click="DO_SOMETHING()">
+              Last opened by me
+            </md-button>
+          </md-menu-item>
+        </md-menu-content>
+      </md-menu>
+      <md-button ng-click="download()" class="md-icon-button" aria-label="download">
+        <md-tooltip>Download</md-tooltip>
+        <i class="fa fa-download"></i>
+      </md-button>
+      <md-button ng-click="showNewSystemUserDialog($event)" class="md-raised md-primary md-icon-button" aria-label="new user">
+        <md-tooltip>Add User</md-tooltip>
+        <i class="fa fa-plus"></i>
+      </md-button>
+    </div>
+  </div>
+  <ms-search-view change-event="updateUsers" search="searchUsers" options="searchViewOptions" user-search="userSearch">
+    <table class="md-data-table u-full-width">
+      <thead>
+        <tr>
+          <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
+          <th class="md-data-table__cell--non-numeric">User</th>
+          <th></th>
+          <th>UserID</th>
+          <th>TenantID</th>
+          <th>30-day Logins</th>
+          <th>Lifetime Logins</th>
+          <th class="md-data-table__cell--non-numeric">Online</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="user in $displayedIndex | objectLookup:$hashMap track by user.id" ui-sref="app.site-admin.system.user.account({userID:user.id})" style="cursor:pointer;">
+          <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ user | json }}</pre></td>
+          <td class="md-data-table__cell--non-numeric">
+            <img ng-src="{{user.profilePhotoUrl || '/images/user-img-placeholder.png'}}" class="mini-user-img" style="margin-bottom:1rem;"/>
+          </td>
+          <td class="md-data-table__cell--non-numeric">
+            <strong>{{ user.displayName }}</strong><br/>
+            <span class="md-caption">{{ user.email }}</span>
+          </td>
+          <td>{{ user.id }}</td>
+          <td>{{ user.tenantID }}</td>
+          <td>
+            9 <span><i class="fa fa-arrow-up green"></i></span>
+          </td>
+          <td>
+            99
+          </td>
+          <td class="md-data-table__cell--non-numeric"><i ng-show="user.connectionState=='Online'" class="fa fa-circle green"></i></td>
+        </tr>
+      </tbody>
+    </table>
+  </ms-search-view>
+</section> -->

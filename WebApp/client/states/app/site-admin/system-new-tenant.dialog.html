@@ -1,0 +1,32 @@
+<md-dialog>
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2 class="md-title">New Tenant</h2>
+      <span flex></span>
+      <md-button ng-click="cancelDialog()" class="md-icon-button" aria-label="Cancel dialog"><i class="fa fa-times"></i></md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content>
+    <form name="form">
+      <div>
+        <p class="md-body-1">
+          To create a new tenant, just give it a name (e.g. "NY - OneStop").
+        </p>
+        <div layout layout-sm="column">
+          <md-input-container flex>
+            <label>Tenant name</label>
+            <input ng-model="newTenantName">
+          </md-input-container>
+        </div>
+      </div>
+    </form>
+  </md-dialog-content>
+  <div class="md-actions" layout="row">
+    <md-button ng-click="cancelDialog()">
+      Cancel
+    </md-button>
+    <md-button ng-click="createTenant(newTenantName)" class="md-primary">
+      Create Tenant
+    </md-button>
+  </div>
+</md-dialog>

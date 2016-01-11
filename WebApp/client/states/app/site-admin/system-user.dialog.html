@@ -1,0 +1,26 @@
+<md-dialog aria-label="system user dialog"  ng-cloak>
+  <form>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>User Details</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancelDialog()" aria-label="close">
+          <i class="fa fa-remove"></i>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-dialog-content>
+      <h2 class="md-title">Title</h2>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
+        incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      </p>
+    </md-dialog-content>
+    <div class="md-actions" layout="row">
+      <span flex></span>
+      <md-button ng-click="cancelDialog()">Close</md-button>
+      <md-button ng-click="save(formData)" class="md-primary">Save</md-button>
+    </div>
+  </form>
+</md-dialog>

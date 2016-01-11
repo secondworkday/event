@@ -1,0 +1,131 @@
+<h2 class="md-title">
+  Data Import
+</h2>
+<md-divider></md-divider>
+<section>
+  <md-card>
+    <md-card-content>
+      <p class="md-title">Upload A File</p>
+      <md-divider></md-divider>
+      <div style="height:1rem;"></div>
+      <div layout>
+        <div style="margin-right:2rem;">
+          <p class="md-body-2">
+            1. Select file type
+          </p>
+          <md-radio-group ng-model="subTypeChoice">
+            <md-radio-button ng-repeat="subType in subTypes" ng-value="subType.code">{{subType.name}}</md-radio-button>
+          </md-radio-group>
+        </div>
+        <div>
+          <p class="md-body-2">
+            2. Choose a file
+          </p>
+          <div layout ng-click="setFileUploaderItemData(subTypeChoice)">
+            <input type="file" nv-file-select uploader="uploader"/>
+          </div>
+        </div>
+      </div>
+      <div layout layout-align="center center" class="text-hint" ng-show="processingFile" style="margin:3rem auto;">
+        Processing file...
+      </div>
+      <div ng-show="reviewReady">
+        <h3 class="md-subhead">Warning Messages</h3>
+        <div ng-repeat="message in warnings" style="border-left:3px solid yellow; padding:1rem;margin-bottom:1rem;background-color:rgba(255,255,0,0.15);">
+          "{{message}}"
+        </div>
+        <h3 class="md-subhead">Error Messages</h3>
+        <div ng-repeat="message in errors" style="border-left:3px solid red; padding:1rem;margin-bottom:1rem;background-color:rgba(215,44,44,0.15);">
+          "{{message}}"
+        </div>
+        <h3 class="md-subhead">Review Error Rows</h3>
+        <table class="u-full-width">
+          <thead>
+            <tr>
+              <th ng-repeat="tableHeader in tableData.headers">{{tableHeader}}</th>
+            </tr>
+          </thead>
+          <tbody class="red">
+            <tr ng-repeat="tableRow in tableData.rows">
+              <td ng-repeat="data in tableRow">{{data}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </md-card-content>
+  </md-card>
+  <div style="height:1rem;"></div>
+  <div>
+    <p class="md-title">Files</p>
+    <table class="md-data-table u-full-width">
+      <thead>
+        <tr>
+          <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
+          <th class="md-data-table__cell--non-numeric">File Name</th>
+          <th class="md-data-table__cell--non-numeric">Upload Date</th>
+          <th>Size</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="file in files">
+          <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ file | json }}</pre></td>
+          <td class="md-data-table__cell--non-numeric">
+            <strong>{{ file.fileName }}</strong>
+          </td>
+          <td class="md-data-table__cell--non-numeric">{{file.uploadDate | amCalendar}}</td>
+          <td>{{ file.size | number }} kb</td>
+          <td>
+            <md-button ng-click="downloadFile(file)" class="md-icon-button" aria-label="download" style="margin-top:-1rem;margin-bottom:0;">
+              <md-tooltip>Download File</md-tooltip>
+              <i class="fa fa-download"></i>
+            </md-button>
+            <md-button ng-click="removeFile(file)" class="md-warn md-icon-button" aria-label="remove" style="margin-top:-1rem;margin-bottom:0;">
+              <md-tooltip>Remove File</md-tooltip>
+              <i class="fa fa-remove"></i>
+            </md-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="u-md-space"></div>
+  <div>
+    <p class="md-title">States</p>
+    <table class="md-data-table u-full-width">
+      <thead>
+        <tr>
+          <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
+          <th class="md-data-table__cell--non-numeric">State</th>
+          <th class="md-data-table__cell--non-numeric">Last Update</th>
+          <th class="md-data-table__cell--non-numeric">
+            Use Enhanced Data?
+          </th>
+          <th>Edu Programs</th>
+          <th>Edu Providers</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="state in sampleDataImportStates">
+          <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ state | json }}</pre></td>
+          <td class="md-data-table__cell--non-numeric">
+            <strong>{{ state.name }}</strong>
+          </td>
+          <td class="md-data-table__cell--non-numeric">{{state.lastUpdateDate | amCalendar}}</td>
+          <td class="md-data-table__cell--non-numeric">
+            <md-switch style="margin:0;padding:0;" ng-model="state.useEnhancedData" aria-label="use enhanced data" class="md-primary"></md-switch>
+          </td>
+          <td>{{ state.programCount | number }}</td>
+          <td>{{ state.providerCount | number }}</td>
+          <td>
+            <md-button ng-click="downloadStateData(state)" class="md-icon-button" aria-label="download" style="margin-top:-1rem;margin-bottom:0;">
+              <md-tooltip>Download Data</md-tooltip>
+              <i class="fa fa-download"></i>
+            </md-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

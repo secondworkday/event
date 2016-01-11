@@ -1,0 +1,82 @@
+<section>
+
+  <div ms-debug-only><pre>{{occupation | json}}</pre></div>
+  <div style="height:250px;background-image: url('{{occupation.heroImageUrl}}'); background-size:cover; background-position: {{occupation.heroImageFocusPointXPercent}}% {{occupation.heroImageFocusPointYPercent}}%;"></div>
+  <h2 ng-hide="customDisplayTitle" class="md-title">{{occupation.displayTitle}}</h2>
+  <h2 ng-show="customDisplayTitle" class="md-title">{{customDisplayTitle}}*</h2>
+  <p ng-show="customDisplayTitle" class="md-caption">
+    * Edited display title
+  </p>
+  <p class="md-caption">
+    O*NET Title: {{occupation.title}}
+  </p>
+  <div ng-hide="showCustomDisplayTitleInput">
+    <a href="#" class="md-caption" ng-click="showCustomDisplayTitleInput = !showCustomDisplayTitleInput">Edit Display Title</a>
+  </div>
+  <div ng-show="showCustomDisplayTitleInput">
+    <md-input-container>
+      <label>Edit Display Title</label>
+      <input ng-model="customDisplayTitle">
+    </md-input-container>
+    <md-button ng-click="showCustomDisplayTitleInput = !showCustomDisplayTitleInput">Cancel</md-button>
+    <md-button class="md-primary" ng-click="showCustomDisplayTitleInput = !showCustomDisplayTitleInput">Save</md-button>
+  </div>
+
+  <h2 class="md-subhead">Description</h2>
+  <p class="md-body-1">
+    {{occupation.description}}
+  </p>
+  <p class="md-caption">
+    <a href="#" class="md-caption">edit description</a>
+  </p>
+  <h2 class="md-subhead">Details</h2>
+  <!-- TODO fix detail numbers  -->
+  <p class="md-body-1">
+    Employement: 999,999<br/>
+    Median Wages: $99 hourly, $99,999 annual<br/>
+    <a href="http://www.onetonline.org/link/summary/{{occupation.occupationCode.OnetCode}}" target="_blank"><i class="fa fa-external-link"></i> View on O*NET</a>
+  </p>
+
+  <h2 class="md-subhead">Job Board Search Keywords</h2>
+  <!-- TODO add chips here  -->
+  <p class="md-body-1">
+    {{occupation.displayTitle}}
+  </p>
+
+</section>
+<section>
+  <h2 class="md-subhead">Release state</h2>
+  <md-radio-group ng-change="onChangeReleaseState()" ng-model="occupation.releaseState">
+    <md-radio-button value="Red"> <i class="fa fa-circle text-red"></i> Red</md-radio-button>
+    <md-radio-button value="Yellow"> <i class="fa fa-circle text-yellow"></i> Yellow</md-radio-button>
+    <md-radio-button value="Green"> <i class="fa fa-circle text-green"></i> Green</md-radio-button>
+  </md-radio-group>
+</section>
+<section>
+  <h3 class="md-body-2">Image License</h3>
+  <div>
+    <md-radio-group ng-change="setImageLicense(occupation.license)" ng-model="occupation.license">
+      <md-radio-button ng-repeat="license in licenseTypes" value="{{license}}"> {{license}} </md-radio-button>
+    </md-radio-group>
+  </div>
+  <h3 class="md-body-2">Image Source</h3>
+  <md-input-container>
+    <md-select ng-change="setImageSource(occupation.source)" ng-model="occupation.source" placeholder="Choose source...">
+      <md-option ng-repeat="source in imageSources" value="{{source}}">{{source}}</md-option>
+    </md-select>
+  </md-input-container>
+</section>
+<section>
+  <h2 class="md-subhead">Custom Image</h2>
+  <p class="md-caption text-red" ng-show="occupation.isHeroImageInherited">
+    <i class="fa fa-exclamation-triangle"></i> Warning: this image is inhereted from the Occupation Major Group
+  </p>
+  <img src="{{occupation.heroImageUrl || 'no image available'}}" alt="" focus-point="onFocusPointUpdated" />
+  <input type="file" nv-file-select uploader="uploader"/>
+  <span class="info">x: {{occupation.heroImageFocusPointXPercent}}, y: {{occupation.heroImageFocusPointYPercent}}</span>
+</section>
+<div class="u-sm-space"></div>
+<div layout="column" class="focus-point">
+  <p class="md-body-2">Circle Preview</p>
+  <span style="background-image: url('{{occupation.heroImageUrl}}'); background-position: {{occupation.heroImageFocusPointXPercent}}% {{occupation.heroImageFocusPointYPercent}}%" class="circle"></span>
+</div>

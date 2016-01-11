@@ -1,0 +1,177 @@
+<div layout>
+  <div flex>
+    <md-input-container class="md-block" flex-gt-sm>
+      <label><i class="fa fa-search"></i> Search for any text, &commat;name, or even &num;tag</label>
+      <input ng-model="searchViewOptions.userSearch">
+    </md-input-container>
+  </div>
+  <div hide-xs>
+    <md-menu md-position-mode="target-right target">
+      <md-button aria-label="Open sort menu" class="md-icon-button" ng-click="$mdOpenMenu()">
+        <i md-menu-origin class="fa fa-sort"></i>
+      </md-button>
+      <md-menu-content width="4">
+        <md-menu-item ng-repeat="sortOption in sortOptions">
+          <md-button ng-click="searchViewOptions.sort = sortOption">
+            {{sortOption.name}}
+          </md-button>
+        </md-menu-item>
+      </md-menu-content>
+    </md-menu>
+    <md-button ng-click="download()" class="md-icon-button" aria-label="download">
+      <i class="fa fa-download"></i>
+    </md-button>
+    <md-button ng-click="showNewSystemFilterDialog($event)" class="md-fab md-primary" aria-label="new">
+      <i class="fa fa-plus fa-lg"></i>
+    </md-button>
+  </div>
+</div>
+
+<!-- TODO wrap in ms-search-view  -->
+<table class="md-data-table u-full-width">
+  <thead>
+    <tr>
+      <th class="md-data-table__cell--non-numeric">Filter Name</th>
+      <th class="md-data-table__cell--non-numeric">Created By</th>
+      <th class="md-data-table__cell--non-numeric">Hidden</th>
+      <th class="md-data-table__cell--non-numeric">Shared</th>
+      <th class="md-data-table__cell--non-numeric">Date Created</th>
+      <th class="md-data-table__cell--non-numeric">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="u-hover-container" ng-repeat="filter in filters">
+      <td class="md-data-table__cell--non-numeric">{{filter.name}}</td>
+      <td class="md-data-table__cell--non-numeric">{{filter.createdBy}}</td>
+      <td class="md-data-table__cell--non-numeric">
+        <i class="fa fa-check green" ng-show="filter.isHidden"></i>
+      </td>
+      <td class="md-data-table__cell--non-numeric">
+        <i class="fa fa-check green" ng-show="filter.isShared"></i>
+      </td>
+      <td class="md-data-table__cell--non-numeric">{{filter.dateCreated}}</td>
+      <td class="md-data-table__cell--non-numeric"><a href="#">edit</a> &middot; <a href="#" class="red">delete</a></td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+<!--
+<h2 class="md-title">
+  Filters
+</h2>
+<md-divider></md-divider>
+<section>
+  <div layout layout-padding>
+    <div flex>
+      <md-input-container style="margin-top:-1rem;">
+        <label><i class="fa fa-search"></i> Search for any text, &commat;name, or even &num;tag</label>
+        <input ng-model="userSearch">
+      </md-input-container>
+    </div>
+    <div style="margin-top:1rem;">
+      <md-menu md-position-mode="target-right target">
+        <md-button aria-label="Open sort menu" class="md-icon-button" ng-click="$mdOpenMenu()">
+          <i md-menu-origin class="fa fa-sort"></i>
+        </md-button>
+        <md-menu-content width="4">
+          <md-menu-item ng-repeat="sortOption in sortOptions">
+            <md-button ng-click="searchViewOptions.sort = sortOption">
+              {{sortOption.name}}
+            </md-button>
+          </md-menu-item>
+          <md-menu-item>
+            <md-button ng-click="DO_SOMETHING()">
+              Last modified
+            </md-button>
+          </md-menu-item>
+          <md-menu-item>
+            <md-button ng-click="DO_SOMETHING()">
+              Last modified by me
+            </md-button>
+          </md-menu-item>
+          <md-menu-item>
+            <md-button ng-click="DO_SOMETHING()">
+              Last opened by me
+            </md-button>
+          </md-menu-item>
+        </md-menu-content>
+      </md-menu>
+      <md-button ng-click="download()" class="md-icon-button" aria-label="download">
+        <md-tooltip>Download</md-tooltip>
+        <i class="fa fa-download"></i>
+      </md-button>
+      <md-button ng-click="showNewSystemFilterDialog($event)" class="md-raised md-primary md-icon-button" aria-label="new filter">
+        <md-tooltip>Create New Filter</md-tooltip>
+        <i class="fa fa-plus"></i>
+      </md-button>
+    </div>
+  </div>
+  <table class="md-data-table u-full-width">
+    <thead>
+      <tr>
+        <th class="md-data-table__cell--non-numeric">Filter Name</th>
+        <th class="md-data-table__cell--non-numeric">Created By</th>
+        <th class="md-data-table__cell--non-numeric">Hidden</th>
+        <th class="md-data-table__cell--non-numeric">Shared</th>
+        <th class="md-data-table__cell--non-numeric">Date Created</th>
+        <th class="md-data-table__cell--non-numeric">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="u-hover-container" ng-repeat="filter in filters">
+        <td class="md-data-table__cell--non-numeric">{{filter.name}}</td>
+        <td class="md-data-table__cell--non-numeric">{{filter.createdBy}}</td>
+        <td class="md-data-table__cell--non-numeric">
+          <i class="fa fa-check green" ng-show="filter.isHidden"></i>
+        </td>
+        <td class="md-data-table__cell--non-numeric">
+          <i class="fa fa-check green" ng-show="filter.isShared"></i>
+        </td>
+        <td class="md-data-table__cell--non-numeric">{{filter.dateCreated}}</td>
+        <td class="md-data-table__cell--non-numeric"><a href="#">edit</a> &middot; <a href="#" class="red">delete</a></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+
+<section hide layout>
+  <md-card flex>
+    <md-card-content>
+      <p>
+        Search and Controls
+      </p>
+      <p>
+        List of Occupations
+      </p>
+    </md-card-content>
+  </md-card>
+  <md-card flex="33">
+    <md-card-content>
+      <h2 class="md-title">Add a filter name</h2>
+      <p class="md-body-1">
+        Add a short description...
+      </p>
+      <md-list>
+        <md-list-item ng-repeat="occupation in addedOccupations" ng-click="DO_SOMETHING(occupation)">
+          <img alt="{{ occupation.displayTitle }}" ng-src="{{occupation.heroImageUrl || 'no img'}}" class="md-avatar" />
+          <p>{{ occupation.displayTitle }}</p>
+          <i ng-click="removeOccupation(occupation)" aria-label="remove" class="fa fa-remove md-secondary md-warn"></i>
+        </md-list-item>
+      </md-list>
+    </md-card-content>
+    <div class="md-actions" layout="row" layout-align="end center">
+      <md-button>Clear</md-button>
+      <md-button class="md-primary">Save Filter</md-button>
+    </div>
+  </md-card>
+</section> -->
