@@ -8,7 +8,7 @@
 
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
 
-    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/client/application.css")%>">
+    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/client/styles.css")%>">
 
 
     <link rel="apple-touch-icon" sizes="57x57" href="/images/app-icon/apple-icon-57x57px.png" />

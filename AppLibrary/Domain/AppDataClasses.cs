@@ -3,6 +3,9 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Net.Mail;
 using System.Linq;
+using System.Data.Linq;
+using System.Data.Linq.Mapping;
+using System.Xml.Linq;
 using System.Text;
 using System.Data;
 using System.IO;
@@ -38,12 +41,12 @@ namespace App.Library
         {
             new string []
             {
-                @"CREATE NONCLUSTERED INDEX [IX_Episode_Show] ON [dbo].[Episode] ([ShowID]) INCLUDE ([ScopeType],[ScopeID])",
-                @"CREATE NONCLUSTERED INDEX [IX_Video_Tenant_Show_Episode] ON [dbo].[Video] ([ScopeType],[ScopeID],[ShowID],[EpisodeID])",
-                @"CREATE NONCLUSTERED INDEX [IX_ExtendedProperty_DeletedUser_TargetTable_Target_Category_ScopeType_Scope_EPType] ON [dbo].[ExtendedProperty] ([DeletedByUserID],[TargetTable],[TargetID],[CategoryID],[ScopeType],[ScopeID],[EPType])",
+                //@"CREATE NONCLUSTERED INDEX [IX_Episode_Show] ON [dbo].[Episode] ([ShowID]) INCLUDE ([ScopeType],[ScopeID])",
+                //@"CREATE NONCLUSTERED INDEX [IX_Video_Tenant_Show_Episode] ON [dbo].[Video] ([ScopeType],[ScopeID],[ShowID],[EpisodeID])",
+                //@"CREATE NONCLUSTERED INDEX [IX_ExtendedProperty_DeletedUser_TargetTable_Target_Category_ScopeType_Scope_EPType] ON [dbo].[ExtendedProperty] ([DeletedByUserID],[TargetTable],[TargetID],[CategoryID],[ScopeType],[ScopeID],[EPType])",
 
                 // Unique Constraints
-                @"ALTER TABLE [dbo].[Show] ADD CONSTRAINT [AK_Provider] UNIQUE ([Provider], [ProviderID])",
+                //@"ALTER TABLE [dbo].[Show] ADD CONSTRAINT [AK_Provider] UNIQUE ([Provider], [ProviderID])",
             }.ForEach(sqlCommand =>
             {
                 try

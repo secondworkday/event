@@ -220,7 +220,8 @@ namespace WebApp
                 requestPathLower.StartsWith("/inbox")
                 )
             {
-                context.RewritePath("/app/default.aspx");
+                context.RewritePath("/Spas/Material.aspx");
+                // context.RewritePath("/app/default.aspx");
                 return true;
             }
 
