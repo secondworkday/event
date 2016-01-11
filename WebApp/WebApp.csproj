@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -19,7 +19,6 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
-    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -146,12 +145,81 @@
     <Content Include="Bootstrap\bootstrap.html" />
     <Content Include="Bootstrap\bootstrap.js" />
     <Content Include="Bootstrap\Default.aspx" />
+    <Content Include="client\app\account.html" />
+    <Content Include="client\app\app.config.js" />
+    <Content Include="client\app\app.controller.js" />
+    <Content Include="client\app\app.html" />
+    <Content Include="client\app\home.html" />
+    <Content Include="client\app\system-admin.html" />
+    <Content Include="client\app\users.html" />
+    <Content Include="client\public\landing.html" />
+    <Content Include="client\public\login.html" />
+    <Content Include="client\public\public.config.js" />
+    <Content Include="client\public\public.controller.js" />
+    <Content Include="client\public\public.html" />
+    <Content Include="client\states\public\connection\disconnected.controller.js" />
+    <Content Include="client\states\public\connection\disconnected.html" />
+    <Content Include="client\states\public\connection\reconnecting.controller.js" />
+    <Content Include="client\states\public\connection\reconnecting.html" />
+    <Content Include="client\states\public\job-seeker-signup.controller.js" />
+    <Content Include="client\states\public\job-seeker-signup.html" />
+    <Content Include="client\states\public\privacy-policy.html" />
+    <Content Include="client\states\public\public.config.js" />
+    <Content Include="client\states\public\public.controller.js" />
+    <Content Include="client\states\public\public.html" />
+    <Content Include="client\states\public\signin-demo-account.dialog.html" />
+    <Content Include="client\states\public\signin.controller.js" />
+    <Content Include="client\states\public\signin.html" />
+    <Content Include="client\states\public\wait.controller.js" />
+    <Content Include="client\states\public\wait.html" />
+    <Content Include="client\styles.css" />
     <Content Include="Content\angular-material\angular-material.css" />
     <Content Include="Content\angular-material\angular-material.min.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
     <Content Include="default.html" />
     <Content Include="Global.asax" />
+    <Content Include="js\mk-editable-span.js" />
+    <Content Include="js\mk-editable-span.min.js" />
+    <Content Include="js\ms-utility.js" />
+    <Content Include="js\ms-utility.ui-material.js" />
+    <Content Include="js\ng-infinite-scroll-1.2.0.js" />
+    <Content Include="js\ng-infinite-scroll-1.2.0.min.js" />
+    <Content Include="js\xml2json.js" />
+    <Content Include="js\xml2json.min.js" />
+    <Content Include="Scripts\angular-animate.js" />
+    <Content Include="Scripts\angular-animate.min.js" />
+    <Content Include="Scripts\angular-aria.js" />
+    <Content Include="Scripts\angular-aria.min.js" />
+    <Content Include="Scripts\angular-file-upload.min.js" />
+    <Content Include="Scripts\angular-material.js" />
+    <Content Include="Scripts\angular-material.min.js" />
+    <Content Include="Scripts\angular-material\themes\green-theme.css" />
+    <Content Include="Scripts\angular-material\themes\indigo-theme.css" />
+    <Content Include="Scripts\angular-moment.js" />
+    <Content Include="Scripts\angular-moment.min.js" />
+    <Content Include="Scripts\angular-sanitize.js" />
+    <Content Include="Scripts\angular-sanitize.min.js" />
+    <Content Include="Scripts\angular-ui-router.js" />
+    <Content Include="Scripts\angular-ui-router.min.js" />
+    <Content Include="Scripts\angular-xeditable\xeditable.css" />
+    <Content Include="Scripts\angular-xeditable\xeditable.js" />
+    <Content Include="Scripts\angular-xeditable\xeditable.min.js" />
+    <Content Include="Scripts\angular.js" />
+    <Content Include="Scripts\angular.min.js" />
+    <Content Include="client\states\public\public.scss" />
+    <None Include="Scripts\jquery-2.1.4.intellisense.js" />
+    <Content Include="Scripts\jquery-2.1.4.js" />
+    <Content Include="Scripts\jquery-2.1.4.min.js" />
+    <Content Include="Scripts\jquery.signalR-2.2.0.js" />
+    <Content Include="Scripts\jquery.signalR-2.2.0.min.js" />
+    <Content Include="Scripts\json2.js" />
+    <Content Include="Scripts\json2.min.js" />
+    <Content Include="Scripts\moment.js" />
+    <Content Include="Scripts\moment.min.js" />
+    <Content Include="Scripts\ng-tags-input\ng-tags-input.bootstrap.min.css" />
+    <Content Include="Scripts\ng-tags-input\ng-tags-input.min.css" />
+    <Content Include="Scripts\ng-tags-input\ng-tags-input.min.js" />
     <Content Include="Spas\Material.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -203,9 +271,14 @@
     <None Include="Properties\PublishProfiles\dev.socialventuresoftware.org.pubxml" />
     <Content Include="Resource.ashx" />
     <Content Include="System\Impersonate.ashx" />
-    <Content Include="templates\OSB-Reminder-Form.docx" />
-    <Content Include="templates\Table Template.xlsx" />
+    <Content Include="Scripts\angular-animate.min.js.map" />
+    <Content Include="Scripts\angular-aria.min.js.map" />
     <Content Include="templates\OSB-Reminder-Form-2.docx" />
+    <Content Include="Scripts\angular-file-upload.min.js.map" />
+    <Content Include="Scripts\angular-moment.min.js.map" />
+    <Content Include="Scripts\angular-sanitize.min.js.map" />
+    <Content Include="Scripts\angular.min.js.map" />
+    <Content Include="Scripts\jquery-2.1.4.min.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

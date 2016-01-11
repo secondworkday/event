@@ -1,0 +1,42 @@
+<div layout layout-align="center center">
+  <div flex>
+    <div class="text-center">
+      <img src="/images/torq_logo_color.png" height="100">
+    </div>
+    <md-card>
+      <form name="signInForm">
+      <md-card-content>
+        <div class="text-center">
+          <h2 class="md-subhead">Log in to your TORQ account</h2>
+        </div>
+        <div layout="column">
+          <md-input-container flex>
+            <label>Email</label>
+            <input ng-model="formData.email" type="email">
+          </md-input-container>
+          <md-input-container flex>
+            <label>Password</label>
+            <input ng-model="formData.password" type="password">
+          </md-input-container>
+        </div>
+      </md-card-content>
+      <md-card-actions layout="row" layout-align="end center">
+        <md-button type="submit" ng-click="signIn(formData)" class="md-primary">Log In</md-button>
+      </md-card-actions>
+      </form>
+    </md-card>
+    <div>
+      <div class="u-sm-space"></div>
+      <div layout>
+        <span class="md-caption"><a ng-click="sendPasswordResetEmail(formData.email)">Forgot password?</a></span>
+        <span flex></span>
+        <span class="md-caption">Don't have an account? <a ui-sref="public.job-seeker-signup">Get started</a></span>
+      </div>
+      <div class="u-sm-space"></div>
+      <div class="u-sm-space"></div>
+      <div>
+        <span class="md-caption"><a ng-click="showDemoAccountDialog()">Demo Users</a></span>
+      </div>
+    </div>
+  </div>
+</div>
