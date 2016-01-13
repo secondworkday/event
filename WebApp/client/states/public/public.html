@@ -1,15 +1,15 @@
-<div layout layout-align="center center" id="public" class="public-wrapper">
+<div id="public" class="public-wrapper">
 
-  <div flex class="public-content">
+  <div layout="column">
 
     <nav layout="row" layout-padding>
-      <a ui-sref="public.landing">SVS</a>
+      <a ui-sref="public.landing"><strong>App</strong></a>
       <span flex></span>
       <a ui-sref="public.create-account">Create account</a>
       <a ui-sref="public.sign-in">Sign In</a>
     </nav>
 
-    <div ui-view></div>
+    <div class="public-content" ui-view></div>
 
   </div>
 

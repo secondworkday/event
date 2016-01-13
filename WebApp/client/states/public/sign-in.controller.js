@@ -7,7 +7,7 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $log, web
     utilityService.signIn(credentials)
       .then(function () {
         // success
-        $state.go('app.home', {}, { reload: true });
+        $state.go('app.user.home', {}, { reload: true });
         // $state.go('app.system.users', {}, { reload: true });
       }, function (failureData) {
         // failure
