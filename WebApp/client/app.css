@@ -197,6 +197,16 @@
     display: inline-block;
   }
 
+  .card-event {
+    width: 300px;
+  }
+
+
+
+
+
+
+
   /* Text Style Utilities */
   .text-center {
     text-align: center;
