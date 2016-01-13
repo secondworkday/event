@@ -1,13 +1,11 @@
+<div class="u-md-space"></div>
 <div layout layout-align="center center">
-  <div flex>
-    <div class="text-center">
-      <img src="/images/torq_logo_color.png" height="100">
-    </div>
+  <div flex-gt-xs="50">
     <md-card>
       <form name="signInForm">
       <md-card-content>
         <div class="text-center">
-          <h2 class="md-subhead">Log in to your TORQ account</h2>
+          <h2 class="md-subhead">Sign in to your account</h2>
         </div>
         <div layout="column">
           <md-input-container flex>
@@ -21,22 +19,20 @@
         </div>
       </md-card-content>
       <md-card-actions layout="row" layout-align="end center">
-        <md-button type="submit" ng-click="signIn(formData)" class="md-primary">Log In</md-button>
+        <md-button type="submit" ng-click="signIn(formData)" class="md-primary">Sign In</md-button>
       </md-card-actions>
       </form>
     </md-card>
     <div>
       <div class="u-sm-space"></div>
-      <div layout>
+      <div class="md-padding" layout>
         <span class="md-caption"><a ng-click="sendPasswordResetEmail(formData.email)">Forgot password?</a></span>
         <span flex></span>
-        <span class="md-caption">Don't have an account? <a ui-sref="public.job-seeker-signup">Get started</a></span>
+        <span class="md-caption"><a ui-sref="public.create-account">Create account</a></span>
       </div>
-      <div class="u-sm-space"></div>
-      <div class="u-sm-space"></div>
-      <div>
+      <!-- <div>
         <span class="md-caption"><a ng-click="showDemoAccountDialog()">Demo Users</a></span>
-      </div>
+      </div> -->
     </div>
   </div>
 </div>
