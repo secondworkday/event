@@ -12,6 +12,10 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         url: '/home',
         templateUrl: '/client/states/app/user/home.html',
     })
+    .state('app.user.event', {
+        url: '/event',
+        templateUrl: '/client/states/app/user/event.html',
+    })
 
     ;// closes $stateProvider
 }]);

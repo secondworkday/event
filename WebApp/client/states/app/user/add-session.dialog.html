@@ -1,0 +1,61 @@
+<md-dialog aria-label="add session" ng-cloak>
+  <form>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>Add Session</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <i class="fa fa-times"></i>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-dialog-content>
+      <div class="md-dialog-content">
+        <form name="form">
+          <div layout-gt-sm="row">
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>Session name</label>
+              <input ng-model="formData.name">
+            </md-input-container>
+            <md-datepicker style="margin-top:1rem;" ng-model="formData.date" md-placeholder="Session date">
+            </md-datepicker>
+          </div>
+          <div layout-gt-sm="row">
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>Location name</label>
+              <input ng-model="formData.location">
+            </md-input-container>
+          </div>
+          <div layout-gt-sm="row">
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>Street address</label>
+              <input ng-model="formData.streetAddress">
+            </md-input-container>
+          </div>
+          <div layout-gt-sm="row">
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>City</label>
+              <input ng-model="formData.city">
+            </md-input-container>
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>State</label>
+              <input ng-model="formData.state">
+            </md-input-container>
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>Zip code</label>
+              <input ng-model="formData.zipCode">
+            </md-input-container>
+          </div>
+        </form>
+      </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row" layout-align="end center">
+      <md-button ng-click="cancel()">
+       Cancel
+      </md-button>
+      <md-button ng-click="addSession(formData)">
+        Add
+      </md-button>
+    </md-dialog-actions>
+  </form>
+</md-dialog>

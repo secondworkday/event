@@ -1,0 +1,109 @@
+<header layout layout-align="start center">
+  <div flex>
+    <h2 class="md-display-1">
+      <span ng-show="sampleEvents[0].name">{{sampleEvents[0].name}}</span>
+      <span ng-hide="sampleEvents[0].name">New event <a class="md-body-1" href="#">name this event</a></span>
+    </h2>
+  </div>
+  <div>
+    <md-button ui-sref="app.user.home" class="md-primary">Go home</md-button>
+  </div>
+</header>
+<md-divider></md-divider>
+<div class="u-sm-space"></div>
+
+<section layout="column" layout-gt-sm="row">
+  <div flex layout="column" layout-gt-sm="row">
+    <div flex>
+      <div layout layout-align="start center">
+        <div>
+          <h3 class="md-title">Team</h3>
+        </div>
+        <div>
+          <md-button ng-click="showAddTeamMemberDialog($event)" class="md-primary md-icon-button"><i class="fa fa-plus"></i></md-button>
+        </div>
+      </div>
+      <md-content>
+        <md-list>
+          <md-list-item class="md-2-line"
+              ng-click="DO_SOMETHING()"
+              ng-repeat="member in sampleEvents[0].teamMembers">
+            <div class="md-list-item-text">
+              <h3>{{member.firstName}} {{member.lastName}}</h3>
+              <p>{{member.email}}</p>
+            </div>
+          </md-list-item>
+        </md-list>
+      </md-content>
+    </div>
+    <div flex>
+      <div layout layout-align="start center">
+        <div>
+          <h3 class="md-title">Schools</h3>
+        </div>
+        <div>
+          <md-button ng-click="showAddSchoolDialog($event)" class="md-primary md-icon-button"><i class="fa fa-plus"></i></md-button>
+        </div>
+      </div>
+      <md-content>
+        <md-list>
+          <md-list-item class="md-2-line"
+              ng-click="DO_SOMETHING()"
+              ng-repeat="school in sampleEvents[0].schools">
+            <div class="md-list-item-text">
+              <h3>{{school.name}}</h3>
+              <p>{{school.participants}} participants of {{school.totalStudents | number}} students</p>
+            </div>
+          </md-list-item>
+        </md-list>
+      </md-content>
+    </div>
+  </div>
+  <div flex layout="column" layout-gt-sm="row">
+    <div flex>
+      <div layout layout-align="start center">
+        <div>
+          <h3 class="md-title">Participants</h3>
+        </div>
+        <div>
+          <md-button ng-click="showAddParticipantsDialog($event)" class="md-primary md-icon-button"><i class="fa fa-plus"></i></md-button>
+        </div>
+      </div>
+      <md-content>
+        <md-list>
+          <md-list-item class="md-2-line"
+              ng-click="DO_SOMETHING()"
+              ng-repeat="participant in sampleEvents[0].participants">
+            <div class="md-list-item-text">
+              <h3>{{participant.firstName}} {{participant.lastName}}</h3>
+              <p>{{participant.grade}} at {{participant.school}}</p>
+            </div>
+          </md-list-item>
+        </md-list>
+      </md-content>
+    </div>
+    <div flex>
+      <div layout layout-align="start center">
+        <div>
+          <h3 class="md-title">Sessions</h3>
+        </div>
+        <div>
+          <md-button ng-click="showAddSessionDialog($event)" class="md-primary md-icon-button"><i class="fa fa-plus"></i></md-button>
+        </div>
+      </div>
+      <md-content>
+        <md-list>
+          <md-list-item class="md-3-line"
+              ng-click="DO_SOMETHING()"
+              ng-repeat="session in sampleEvents[0].sessions">
+            <div class="md-list-item-text">
+              <h3>{{session.name}}</h3>
+              <h4>{{session.date | date}}</h4>
+              <p>{{session.location}}</p>
+            </div>
+          </md-list-item>
+        </md-list>
+      </md-content>
+    </div>
+  </div>
+</section>
