@@ -1,5 +1,5 @@
-<div class="V2-app-wrapper u-cf">
-  <md-content class="V2-appbar">
+<div class="app-wrapper u-cf">
+  <md-content class="appbar">
     <md-toolbar>
       <div class="md-toolbar-tools">
         <md-button ng-click="goToState('app.site-admin.menu')" ng-hide="stateData.pageTitle == 'Back'" hide-gt-xs class="md-icon-button" aria-label="Menu">
@@ -13,11 +13,11 @@
         </div>
         <span flex></span>
         <md-menu>
-          <md-button aria-label="User menu" ng-click="$mdOpenMenu()">
+          <md-button md-menu-origin aria-label="User menu" ng-click="$mdOpenMenu()">
             <md-tooltip>
               {{model.authenticatedUser.displayName}} ({{model.authenticatedUser.email | lowercase}})
             </md-tooltip>
-            <img md-menu-origin ng-show="model.authenticatedUser.profilePhotoUrl" ng-src="{{model.authenticatedUser.profilePhotoUrl}}" alt="user img" class="mini-user-img" />
+            <img ng-show="model.authenticatedUser.profilePhotoUrl" ng-src="{{model.authenticatedUser.profilePhotoUrl}}" alt="user img" class="mini-user-img" />
             <img ng-hide="model.authenticatedUser.profilePhotoUrl" ng-src="/images/user-img-placeholder.png" alt="user img" class="mini-user-img" />
             <span hide-xs>{{model.authenticatedUser.displayName}} <i class="fa fa-caret-down"></i></span>
           </md-button>
@@ -48,7 +48,7 @@
       </div>
     </md-toolbar>
   </md-content>
-  <div hide-xs class="V2-pinned-sidenav u-pull-left u-cf">
+  <div hide-xs class="pinned-sidenav u-pull-left u-cf">
     <nav class="tiny-nav">
       <ul>
         <li ng-hide="showSystemNav">
@@ -129,16 +129,14 @@
       </ul>
     </nav>
   </div>
-  <div class="V2-content-canvas">
-    <div class="V2-content" ui-view></div>
+  <div class="content-canvas">
+    <div class="content" ui-view></div>
   </div>
 </div>
-<div hide-xs layout layout-align="start center" class="V2-footer">
+<div hide-xs layout layout-align="start center" class="footer">
   <nav>
     <ul>
-      <li>&copy; 2015 TORQworks &middot; v{{currentVersion}}</li>
-      <li><a class="md-body-2" href="#">Privacy Policy</a></li>
-      <li><a class="md-body-2" href="#">Terms of Service</a></li>
+      <li>&copy; 2016 App</li>
       <li><a class="md-body-2" ng-click="showSiteInfoDialog($event)">Site Info</a></li>
     </ul>
   </nav>

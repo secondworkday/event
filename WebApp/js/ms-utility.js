@@ -1,5 +1,5 @@
 ﻿
-// Define basic Authorization roles here. 
+// Define basic Authorization roles here.
 // They allow states to be protected based on Role. (Only SystemAdmins can enter system admin states, etc.)
 
 app.constant('AUTHORIZATION_ROLES', {
@@ -118,7 +118,7 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
 
         if (!authenticatedIdenity) {
           // log on / sign in...
-          $state.go("public.signin", null, { location: 'replace' });
+          $state.go("public.sign-in", null, { location: 'replace' });
         }
         if (authenticate(stateAllowedRoles, authenticatedIdenity)) {
           // location: 'replace' prevents the browser back button from returning a logged in user to the login page.
@@ -162,7 +162,7 @@ app.controller('SpaController', function ($scope, $http, $window, $state, SYSTEM
   $scope.signOut = function () {
     utilityService.signOut()
       .then(function () {
-        $state.go('public.signin', {}, { reload: true });
+        $state.go('public.sign-in', {}, { reload: true });
         // $state.go('app.system.users', {}, { reload: true });
       });
   };
@@ -310,7 +310,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
   var self = this;
 
   // the generated client-side hub proxy - only callable when promise held by hubReady is resolved. Use callHub() calling pattern to ensure this.
-  var utilityHub = $.connection.utilityHub; 
+  var utilityHub = $.connection.utilityHub;
   // holds promised returned when starting our hub connection or null if we haven't started the connection yet
   var hubReady;
   // holds the ui-router state the application was in when the connection with the server was lost
@@ -428,7 +428,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     var model = {
 
         // SignalR provide connection states - see http://www.asp.net/signalr/overview/guide-to-the-api/handling-connection-lifetime-events
-        serverConnectionStatus:  CONNECTION_STATUS.disconnected, 
+        serverConnectionStatus:  CONNECTION_STATUS.disconnected,
         serverConnectionSlow: false, // { true | false }
 
         authenticatedIdentity: null,
@@ -1828,7 +1828,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         }
         else {
           // shouldn't happen
-          $state.go('public.signin');
+          $state.go('public.sign-in');
         }
       }).fail(function (reason) {
         //!! show the button or change states
@@ -1846,7 +1846,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         }
         else {
           // shouldn't happen
-          $state.go('public.signin');
+          $state.go('public.sign-in');
         }
       });
     });

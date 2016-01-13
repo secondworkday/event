@@ -1,0 +1,33 @@
+<md-menu md-position-mode="target-right target">
+  <md-button class="md-icon-button" aria-label="Menu" ng-click="$mdOpenMenu()">
+    <i class="fa fa-ellipsis-v fa-lg"></i>
+  </md-button>
+  <md-menu-content width="4">
+    <md-menu-item>
+      <md-button ng-click="toggleDebugMode()">
+        <p><i class="fa fa-code"></i> Debug Mode: {{debugMode ? "On" : "Off"}}</p>
+      </md-button>
+    </md-menu-item>
+    <md-menu-divider></md-menu-divider>
+    <md-menu-item>
+      <md-button ng-click="goToState('app.goodies')">
+        <p><i class="fa fa-gift"></i> Goodies</p>
+      </md-button>
+    </md-menu-item>
+    <md-menu-item>
+      <md-button ng-click="goToState('app.site-admin.system.dashboard')">
+        <p><i class="fa fa-bolt"></i> System Admin</p>
+      </md-button>
+    </md-menu-item>
+    <md-menu-item>
+      <md-button ng-click="goToState('app.site-admin.ops.dashboard')">
+        <p><i class="fa fa-bolt"></i> Ops Admin</p>
+      </md-button>
+    </md-menu-item>
+    <md-menu-item>
+      <md-button ng-click="goToState('app.site-admin.database.dashboard')">
+        <p><i class="fa fa-bolt"></i> Database Admin</p>
+      </md-button>
+    </md-menu-item>
+  </md-menu-content>
+</md-menu>

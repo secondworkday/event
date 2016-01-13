@@ -27,10 +27,6 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
             allowedRoles: [AUTHORIZATION_ROLES.authenticated]
         }
     })
-    .state('app.home', {
-        url: '/home',
-        templateUrl: '/client/states/app/home.html',
-    })
 
     ;// closes $stateProvider
 }]);
