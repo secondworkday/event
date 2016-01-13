@@ -72,16 +72,6 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       backState: "app.site-admin.system.users"
     }
   })
-  .state('app.site-admin.system.career-sets', {
-    url: '/career-sets',
-    templateUrl: '/client/states/app/site-admin/system-career-sets.html',
-    controller: 'SystemCareerSetsController',
-    data: {
-      stateMapName: 'System Career Sets',
-      pageTitle: "Career Sets",
-      backState: ""
-    }
-  })
   .state('app.site-admin.system.settings', {
     url: '/settings',
     templateUrl: '/client/states/app/site-admin/system-settings.html',
@@ -204,66 +194,6 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       stateMapComment: 'change identity and redirect',
       pageTitle: "Back",
       backState: "app.site-admin.system.tenants"
-    }
-  })
-  .state('app.site-admin.system.library', {
-    url: '/library',
-    templateUrl: '/client/states/app/site-admin/system-library.html',
-    controller: 'SystemLibraryController',
-    data: {
-      stateMapName: 'Library',
-      pageTitle: "Library",
-      backState: ""
-    }
-  })
-  .state('app.site-admin.system.library.occupations', {
-    url: '/occupations',
-    data: {
-      'selectedTab': 0,
-      pageTitle: "Library",
-      backState: ""
-    },
-    views: {
-      'occupations': {
-        templateUrl: '/client/states/app/site-admin/system-library-occupations.html',
-        controller: "SystemLibraryOccupationsController"
-      }
-    }
-  })
-  .state('app.site-admin.system.library.occupations.occupation', {
-    url: '/:occupationID',
-    templateUrl: "/client/states/app/site-admin/system-library-occupation.html",
-    controller: "SystemLibraryOccupationController",
-    resolve: {
-      occupation: function ($stateParams, siteService) {
-        var occupationID = $stateParams.occupationID;
-        return siteService.ensureOccupation(occupationID);
-      }
-    }
-  })
-  .state('app.site-admin.system.library.occupation-major-groups', {
-    url: '/major-groups',
-    data: {
-      'selectedTab': 1,
-      pageTitle: "Library",
-      backState: ""
-    },
-    views: {
-      'occupation-major-groups': {
-        templateUrl: '/client/states/app/site-admin/system-library-occupation-major-groups.html',
-        controller: "SystemLibraryOccupationMajorGroupsController"
-      }
-    }
-  })
-  .state('app.site-admin.system.library.occupation-major-groups.occupation-major-group', {
-    url: '/:occupationMajorGroupCode',
-    templateUrl: "/client/states/app/site-admin/system-library-occupation-major-group.html",
-    controller: "SystemLibraryOccupationMajorGroupController",
-    resolve: {
-      occupationMajorGroup: function ($stateParams, siteService) {
-        var occupationMajorGroupCode = $stateParams.occupationMajorGroupCode;
-        return siteService.getOccupationAuxiliaryData(occupationMajorGroupCode);
-      }
     }
   })
   .state('app.site-admin.ops', {
