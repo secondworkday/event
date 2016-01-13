@@ -1,0 +1,464 @@
+  /* ------------------------------------
+      Breakpoints
+
+      XS ( width < 600px )
+
+      SM ( 600px <= width < 960px )
+
+      MD ( 960px <= width < 1280px )
+
+      LG ( 1280px <= width < 1920px )
+
+      XL ( width >= 1920px )
+  ------------------------------------ */
+
+
+  html, body {
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    height: 100%;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  a {
+    cursor: pointer;
+  }
+
+  .app-wrapper,
+  .public-wrapper {
+    min-width: 320px;
+    min-height: 100%;
+  }
+
+  #app {
+
+  }
+
+  #public {
+
+  }
+
+  .appbar {
+    height: 56px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+  }
+  @media screen
+    and (min-width: 820px)
+    and (max-width: 959px) {
+    .appbar {
+      height: 48px;
+    }
+  }
+  @media (min-width: 960px) {
+    .appbar {
+      height: 64px;
+    }
+  }
+
+  .pinned-sidenav {
+    height: 100%;
+    position: fixed;
+    padding-bottom: 64px;
+    padding-top: 64px;
+    top: 0;
+    width: 210px;
+  }
+  nav {
+    padding-bottom: 2rem;
+    padding-top: 2rem;
+  }
+  nav a {
+    display: block;
+    padding-bottom: 2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-top: 2rem;
+    text-decoration: none;
+  }
+  nav a:hover {
+    background-color: #e0e0e0;
+    cursor: pointer;
+  }
+
+  nav a,
+  nav a:hover,
+  nav a:visited,
+  nav a:focus {
+    color: rgba(0,0,0,.87);
+    text-decoration: none;
+  }
+
+  nav a i {
+    /*color: rgba(0,0,0,.54);*/
+    margin-right: 2rem;
+  }
+
+  nav.tiny-nav a {
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+  }
+
+  .content-canvas,
+  .onboarding-canvas {
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 56px;
+    padding-top: 56px;
+  }
+    @media screen and (min-width: 600px) {
+      .content-canvas {
+        padding-top: 64px;
+        padding-bottom: 64px;
+        margin-left: 210px;
+      }
+      .onboarding-canvas {
+        padding-top: 64px;
+        padding-bottom: 64px;
+      }
+    }
+
+  .content {
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-top: 2rem;
+  }
+  .public-content {
+    width: 100%;
+    height: 100%;
+    max-width: 600px;
+    padding-bottom: 64px;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-top: 2rem;
+  }
+  /* MD */
+  @media only screen
+    and (min-width: 960px)
+    and (max-width: 1279px) {
+      .content {
+        width: 750px;
+      }
+    }
+  /* LG */
+  @media screen
+    and (min-width: 1280px)
+    and (max-width: 1919px) {
+      .content {
+        width: 1070px;
+      }
+    }
+  /* XL */
+  @media screen
+    and (min-width: 1920px) {
+      .content {
+        width: 1720px;
+      }
+    }
+
+  .bottom-tabs {
+    min-width: 320px;
+    line-height: 1;
+    background-color: #fff;
+    bottom:0;
+    height:56px;
+    left:0;
+    position: fixed;
+    right:0;
+    z-index:3;
+  }
+  .bottom-tabs .tab {
+    text-align: center;
+    cursor: pointer;
+  }
+  .bottom-tabs md-toolbar {
+    color: rgba(0,0,0,.87);
+    background-color: #fff;
+  }
+
+  .footer {
+    background-color: #FAFAFA;
+    bottom:0;
+    height:64px;
+    left:0;
+    position: fixed;
+    right:0;
+    padding-left: 2rem;
+  }
+  .footer nav li {
+    display: inline-block;
+  }
+
+  /* Text Style Utilities */
+  .text-center {
+    text-align: center;
+  }
+
+  .text-left {
+    text-align: left;
+  }
+
+  .text-right {
+    text-align: right;
+  }
+
+  .text-red {
+    color: #F44336; }
+
+  .text-green {
+    color: #4CAF50; }
+
+  .text-yellow {
+    color: #FFEB3B; }
+
+  .text-orange {
+    color: #FF9800;
+  }
+
+  .text-blue {
+    color: #2196F3;
+  }
+
+  .text-black {
+    color: #000;
+    color: rgba(0,0,0,.87);
+  }
+
+  .text-hint,
+  a.text-hint {
+    color: rgba(0,0,0,.30);
+  }
+
+  .text-support,
+  a.text-support {
+    color: rgba(0,0,0,.54);
+  }
+
+  /* Background Style Utilities */
+
+  .bg-red {
+    color: #FFF;
+    background-color: #F44336; }
+
+  .bg-green {
+    color: #FFF;
+    background-color: #4CAF50; }
+
+  .bg-yellow {
+    color: #FFF;
+    background-color: #FFEB3B; }
+
+  .bg-blue {
+    color: #FFF;
+    background-color: #2196F3;
+  }
+
+  .bg-gray {
+    color: #FFF;
+    background-color: #E0E0E0;
+  }
+
+
+  /* Utilities */
+
+  .u-full-width {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .u-max-full-width {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 600px) {
+    .u-expand-sm {
+      margin: -2rem;
+    }
+  }
+
+
+  .u-pull-right {
+    float: right;
+  }
+
+  .u-pull-left {
+    float: left;
+  }
+
+  /* Clear a float */
+  .u-cf:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  .u-inline {
+    display: inline-block;
+  }
+
+  .u-sm-space {
+    height: 1rem;
+  }
+
+  .u-md-space {
+    height: 2rem;
+  }
+
+  .u-lg-space {
+    height: 4rem;
+  }
+
+  .u-xl-space {
+    height: 8rem;
+  }
+
+  .u-sm-margin-right {
+    margin-right: 1rem;
+  }
+
+  .u-md-margin-right {
+    margin-right: 2rem;
+  }
+
+  .u-sm-margin-left {
+    margin-left: 1rem;
+  }
+
+  .u-md-margin-left {
+    margin-left: 2rem;
+  }
+
+  .u-hover-container:hover .u-display-hover {
+    display: inline-block;
+  }
+
+  .u-hover-container:hover  .u-hide-hover {
+    display: none;
+  }
+
+  .u-display-hover {
+    display: none;
+  }
+
+  .u-display-hover:hover {
+    display: inline-block;
+  }
+
+  .u-clickable {
+    cursor: pointer;
+  }
+
+  img.mini-user-img {
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+  }
+
+  img.user-img {
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+  }
+
+  img.mega-user-img {
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+  }
+
+  .md-button img.mini-user-img {
+    margin-right: 3px;
+  }
+
+  .md-icon-button img.mini-user-img {
+    margin: 0;
+  }
+
+
+
+  /* =========================================================================== */
+  /*
+   * styles below were pulled directly from Material Design Lite and changed from
+   * mdl- to md- as soon as Angular-Material has components for the items below this
+   * code will no longer be necessary
+  */
+  /* =========================================================================== */
+
+
+
+
+  .md-data-table {
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-collapse: collapse;
+    white-space: nowrap;
+    font-size: 13px;
+    background-color: rgb(255,255,255); }
+    .md-data-table thead {
+      padding-bottom: 3px; }
+      .md-data-table thead .md-data-table__select {
+        margin-top: 0; }
+    .md-data-table tbody tr {
+      position: relative;
+      height: 48px;
+      -webkit-transition-duration: 0.28s;
+              transition-duration: 0.28s;
+      -webkit-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+              transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-transition-property: background-color;
+              transition-property: background-color; }
+      .md-data-table tbody tr.is-selected {
+        background-color: #e0e0e0; }
+      .md-data-table tbody tr:hover {
+        background-color: #eeeeee; }
+    .md-data-table td, .md-data-table th {
+      padding: 0 18px 0 18px;
+      text-align: right; }
+      .md-data-table td:first-of-type, .md-data-table th:first-of-type {
+        padding-left: 24px; }
+      .md-data-table td:last-of-type, .md-data-table th:last-of-type {
+        padding-right: 24px; }
+    .md-data-table td {
+      position: relative;
+      vertical-align: top;
+      height: 48px;
+      border-top: 1px solid rgba(0, 0, 0, 0.12);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      padding-top: 12px;
+      box-sizing: border-box; }
+      .md-data-table td .md-data-table__select {
+        vertical-align: top;
+        position: absolute;
+        left: 24px; }
+    .md-data-table th {
+      position: relative;
+      vertical-align: bottom;
+      text-overflow: ellipsis;
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 24px;
+      letter-spacing: 0;
+      height: 48px;
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.54);
+      padding-bottom: 8px;
+      box-sizing: border-box; }
+      .md-data-table th .md-data-table__select {
+        position: relative; }
+
+  .md-data-table__select {
+    width: 16px; }
+
+  .md-data-table__cell--non-numeric.md-data-table__cell--non-numeric {
+    text-align: left; }
