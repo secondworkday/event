@@ -35,6 +35,12 @@ namespace App.Library
     partial void InsertExtendedUser(ExtendedUser instance);
     partial void UpdateExtendedUser(ExtendedUser instance);
     partial void DeleteExtendedUser(ExtendedUser instance);
+    partial void InsertEvent(Event instance);
+    partial void UpdateEvent(Event instance);
+    partial void DeleteEvent(Event instance);
+    partial void InsertEventSession(EventSession instance);
+    partial void UpdateEventSession(EventSession instance);
+    partial void DeleteEventSession(EventSession instance);
     partial void InsertParticipantGroup(ParticipantGroup instance);
     partial void UpdateParticipantGroup(ParticipantGroup instance);
     partial void DeleteParticipantGroup(ParticipantGroup instance);
@@ -80,6 +86,22 @@ namespace App.Library
 			get
 			{
 				return this.GetTable<ExtendedUser>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Event> Events
+		{
+			get
+			{
+				return this.GetTable<Event>();
+			}
+		}
+		
+		public System.Data.Linq.Table<EventSession> EventSessions
+		{
+			get
+			{
+				return this.GetTable<EventSession>();
 			}
 		}
 		
@@ -751,6 +773,511 @@ namespace App.Library
 					this._CustomProperties = value;
 					this.SendPropertyChanged("CustomProperties");
 					this.OnCustomPropertiesChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Event")]
+	public partial class Event : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _ID;
+		
+		private global::MS.Utility.ExtendedPropertyScopeType _ScopeType;
+		
+		private System.Nullable<int> _ScopeID;
+		
+		private System.DateTime _CreatedTimestamp;
+		
+		private System.DateTime _LastModifiedTimestamp;
+		
+		private string _Name;
+		
+		private string _Overview;
+		
+		private EntitySet<EventSession> _EventSessions;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIDChanging(int value);
+    partial void OnIDChanged();
+    partial void OnScopeTypeChanging(global::MS.Utility.ExtendedPropertyScopeType value);
+    partial void OnScopeTypeChanged();
+    partial void OnScopeIDChanging(System.Nullable<int> value);
+    partial void OnScopeIDChanged();
+    partial void OnCreatedTimestampChanging(System.DateTime value);
+    partial void OnCreatedTimestampChanged();
+    partial void OnLastModifiedTimestampChanging(System.DateTime value);
+    partial void OnLastModifiedTimestampChanged();
+    partial void OnNameChanging(string value);
+    partial void OnNameChanged();
+    partial void OnOverviewChanging(string value);
+    partial void OnOverviewChanged();
+    #endregion
+		
+		public Event()
+		{
+			this._EventSessions = new EntitySet<EventSession>(new Action<EventSession>(this.attach_EventSessions), new Action<EventSession>(this.detach_EventSessions));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int ID
+		{
+			get
+			{
+				return this._ID;
+			}
+			set
+			{
+				if ((this._ID != value))
+				{
+					this.OnIDChanging(value);
+					this.SendPropertyChanging();
+					this._ID = value;
+					this.SendPropertyChanged("ID");
+					this.OnIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ScopeType", DbType="Int NOT NULL", CanBeNull=false)]
+		public global::MS.Utility.ExtendedPropertyScopeType ScopeType
+		{
+			get
+			{
+				return this._ScopeType;
+			}
+			set
+			{
+				if ((this._ScopeType != value))
+				{
+					this.OnScopeTypeChanging(value);
+					this.SendPropertyChanging();
+					this._ScopeType = value;
+					this.SendPropertyChanged("ScopeType");
+					this.OnScopeTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ScopeID", DbType="Int")]
+		public System.Nullable<int> ScopeID
+		{
+			get
+			{
+				return this._ScopeID;
+			}
+			set
+			{
+				if ((this._ScopeID != value))
+				{
+					this.OnScopeIDChanging(value);
+					this.SendPropertyChanging();
+					this._ScopeID = value;
+					this.SendPropertyChanged("ScopeID");
+					this.OnScopeIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedTimestamp", DbType="DATETIME2 NOT NULL")]
+		public System.DateTime CreatedTimestamp
+		{
+			get
+			{
+				return this._CreatedTimestamp;
+			}
+			set
+			{
+				if ((this._CreatedTimestamp != value))
+				{
+					this.OnCreatedTimestampChanging(value);
+					this.SendPropertyChanging();
+					this._CreatedTimestamp = value;
+					this.SendPropertyChanged("CreatedTimestamp");
+					this.OnCreatedTimestampChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LastModifiedTimestamp", DbType="DATETIME2 NOT NULL")]
+		public System.DateTime LastModifiedTimestamp
+		{
+			get
+			{
+				return this._LastModifiedTimestamp;
+			}
+			set
+			{
+				if ((this._LastModifiedTimestamp != value))
+				{
+					this.OnLastModifiedTimestampChanging(value);
+					this.SendPropertyChanging();
+					this._LastModifiedTimestamp = value;
+					this.SendPropertyChanged("LastModifiedTimestamp");
+					this.OnLastModifiedTimestampChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="nvarchar(128) NOT NULL", CanBeNull=false)]
+		public string Name
+		{
+			get
+			{
+				return this._Name;
+			}
+			set
+			{
+				if ((this._Name != value))
+				{
+					this.OnNameChanging(value);
+					this.SendPropertyChanging();
+					this._Name = value;
+					this.SendPropertyChanged("Name");
+					this.OnNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Overview", DbType="nvarchar(MAX)")]
+		public string Overview
+		{
+			get
+			{
+				return this._Overview;
+			}
+			set
+			{
+				if ((this._Overview != value))
+				{
+					this.OnOverviewChanging(value);
+					this.SendPropertyChanging();
+					this._Overview = value;
+					this.SendPropertyChanged("Overview");
+					this.OnOverviewChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Event_EventSession", Storage="_EventSessions", ThisKey="ID", OtherKey="EventID")]
+		public EntitySet<EventSession> EventSessions
+		{
+			get
+			{
+				return this._EventSessions;
+			}
+			set
+			{
+				this._EventSessions.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_EventSessions(EventSession entity)
+		{
+			this.SendPropertyChanging();
+			entity.Event = this;
+		}
+		
+		private void detach_EventSessions(EventSession entity)
+		{
+			this.SendPropertyChanging();
+			entity.Event = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.EventSession")]
+	public partial class EventSession : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _ID;
+		
+		private global::MS.Utility.ExtendedPropertyScopeType _ScopeType;
+		
+		private System.Nullable<int> _ScopeID;
+		
+		private System.DateTime _CreatedTimestamp;
+		
+		private System.DateTime _LastModifiedTimestamp;
+		
+		private string _Name;
+		
+		private string _Overview;
+		
+		private int _EventID;
+		
+		private EntityRef<Event> _Event;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIDChanging(int value);
+    partial void OnIDChanged();
+    partial void OnScopeTypeChanging(global::MS.Utility.ExtendedPropertyScopeType value);
+    partial void OnScopeTypeChanged();
+    partial void OnScopeIDChanging(System.Nullable<int> value);
+    partial void OnScopeIDChanged();
+    partial void OnCreatedTimestampChanging(System.DateTime value);
+    partial void OnCreatedTimestampChanged();
+    partial void OnLastModifiedTimestampChanging(System.DateTime value);
+    partial void OnLastModifiedTimestampChanged();
+    partial void OnNameChanging(string value);
+    partial void OnNameChanged();
+    partial void OnOverviewChanging(string value);
+    partial void OnOverviewChanged();
+    partial void OnEventIDChanging(int value);
+    partial void OnEventIDChanged();
+    #endregion
+		
+		public EventSession()
+		{
+			this._Event = default(EntityRef<Event>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int ID
+		{
+			get
+			{
+				return this._ID;
+			}
+			set
+			{
+				if ((this._ID != value))
+				{
+					this.OnIDChanging(value);
+					this.SendPropertyChanging();
+					this._ID = value;
+					this.SendPropertyChanged("ID");
+					this.OnIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ScopeType", DbType="Int NOT NULL", CanBeNull=false)]
+		public global::MS.Utility.ExtendedPropertyScopeType ScopeType
+		{
+			get
+			{
+				return this._ScopeType;
+			}
+			set
+			{
+				if ((this._ScopeType != value))
+				{
+					this.OnScopeTypeChanging(value);
+					this.SendPropertyChanging();
+					this._ScopeType = value;
+					this.SendPropertyChanged("ScopeType");
+					this.OnScopeTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ScopeID", DbType="Int")]
+		public System.Nullable<int> ScopeID
+		{
+			get
+			{
+				return this._ScopeID;
+			}
+			set
+			{
+				if ((this._ScopeID != value))
+				{
+					this.OnScopeIDChanging(value);
+					this.SendPropertyChanging();
+					this._ScopeID = value;
+					this.SendPropertyChanged("ScopeID");
+					this.OnScopeIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedTimestamp", DbType="DATETIME2 NOT NULL")]
+		public System.DateTime CreatedTimestamp
+		{
+			get
+			{
+				return this._CreatedTimestamp;
+			}
+			set
+			{
+				if ((this._CreatedTimestamp != value))
+				{
+					this.OnCreatedTimestampChanging(value);
+					this.SendPropertyChanging();
+					this._CreatedTimestamp = value;
+					this.SendPropertyChanged("CreatedTimestamp");
+					this.OnCreatedTimestampChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LastModifiedTimestamp", DbType="DATETIME2 NOT NULL")]
+		public System.DateTime LastModifiedTimestamp
+		{
+			get
+			{
+				return this._LastModifiedTimestamp;
+			}
+			set
+			{
+				if ((this._LastModifiedTimestamp != value))
+				{
+					this.OnLastModifiedTimestampChanging(value);
+					this.SendPropertyChanging();
+					this._LastModifiedTimestamp = value;
+					this.SendPropertyChanged("LastModifiedTimestamp");
+					this.OnLastModifiedTimestampChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="nvarchar(128) NOT NULL", CanBeNull=false)]
+		public string Name
+		{
+			get
+			{
+				return this._Name;
+			}
+			set
+			{
+				if ((this._Name != value))
+				{
+					this.OnNameChanging(value);
+					this.SendPropertyChanging();
+					this._Name = value;
+					this.SendPropertyChanged("Name");
+					this.OnNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Overview", DbType="nvarchar(MAX)")]
+		public string Overview
+		{
+			get
+			{
+				return this._Overview;
+			}
+			set
+			{
+				if ((this._Overview != value))
+				{
+					this.OnOverviewChanging(value);
+					this.SendPropertyChanging();
+					this._Overview = value;
+					this.SendPropertyChanged("Overview");
+					this.OnOverviewChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EventID", DbType="Int NOT NULL")]
+		public int EventID
+		{
+			get
+			{
+				return this._EventID;
+			}
+			set
+			{
+				if ((this._EventID != value))
+				{
+					if (this._Event.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnEventIDChanging(value);
+					this.SendPropertyChanging();
+					this._EventID = value;
+					this.SendPropertyChanged("EventID");
+					this.OnEventIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Event_EventSession", Storage="_Event", ThisKey="EventID", OtherKey="ID", IsForeignKey=true)]
+		public Event Event
+		{
+			get
+			{
+				return this._Event.Entity;
+			}
+			set
+			{
+				Event previousValue = this._Event.Entity;
+				if (((previousValue != value) 
+							|| (this._Event.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Event.Entity = null;
+						previousValue.EventSessions.Remove(this);
+					}
+					this._Event.Entity = value;
+					if ((value != null))
+					{
+						value.EventSessions.Add(this);
+						this._EventID = value.ID;
+					}
+					else
+					{
+						this._EventID = default(int);
+					}
+					this.SendPropertyChanged("Event");
 				}
 			}
 		}

@@ -293,6 +293,109 @@ namespace WebApp
 
 
 
+
+
+
+
+
+
+        public HubResult GetEvents()
+        {
+            return GetEvents(0, int.MaxValue);
+        }
+
+        public HubResult GetEvents(int startRowIndex, int maximumRows)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var sortField = "name";
+                var result = Event.Search(dc, SearchExpression.Empty, sortField, startRowIndex, maximumRows);
+
+                return HubResult.CreateSuccessData(result);
+            });
+        }
+
+
+
+        public HubResult SearchEvents(string searchExpressionString)
+        {
+            return SearchEvents(searchExpressionString, string.Empty, 0, int.MaxValue);
+        }
+
+        public HubResult SearchEvents(string searchExpressionString, string sortField, int startRowIndex, int maximumRows)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var searchExpression = SearchExpression.Create(searchExpressionString);
+                var result = Event.Search(dc, searchExpression, sortField, startRowIndex, maximumRows);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
+
+        public HubResult ModifyEventTag(int itemID, string tagName, bool isAssigned)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                return Event.ModifyTag(dc, itemID, tagName, isAssigned);
+            });
+        }
+
+        public HubResult ModifyEventMyTag(int itemID, string tagName, bool isAssigned)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                return Event.ModifyMyTag(dc, itemID, tagName, isAssigned);
+            });
+        }
+
+        public HubResult ModifyMyFavoriteEvent(int itemID, bool isFavorite)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                return Event.ModifyMyFavorite(dc, itemID, isFavorite);
+            });
+        }
+
+#if false
+        public HubResult EmailProjectReport(int itemID, string emailType, dynamic mailMessageData)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                return Project.EmailReport(dc, itemID, emailType, mailMessageData);
+            });
+        }
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #if false
         #region Career Profiles
 

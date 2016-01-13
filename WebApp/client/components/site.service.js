@@ -558,6 +558,66 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
 
 
 
+  //** Events Related
+  model.events = {
+    hashMap: {},
+    index: [],
+
+    search: function (searchExpression, sortExpression, startIndex, rowCount) {
+      return utilityService.callHub(function () {
+        return siteHub.server.searchEvents(searchExpression, sortExpression, startIndex, rowCount);
+      }).then(function (itemsData) {
+        return utilityService.updateItemsModel(model.events, itemsData);
+      });
+    }
+  };
+
+
+  self.getEvent = function (itemID) {
+    var searchExpression = "%" + itemID;
+    //!! hmm - perhaps need a flag to indicate we want detailed information, not just overview information
+    return self.searchEvents(searchExpression, '', 0, 1)
+    .then(function (itemsData) {
+      var item = model.events.hashMap[itemID];
+      if (item) {
+        return item;
+      }
+      return $q.reject("not found");
+    });
+  };
+
+  this.modifyEventTag = function (item, newTag, isAssigned) {
+    return utilityService.callHub(function () {
+      return siteHub.server.modifyEventTag(item.id, newTag, isAssigned);
+    });
+  };
+  this.modifyEventMyTag = function (item, newTag, isAssigned) {
+    return utilityService.callHub(function () {
+      return siteHub.server.modifyEventMyTag(item.id, newTag, isAssigned);
+    });
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

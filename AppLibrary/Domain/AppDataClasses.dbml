@@ -37,6 +37,45 @@
     </Type>
   </Table>
 
+
+  <Table Name="dbo.Event" Member="Events">
+    <Type Name="Event" >
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ScopeType" Type="global::MS.Utility.ExtendedPropertyScopeType" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ScopeID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+
+      <Column Name="CreatedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+
+      <Column Name="Name" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
+      <Column Name="Overview" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true"/>
+
+      <Association Name="EventSession_Event" Member="EventSessions" ThisKey="ID" OtherKey="EventID" Type="EventSession" />
+    </Type>
+  </Table>
+
+
+
+  <Table Name="dbo.EventSession" Member="EventSessions">
+    <Type Name="EventSession" >
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ScopeType" Type="global::MS.Utility.ExtendedPropertyScopeType" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ScopeID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+
+      <Column Name="CreatedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+
+      <Column Name="Name" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
+      <Column Name="Overview" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true"/>
+
+      <Column Name="EventID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="EventSession_Event" Member="Event" ThisKey="EventID" OtherKey="ID" Type="Event" IsForeignKey="true" />
+    </Type>
+  </Table>
+
+
+
+
   <Table Name="dbo.ParticipantGroup" Member="ParticipantGroups">
     <Type Name="ParticipantGroup" >
       <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -52,7 +91,6 @@
       <Association Name="ParticipantGroup_Participant" Member="Participants" ThisKey="ID" OtherKey="ParticipantGroupID" Type="Participant" />
     </Type>
   </Table>
-
 
   <Table Name="dbo.Participant" Member="Participants">
     <Type Name="Participant">
