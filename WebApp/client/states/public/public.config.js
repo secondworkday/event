@@ -10,62 +10,33 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       templateUrl: '/client/states/public/public.html',
       controller: 'PublicController',
       data: {
-          stateMapName: "Public master page",
-          stateMapComment: "abstract, no authentication",
           allowedRoles: [AUTHORIZATION_ROLES.anonymous]
       }
   })
-  .state('public.signin', {
-      url: '/signin',
-      templateUrl: '/client/states/public/signin.html',
-      controller: 'SignInController',
-      data: {
-          stateMapName: "Sign In"
-          // <%= SignInPageDemoDataJson %>
-          //!! TODO do we need to pull in this demo data json another way??
-      }
+  .state('public.landing', {
+      url: '/',
+      templateUrl: '/client/states/public/landing.html',
   })
-  .state('public.job-seeker-signup', {
-      url: '/signup',
-      templateUrl: '/client/states/public/job-seeker-signup.html',
-      controller: 'JobSeekerSignupController',
-      data: {
-          stateMapName: "Job Seeker Sign Up"
-      }
+  .state('public.create-account', {
+      url: '/create-account',
+      templateUrl: '/client/states/public/create-account.html',
+      controller: 'CreateAccountController'
   })
-  .state('public.privacy-policy', {
-      url: '/privacy-policy',
-      templateUrl: '/client/states/public/privacy-policy.html',
-      data: {
-          stateMapName: "Privacy Policy"
-      }
+  .state('public.sign-in', {
+      url: '/sign-in',
+      templateUrl: '/client/states/public/sign-in.html',
+      controller: 'SignInController'
   })
   .state('public.wait', {
       url: '/wait',
-      templateUrl: '/client/states/public/wait.html',
-      controller: 'WaitController',
-      data: {
-          stateMapName: "Please Wait"
-      }
+      templateUrl: '/client/states/public/wait.html'
   })
-
   .state('public.reconnecting', {
     url: '/reconnecting',
-    templateUrl: '/client/states/public/connection/reconnecting.html',
-    controller: 'ReconnectingController',
-    data: {
-      stateMapName: "SignalR Reconnecting"
-    }
+    templateUrl: '/client/states/public/connection/reconnecting.html'
   })
   .state('public.disconnected', {
     url: '/disconnected',
-    templateUrl: '/client/states/public/connection/disconnected.html',
-    controller: 'DisconnectedController',
-    data: {
-      stateMapName: "SignalR Disconnected"
-    }
-  })
-
-
-  ;// closes $stateProvider
+    templateUrl: '/client/states/public/connection/disconnected.html'
+  });// closes $stateProvider
 }]);
