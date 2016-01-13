@@ -298,6 +298,25 @@ namespace WebApp
 
 
 
+        public HubResult GenerateRandomEvent()
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var randomEvent = Event.GenerateRandom(dc);
+                return HubResult.CreateSuccessData(randomEvent.ID);
+            });
+        }
+
+        public HubResult CreateEvent(dynamic formData)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var randomEvent = Event.Create(dc, formData);
+                return HubResult.CreateSuccessData(randomEvent.ID);
+            });
+        }
+
+
 
         public HubResult GetEvents()
         {

@@ -572,6 +572,18 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
     }
   };
 
+  this.generateRandomEvent = function () {
+    return utilityService.callHub(function () {
+      return siteHub.server.generateRandomEvent();
+    });
+  };
+
+  this.createEvent = function (formData) {
+    return utilityService.callHub(function () {
+      return siteHub.server.createEvent(formData);
+    });
+  };
+
 
   self.getEvent = function (itemID) {
     var searchExpression = "%" + itemID;

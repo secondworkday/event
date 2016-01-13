@@ -34,16 +34,16 @@ namespace App.Library
         protected override int? objectScopeID { get { return this.ScopeID; } }
 
 
-        protected Event(DateTime createdTimestamp, string name)
+        protected Event(DateTime createdTimestamp, EPScope epScope, string name)
             : this()
         {
             Debug.Assert(!string.IsNullOrEmpty(name));
 
-            this.ScopeType = ExtendedPropertyScopeType.Global;
-            this.ScopeID = null;
-
             this.CreatedTimestamp = createdTimestamp;
             this.LastModifiedTimestamp = createdTimestamp;
+
+            this.ScopeType = epScope.ScopeType;
+            this.ScopeID = epScope.ID;
 
             this.Name = name;
         }
@@ -181,6 +181,49 @@ namespace App.Library
 
 
 
+
+
+
+        public static Event GenerateRandom(AppDC dc)
+        {
+            var data = new
+            {
+                name = "Demo Event"
+            };
+
+            var result = Event.createLock(dc, () =>
+            {
+                var newHome = Event.Create(dc, data);
+                Debug.Assert(newHome != null && newHome.ID > 0);
+
+                return newHome;
+            });
+
+            return result;
+        }
+
+        public static Event Create(AppDC dc, dynamic data)
+        {
+            return Event.createLock(dc, () =>
+            {
+                var createdTimestamp = dc.TransactionTimestamp;
+                var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+
+                var name = (string)data.name;
+
+                var newItem = new Event(createdTimestamp, teamEPScope, name);
+                dc.Save(newItem);
+                // (have to save to obtain an ID before we can save ExtendedProperties
+                Debug.Assert(newItem.ID > 0);
+
+                // After we've got our ID, advance Status to Opened
+                //!! newItem.setStatus(dc, ProjectStatus.Submitted);
+
+                //!! newItem.updateData(dc, data);
+
+                return newItem;
+            });
+        }
 
 
 
