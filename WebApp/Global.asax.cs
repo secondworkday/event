@@ -30,7 +30,7 @@ namespace WebApp
 
             var appInfo = AppInfo.Create("osb", "osb.socialventuresoftware.org");
             appInfo.SetProductName("OSB");
-            appInfo.SetDevelopmentDomainName(".torqlab.com");
+            appInfo.SetDevelopmentDomainName("dev.socialventuresoftware.org");
             appInfo.SetProductionSiteDomainName("www.socialventuresoftware.org");
             appInfo.SetEmailSignature("The Justice League Team");
 
