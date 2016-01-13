@@ -26,11 +26,33 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, util
     }
   ];
 
-  $scope.createEvent = function(){
-    // create an event
-    // go to the new event
-    $state.go('app.user.event');
-  };
+  $scope.showCreateEventDialog = function(ev) {
+    $mdDialog.show({
+      controller: CreateEventDialog,
+      templateUrl: '/client/states/app/user/create-event.dialog.html',
+      parent: angular.element(document.body),
+      targetEvent: ev,
+      clickOutsideToClose:true,
+      fullscreen: false
+    })
+    .then(function() {
+      // $scope.status = 'You said the information was "' + answer + '".';
+    }, function() {
+      // $scope.status = 'You cancelled the dialog.';
+    });
+  }
+  function CreateEventDialog($scope, $mdDialog) {
+    $scope.hide = function() {
+      $mdDialog.hide();
+    };
+    $scope.cancel = function() {
+      $mdDialog.cancel();
+    };
+    $scope.createEvent = function(formData) {
+      $mdDialog.hide(formData);
+      $state.go('app.user.event');
+    };
+  }
 
   $scope.showAddTeamMemberDialog = function(ev) {
     $mdDialog.show({
