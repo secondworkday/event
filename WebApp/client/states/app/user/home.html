@@ -1,14 +1,30 @@
-<h2 class="md-title">
-  Welcome to the app!
+<h2 class="md-display-1">
+  Dashboard
 </h2>
 <md-divider></md-divider>
+<div class="u-sm-space"></div>
 <section>
-  <p>
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
-    eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-    sunt in culpa qui officia deserunt mollit anim id est laborum.
-  </p>
+  <div layout layout-align="start center">
+    <div flex>
+      <h3 class="md-title">Your events</h3>
+    </div>
+    <div>
+      <md-button ng-click="createEvent()" class="md-primary"><i class="fa fa-plus"></i> Create new event</md-button>
+    </div>
+  </div>
+
+  <div layout layout-wrap>
+    <md-card class="card-event"
+        ng-repeat="event in sampleEvents">
+      <md-card-content ui-sref="app.user.event" class="u-clickable">
+        <h4 style="margin-top:0;" class="md-title">{{event.name}}</h4>
+        <p class="md-body-1">{{event.description}}</p>
+      </md-card-content>
+      <md-card-actions layout="row" layout-align="start center">
+        <md-button ui-sref="app.user.event" class="md-primary">View</md-button>
+        <md-button class="md-warn">Archive</md-button>
+      </md-card-actions>
+    </md-card>
+  </div>
+
 </section>
