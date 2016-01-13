@@ -1,5 +1,5 @@
-app.controller('JobSeekerSignupController', function ($scope, $log, $filter, $state, utilityService, siteService) {
-  $log.debug("Loading JobSeekerSignupController...");
+app.controller('CreateAccountController', function ($scope, $log, $filter, $state, utilityService, siteService) {
+  $log.debug('Loading CreateAccountController...');
 
   $scope.formData = {};
   $scope.passwordInputType = "password";
@@ -27,7 +27,7 @@ app.controller('JobSeekerSignupController', function ($scope, $log, $filter, $st
       utilityService.signIn(newUserCred)
       .then(function () {
         // success (sign in)
-        $state.go('app.job-seeker.onboard.intro');
+        $state.go('app.home');
       }, function () {
         // failure (sign in) (shouldn't happen)
         alert("nope");
@@ -37,4 +37,5 @@ app.controller('JobSeekerSignupController', function ($scope, $log, $filter, $st
       alert(failureData.errorMessage);
     });
   };
+
 });
