@@ -49,6 +49,16 @@ namespace WebApp
                         var usersRowData = User.GetExportRows(appDC);
                         response.SendCsvFileToBrowser("Users.csv", usersRowData);
                         return;
+
+                    case "reminderForm":
+                        var participantID = request.QueryString.GetNullableInt32("id");
+                        if (participantID.HasValue)
+                        {
+                            downloadReminderForm(response, appDC, siteContext, participantID.Value);
+                            return;
+                        }
+                        return;
+
 #if false
                     case "clients":
                         var clientsRowData = Client.GetExportRows(appDC, searchExpression);
@@ -96,6 +106,20 @@ namespace WebApp
             }
         }
 #endif
+
+        private void downloadReminderForm(HttpResponse response, AppDC appDC, SiteContext siteContext, int projectID)
+        {
+            var reportGenerator = Participant.GetReportGenerator(appDC, "OSB-Reminder-Form-2.docx", ReportFormat.Pdf, projectID);
+
+            if (reportGenerator != null)
+            {
+                var reportStream = reportGenerator.Generate();
+                reportStream.Position = 0;
+
+                response.DownloadToBrowser("ReminderForm" + DateTime.Now.ToString() + reportGenerator.ReportFileExtension, reportGenerator.ReportContentType, reportStream);
+            }
+        }
+
         public bool IsReusable
         {
             get { return true; }

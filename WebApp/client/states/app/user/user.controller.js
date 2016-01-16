@@ -1,3 +1,13 @@
+app.controller('ReportController', function ($scope, $log, utilityService, siteService) {
+    $scope.downloadReport = function() {
+        var query = {
+            type: 'reminderForm',
+            id: 2
+        };
+        utilityService.download(query);
+    }
+});
+
 app.controller('UserController', function ($scope, $log, $state, $mdDialog, utilityService, siteService) {
   $log.debug('Loading UserController...');
 

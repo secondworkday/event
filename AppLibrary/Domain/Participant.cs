@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 
 using MS.Utility;
+using MS.TemplateReports;
 
 namespace App.Library
 {
@@ -185,7 +186,7 @@ namespace App.Library
 
                 // https://s3.amazonaws.com/gopvr-com-lab-public/tvdb/S-124971/P-posters/124971-1.jpg
                 //this.imageUrl = string.IsNullOrEmpty(exItem.item.ImageS3Path) ? null :
-                    //new Uri(SiteContext.Current.PublicBucketUrl + exItem.item.ImageS3Path);
+                //new Uri(SiteContext.Current.PublicBucketUrl + exItem.item.ImageS3Path);
             }
 
             public static SearchItem Create(ExtendedItem<Participant> item, SearchItemContext context)
@@ -202,7 +203,7 @@ namespace App.Library
             var resultSetQuery = ExtendedQuery(dc, searchExpression);
 
             //resultSetQuery = resultSetQuery
-                //.OrderBy(foo => foo.item.ReleasedTimestamp);
+            //.OrderBy(foo => foo.item.ReleasedTimestamp);
 
             var results = Search(dc, searchExpression, sortExpression, startRowIndex, maximumRows, resultSetQuery, SearchItem.Create);
             return results;
@@ -581,6 +582,130 @@ namespace App.Library
         public override string ToString()
         {
             return this.Name;
+        }
+
+        public static Participant GenerateRandom(AppDC dc)
+        {
+            dynamic randomUserData = RandomUserGenerator.GenerateUser();
+
+            dynamic userNameJson = randomUserData.name;
+            string firstName = userNameJson.first;
+            string lastName = userNameJson.last;
+
+            dynamic userLocationJson = randomUserData.location;
+            string streetAddress = userLocationJson.street;
+
+            var data = new
+            {
+                name = CapitalizeFirstChar(firstName) + " " + CapitalizeFirstChar(lastName),
+                grade = new Random().Next(1, 7),
+                schoolID = 1
+            }.ToJson().FromJson();
+
+            var result = Participant.createLock(dc, () =>
+            {
+                var newParticipant = Participant.Create(dc, data);
+                return newParticipant;
+            });
+
+            return result;
+
+        }
+
+        private static string CapitalizeFirstChar(string s)
+        {
+            if (string.IsNullOrEmpty(s))
+            {
+                return string.Empty;
+            }
+            return char.ToUpper(s[0]) + s.Substring(1);
+        }
+
+        public static Participant Create(AppDC dc, dynamic data)
+        {
+            return Participant.createLock(dc, () =>
+            {
+                var createdTimestamp = dc.TransactionTimestamp;
+                var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+
+                var name = (string)data.name;
+                var grade = (int)data.grade;
+                var schoolID = (int)data.schoolID;
+
+                var newItem = new Participant(createdTimestamp, teamEPScope, name, grade, schoolID);
+                dc.Save(newItem);
+
+                Debug.Assert(newItem.ID > 0);
+
+                return newItem;
+            });
+        }
+
+        protected Participant(DateTime createdTimestamp, EPScope epScope, string name, int grade, int participantGroupID)
+            : this()
+        {
+            this.CreatedTimestamp = createdTimestamp;
+            this.ScopeType = epScope.ScopeType;
+            this.ScopeID = epScope.ID;
+
+            this.Name = name;
+            this.Grade = (uint)grade;
+            this.ParticipantGroupID = participantGroupID;
+        }
+
+        public static ReportGenerator GetReportGenerator(AppDC appDC, string templateName, ReportFormat reportFormat, int itemID)
+        {
+            var siteContext = SiteContext.Current;
+
+            TagProvider tagProvider = null;
+            tagProvider = Participant.createParticipantTagProvider(appDC, itemID);
+
+            ReportGenerator reportGenerator = null;
+            if (tagProvider != null)
+            {
+                reportGenerator = siteContext.Reports.Generate(reportFormat, DocumentTemplate.FromResource("AppLibrary.Reports." + templateName, null), tagProvider);//siteContext.Reports.Generate(typeof(Participant), reportFormat, templateName, tagProvider);
+            }
+
+            return reportGenerator;
+        }
+
+        private static TagProvider createParticipantTagProvider(AppDC appDC, int itemID)
+        {
+            var exQuery =
+                from epParticipant in ExtendedQuery(appDC)
+                join school in ParticipantGroup.Query(appDC) on epParticipant.item.ParticipantGroupID equals school.ID
+                select new { epParticipant };
+
+            var exResult = exQuery
+                .Where(exItem => exItem.epParticipant.item.ID == itemID)
+                .FirstOrDefault();
+
+            var participant = exResult.epParticipant.item;
+
+            IEnumerable<ProviderTag> tags = new ProviderTag[]
+            {
+                StringProviderTag.Create("StudentName", participant.Name),
+                StringProviderTag.Create("SchoolName", participant.ParticipantGroup.Name),
+                StringProviderTag.Create("Address", "Main Street, Redmond WA 98052"),
+            };
+
+            return TagProvider.Create(tags);
+        }
+    }
+
+    public static class RandomUserGenerator
+    {
+        public static dynamic GenerateUser()
+        {
+            using (var msWebClient = new MSWebClient())
+            {
+                var responseString = msWebClient.DownloadString(@"http://api.randomuser.me/0.4/");
+                dynamic randomUserJson = Newtonsoft.Json.Linq.JObject.Parse(responseString);
+
+                dynamic userJson = randomUserJson.results[0].user;
+
+                return userJson;
+            }
         }
     }
 }

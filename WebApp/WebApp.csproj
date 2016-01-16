@@ -248,6 +248,7 @@
     <Content Include="Scripts\angular-xeditable\xeditable.min.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
+    <Content Include="api.ashx" />
     <None Include="Scripts\jquery-2.1.4.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.4.js" />
     <Content Include="Scripts\jquery-2.1.4.min.js" />
@@ -285,6 +286,9 @@
     </Compile>
     <Compile Include="Bootstrap\Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="api.ashx.cs">
+      <DependentUpon>api.ashx</DependentUpon>
     </Compile>
     <Compile Include="Download.ashx.cs">
       <DependentUpon>Download.ashx</DependentUpon>

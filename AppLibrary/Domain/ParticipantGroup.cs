@@ -49,6 +49,16 @@ namespace App.Library
             this.Name = name;
         }
 
+        protected ParticipantGroup(DateTime createdTimestamp, EPScope epScope, string name)
+            : this()
+        {
+            this.CreatedTimestamp = createdTimestamp;
+            this.ScopeType = epScope.ScopeType;
+            this.ScopeID = epScope.ID;
+
+            this.Name = name;
+        }
+
 
 
         private static Func<IQueryable<ParticipantGroup>, string, IQueryable<ParticipantGroup>> termFilter = (query, searchTermLower) =>
@@ -621,6 +631,41 @@ namespace App.Library
         public override string ToString()
         {
             return this.Name;
+        }
+
+        public static ParticipantGroup GenerateRandom(AppDC dc)
+        {
+            var data = new
+            {
+                name = "Eastside Elementary"
+            }
+            .ToJson().FromJson();
+
+            var result = ParticipantGroup.createLock(dc, () =>
+            {
+                var newParticipantGroup = ParticipantGroup.Create(dc, data);
+                return newParticipantGroup;
+            });
+
+            return result;
+        }
+
+        public static ParticipantGroup Create(AppDC dc, dynamic data)
+        {
+            return ParticipantGroup.createLock(dc, () =>
+            {
+                var createdTimestamp = dc.TransactionTimestamp;
+                var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+
+                var name = (string)data.name;
+
+                var newItem = new ParticipantGroup(createdTimestamp, teamEPScope, name);
+                dc.Save(newItem);
+
+                Debug.Assert(newItem.ID > 0);
+
+                return newItem;
+            });
         }
     }
 }
