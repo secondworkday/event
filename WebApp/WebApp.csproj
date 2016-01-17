@@ -199,6 +199,12 @@
     <Content Include="client\states\app\site-admin\system-user.dialog.html" />
     <Content Include="client\states\app\site-admin\system-users.controller.js" />
     <Content Include="client\states\app\site-admin\system-users.html" />
+    <Content Include="client\states\app\user\add-participants.dialog.html" />
+    <Content Include="client\states\app\user\add-school.dialog.html" />
+    <Content Include="client\states\app\user\add-session.dialog.html" />
+    <Content Include="client\states\app\user\add-team-member.dialog.html" />
+    <Content Include="client\states\app\user\create-event.dialog.html" />
+    <Content Include="client\states\app\user\event.html" />
     <Content Include="client\states\app\user\home.html" />
     <Content Include="client\states\app\user\user-container.html" />
     <Content Include="client\states\app\user\user.config.js" />
