@@ -958,6 +958,29 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
   };
 
 
+    // ** Participant Group related
+  model.participantGroups = {
+      hashMap: {},
+      index: [],
+
+      search: function (searchExpression, sortExpression, startIndex, rowCount) {
+          return utilityService.callHub(function () {
+              return siteHub.server.searchParticipantGroups(searchExpression, sortExpression, startIndex, rowCount);
+          }).then(function (itemsData) {
+              return utilityService.updateItemsModel(model.participantGroups, itemsData);
+          });
+      }
+  };
+
+  this.createParticipantGroup = function (formData) {
+      return utilityService.callHub(function () {
+          return siteHub.server.createParticipantGroup(formData);
+      });
+  };
+
+  this.updateParticipantGroups = function (itemsData) {
+      $rootScope.$apply(utilityService.updateItemsModel(model.participantGroups, itemsData));
+  }
 
 
   siteHub.on('updateSettings', function (settingsObject) {
@@ -967,9 +990,12 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
     $rootScope.$apply($rootScope.$broadcast('updateProjects', onProjectsUpdated(projectsData)));
 
   }).on('updateCompanyLayTitles', function (itemsData) {
-    $rootScope.$apply($rootScope.$broadcast('updateCompanyLayTitles', itemsData));
+    $rootScope.$apply($rootScope.$broadcast('updateCompanyLayTitles', itemsData, model.companyLayTitles));
 
 
+    
+  }).on('updateParticipantGroups', function (itemsData) {
+      $rootScope.$apply($rootScope.$broadcast('updateParticipantGroups', utilityService.updateItemsModel(model.participantGroups, itemsData)));
 
   }).on('updateOccupations', function (itemsData) {
     $rootScope.$apply($rootScope.$broadcast('updateOccupations', onOccupationsUpdated(itemsData)));
@@ -1002,11 +1028,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
     //!! in TORQ I don't think we want to get all users - aren't there too many of them?
     //utilityService.getUsers();
   });
-
-
-
-
-
 
 
   // init
