@@ -44,7 +44,6 @@ namespace WebApp
         }
 
 
-
         /// <summary>
         /// Authenticates as a TenantAdmin for our Demo Tenant - for creating tenant stuff
         /// </summary>
@@ -88,7 +87,29 @@ namespace WebApp
         }
 
 
+        public HubResult CreateParticipantGroup(dynamic data)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var newParticipantGroup = ParticipantGroup.Create(dc, data);
+                return HubResult.CreateSuccessData(newParticipantGroup.ID);
+            });
+        }
 
+        public HubResult SearchParticipantGroups(string searchExpressionString)
+        {
+            return SearchParticipantGroups(searchExpressionString, string.Empty, 0, int.MaxValue);
+        }
+
+        public HubResult SearchParticipantGroups(string searchExpressionString, string sortField, int startRowIndex, int maximumRows)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var searchExpression = SearchExpression.Create(searchExpressionString);
+                var result = ParticipantGroup.Search(dc, searchExpression, sortField, startRowIndex, maximumRows);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
 
 
 

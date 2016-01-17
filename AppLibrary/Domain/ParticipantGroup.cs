@@ -625,7 +625,7 @@ namespace App.Library
 
             var hubClients = siteContext.ConnectionManager.GetHubContext("siteHub").Clients;
             Debug.Assert(hubClients != null);
-            hubClients.All.updateShows(notification);
+            hubClients.All.updateParticipantGroups(notification);
         }
 
         public override string ToString()
@@ -657,7 +657,7 @@ namespace App.Library
                 var createdTimestamp = dc.TransactionTimestamp;
                 var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
 
-                var name = (string)data.name;
+                var name = (string)data.schoolName;
 
                 var newItem = new ParticipantGroup(createdTimestamp, teamEPScope, name);
                 dc.Save(newItem);

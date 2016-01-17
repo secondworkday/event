@@ -6,8 +6,8 @@
     </h2>
   </div>
   <div>
-      <md-button ng-controller="ReportController" ui-sref="" ng-click="downloadReport()" class="md-primary">Generate Reminder Form</md-button>
-      <md-button ui-sref="app.user.home" class="md-primary">Go home</md-button>
+    <md-button ng-controller="ReportController" ui-sref="" ng-click="downloadReport()" class="md-primary">Generate Reminder Form</md-button>
+    <md-button ui-sref="app.user.home" class="md-primary">Go home</md-button>
   </div>
 </header>
 <md-divider></md-divider>
@@ -27,8 +27,8 @@
       <md-content>
         <md-list>
           <md-list-item class="md-2-line"
-              ng-click="DO_SOMETHING()"
-              ng-repeat="member in sampleEvents[0].teamMembers">
+                        ng-click="DO_SOMETHING()"
+                        ng-repeat="member in sampleEvents[0].teamMembers">
             <div class="md-list-item-text">
               <h3>{{member.firstName}} {{member.lastName}}</h3>
               <p>{{member.email}}</p>
@@ -47,16 +47,28 @@
         </div>
       </div>
       <md-content>
-        <md-list>
-          <md-list-item class="md-2-line"
-              ng-click="DO_SOMETHING()"
-              ng-repeat="school in sampleEvents[0].schools">
-            <div class="md-list-item-text">
-              <h3>{{school.name}}</h3>
-              <p>{{school.participants}} participants of {{school.totalStudents | number}} students</p>
-            </div>
-          </md-list-item>
-        </md-list>
+        <ms-search-view change-event="updateParticipantGroups" search="searchParticipantGroups" options="searchViewOptions" user-search="userSearch">
+          <md-list>
+            <!--<md-list-item class="md-2-line"
+                          ng-click="DO_SOMETHING()"
+                          ng-repeat="school in sampleEvents[0].schools">
+                <div class="md-list-item-text">
+                    <h3>{{school.name}}</h3>
+                    <p>{{school.participants}} participants of {{school.totalStudents | number}} students</p>
+                </div>
+            </md-list-item>-->
+            <md-list-item class="md-2-line"
+                          ng-click="DO_SOMETHING()"
+                          ng-repeat="school in $displayedIndex | objectLookup:$hashMap track by school.id">
+              <div class="md-list-item-text">
+                <h3>{{school.name}}</h3>
+                <p>50 participants of 2,345 students</p>
+              </div>
+            </md-list-item>
+          </md-list>
+        </ms-search-view>
+
+
       </md-content>
     </div>
   </div>
@@ -73,8 +85,8 @@
       <md-content>
         <md-list>
           <md-list-item class="md-2-line"
-              ng-click="DO_SOMETHING()"
-              ng-repeat="participant in sampleEvents[0].participants">
+                        ng-click="DO_SOMETHING()"
+                        ng-repeat="participant in sampleEvents[0].participants">
             <div class="md-list-item-text">
               <h3>{{participant.firstName}} {{participant.lastName}}</h3>
               <p>{{participant.grade}} at {{participant.school}}</p>
@@ -95,8 +107,8 @@
       <md-content>
         <md-list>
           <md-list-item class="md-3-line"
-              ng-click="DO_SOMETHING()"
-              ng-repeat="session in sampleEvents[0].sessions">
+                        ng-click="DO_SOMETHING()"
+                        ng-repeat="session in sampleEvents[0].sessions">
             <div class="md-list-item-text">
               <h3>{{session.name}}</h3>
               <h4>{{session.date | date}}</h4>
