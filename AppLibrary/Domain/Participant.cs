@@ -568,7 +568,7 @@ namespace App.Library
 #endif
 
 
-        internal static void NotifyClients(AppDC dc, SearchExpression notifyExpression)
+        internal static void NotifyClients(AppDC dc, NotifyExpression notifyExpression)
         {
             var siteContext = SiteContext.Current;
 
@@ -663,7 +663,8 @@ namespace App.Library
             ReportGenerator reportGenerator = null;
             if (tagProvider != null)
             {
-                reportGenerator = siteContext.Reports.Generate(reportFormat, DocumentTemplate.FromResource("AppLibrary.Reports." + templateName, null), tagProvider);//siteContext.Reports.Generate(typeof(Participant), reportFormat, templateName, tagProvider);
+                var documentTemplate = DocumentTemplate.FromResource("AppLibrary.Reports." + templateName, null);
+                reportGenerator = siteContext.TemplateReports.Generate(reportFormat, tagProvider, documentTemplate);
             }
 
             return reportGenerator;

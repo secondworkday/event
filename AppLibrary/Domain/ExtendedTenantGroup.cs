@@ -452,7 +452,7 @@ namespace App.Library
 //            dc.SubmitChanges();
 
             // (This includes a tenant cache refresh)
-            TenantGroup.NotifyClients(dc, SearchExpression.Create(newItem.ID));
+            TenantGroup.NotifyClients(dc, NotifyExpression.CreateModifiedID(newItem.ID));
 
             return HubResult.CreateSuccessData(new { id = newItem.ID });
         }

@@ -617,7 +617,7 @@ namespace App.Library
 
 
 
-        internal static void NotifyClients(AppDC dc, SearchExpression notifyExpression)
+        internal static void NotifyClients(AppDC dc, NotifyExpression notifyExpression)
         {
             var siteContext = SiteContext.Current;
 
