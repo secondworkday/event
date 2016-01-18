@@ -585,13 +585,13 @@ namespace App.Library
         }
 
         // probably need to use ShowNameAlias.FindShowOrCreateUnmatched() instead
-        internal static ParticipantGroup FindByName(AppDC dc, string showName)
+        internal static ParticipantGroup FindByName(AppDC dc, string name)
         {
-            var existingShow = ParticipantGroup.Query(dc)
-                .Where(show => show.Name == showName)
+            var existingItem = ParticipantGroup.Query(dc)
+                .Where(item => item.Name == name)
                 .FirstOrDefault();
 
-            return existingShow;
+            return existingItem;
         }
 
 
@@ -675,8 +675,12 @@ namespace App.Library
                 var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
 
                 var name = (string)data.name;
-
                 var newItem = new ParticipantGroup(createdTimestamp, teamEPScope, name);
+
+                // optional
+                var badgeName = (string)data.badgeName;
+                newItem.BadgeName = badgeName;
+
                 dc.Save(newItem);
 
                 Debug.Assert(newItem.ID > 0);

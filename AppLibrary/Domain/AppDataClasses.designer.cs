@@ -1419,6 +1419,8 @@ namespace App.Library
 		
 		private string _Overview;
 		
+		private string _BadgeName;
+		
 		private EntitySet<Participant> _Participants;
 		
     #region Extensibility Method Definitions
@@ -1439,6 +1441,8 @@ namespace App.Library
     partial void OnNameChanged();
     partial void OnOverviewChanging(string value);
     partial void OnOverviewChanged();
+    partial void OnBadgeNameChanging(string value);
+    partial void OnBadgeNameChanged();
     #endregion
 		
 		public ParticipantGroup()
@@ -1583,6 +1587,26 @@ namespace App.Library
 					this._Overview = value;
 					this.SendPropertyChanged("Overview");
 					this.OnOverviewChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BadgeName", DbType="nvarchar(128)")]
+		public string BadgeName
+		{
+			get
+			{
+				return this._BadgeName;
+			}
+			set
+			{
+				if ((this._BadgeName != value))
+				{
+					this.OnBadgeNameChanging(value);
+					this.SendPropertyChanging();
+					this._BadgeName = value;
+					this.SendPropertyChanged("BadgeName");
+					this.OnBadgeNameChanged();
 				}
 			}
 		}

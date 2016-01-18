@@ -97,6 +97,9 @@
       <Column Name="Name" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
       <Column Name="Overview" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true"/>
 
+      <Column Name="BadgeName" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />
+
+
       <Association Name="ParticipantGroup_Participant" Member="Participants" ThisKey="ID" OtherKey="ParticipantGroupID" Type="Participant" />
     </Type>
   </Table>

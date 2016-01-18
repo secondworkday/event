@@ -367,7 +367,7 @@ namespace WebApp
             return accountsOnlyHeader((siteContext, dc) =>
             {
                 for (int i=0; i < numberOfParticipants; i++) { 
-                    var randomParticipant = Participant.GenerateRandom(dc, participantGroupID);
+                    var randomParticipant = Participant.GenerateRandom(dc, participantGroupID.ToEnumerable().ToArray());
                 }
                 return HubResult.CreateSuccessData(participantGroupID);
             });
@@ -377,7 +377,7 @@ namespace WebApp
         {
             return accountsOnlyHeader((siteContext, dc) =>
             {
-                var randomParticipant = Participant.GenerateRandom(dc, participantGroupID);
+                var randomParticipant = Participant.GenerateRandom(dc, new [] {participantGroupID});
                 return HubResult.CreateSuccessData(randomParticipant.ID);
             });
         }

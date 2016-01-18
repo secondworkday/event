@@ -584,22 +584,40 @@ namespace App.Library
             return this.Name;
         }
 
-        public static Participant GenerateRandom(AppDC dc, int participantGroupID)
+        public static Participant GenerateRandom(AppDC dc)
         {
-            dynamic randomUserData = RandomUserGenerator.GenerateUser();
+            return GenerateRandom(dc, null);
+        }
 
-            dynamic userNameJson = randomUserData.name;
+        public static Participant GenerateRandom(AppDC dc, int[] participantGroups)
+        {
+            var random = RandomProvider.GetThreadRandom();
+
+            // generate a random contact
+            var randomContactJson = User.GenerateRandomContact();
+
+            dynamic userNameJson = randomContactJson.name;
             string firstName = userNameJson.first;
             string lastName = userNameJson.last;
 
-            dynamic userLocationJson = randomUserData.location;
+            dynamic userLocationJson = randomContactJson.location;
             string streetAddress = userLocationJson.street;
+
+            string phoneNumber = randomContactJson.phone;
+            string email = randomContactJson.email;
+            string profilePhotoUrlString = randomContactJson.picture;
+            string ssn = randomContactJson.SSN;
+
+            var textInfo = new System.Globalization.CultureInfo("en-US", false).TextInfo;
+            var firstNameCapitalized = textInfo.ToTitleCase(firstName);
+            var lastNameCapitalized = textInfo.ToTitleCase(lastName);
+            var mailAddress = email.ParseMailAddress();
 
             var data = new
             {
-                name = CapitalizeFirstChar(firstName) + " " + CapitalizeFirstChar(lastName),
-                grade = new Random().Next(1, 7),
-                participantGroupID = participantGroupID
+                name = firstNameCapitalized + " " + lastNameCapitalized,
+                grade = random.Next(1, 12),
+                participantGroupID = participantGroups.ChooseRandom(),
             }.ToJson().FromJson();
 
             var result = Participant.createLock(dc, () =>
@@ -609,20 +627,7 @@ namespace App.Library
             });
 
             return result;
-        }
 
-        //public static Participant GenerateRandom(AppDC dc)
-        //{
-
-        //}
-
-        private static string CapitalizeFirstChar(string s)
-        {
-            if (string.IsNullOrEmpty(s))
-            {
-                return string.Empty;
-            }
-            return char.ToUpper(s[0]) + s.Substring(1);
         }
 
         public static Participant Create(AppDC dc, dynamic data)
@@ -695,22 +700,6 @@ namespace App.Library
             };
 
             return TagProvider.Create(tags);
-        }
-    }
-
-    public static class RandomUserGenerator
-    {
-        public static dynamic GenerateUser()
-        {
-            using (var msWebClient = new MSWebClient())
-            {
-                var responseString = msWebClient.DownloadString(@"http://api.randomuser.me/0.4/");
-                dynamic randomUserJson = Newtonsoft.Json.Linq.JObject.Parse(responseString);
-
-                dynamic userJson = randomUserJson.results[0].user;
-
-                return userJson;
-            }
         }
     }
 }
