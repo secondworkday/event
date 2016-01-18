@@ -1,15 +1,21 @@
 app.controller('ReportController', function ($scope, $log, utilityService, siteService) {
-    $scope.downloadReport = function () {
-        var query = {
-            type: 'reminderForm',
-            id: 2
-        };
-        utilityService.download(query);
+  var participants = siteService.model.participants;
+
+  $scope.downloadReport = function () {
+    // TODO: Change! Hard-coded to first participant for now
+    for (var key in participants.hashMap) break;
+
+    var query = {
+        type: 'reminderForm',
+        id: key
+    };
+    utilityService.download(query);
     }
 });
 
 app.controller('UserController', function ($scope, $log, $state, $mdDialog, utilityService, siteService) {
-    $log.debug('Loading UserController...');
+  $log.debug('Loading UserController...');
+  $scope.participantGroups = siteService.model.participantGroups;
 
     $scope.sampleEvents = [
       {
@@ -37,6 +43,7 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, util
     ];
 
     $scope.searchParticipantGroups = siteService.model.participantGroups.search;
+    $scope.searchParticipants = siteService.model.participants.search;
 
     $scope.sortOptions = [
       { name: 'Name', serverTerm: 'item.name', clientFunction: utilityService.localeCompareByPropertyThenByID('name') },
@@ -65,6 +72,12 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, util
       siteService.generateRandomEvent();
     }
 
+
+    $scope.searchParticipantViewOptions = {
+      sort: $scope.sortOptions[0],
+      filter: $scope.filterOptions[2],
+      participantSearch: null
+    };
 
     $scope.showCreateEventDialog = function (ev) {
         $mdDialog.show({
@@ -165,15 +178,21 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, util
         });
     }
     function AddParticipantsDialogController($scope, $mdDialog) {
+      $scope.participantGroups = siteService.model.participantGroups;
         $scope.hide = function () {
             $mdDialog.hide();
         };
         $scope.cancel = function () {
             $mdDialog.cancel();
         };
-        $scope.generateParticipants = function () {
-            $mdDialog.hide();
+        $scope.generateRandomParticipants = function (participantGroupID, numberOfParticipants) {
+          siteService.generateRandomParticipants(participantGroupID, numberOfParticipants);
+          $mdDialog.hide();
         };
+        $scope.createParticipant = function (formData) {
+          siteService.createParticipant(formData);
+          $mdDialog.hide();
+        }
     }
 
     $scope.showAddSessionDialog = function (ev) {

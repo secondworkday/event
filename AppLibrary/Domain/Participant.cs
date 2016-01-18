@@ -576,7 +576,7 @@ namespace App.Library
 
             var hubClients = siteContext.ConnectionManager.GetHubContext("siteHub").Clients;
             Debug.Assert(hubClients != null);
-            hubClients.All.updateEpisodesData(notification);
+            hubClients.All.updateParticipants(notification);
         }
 
         public override string ToString()
@@ -584,7 +584,7 @@ namespace App.Library
             return this.Name;
         }
 
-        public static Participant GenerateRandom(AppDC dc)
+        public static Participant GenerateRandom(AppDC dc, int participantGroupID)
         {
             dynamic randomUserData = RandomUserGenerator.GenerateUser();
 
@@ -599,7 +599,7 @@ namespace App.Library
             {
                 name = CapitalizeFirstChar(firstName) + " " + CapitalizeFirstChar(lastName),
                 grade = new Random().Next(1, 7),
-                schoolID = 1
+                participantGroupID = participantGroupID
             }.ToJson().FromJson();
 
             var result = Participant.createLock(dc, () =>
@@ -609,8 +609,12 @@ namespace App.Library
             });
 
             return result;
-
         }
+
+        //public static Participant GenerateRandom(AppDC dc)
+        //{
+
+        //}
 
         private static string CapitalizeFirstChar(string s)
         {
@@ -630,9 +634,9 @@ namespace App.Library
 
                 var name = (string)data.name;
                 var grade = (int)data.grade;
-                var schoolID = (int)data.schoolID;
+                var participantGroupID = (int)data.participantGroupID;
 
-                var newItem = new Participant(createdTimestamp, teamEPScope, name, grade, schoolID);
+                var newItem = new Participant(createdTimestamp, teamEPScope, name, grade, participantGroupID);
                 dc.Save(newItem);
 
                 Debug.Assert(newItem.ID > 0);

@@ -978,21 +978,15 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
       });
   };
 
+  this.generateRandomParticipants = function (participantGroupID, numberOfParticipants) {
+    return utilityService.callHub(function () {
+      return siteHub.server.generateRandomParticipants(participantGroupID, numberOfParticipants);
+    });
+  }
+
   this.updateParticipantGroups = function (itemsData) {
       $rootScope.$apply(utilityService.updateItemsModel(model.participantGroups, itemsData));
   }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   this.generateRandomEvent = function () {
@@ -1002,12 +996,28 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
   };
 
 
+  // ** Particpants related
+  model.participants = {
+    hashMap: {},
+    index: [],
+    search: function (searchExpression, sortExpression, startIndex, rowCount) {
+      return utilityService.callHub(function () {
+        return siteHub.server.searchParticipants(searchExpression, sortExpression, startIndex, rowCount);
+      }).then(function (itemsData) {
+        return utilityService.updateItemsModel(model.participants, itemsData);
+      });
+    }
+  };
 
+  this.createParticipant = function (formData) {
+    return utilityService.callHub(function () {
+      return siteHub.server.createParticipant(formData);
+    });
+  };
 
-
-
-
-
+  this.updateParticipants = function (itemsData) {
+    $rootScope.$apply(utilityService.updateItemsModel(model.participants, itemsData));
+  }
 
 
 
@@ -1026,6 +1036,9 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
     
   }).on('updateParticipantGroups', function (itemsData) {
       $rootScope.$apply($rootScope.$broadcast('updateParticipantGroups', utilityService.updateItemsModel(model.participantGroups, itemsData)));
+
+  }).on('updateParticipants', function (itemsData) {
+    $rootScope.$apply($rootScope.$broadcast('updateParticipants', utilityService.updateItemsModel(model.participants, itemsData)));
 
   }).on('updateOccupations', function (itemsData) {
     $rootScope.$apply($rootScope.$broadcast('updateOccupations', onOccupationsUpdated(itemsData)));
