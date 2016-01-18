@@ -242,7 +242,7 @@ namespace App.Library
                 "Rush Elementary",
             };
 
-            var demoParticipantGroupsMascots = new[]
+            var demoParticipantGroupBadgeNames = new[]
             {   
                 "Eagles",
                 "Tigers",
@@ -287,19 +287,27 @@ namespace App.Library
 
             int numParticipantGroups = 6 + random.Next(8);
             var participantGroupNames = demoParticipantGroupNames.ChooseMultiple(numParticipantGroups);
+            var participantGroupBadgeNames = demoParticipantGroupBadgeNames.ChooseMultiple(numParticipantGroups)
+                .ToArray();
 
             var participantGroups = participantGroupNames
-                .Select(participantGroupName => new
-                {
-                    Name = participantGroupName,
-                    EventSession = ParticipantGroup.Create(dc, new { name = participantGroupName }),
-                });
+                .Select((participantGroupName, index) =>
+                    ParticipantGroup.FindByName(dc, participantGroupName) ?? ParticipantGroup.Create(dc, new { name = participantGroupName, badgeName = participantGroupBadgeNames[index] })
+                )
+                .ToArray();
+
+            var participantGroupIDs = participantGroups
+                .Select(participantGroup => participantGroup.ID)
+                .ToArray();
 
 
-
-            // Ensure we've got at least 250 participants
-
-
+            // Ensure we've got enough participants, and stick each one into a participant group
+            int numParticipants = 50 + random.Next(350);
+            //!!
+            numParticipants = 5;
+            var participants = Enumerable.Range(0, numParticipants)
+                .Select(index => Participant.GenerateRandom(dc, participantGroupIDs))
+                .ToArray();
 
 
             // Now Create a random number of Event Sessions
