@@ -657,7 +657,7 @@ namespace App.Library
                 var createdTimestamp = dc.TransactionTimestamp;
                 var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
 
-                var name = (string)data.schoolName;
+                var name = (string)data.name;
 
                 var newItem = new ParticipantGroup(createdTimestamp, teamEPScope, name);
                 dc.Save(newItem);
