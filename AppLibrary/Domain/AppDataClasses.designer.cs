@@ -47,6 +47,9 @@ namespace App.Library
     partial void InsertParticipant(Participant instance);
     partial void UpdateParticipant(Participant instance);
     partial void DeleteParticipant(Participant instance);
+    partial void InsertEventParticipant(EventParticipant instance);
+    partial void UpdateEventParticipant(EventParticipant instance);
+    partial void DeleteEventParticipant(EventParticipant instance);
     #endregion
 		
 		public AppDC(string connection) : 
@@ -118,6 +121,14 @@ namespace App.Library
 			get
 			{
 				return this.GetTable<Participant>();
+			}
+		}
+		
+		public System.Data.Linq.Table<EventParticipant> EventParticipants
+		{
+			get
+			{
+				return this.GetTable<EventParticipant>();
 			}
 		}
 	}
@@ -1927,6 +1938,332 @@ namespace App.Library
 						this._ParticipantGroupID = default(int);
 					}
 					this.SendPropertyChanged("ParticipantGroup");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.EventParticipant")]
+	public partial class EventParticipant : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _ID;
+		
+		private global::MS.Utility.ExtendedPropertyScopeType _ScopeType;
+		
+		private System.Nullable<int> _ScopeID;
+		
+		private int _ParticipantID;
+		
+		private int _EventID;
+		
+		private System.DateTime _CreatedTimestamp;
+		
+		private System.DateTime _LastModifiedTimestamp;
+		
+		private System.Nullable<int> _EventSessionID;
+		
+		private System.Nullable<System.DateTime> _CheckInTimestamp;
+		
+		private System.Nullable<System.DateTime> _CheckOutTimestamp;
+		
+		private System.Nullable<decimal> _ContributionLimit;
+		
+		private System.Nullable<decimal> _ContributionAmount;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIDChanging(int value);
+    partial void OnIDChanged();
+    partial void OnScopeTypeChanging(global::MS.Utility.ExtendedPropertyScopeType value);
+    partial void OnScopeTypeChanged();
+    partial void OnScopeIDChanging(System.Nullable<int> value);
+    partial void OnScopeIDChanged();
+    partial void OnParticipantIDChanging(int value);
+    partial void OnParticipantIDChanged();
+    partial void OnEventIDChanging(int value);
+    partial void OnEventIDChanged();
+    partial void OnCreatedTimestampChanging(System.DateTime value);
+    partial void OnCreatedTimestampChanged();
+    partial void OnLastModifiedTimestampChanging(System.DateTime value);
+    partial void OnLastModifiedTimestampChanged();
+    partial void OnEventSessionIDChanging(System.Nullable<int> value);
+    partial void OnEventSessionIDChanged();
+    partial void OnCheckInTimestampChanging(System.Nullable<System.DateTime> value);
+    partial void OnCheckInTimestampChanged();
+    partial void OnCheckOutTimestampChanging(System.Nullable<System.DateTime> value);
+    partial void OnCheckOutTimestampChanged();
+    partial void OnContributionLimitChanging(System.Nullable<decimal> value);
+    partial void OnContributionLimitChanged();
+    partial void OnContributionAmountChanging(System.Nullable<decimal> value);
+    partial void OnContributionAmountChanged();
+    #endregion
+		
+		public EventParticipant()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int ID
+		{
+			get
+			{
+				return this._ID;
+			}
+			set
+			{
+				if ((this._ID != value))
+				{
+					this.OnIDChanging(value);
+					this.SendPropertyChanging();
+					this._ID = value;
+					this.SendPropertyChanged("ID");
+					this.OnIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ScopeType", DbType="Int NOT NULL", CanBeNull=false)]
+		public global::MS.Utility.ExtendedPropertyScopeType ScopeType
+		{
+			get
+			{
+				return this._ScopeType;
+			}
+			set
+			{
+				if ((this._ScopeType != value))
+				{
+					this.OnScopeTypeChanging(value);
+					this.SendPropertyChanging();
+					this._ScopeType = value;
+					this.SendPropertyChanged("ScopeType");
+					this.OnScopeTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ScopeID", DbType="Int")]
+		public System.Nullable<int> ScopeID
+		{
+			get
+			{
+				return this._ScopeID;
+			}
+			set
+			{
+				if ((this._ScopeID != value))
+				{
+					this.OnScopeIDChanging(value);
+					this.SendPropertyChanging();
+					this._ScopeID = value;
+					this.SendPropertyChanged("ScopeID");
+					this.OnScopeIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ParticipantID", DbType="Int NOT NULL")]
+		public int ParticipantID
+		{
+			get
+			{
+				return this._ParticipantID;
+			}
+			set
+			{
+				if ((this._ParticipantID != value))
+				{
+					this.OnParticipantIDChanging(value);
+					this.SendPropertyChanging();
+					this._ParticipantID = value;
+					this.SendPropertyChanged("ParticipantID");
+					this.OnParticipantIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EventID", DbType="Int NOT NULL")]
+		public int EventID
+		{
+			get
+			{
+				return this._EventID;
+			}
+			set
+			{
+				if ((this._EventID != value))
+				{
+					this.OnEventIDChanging(value);
+					this.SendPropertyChanging();
+					this._EventID = value;
+					this.SendPropertyChanged("EventID");
+					this.OnEventIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedTimestamp", DbType="DATETIME2 NOT NULL")]
+		public System.DateTime CreatedTimestamp
+		{
+			get
+			{
+				return this._CreatedTimestamp;
+			}
+			set
+			{
+				if ((this._CreatedTimestamp != value))
+				{
+					this.OnCreatedTimestampChanging(value);
+					this.SendPropertyChanging();
+					this._CreatedTimestamp = value;
+					this.SendPropertyChanged("CreatedTimestamp");
+					this.OnCreatedTimestampChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LastModifiedTimestamp", DbType="DATETIME2 NOT NULL")]
+		public System.DateTime LastModifiedTimestamp
+		{
+			get
+			{
+				return this._LastModifiedTimestamp;
+			}
+			set
+			{
+				if ((this._LastModifiedTimestamp != value))
+				{
+					this.OnLastModifiedTimestampChanging(value);
+					this.SendPropertyChanging();
+					this._LastModifiedTimestamp = value;
+					this.SendPropertyChanged("LastModifiedTimestamp");
+					this.OnLastModifiedTimestampChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EventSessionID", DbType="Int")]
+		public System.Nullable<int> EventSessionID
+		{
+			get
+			{
+				return this._EventSessionID;
+			}
+			set
+			{
+				if ((this._EventSessionID != value))
+				{
+					this.OnEventSessionIDChanging(value);
+					this.SendPropertyChanging();
+					this._EventSessionID = value;
+					this.SendPropertyChanged("EventSessionID");
+					this.OnEventSessionIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CheckInTimestamp", DbType="DATETIME2")]
+		public System.Nullable<System.DateTime> CheckInTimestamp
+		{
+			get
+			{
+				return this._CheckInTimestamp;
+			}
+			set
+			{
+				if ((this._CheckInTimestamp != value))
+				{
+					this.OnCheckInTimestampChanging(value);
+					this.SendPropertyChanging();
+					this._CheckInTimestamp = value;
+					this.SendPropertyChanged("CheckInTimestamp");
+					this.OnCheckInTimestampChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CheckOutTimestamp", DbType="DATETIME2")]
+		public System.Nullable<System.DateTime> CheckOutTimestamp
+		{
+			get
+			{
+				return this._CheckOutTimestamp;
+			}
+			set
+			{
+				if ((this._CheckOutTimestamp != value))
+				{
+					this.OnCheckOutTimestampChanging(value);
+					this.SendPropertyChanging();
+					this._CheckOutTimestamp = value;
+					this.SendPropertyChanged("CheckOutTimestamp");
+					this.OnCheckOutTimestampChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ContributionLimit", DbType="Money")]
+		public System.Nullable<decimal> ContributionLimit
+		{
+			get
+			{
+				return this._ContributionLimit;
+			}
+			set
+			{
+				if ((this._ContributionLimit != value))
+				{
+					this.OnContributionLimitChanging(value);
+					this.SendPropertyChanging();
+					this._ContributionLimit = value;
+					this.SendPropertyChanged("ContributionLimit");
+					this.OnContributionLimitChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ContributionAmount", DbType="Money")]
+		public System.Nullable<decimal> ContributionAmount
+		{
+			get
+			{
+				return this._ContributionAmount;
+			}
+			set
+			{
+				if ((this._ContributionAmount != value))
+				{
+					this.OnContributionAmountChanging(value);
+					this.SendPropertyChanging();
+					this._ContributionAmount = value;
+					this.SendPropertyChanged("ContributionAmount");
+					this.OnContributionAmountChanged();
 				}
 			}
 		}
