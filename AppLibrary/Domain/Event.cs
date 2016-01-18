@@ -290,59 +290,95 @@ namespace App.Library
             var participantGroupBadgeNames = demoParticipantGroupBadgeNames.ChooseMultiple(numParticipantGroups)
                 .ToArray();
 
-            var participantGroups = participantGroupNames
+            var participantGroupIDs = participantGroupNames
                 .Select((participantGroupName, index) =>
                     ParticipantGroup.FindByName(dc, participantGroupName) ?? ParticipantGroup.Create(dc, new { name = participantGroupName, badgeName = participantGroupBadgeNames[index] })
                 )
-                .ToArray();
-
-            var participantGroupIDs = participantGroups
                 .Select(participantGroup => participantGroup.ID)
                 .ToArray();
 
 
-            // Ensure we've got enough participants, and stick each one into a participant group
+            // Choose a random number of Event Sessions ...
+            int numSessions = 2 + random.Next(3);
+            // ... and a random number of Participants
             int numParticipants = 50 + random.Next(350);
-            //!!
+
+            //!! for debug - limit Participants
             numParticipants = 15;
-            var participants = Enumerable.Range(0, numParticipants)
-                .Select(index => Participant.GenerateRandom(dc, participantGroupIDs))
+
+            // Create our Participants, sticking each into a ParticpantGroup, and dividing them into an EventSession (leaving some assigned to the Event but no EventSession).
+
+            var participantInfos = Enumerable.Range(0, numParticipants)
+                .Select(participantIndex => new {
+                    Participant = Participant.GenerateRandom(dc, participantGroupIDs),
+                    EventSessionIndex = random.Next(numSessions + 1),
+                })
                 .ToArray();
 
 
-            // Now Create a random number of Event Sessions
-            int numSessions = 2 + random.Next(3);
+            // Create a EventParticipant "ticket" for Participiants not yet assigned to any EventSession
+            participantInfos
+                // (this is our + 1 bucket - for Participants with no EventSession)
+                .Where(participantInfo => participantInfo.EventSessionIndex == numSessions)
+                .Select(participantInfo => new
+                {
+                    eventID = randomEvent.ID,
+                    participantID = participantInfo.Participant.ID,
+                }.ToJson().FromJson())
+                .ForEach(eventParticipantData =>
+                {
+                    var eventParticipant = EventParticipant.Create(dc, eventParticipantData);
+                    Debug.Assert(eventParticipant != null);
+                });
+
+
 
             // choose a date for our first EventSession
             var firstSessionDate = DateTime.UtcNow.AddDays(15 + random.Next(30)).Date;
 
 
-            for (int sessionIndex = 0; sessionIndex < numSessions; sessionIndex++)
-            {
-                var sessionStartDate = firstSessionDate.AddDays(sessionIndex);
-                if (sessionStartDate.DayOfWeek == DayOfWeek.Saturday || sessionStartDate.DayOfWeek == DayOfWeek.Sunday)
+            Enumerable.Range(0, numSessions)
+                .ForEach(sessionIndex =>
                 {
-                    sessionStartDate += TimeSpan.FromHours(new [] { 13, 14, 15 }.ChooseRandom());
-                } else {
-                    sessionStartDate += TimeSpan.FromHours(new [] { 18.5, 19, 19.5, 20 }.ChooseRandom());
-                }
-                var sessionEndDate = sessionStartDate.AddHours(new [] { 2, 2.5, 3 }.ChooseRandom());
+                    var sessionStartDate = firstSessionDate.AddDays(sessionIndex);
+                    if (sessionStartDate.DayOfWeek == DayOfWeek.Saturday || sessionStartDate.DayOfWeek == DayOfWeek.Sunday)
+                    {
+                        sessionStartDate += TimeSpan.FromHours(new[] { 13, 14, 15 }.ChooseRandom());
+                    }
+                    else
+                    {
+                        sessionStartDate += TimeSpan.FromHours(new[] { 18.5, 19, 19.5, 20 }.ChooseRandom());
+                    }
+                    var sessionEndDate = sessionStartDate.AddHours(new[] { 2, 2.5, 3 }.ChooseRandom());
 
-                var sessionData = new 
-                {
-                    eventID = randomEvent.ID,
-                    name = "Session " + (sessionIndex + 1).ToString(),
-                    location = sponsor,
-                    startDate = sessionStartDate,
-                    endDate = sessionEndDate,
-                };
+                    var sessionData = new
+                    {
+                        eventID = randomEvent.ID,
+                        name = "Session " + (sessionIndex + 1).ToString(),
+                        location = sponsor,
+                        startDate = sessionStartDate,
+                        endDate = sessionEndDate,
+                    };
 
-                var eventSession = EventSession.Create(dc, sessionData);
-                Debug.Assert(eventSession != null);
+                    var eventSession = EventSession.Create(dc, sessionData);
+                    Debug.Assert(eventSession != null);
 
-                //!! add in participants to the session!
+                    // Create a EventParticipant "ticket" for Participiants assigned to this EventSession
+                    participantInfos
+                        .Where(participantInfo => participantInfo.EventSessionIndex == sessionIndex)
+                        .Select(participantInfo => new
+                        {
+                            eventID = randomEvent.ID,
+                            participantID = participantInfo.Participant.ID,
 
-            }
+                            eventSessionID = eventSession.ID,
+                        }.ToJson().FromJson())
+                        .ForEach(eventParticipantData =>
+                        {
+                            var eventParticipant = EventParticipant.Create(dc, eventParticipantData);
+                            Debug.Assert(eventParticipant != null);
+                        });
+                });
 
             return randomEvent;
         }

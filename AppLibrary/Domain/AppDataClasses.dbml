@@ -124,4 +124,32 @@
     </Type>
   </Table>
 
+
+  <Table Name="dbo.EventParticipant" Member="EventParticipants">
+    <Type Name="EventParticipant">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ScopeType" Type="global::MS.Utility.ExtendedPropertyScopeType" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ScopeID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ParticipantID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="EventID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+
+      <Column Name="CreatedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+
+      <Column Name="EventSessionID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+
+      <Column Name="CheckInTimestamp" Type="System.DateTime" DbType="DATETIME2" CanBeNull="true" />
+      <Column Name="CheckOutTimestamp" Type="System.DateTime" DbType="DATETIME2" CanBeNull="true" />
+
+      <Column Name="ContributionLimit" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="ContributionAmount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+    </Type>
+  </Table>
+
+
+
+
+
+
+
 </Database>
