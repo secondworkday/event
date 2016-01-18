@@ -576,7 +576,7 @@ namespace App.Library
 
             var hubClients = siteContext.ConnectionManager.GetHubContext("siteHub").Clients;
             Debug.Assert(hubClients != null);
-            hubClients.All.updateEpisodesData(notification);
+            hubClients.All.updateParticipants(notification);
         }
 
         public override string ToString()

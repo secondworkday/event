@@ -112,6 +112,29 @@ namespace WebApp
         }
 
 
+        public HubResult CreateParticipant(dynamic data)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var newParticipant = Participant.Create(dc, data);
+                return HubResult.CreateSuccessData(newParticipant.ID);
+            });
+        }
+
+        public HubResult SearchParticipants(string searchExpressionString)
+        {
+            return SearchParticipants(searchExpressionString, string.Empty, 0, int.MaxValue);
+        }
+
+        public HubResult SearchParticipants(string searchExpressionString, string sortField, int startRowIndex, int maximumRows)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var searchExpression = SearchExpression.Create(searchExpressionString);
+                var result = Participant.Search(dc, searchExpression, sortField, startRowIndex, maximumRows);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
 
 
 
@@ -339,6 +362,25 @@ namespace WebApp
             });
         }
 
+        public HubResult GenerateRandomParticipants(int participantGroupID, int numberOfParticipants)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                for (int i=0; i < numberOfParticipants; i++) { 
+                    var randomParticipant = Participant.GenerateRandom(dc, participantGroupID.ToEnumerable().ToArray());
+                }
+                return HubResult.CreateSuccessData(participantGroupID);
+            });
+        }
+
+        public HubResult GenerateRandomParticipant(int participantGroupID)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var randomParticipant = Participant.GenerateRandom(dc, new [] {participantGroupID});
+                return HubResult.CreateSuccessData(randomParticipant.ID);
+            });
+        }
 
 
         public HubResult GetEvents()

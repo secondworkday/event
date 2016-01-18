@@ -6,7 +6,7 @@
     </h2>
   </div>
   <div>
-    <md-button ng-controller="ReportController" ui-sref="" ng-click="downloadReport()" class="md-primary">Generate Reminder Form</md-button>
+    <md-button ng-controller="ReportController" ng-click="downloadReport()" class="md-primary">Generate Reminder Form</md-button>
     <md-button ui-sref="app.user.home" class="md-primary">Go home</md-button>
   </div>
 </header>
@@ -83,17 +83,20 @@
         </div>
       </div>
       <md-content>
-        <md-list>
-          <md-list-item class="md-2-line"
-                        ng-click="DO_SOMETHING()"
-                        ng-repeat="participant in sampleEvents[0].participants">
-            <div class="md-list-item-text">
-              <h3>{{participant.firstName}} {{participant.lastName}}</h3>
-              <p>{{participant.grade}} at {{participant.school}}</p>
-            </div>
-          </md-list-item>
-        </md-list>
-      </md-content>
+        <ms-search-view change-event="updateParticipants" search="searchParticipants" options="searchParticipantViewOptions" user-search="userSearch">
+          <md-list>
+            <md-list-item class="md-2-line"
+                          ng-click="DO_SOMETHING()"
+                          ng-repeat="participant in $displayedIndex | objectLookup:$hashMap track by participant.id">
+              <div class="md-list-item-text">
+                <h3>{{participant.name}}</h3>
+                <p>{{participantGroups.hashMap[participant.participantGroupID].name}}</p>
+                <div ms-debug-only>{{participant | json}}</div>
+              </div>
+            </md-list-item>
+          </md-list>
+        </ms-search-view>
+</md-content>
     </div>
     <div flex>
       <div layout layout-align="start center">

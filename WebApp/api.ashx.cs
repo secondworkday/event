@@ -50,7 +50,7 @@ namespace WebApp
 
         private void GenerateRandomParticipant(AppDC appDC)
         {
-            var random = Participant.GenerateRandom(appDC);
+            var random = Participant.GenerateRandom(appDC, null);
         }
 
         private void GenerateRandomParticipantGroup(AppDC appDC)

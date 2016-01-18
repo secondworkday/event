@@ -304,7 +304,7 @@ namespace App.Library
             // Ensure we've got enough participants, and stick each one into a participant group
             int numParticipants = 50 + random.Next(350);
             //!!
-            numParticipants = 5;
+            numParticipants = 15;
             var participants = Enumerable.Range(0, numParticipants)
                 .Select(index => Participant.GenerateRandom(dc, participantGroupIDs))
                 .ToArray();

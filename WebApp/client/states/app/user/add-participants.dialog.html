@@ -11,14 +11,36 @@
     </md-toolbar>
     <md-dialog-content>
       <div class="md-dialog-content">
+        <md-input-container class="md-block" flex-gt-sm>
+          <label>Name</label>
+          <input ng-model="formData.name">
+        </md-input-container>
+        <md-input-container class="md-block" flex-gt-sm>
+          <label>Grade</label>
+          <input type="number" ng-model="formData.grade">
+        </md-input-container>
+        <md-input-container class="md-block" flex-gt-sm>
+          <label>School</label>
+          <md-select ng-model="formData.participantGroupID">
+            <md-option ng-repeat="school in participantGroups.index | objectLookup:participantGroups.hashMap track by school.id" value="{{school.id}}">
+              {{school.name}}
+            </md-option>
+          </md-select>
+        </md-input-container>
+        <br/>
         <md-button disabled ng-click="DO_SOMETHING()" class="md-primary"><i class="fa fa-upload"></i> Upload participants file</md-button>
-        <md-button ng-click="generateParticipants()"><i class="fa fa-magic"></i> Generate 50 participants</md-button>
+        <md-button ng-disabled="!formData.participantGroupID" ng-click="generateRandomParticipants(formData.participantGroupID, 25)"><i class="fa fa-magic"></i> Generate 25 participants</md-button>
       </div>
     </md-dialog-content>
     <md-dialog-actions layout="row" layout-align="end center">
       <md-button ng-click="cancel()">
        Cancel
       </md-button>
+      <md-button ng-disabled="!(formData.participantGroupID && formData.name && formData.grade)" ng-click="createParticipant(formData)"><i class="fa fa-magic"></i> OK</md-button>
     </md-dialog-actions>
+    <div ms-debug-only>
+      <h1>Debug</h1>
+      <pre>{{formData | json}}</pre>
+    </div>
   </form>
 </md-dialog>
