@@ -50,6 +50,9 @@
       <Column Name="Name" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
       <Column Name="Overview" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true"/>
 
+      <Column Name="Sponsor" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />
+
+
       <Association Name="EventSession_Event" Member="EventSessions" ThisKey="ID" OtherKey="EventID" Type="EventSession" />
     </Type>
   </Table>
@@ -67,6 +70,12 @@
 
       <Column Name="Name" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
       <Column Name="Overview" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true"/>
+
+      <Column Name="Location" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
+
+      <Column Name="StartDate" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+      <Column Name="EndDate" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+
 
       <Column Name="EventID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="EventSession_Event" Member="Event" ThisKey="EventID" OtherKey="ID" Type="Event" IsForeignKey="true" />

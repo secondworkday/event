@@ -818,6 +818,8 @@ namespace App.Library
 		
 		private string _Overview;
 		
+		private string _Sponsor;
+		
 		private EntitySet<EventSession> _EventSessions;
 		
     #region Extensibility Method Definitions
@@ -838,6 +840,8 @@ namespace App.Library
     partial void OnNameChanged();
     partial void OnOverviewChanging(string value);
     partial void OnOverviewChanged();
+    partial void OnSponsorChanging(string value);
+    partial void OnSponsorChanged();
     #endregion
 		
 		public Event()
@@ -986,6 +990,26 @@ namespace App.Library
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Sponsor", DbType="nvarchar(128)")]
+		public string Sponsor
+		{
+			get
+			{
+				return this._Sponsor;
+			}
+			set
+			{
+				if ((this._Sponsor != value))
+				{
+					this.OnSponsorChanging(value);
+					this.SendPropertyChanging();
+					this._Sponsor = value;
+					this.SendPropertyChanged("Sponsor");
+					this.OnSponsorChanged();
+				}
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Event_EventSession", Storage="_EventSessions", ThisKey="ID", OtherKey="EventID")]
 		public EntitySet<EventSession> EventSessions
 		{
@@ -1052,6 +1076,12 @@ namespace App.Library
 		
 		private string _Overview;
 		
+		private string _Location;
+		
+		private System.DateTime _StartDate;
+		
+		private System.DateTime _EndDate;
+		
 		private int _EventID;
 		
 		private EntityRef<Event> _Event;
@@ -1074,6 +1104,12 @@ namespace App.Library
     partial void OnNameChanged();
     partial void OnOverviewChanging(string value);
     partial void OnOverviewChanged();
+    partial void OnLocationChanging(string value);
+    partial void OnLocationChanged();
+    partial void OnStartDateChanging(System.DateTime value);
+    partial void OnStartDateChanged();
+    partial void OnEndDateChanging(System.DateTime value);
+    partial void OnEndDateChanged();
     partial void OnEventIDChanging(int value);
     partial void OnEventIDChanged();
     #endregion
@@ -1220,6 +1256,66 @@ namespace App.Library
 					this._Overview = value;
 					this.SendPropertyChanged("Overview");
 					this.OnOverviewChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Location", DbType="nvarchar(128) NOT NULL", CanBeNull=false)]
+		public string Location
+		{
+			get
+			{
+				return this._Location;
+			}
+			set
+			{
+				if ((this._Location != value))
+				{
+					this.OnLocationChanging(value);
+					this.SendPropertyChanging();
+					this._Location = value;
+					this.SendPropertyChanged("Location");
+					this.OnLocationChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StartDate", DbType="DATETIME2 NOT NULL")]
+		public System.DateTime StartDate
+		{
+			get
+			{
+				return this._StartDate;
+			}
+			set
+			{
+				if ((this._StartDate != value))
+				{
+					this.OnStartDateChanging(value);
+					this.SendPropertyChanging();
+					this._StartDate = value;
+					this.SendPropertyChanged("StartDate");
+					this.OnStartDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EndDate", DbType="DATETIME2 NOT NULL")]
+		public System.DateTime EndDate
+		{
+			get
+			{
+				return this._EndDate;
+			}
+			set
+			{
+				if ((this._EndDate != value))
+				{
+					this.OnEndDateChanging(value);
+					this.SendPropertyChanging();
+					this._EndDate = value;
+					this.SendPropertyChanged("EndDate");
+					this.OnEndDateChanged();
 				}
 			}
 		}

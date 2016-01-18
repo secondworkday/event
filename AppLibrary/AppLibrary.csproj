@@ -84,6 +84,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Domain\AuthToken.cs" />
+    <Compile Include="Domain\EventSession.cs" />
     <Compile Include="Domain\Event.cs" />
     <Compile Include="Domain\ExtendedTenantGroup.cs" />
     <Compile Include="Domain\ExtendedUser.cs" />

@@ -18,7 +18,7 @@ using MS.Utility;
 namespace App.Library
 {
 
-    public partial class Event
+    public partial class EventSession
     {
         partial void OnLoaded()
         {
@@ -27,14 +27,14 @@ namespace App.Library
             this._LastModifiedTimestamp = DateTime.SpecifyKind(this.LastModifiedTimestamp, DateTimeKind.Utc);
         }
     }
-    public partial class Event : ExtendedObject<Event>, IEPScopeObject
+    public partial class EventSession : ExtendedObject<EventSession>, IEPScopeObject
     {
         protected override int objectID { get { return this.ID; } }
         protected override ExtendedPropertyScopeType objectScopeType { get { return this.ScopeType; } }
         protected override int? objectScopeID { get { return this.ScopeID; } }
 
 
-        protected Event(DateTime createdTimestamp, EPScope epScope, string name)
+        protected EventSession(DateTime createdTimestamp, EPScope epScope, int eventID, string name, string location, DateTime startDate, DateTime endDate)
             : this()
         {
             Debug.Assert(!string.IsNullOrEmpty(name));
@@ -45,26 +45,30 @@ namespace App.Library
             this.ScopeType = epScope.ScopeType;
             this.ScopeID = epScope.ID;
 
+            this.EventID = eventID;
             this.Name = name;
+            this.Location = location;
+            this.StartDate = startDate;
+            this.EndDate = endDate;
         }
 
 
 
-        private static Func<IQueryable<Event>, string, IQueryable<Event>> termFilter = (query, searchTermLower) =>
+        private static Func<IQueryable<EventSession>, string, IQueryable<EventSession>> termFilter = (query, searchTermLower) =>
         {
             return query.Where(item =>
                 item.Name.Contains(searchTermLower));
         };
 
 
-        private static IQueryable<Event> query(AppDC dc)
+        private static IQueryable<EventSession> query(AppDC dc)
         {
-            var result = dc.Events
+            var result = dc.EventSessions
                 .Select(item => item);
             return result;
         }
 
-        public static IQueryable<Event> Query(AppDC dc)
+        public static IQueryable<EventSession> Query(AppDC dc)
         {
             Debug.Assert(dc.TransactionAuthorizedBy != null);
 
@@ -72,20 +76,20 @@ namespace App.Library
 
             var result = query(dc)
                 // http://stackoverflow.com/questions/586097/compare-nullable-types-in-linq-to-sql
-                .Where(show => show.ScopeType == ExtendedPropertyScopeType.Global ||
-                    show.ScopeType == teamEPScope.ScopeType && object.Equals(show.ScopeID, teamEPScope.ID));
+                .Where(item => item.ScopeType == ExtendedPropertyScopeType.Global ||
+                    item.ScopeType == teamEPScope.ScopeType && object.Equals(item.ScopeID, teamEPScope.ID));
 
             return result;
         }
 
-        public static IQueryable<Event> Query(AppDC dc, SearchExpression searchExpression)
+        public static IQueryable<EventSession> Query(AppDC dc, SearchExpression searchExpression)
         {
             var query = Query(dc);
             query = FilterBy(dc, query, searchExpression, termFilter);
             return query;
         }
 
-        public static IQueryable<Event> Query(AppDC dc, SearchExpression searchExpression, string sortExpression, int startRowIndex, int maximumRows)
+        public static IQueryable<EventSession> Query(AppDC dc, SearchExpression searchExpression, string sortExpression, int startRowIndex, int maximumRows)
         {
             var query = Query(dc, searchExpression);
             query = query.SortBy(sortExpression, startRowIndex, maximumRows);
@@ -111,19 +115,19 @@ namespace App.Library
 #endif
 
 
-        protected static IQueryable<ExtendedItem<Event>> ExtendedQuery(AppDC dc)
+        protected static IQueryable<ExtendedItem<EventSession>> ExtendedQuery(AppDC dc)
         {
             return ExtendedQuery(dc, Query(dc));
         }
 
-        public static IQueryable<ExtendedItem<Event>> ExtendedQuery(AppDC dc, SearchExpression searchExpression)
+        public static IQueryable<ExtendedItem<EventSession>> ExtendedQuery(AppDC dc, SearchExpression searchExpression)
         {
             var query = Query(dc, searchExpression);
             var exQuery = ExtendedQuery(dc, query);
             return exQuery;
         }
 
-        public static IQueryable<ExtendedItem<Event>> ExtendedQuery(AppDC dc, SearchExpression searchExpression, string sortExpression, int startRowIndex, int maximumRows)
+        public static IQueryable<ExtendedItem<EventSession>> ExtendedQuery(AppDC dc, SearchExpression searchExpression, string sortExpression, int startRowIndex, int maximumRows)
         {
             var epQuery = ExtendedQuery(dc, searchExpression);
             epQuery = epQuery.SortBy(sortExpression, startRowIndex, maximumRows);
@@ -134,27 +138,36 @@ namespace App.Library
 
         public class SearchItem : ExtendedSearchItem
         {
-            //public string type { get; internal set; }
-            public string name { get; internal set; }
-            public string overview { get; internal set; }
-
             [JsonProperty("createdTimestamp")]
             public DateTime CreatedTimestamp { get; internal set; }
             [JsonProperty("lastModifiedTimestamp")]
             public DateTime LastModifiedTimestamp { get; internal set; }
 
-            public SearchItem(ExtendedItem<Event> exItem, SearchItemContext context)
+            //public string type { get; internal set; }
+            public string name { get; internal set; }
+            public string overview { get; internal set; }
+
+            [JsonProperty("startDate")]
+            public DateTime StartDate { get; internal set; }
+            [JsonProperty("endDate")]
+            public DateTime EndDate { get; internal set; }
+
+
+            public SearchItem(ExtendedItem<EventSession> exItem, SearchItemContext context)
                 : base(exItem, context)
             {
+                this.CreatedTimestamp = exItem.item.CreatedTimestamp;
+                this.LastModifiedTimestamp = exItem.item.LastModifiedTimestamp;
+
                 //this.type = exItem.item.Ty
                 this.name = exItem.item.Name;
                 this.overview = exItem.item.Overview;
 
-                this.CreatedTimestamp = exItem.item.CreatedTimestamp;
-                this.LastModifiedTimestamp = exItem.item.LastModifiedTimestamp;
+                this.StartDate = exItem.item.StartDate;
+                this.EndDate = exItem.item.EndDate;
             }
 
-            public static SearchItem Create(ExtendedItem<Event> item, SearchItemContext context)
+            public static SearchItem Create(ExtendedItem<EventSession> item, SearchItemContext context)
             {
                 var optionTags = context.TeamEPScopeItemTagCategoryGroups
                     .Where(group => group.Key == EPCategory.OptionCategory)
@@ -184,175 +197,21 @@ namespace App.Library
 
 
 
-        public static Event GenerateRandom(AppDC dc)
+
+        public static EventSession Create(AppDC dc, dynamic data)
         {
-            var random = RandomProvider.GetThreadRandom();
-
-            var sponsor = new[]
-            {
-                "Fred Meyer",
-                "Walmart",
-                "Target",
-                "Costco",
-            }.ChooseRandom();
-
-
-            var data = new
-            {
-                name = "Demo Event " + DateTime.Now.ToString(),
-                sponsor = sponsor,
-            };
-
-            var randomEvent = Event.createLock(dc, () =>
-            {
-                var newItem = Event.Create(dc, data);
-                Debug.Assert(newItem != null && newItem.ID > 0);
-
-                return newItem;
-            });
-            Debug.Assert(randomEvent != null);
-
-
-            // Ensure we've got some participant groups
-            var demoParticipantGroupNames = new []
-            {
-                "BEST High School",
-                "Eastlake High School",
-                "International Community School",
-                "Lake Washington High School",
-                "Redmond High School",
-                "STEM High School",
-
-                "Stella Schola",
-                "International Community School",
-                "Northstar Middle School",
-                "Inglewood Middle School",
-                "Kirkland Middle School",
-                "Tyee Middle School",
-                "Evergreen Middle School",
-                "Odle Middle School",
-
-                "Alcott Elementary",
-                "Audubon Elementary",
-                "Dickinson Elementary",
-                "Einstein Elementary",
-                "Explorer Community School",
-                "Redmond Elementary",
-                "Rockwell Elementary",
-                "Rush Elementary",
-            };
-
-            var demoParticipantGroupsMascots = new[]
-            {   
-                "Eagles",
-                "Tigers",
-                "Panthers",
-                "Bulldogs",
-                "Wildcats",
-                "Warriors",
-                "Lions",
-                "Cougars",
-                "Indians",
-                "Knights",
-                "Mustangs",
-                "Falcons",
-                "Trojans",
-                "Vikings",
-                "Rams",
-                "Cardinals",
-                "Raiders",
-                "Spartans",
-                "Patriots",
-                "Pirates",
-                "Hornets",
-                "Crusaders",
-                "Bears",
-                "Hawks",
-                "Rebels",
-                "Bobcats",
-                "Blue Devils",
-                "Wolverines",
-                "Wolves",
-                "Huskies",
-                "Jaguars",
-                "Titans",
-                "Chargers",
-                "Dragons",
-                "Saints",
-                "Braves",
-                "Red Devils",
-                "Rockets",
-                "Pioneers"
-            };
-
-            int numParticipantGroups = 6 + random.Next(8);
-            var participantGroupNames = demoParticipantGroupNames.ChooseMultiple(numParticipantGroups);
-
-            var participantGroups = participantGroupNames
-                .Select(participantGroupName => new
-                {
-                    Name = participantGroupName,
-                    EventSession = ParticipantGroup.Create(dc, new { name = participantGroupName }),
-                });
-
-
-
-            // Ensure we've got at least 250 participants
-
-
-
-
-            // Now Create a random number of Event Sessions
-            int numSessions = 2 + random.Next(3);
-
-            // choose a date for our first EventSession
-            var firstSessionDate = DateTime.UtcNow.AddDays(15 + random.Next(30)).Date;
-
-
-            for (int sessionIndex = 0; sessionIndex < numSessions; sessionIndex++)
-            {
-                var sessionStartDate = firstSessionDate.AddDays(sessionIndex);
-                if (sessionStartDate.DayOfWeek == DayOfWeek.Saturday || sessionStartDate.DayOfWeek == DayOfWeek.Sunday)
-                {
-                    sessionStartDate += TimeSpan.FromHours(new [] { 13, 14, 15 }.ChooseRandom());
-                } else {
-                    sessionStartDate += TimeSpan.FromHours(new [] { 18.5, 19, 19.5, 20 }.ChooseRandom());
-                }
-                var sessionEndDate = sessionStartDate.AddHours(new [] { 2, 2.5, 3 }.ChooseRandom());
-
-                var sessionData = new 
-                {
-                    eventID = randomEvent.ID,
-                    name = "Session " + (sessionIndex + 1).ToString(),
-                    location = sponsor,
-                    startDate = sessionStartDate,
-                    endDate = sessionEndDate,
-                };
-
-                var eventSession = EventSession.Create(dc, sessionData);
-                Debug.Assert(eventSession != null);
-
-                //!! add in participants to the session!
-
-            }
-
-            return randomEvent;
-        }
-
-        public static Event Create(AppDC dc, dynamic data)
-        {
-            return Event.createLock(dc, () =>
+            return EventSession.createLock(dc, () =>
             {
                 var createdTimestamp = dc.TransactionTimestamp;
                 var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
 
+                var eventID = (int)data.eventID;
                 var name = (string)data.name;
+                var location = (string)data.location;
+                var startDate = (DateTime)data.startDate;
+                var endDate = (DateTime)data.endDate;
 
-                var newItem = new Event(createdTimestamp, teamEPScope, name);
-                // optional
-                var sponsor = (string)data.sponsor;
-                newItem.Sponsor = sponsor;
-
+                var newItem = new EventSession(createdTimestamp, teamEPScope, eventID, name, location, startDate, endDate);
                 dc.Save(newItem);
                 // (have to save to obtain an ID before we can save ExtendedProperties
                 Debug.Assert(newItem.ID > 0);
@@ -768,28 +627,28 @@ namespace App.Library
 #endif
 
 
-        public static Event FindByID(AppDC dc, int showID)
+        public static EventSession FindByID(AppDC dc, int itemID)
         {
-            var result = Event.Query(dc)
-                .FirstOrDefault<Event>(show => show.ID == showID);
+            var result = EventSession.Query(dc)
+                .FirstOrDefault<EventSession>(item => item.ID == itemID);
             return result;
         }
 
         // probably need to use ShowNameAlias.FindShowOrCreateUnmatched() instead
-        internal static Event FindByName(AppDC dc, string showName)
+        internal static EventSession FindByName(AppDC dc, string itemName)
         {
-            var existingShow = Event.Query(dc)
-                .Where(show => show.Name == showName)
+            var existingItem = EventSession.Query(dc)
+                .Where(item => item.Name == itemName)
                 .FirstOrDefault();
 
-            return existingShow;
+            return existingItem;
         }
 
 
 
 
 
-        private static HubResult CreateLock(AppDC dc, Func<Event> createHandler)
+        private static HubResult CreateLock(AppDC dc, Func<EventSession> createHandler)
         {
             var newCase = createLock(dc, createHandler);
             if (newCase != null)
@@ -800,22 +659,22 @@ namespace App.Library
             return HubResult.Error;
         }
 
-        private static Event createLock(AppDC dc, Func<Event> createHandler)
+        private static EventSession createLock(AppDC dc, Func<EventSession> createHandler)
         {
             return CreateLock(dc, NotifyClients, createHandler);
         }
 
-        internal static T ReadLock<T>(AppDC dc, int itemID, Func<Event, T> readHandler)
+        internal static T ReadLock<T>(AppDC dc, int itemID, Func<EventSession, T> readHandler)
         {
             return ReadLock(dc, itemID, FindByID, readHandler);
         }
 
-        internal static HubResult ReadLock(AppDC dc, int itemID, Func<Event, HubResult> readHandler)
+        internal static HubResult ReadLock(AppDC dc, int itemID, Func<EventSession, HubResult> readHandler)
         {
             return ReadLock(dc, itemID, FindByID, readHandler);
         }
 
-        internal static HubResult WriteLock(AppDC dc, int itemID, Func<Event, NotifyExpression, HubResult> writeHandler)
+        internal static HubResult WriteLock(AppDC dc, int itemID, Func<EventSession, NotifyExpression, HubResult> writeHandler)
         {
             return WriteLock(dc, itemID, FindByID, NotifyClients, writeHandler);
         }
@@ -829,11 +688,11 @@ namespace App.Library
         {
             var siteContext = SiteContext.Current;
 
-            var notification = Event.Search(dc, notifyExpression, null, 0, int.MaxValue);
+            var notification = EventSession.Search(dc, notifyExpression, null, 0, int.MaxValue);
 
             var hubClients = siteContext.ConnectionManager.GetHubContext("siteHub").Clients;
             Debug.Assert(hubClients != null);
-            hubClients.All.updateShows(notification);
+            hubClients.All.updateEventSessions(notification);
         }
 
         public override string ToString()

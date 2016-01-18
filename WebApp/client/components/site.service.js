@@ -983,6 +983,36 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
   }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+  this.generateRandomEvent = function () {
+    return utilityService.callHub(function () {
+      return siteHub.server.generateRandomEvent();
+    });
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+
   siteHub.on('updateSettings', function (settingsObject) {
     $rootScope.$apply(onSettingsUpdated(settingsObject));
   }).on('updateProjects', function (projectsData) {

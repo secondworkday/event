@@ -61,6 +61,11 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, util
         participantGroupSearch: null
     };
 
+    $scope.generateRandomEvent = function () {
+      siteService.generateRandomEvent();
+    }
+
+
     $scope.showCreateEventDialog = function (ev) {
         $mdDialog.show({
             controller: CreateEventDialog,

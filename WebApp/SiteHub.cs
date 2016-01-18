@@ -324,6 +324,8 @@ namespace WebApp
             return accountsOnlyHeader((siteContext, dc) =>
             {
                 var randomEvent = Event.GenerateRandom(dc);
+                Debug.Assert(randomEvent != null);
+
                 return HubResult.CreateSuccessData(randomEvent.ID);
             });
         }
