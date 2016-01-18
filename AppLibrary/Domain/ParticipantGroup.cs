@@ -59,7 +59,24 @@ namespace App.Library
             this.Name = name;
         }
 
+        public static List<int> GetParticipants(AppDC dc, int ParticipantGroupID)
+        {
+            var myQuery = from epParticipantGroup in ExtendedQuery(dc)
+                          join epParticipant in Participant.Query(dc) on epParticipantGroup.item.ID equals ParticipantGroupID
+                          select new { epParticipant};
 
+            var exResult = myQuery
+                .Where(exItem => exItem.epParticipant.ParticipantGroupID == ParticipantGroupID);
+
+            List<int> participantIDs = new List<int>();
+
+            foreach (var p in exResult)
+            {
+                participantIDs.Add(p.epParticipant.ID);
+            }
+
+            return participantIDs;
+        }
 
         private static Func<IQueryable<ParticipantGroup>, string, IQueryable<ParticipantGroup>> termFilter = (query, searchTermLower) =>
         {

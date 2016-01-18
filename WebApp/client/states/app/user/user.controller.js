@@ -1,12 +1,13 @@
 app.controller('ReportController', function ($scope, $log, utilityService, siteService) {
   var participants = siteService.model.participants;
+  var participantGroups = siteService.model.participantGroups;
 
   $scope.downloadReport = function () {
-    // TODO: Change! Hard-coded to first participant for now
-    for (var key in participants.hashMap) break;
+    // TODO: Change! Hard-coded to first participant group for now
+    for (var key in participantGroups.hashMap) break;
 
     var query = {
-        type: 'reminderForm',
+        type: 'reminderFormForSchool',
         id: key
     };
     utilityService.download(query);
