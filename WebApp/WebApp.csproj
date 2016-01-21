@@ -217,6 +217,7 @@
     <Content Include="client\states\public\public.config.js" />
     <Content Include="client\states\public\public.controller.js" />
     <Content Include="client\states\public\public.html" />
+    <Content Include="client\states\public\sign-in-demo-account.dialog.html" />
     <Content Include="client\states\public\sign-in.controller.js" />
     <Content Include="client\states\public\sign-in.html" />
     <Content Include="client\states\public\wait.html" />
@@ -226,6 +227,7 @@
     <Content Include="Content\font-awesome.min.css" />
     <Content Include="default.html" />
     <Content Include="Global.asax" />
+    <Content Include="images\user-img-placeholder.png" />
     <Content Include="js\mk-editable-span.js" />
     <Content Include="js\mk-editable-span.min.js" />
     <Content Include="js\ms-utility.js" />

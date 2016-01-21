@@ -92,6 +92,12 @@ namespace App.Library
         public static IQueryable<EventSession> Query(AppDC dc, SearchExpression searchExpression, string sortExpression, int startRowIndex, int maximumRows)
         {
             var query = Query(dc, searchExpression);
+
+            if (searchExpression.ParentIDs != null)
+            {
+                query = query.Where(eventSession => searchExpression.ParentIDs.Contains(eventSession.EventID));
+            }
+
             query = query.SortBy(sortExpression, startRowIndex, maximumRows);
             return query;
         }

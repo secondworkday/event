@@ -1,4 +1,4 @@
-app.controller('SystemTenantsController', function ($scope, $mdDialog, $log, utilityService, siteService) {
+app.controller('SystemTenantsController', function ($scope, $mdDialog, $log, $msUI, utilityService, siteService) {
   $log.debug('Loading SystemTenantsController...');
 
 
@@ -52,9 +52,22 @@ app.controller('SystemTenantsController', function ($scope, $mdDialog, $log, uti
        controller: NewTenantDialogController
     });
     function NewTenantDialogController($scope, $mdDialog) {
-      $scope.createTenant = function(newTenantName) {
-        // TODO add create Tenant code
-        $log.warn( "You tried to create a Tenant called " + newTenantName + ", but tenant creation is not yet working." );
+      $scope.createTenant = function (newTenantName) {
+
+        var data = {};
+        utilityService.createTenant(newTenantName, data)
+        .then(function (successData) {
+          // success
+          $msUI.showToast("Tenant Created");
+          $log.debug("Task completed.");
+          return successData;
+        }, function (failureData) {
+          // failure
+          $msUI.showToast(failureData.errorMessage);
+          $log.debug(failureData.errorMessage);
+          return failureData;
+        });
+
         $mdDialog.hide();
       };
       $scope.cancelDialog = function() {
