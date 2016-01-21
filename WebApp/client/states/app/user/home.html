@@ -15,7 +15,7 @@
   </div>
 
   <div layout layout-wrap>
-    <md-card class="card-event"
+    <!--<md-card class="card-event"
         ng-repeat="event in sampleEvents">
       <md-card-content ui-sref="app.user.event" class="u-clickable">
         <h4 style="margin-top:0;" class="md-title">{{event.name}}</h4>
@@ -25,7 +25,22 @@
         <md-button ui-sref="app.user.event" class="md-primary">View</md-button>
         <md-button class="md-warn">Archive</md-button>
       </md-card-actions>
-    </md-card>
+    </md-card>-->
+
+    <ms-search-view change-event="updateEvents" search="searchEvents" options="searchViewOptions" user-search="userSearch">
+      <md-card class="card-event" ng-repeat="event in $displayedIndex | objectLookup:$hashMap track by event.id">
+        <md-card-content ui-sref="app.user.event({eventID:event.id})" class="u-clickable">
+          <h4 style="margin-top:0;" class="md-title">{{event.name}}</h4>
+          <p class="md-body-1">{{event.description}}</p>
+        </md-card-content>
+        <md-card-actions layout="row" layout-align="start center">
+          <md-button ui-sref="app.user.event({eventID:event.id})" class="md-primary">View</md-button>
+          <md-button class="md-warn">Archive</md-button>
+        </md-card-actions>
+      </md-card>
+    </ms-search-view>
+
+    <!--<md-button class="md-primary" ui-sref="master.home.assessment({ homeID:home.id })" ng-if="!home.progress">Assessment</md-button>-->
   </div>
 
 </section>

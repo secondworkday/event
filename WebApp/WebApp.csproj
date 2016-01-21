@@ -205,6 +205,7 @@
     <Content Include="client\states\app\user\add-team-member.dialog.html" />
     <Content Include="client\states\app\user\create-event.dialog.html" />
     <Content Include="client\states\app\user\event.html" />
+    <Content Include="client\states\app\user\event-old.html" />
     <Content Include="client\states\app\user\home.html" />
     <Content Include="client\states\app\user\user-container.html" />
     <Content Include="client\states\app\user\user.config.js" />

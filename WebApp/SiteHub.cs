@@ -416,6 +416,27 @@ namespace WebApp
             });
         }
 
+        public HubResult SearchEventSessions(string searchExpressionString, string sortField, int startRowIndex, int maximumRows)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var searchExpression = SearchExpression.Create(searchExpressionString);
+                var result = EventSession.Search(dc, searchExpression, sortField, startRowIndex, maximumRows);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
+
+        public HubResult SearchEventParticipants(string searchExpressionString, string sortField, int startRowIndex, int maximumRows)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var searchExpression = SearchExpression.Create(searchExpressionString);
+                var result = EventParticipant.Search(dc, searchExpression, sortField, startRowIndex, maximumRows);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
+
+
         public HubResult ModifyEventTag(int itemID, string tagName, bool isAssigned)
         {
             return accountsOnlyHeader((siteContext, dc) =>

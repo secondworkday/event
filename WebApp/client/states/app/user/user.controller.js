@@ -14,6 +14,23 @@ app.controller('ReportController', function ($scope, $log, utilityService, siteS
     }
 });
 
+app.controller('EventController', function ($scope, $log, $state, $mdDialog, utilityService, siteService, event, eventSessionsIndex, eventParticipantsIndex, eventParticipantGroupsIndex) {
+  $scope.event = event;
+  $scope.eventSessionsIndex = eventSessionsIndex;
+  $scope.eventParticipantsIndex = eventParticipantsIndex;
+  $scope.eventParticipantGroupsIndex = eventParticipantGroupsIndex;
+
+  $scope.getParticipantCount = function (participantGroupID) {
+    return $scope.eventParticipantsIndex.filter(function (ep) {
+      var pID = $scope.model.eventParticipants.hashMap[ep].participantID;
+      var pgID = $scope.model.participants.hashMap[pID].participantGroupID;
+      return pgID == participantGroupID;
+    }).length;
+  };
+  
+
+});
+
 app.controller('UserController', function ($scope, $log, $state, $mdDialog, utilityService, siteService) {
   $log.debug('Loading UserController...');
   $scope.participantGroups = siteService.model.participantGroups;
@@ -45,6 +62,7 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, util
 
     $scope.searchParticipantGroups = siteService.model.participantGroups.search;
     $scope.searchParticipants = siteService.model.participants.search;
+    $scope.searchEvents = siteService.model.events.search;
 
     $scope.sortOptions = [
       { name: 'Name', serverTerm: 'item.name', clientFunction: utilityService.localeCompareByPropertyThenByID('name') },
@@ -135,7 +153,7 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, util
         };
     }
 
-    $scope.showAddSchoolDialog = function (ev) {
+    $scope.showAddParticipantGroupDialog = function (ev) {
         $mdDialog.show({
             controller: AddSchoolDialogController,
             templateUrl: '/client/states/app/user/add-school.dialog.html',

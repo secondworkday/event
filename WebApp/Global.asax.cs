@@ -197,6 +197,7 @@ namespace WebApp
                 //requestPathLower == "/home" ||
                 requestPathLower == "/home/" ||
                 requestPathLower.StartsWith("/jobs/") ||
+                requestPathLower.StartsWith("/event/") ||
 
                 //!! what is the correct one here?
                 requestPathLower.StartsWith("/c/") ||

@@ -535,11 +535,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
 
 
 
-
-
-
-
-
   self.searchCareerStepTransitions = function (careerStep, searchExpression, sortExpression, startIndex, rowCount) {
     return utilityService.callHub(function () {
       return siteHub.server.searchCareerStepTransitions(careerStep.id, searchExpression, sortExpression, startIndex, rowCount);
@@ -548,14 +543,85 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
 
 
 
+  //** EventSessions Related
+  model.eventSessions = {
+    hashMap: {},
+    index: [],
+
+    search: function (searchExpression, sortExpression, startIndex, rowCount) {
+      return utilityService.callHub(function () {
+        return siteHub.server.searchEventSessions(searchExpression, sortExpression, startIndex, rowCount);
+      }).then(function (itemsData) {
+        return utilityService.updateItemsModel(model.eventSessions, itemsData);
+      });
+    }
+  };
+
+  this.ensureEventSessions = function (eventID) {
+    // Find EventSessions that belong to EventID (foreign key)
+    // Always load latest from server because we can't know if we have them all on the client
+    return model.eventSessions.search("", "", 0, 999999)    // TODO: search("EventID:" + eventID, ...
+      .then(function (itemsData) {
+        // TODO: doing client-side filtering for now, but filtering should be done server-side
+        return $.map(model.eventSessions.hashMap, function (value, index) {
+          if (eventID == value.eventID) {
+            return value.id;
+          }
+        });
+      });
+  }
 
 
+  //** EventSessions Related
+  model.eventParticipants = {
+    hashMap: {},
+    index: [],
 
+    search: function (searchExpression, sortExpression, startIndex, rowCount) {
+      return utilityService.callHub(function () {
+        return siteHub.server.searchEventParticipants(searchExpression, sortExpression, startIndex, rowCount);
+      }).then(function (itemsData) {
+        return utilityService.updateItemsModel(model.eventParticipants, itemsData);
+      });
+    }
+  };
 
+  //this.ensureEventParticipants = function (eventID) {
+  //  // Find EventParticipants that belong to EventID (foreign key)
+  //  // Always load latest from server because we can't know if we have them all on the client
+  //  return model.eventParticipants.search("", "", 0, 999999)    // TODO: search("EventID:" + eventID, ...
+  //    .then(function (itemsData) {
+  //      return model.participants.search("", "", 0, 999999)     // TODO: Need a EventParticipant-Participant JOIN on the server!!!
+  //        .then(function (itemsData) {
+  //          // TODO: doing client-side filtering for now, but filtering should be done server-side
+  //          return $.map(model.eventParticipants.hashMap, function (value, index) {
+  //            if (eventID == value.eventID) {
+  //              var participant = model.participants.hashMap[value.participantID];
+  //              value.name = participant.name;
+  //              value.participantGroupID = participant.participantGroupID;
+  //              return value;
+  //            }
+  //          });
+  //        });
+  //    });
+  //};
 
-
-
-
+  this.ensureEventParticipantsIndex = function (eventID) {
+    // Find EventParticipants that belong to EventID (foreign key)
+    // Always load latest from server because we can't know if we have them all on the client
+    return model.eventParticipants.search("", "", 0, 999999)    // TODO: search("EventID:" + eventID, ...
+      .then(function (itemsData) {
+        return model.participants.search("", "", 0, 999999)     // TODO: Need a EventParticipant-Participant JOIN on the server!!!
+          .then(function (itemsData) {
+            // TODO: doing client-side filtering for now, but filtering should be done server-side
+            return $.map(model.eventParticipants.hashMap, function (value, index) {
+              if (eventID == value.eventID) {
+                return value.id;
+              }
+            });
+          });
+      });
+  }
 
 
   //** Events Related
@@ -571,6 +637,18 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
       });
     }
   };
+
+  this.ensureEvent = function (eventID) {
+    var event = model.events.hashMap[eventID];
+    if (!event) {
+      return model.events.search("%" + eventID, "", 0, 999999)
+      .then(function (eventData) {
+        return model.events.hashMap[eventID];
+      });
+    }
+
+    return $q.when(event);
+  }
 
   this.generateRandomEvent = function () {
     return utilityService.callHub(function () {
@@ -840,7 +918,7 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
     }).then(function (taskID) {
 
       var taskItem = {
-        taskID : taskID
+        taskID: taskID
       };
 
       return taskItem;
@@ -958,24 +1036,24 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
   };
 
 
-    // ** Participant Group related
+  // ** Participant Group related
   model.participantGroups = {
-      hashMap: {},
-      index: [],
+    hashMap: {},
+    index: [],
 
-      search: function (searchExpression, sortExpression, startIndex, rowCount) {
-          return utilityService.callHub(function () {
-              return siteHub.server.searchParticipantGroups(searchExpression, sortExpression, startIndex, rowCount);
-          }).then(function (itemsData) {
-              return utilityService.updateItemsModel(model.participantGroups, itemsData);
-          });
-      }
+    search: function (searchExpression, sortExpression, startIndex, rowCount) {
+      return utilityService.callHub(function () {
+        return siteHub.server.searchParticipantGroups(searchExpression, sortExpression, startIndex, rowCount);
+      }).then(function (itemsData) {
+        return utilityService.updateItemsModel(model.participantGroups, itemsData);
+      });
+    }
   };
 
   this.createParticipantGroup = function (formData) {
-      return utilityService.callHub(function () {
-          return siteHub.server.createParticipantGroup(formData);
-      });
+    return utilityService.callHub(function () {
+      return siteHub.server.createParticipantGroup(formData);
+    });
   };
 
   this.generateRandomParticipants = function (participantGroupID, numberOfParticipants) {
@@ -985,7 +1063,7 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
   }
 
   this.updateParticipantGroups = function (itemsData) {
-      $rootScope.$apply(utilityService.updateItemsModel(model.participantGroups, itemsData));
+    $rootScope.$apply(utilityService.updateItemsModel(model.participantGroups, itemsData));
   }
 
 
@@ -993,6 +1071,24 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
     return utilityService.callHub(function () {
       return siteHub.server.generateRandomEvent();
     });
+  };
+
+  this.ensureEventParticipantGroups = function (siteService, eventParticipantsIndex) {
+    // TODO: Server-side filtering of participant Group based on eventParticipantsIndex
+    return model.participantGroups.search("", "", 0, 999999)
+      .then(function (itemsData) {
+
+        //extract unique ParticipantGroupIDs
+        var flags = [];
+        return $.map(eventParticipantsIndex, function (value, index) {
+          var pID = model.eventParticipants.hashMap[value].participantID;
+          var pgID = model.participants.hashMap[pID].participantGroupID;
+          if (!flags[pgID]) {
+            flags[pgID] = true;
+            return pgID;
+          }
+        });
+      });
   };
 
 
@@ -1033,9 +1129,9 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
     $rootScope.$apply($rootScope.$broadcast('updateCompanyLayTitles', itemsData, model.companyLayTitles));
 
 
-    
+
   }).on('updateParticipantGroups', function (itemsData) {
-      $rootScope.$apply($rootScope.$broadcast('updateParticipantGroups', utilityService.updateItemsModel(model.participantGroups, itemsData)));
+    $rootScope.$apply($rootScope.$broadcast('updateParticipantGroups', utilityService.updateItemsModel(model.participantGroups, itemsData)));
 
   }).on('updateParticipants', function (itemsData) {
     $rootScope.$apply($rootScope.$broadcast('updateParticipants', utilityService.updateItemsModel(model.participants, itemsData)));
