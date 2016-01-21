@@ -158,6 +158,12 @@ namespace App.Library
             [JsonProperty("endDate")]
             public DateTime EndDate { get; internal set; }
 
+            [JsonProperty("eventID")]
+            public int EventID { get; internal set; }
+
+            [JsonProperty("location")]
+            public string Location { get; internal set; }
+
 
             public SearchItem(ExtendedItem<EventSession> exItem, SearchItemContext context)
                 : base(exItem, context)
@@ -171,6 +177,9 @@ namespace App.Library
 
                 this.StartDate = exItem.item.StartDate;
                 this.EndDate = exItem.item.EndDate;
+
+                this.EventID = exItem.item.EventID;
+                this.Location = exItem.item.Location;
             }
 
             public static SearchItem Create(ExtendedItem<EventSession> item, SearchItemContext context)
