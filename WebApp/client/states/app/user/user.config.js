@@ -13,8 +13,8 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         templateUrl: '/client/states/app/user/home.html',
     })
     .state('app.user.event-old', {
-        url: '/event-old',
-        templateUrl: '/client/states/app/user/event-old.html',
+      url: '/event-old',
+      templateUrl: '/client/states/app/user/event-old.html',
     })
     .state('app.user.event', {
       url: '/event/:eventID/',
@@ -38,6 +38,13 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         }
       }
     })
+
+    .state('app.user.event-participants', {
+      url: '/event/:eventID/participants',
+      templateUrl: '/client/states/app/user/participants.html',
+      controller: "EventParticipantsController"
+    })
+
 
     ;// closes $stateProvider
 }]);

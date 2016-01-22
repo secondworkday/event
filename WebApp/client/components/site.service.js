@@ -624,6 +624,22 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
   }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   //** Events Related
   model.events = {
     hashMap: {},
@@ -1090,6 +1106,28 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
         });
       });
   };
+
+
+  // returns an Item (not a promise - see ensureXyz() for the promise variant)
+  self.demandParticipantGroup = function (itemKey) {
+    var modelItems = model.participantGroups;
+    return modelItems.hashMap[itemKey] ||
+      (
+        modelItems.hashMap[itemKey] = { key: itemKey, id: itemKey, code: itemKey, displayTitle: 'loading...' },
+        utilityService.delayLoad2(modelItems, itemKey),
+        modelItems.hashMap[itemKey]
+      );
+  };
+
+
+
+
+
+
+
+
+
+
 
 
   // ** Particpants related

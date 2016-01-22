@@ -207,6 +207,8 @@
     <Content Include="client\states\app\user\event.html" />
     <Content Include="client\states\app\user\event-old.html" />
     <Content Include="client\states\app\user\home.html" />
+    <Content Include="client\states\app\user\event-participants.controller.js" />
+    <Content Include="client\states\app\user\participants.html" />
     <Content Include="client\states\app\user\user-container.html" />
     <Content Include="client\states\app\user\user.config.js" />
     <Content Include="client\states\app\user\user.controller.js" />
