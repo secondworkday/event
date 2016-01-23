@@ -1,0 +1,61 @@
+<div layout>
+  <div flex>
+    <md-input-container class="md-block" flex-gt-sm>
+      <label><i class="fa fa-search"></i> Search for any text</label>
+      <input ng-model="searchViewOptions.userSearch">
+    </md-input-container>
+  </div>
+  <div hide-xs>
+    <md-menu md-position-mode="target-right target">
+      <md-button aria-label="Open sort menu" class="md-icon-button" ng-click="$mdOpenMenu()">
+        <i md-menu-origin class="fa fa-sort"></i>
+      </md-button>
+      <md-menu-content width="4">
+        <md-menu-item ng-repeat="sortOption in sortOptions">
+          <md-button ng-click="searchViewOptions.sort = sortOption">
+            {{sortOption.name}}
+          </md-button>
+        </md-menu-item>
+      </md-menu-content>
+    </md-menu>
+    <md-button ng-click="download()" class="md-icon-button" aria-label="download">
+      <i class="fa fa-download"></i>
+    </md-button>
+    <md-button ng-click="showAddParticipantGroupDialog($event)" class="md-fab md-primary" aria-label="new">
+      <i class="fa fa-plus fa-lg"></i>
+    </md-button>
+  </div>
+</div>
+
+<ms-search-view change-event="updateParticipantGroups" search="searchHandler" options="searchViewOptions" user-search="userSearch">
+  <table class="md-data-table u-full-width">
+   <thead>
+     <tr>
+       <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
+       <th ms-debug-only>ID</th>
+         <th class="md-data-table__cell--non-numeric">Name</th>
+         <th>Slots</th>
+         <th>Contact Name</th>
+         <th>Email</th>
+         <th>Phone</th>
+         <th>Status</th>
+     </tr>
+   </thead>
+   <tbody>
+     <tr ui-sref="" 
+       ng-repeat="participantGroup in $displayedIndex | objectLookup:$hashMap track by participantGroup.id" >
+       <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ participantGroup | json }}</pre></td>
+       <td ms-debug-only>{{ participantGroup.id }}</td>
+       <td class="md-data-table__cell--non-numeric">{{ participantGroup.name }}</td>
+         <td>50</td>
+         <td>Lori Jones</td>
+         <td>jones@school.edu</td>
+         <td>206-434-2122</td>
+         <td>Not Invited</td>
+   </tbody>
+  </table>
+</ms-search-view>
+
+
+
+

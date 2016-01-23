@@ -1,14 +1,14 @@
-app.controller('EventParticipantsController', function ($scope, $mdDialog, $log, $msUI, utilityService, siteService) {
-  $log.debug('Loading EventParticipantsController...');
+app.controller('SchoolsController', function ($scope, $mdDialog, $log, $msUI, utilityService, siteService, eventParticipantGroupsIndex) {
+  $log.debug('Loading SchoolsController...');
 
-  $scope.searchHandler = siteService.model.eventParticipants.search;
+  $scope.searchHandler = siteService.model.participantGroups.search;
   $scope.demandParticipantGroup = siteService.demandParticipantGroup;
   $scope.demandEventSession = siteService.demandEventSession;
 
 
 
   $scope.sortOptions = [
-    { name: 'First Name', serverTerm: 'Participant.FirstName', clientFunction: utilityService.localeCompareByPropertyThenByID('firstName') },
+    { name: 'Name', serverTerm: 'ParticipantGroup.Name', clientFunction: utilityService.localeCompareByPropertyThenByID('name') },
     { name: 'Name Descending', serverTerm: 'item.name DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('name') }
   ];
 
