@@ -820,7 +820,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
   function onTenantGroupsUpdated(itemsModel, itemsData) {
     // Update our main cache (model.xxx) and cacheIndex (model.xxxIndex)
 
-    self.purgeItems(itemsData.deletedKeys, itemsModel.hashMap, itemsModel.index, itemsModel.groupsIndexer.index, itemsModel.tenantsIndexer.index);
+    self.purgeItems(itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index, itemsModel.groupsIndexer.index, itemsModel.tenantsIndexer.index);
     var newItemIDs = cacheSortedItems(itemsData.items, itemsModel.hashMap, itemsModel.index, itemsModel.tenantsIndexer, itemsModel.groupsIndexer);
 
     if (model.authenticatedGroup) {
@@ -834,7 +834,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         return item.id;
       }),
       newIDs: newItemIDs,
-      deletedKeys: itemsData.deletedKeys,
+      deletedIDs: itemsData.deletedIDs,
       totalCount: itemsData.totalCount,
       resolvedIDs: []
     };
@@ -1004,7 +1004,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     function onUsersUpdated(itemsModel, itemsData) {
       // Update our main cache (model.xxx) and cacheIndex (model.xxxIndex)
 
-      self.purgeItems(itemsData.deletedKeys, itemsModel.hashMap, itemsModel.index, itemsModel.activeUsersIndexer.index, itemsModel.disabledUsersIndexer.index);
+      self.purgeItems(itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index, itemsModel.activeUsersIndexer.index, itemsModel.disabledUsersIndexer.index);
       //!! do we need a self?
       var newItemIDs = cacheSortedItems(itemsData.items, itemsModel.hashMap, itemsModel.index, itemsModel.activeUsersIndexer, itemsModel.disabledUsersIndexer);
       //!! check the sorted bit, and that we're doing the indexers right
@@ -1023,7 +1023,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
           return item.id;
         }),
         newIDs: newItemIDs,
-        deletedKeys: itemsData.deletedKeys,
+        deletedIDs: itemsData.deletedIDs,
         totalCount: itemsData.totalCount,
         resolvedIDs: []
       };
@@ -1278,6 +1278,13 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         return callHub(function () {
             return utilityHub.server.generateRandomContact();
         });
+    };
+
+
+    this.createDemoUser = function (appRole) {
+      return callHub(function () {
+        return utilityHub.server.createDemoUser(appRole);
+      });
     };
 
 
@@ -1563,7 +1570,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
   function onEventLogUpdated(itemsModel, itemsData) {
     // Update our main cache (model.xxx) and cacheIndex (model.xxxIndex)
 
-    self.purgeItems(itemsData.deletedKeys, itemsModel.hashMap, itemsModel.index);
+    self.purgeItems(itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index);
     var newItemIDs = cacheItems(itemsData.items, itemsModel.hashMap, itemsModel.index, self.compareByProperties('-firstOccurenceTimestamp', '-id'));
 
     var notification = {
@@ -1572,7 +1579,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         return item.id;
       }),
       newIDs: newItemIDs,
-      deletedKeys: itemsData.deletedKeys,
+      deletedIDs: itemsData.deletedIDs,
       totalCount: itemsData.totalCount,
       resolvedIDs: []
     };
@@ -2193,7 +2200,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     self.updateItemsModel = function(itemsModel, itemsData) {
       // Update our main cache (model.xxx) and cacheIndex (model.xxxIndex)
 
-      self.purgeItems(itemsData.deletedKeys, itemsModel.hashMap, itemsModel.index);
+      self.purgeItems(itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index);
       var newItemIDs = self.cacheItems(itemsData.items, itemsModel.hashMap, itemsModel.index);
 
       var notification = {
@@ -2202,7 +2209,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
           return item.id;
         }),
         newIDs: newItemIDs,
-        deletedKeys: itemsData.deletedKeys,
+        deletedIDs: itemsData.deletedIDs,
         totalCount: itemsData.totalCount,
         resolvedIDs: []
       };
@@ -2338,11 +2345,11 @@ app.directive('msSearchView', function ($parse, utilityService) {
       $scope.onChangeEvent = function (eventData) {
 
         // Handle deleted items - no point showing the user things that don't exist any more
-        utilityService.arrayRemove($scope.displayedIndex, eventData.deletedKeys);
+        utilityService.arrayRemove($scope.displayedIndex, eventData.deletedIDs);
 
         // account for totalCount! did we count these before or not?
-        if ($scope.totalCount && eventData.deletedKeys) {
-          $scope.totalCount -= eventData.deletedKeys.length;
+        if ($scope.totalCount && eventData.deletedIDs) {
+          $scope.totalCount -= eventData.deletedIDs.length;
         }
 
         // Now we have a choice - what to do about objects that are changing. At a minimum their UI should update to reflect reality. But what else?

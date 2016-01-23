@@ -43,7 +43,7 @@ namespace WebApp
             return IdentityHeader(BaseHub.AccountsOnlyDataContextFactory<AppDC>, dc => accountsOnlyHandler(SiteContext.Current, dc));
         }
 
-
+#if false
         /// <summary>
         /// Authenticates as a TenantAdmin for our Demo Tenant - for creating tenant stuff
         /// </summary>
@@ -85,6 +85,7 @@ namespace WebApp
                 }
             }
         }
+#endif
 
 
         public HubResult CreateParticipantGroup(dynamic data)
@@ -309,6 +310,39 @@ namespace WebApp
         }
 #endif
 
+#if false
+        public HubResult CreateDemoUser(AppRole appRole)
+        {
+            var demoTenantID = TenantGroup.GetCachedTenantGroupInfo()
+                .Where(tenantGroupInfo => tenantGroupInfo.IsDemo)
+                .Select(tenantGroupInfo => (int?)tenantGroupInfo.TenantGroupID)
+                .FirstOrDefault();
+
+            if (!demoTenantID.HasValue)
+            {
+                return HubResult.CreateError("No designated Demo tenant");
+            }
+
+            return demoTenantAdminIdentityHeader<AppDC>(appDC =>
+            {
+                var appRoleString = appRole.ToString();
+                string errorMessage;
+                var demoUser = User.CreateRandom(appDC, demoTenantID, appRoleString, out errorMessage);
+
+                if (demoUser == null)
+                {
+                    Debug.Assert(!string.IsNullOrEmpty(errorMessage));
+                    return HubResult.CreateError(errorMessage);
+                }
+
+                // Users and CareerProfiles share a common ID, so we can use the careerProfile.ID here
+                var userMailAddress = User.GetPrimaryMailAddress(appDC, demoUser.ID);
+
+                return HubResult.CreateSuccessData(new { id = demoUser.ID, email = userMailAddress.Address });
+            });
+        }
+#endif
+
 
         public HubResult SendUserSignupInvitation(string email, dynamic data)
         {
@@ -361,6 +395,15 @@ namespace WebApp
                 return HubResult.CreateSuccessData(randomEvent.ID);
             });
         }
+
+        public HubResult DeleteEvent(int itemID)
+        {
+            return accountsOnlyHeader((utilityContext, dc) =>
+            {
+                return Event.Delete(dc, itemID);
+            });
+        }
+
 
         public HubResult GenerateRandomParticipants(int participantGroupID, int numberOfParticipants)
         {

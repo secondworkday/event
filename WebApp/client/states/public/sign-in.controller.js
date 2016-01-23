@@ -66,7 +66,7 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
         $mdDialog.hide();
         utilityService.signIn(user)
         .then(function () {
-          $state.go('app.job-seeker.career-step.home', {}, { reload: true });
+          $state.go('app.user.home', {}, { reload: true });
         });
 
       };
@@ -74,7 +74,7 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
         $mdDialog.hide();
         utilityService.signIn(user)
         .then(function () {
-          $state.go('app.counselor.home', {}, { reload: true });
+          $state.go('app.user.home', {}, { reload: true });
         });
 
       };
@@ -82,16 +82,17 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
         $log.debug( "You canceled the dialog." );
         $mdDialog.hide();
       };
-      $scope.createNewDemoJobSeeker = function() {
+
+      $scope.createDemoUser = function (appRole) {
         $scope.working = true;
 
-        siteService.createDemoJobSeeker()
+        utilityService.createDemoUser(appRole)
         .then(function (newUserCred) {
           // hmm. Not sure what to call newUserCred. It contains the user's email - which on a demo user is enough to get us signed in! Score
           utilityService.signIn(newUserCred)
           .then(function () {
             // success
-            $state.go('app.job-seeker.onboard.intro', {}, { reload: true });
+            $state.go('app.user.home', {}, { reload: true });
           }, function (errorMessage) {
             // failure (signIn)
             $log.debug(errorMessage);
@@ -101,28 +102,6 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
           $log.debug(hubError.errorMessage);
         }).finally(function () {
           $log.debug("createDemoJobSeeker() finally");
-          $mdDialog.hide();
-        });
-      };
-      $scope.createNewDemoCounselor = function() {
-        $scope.working = true;
-
-        siteService.createDemoCounselor()
-        .then(function (newUserCred) {
-          // hmm. Not sure what to call newUserCred. It contains the user's email - which on a demo user is enough to get us signed in! Score
-          utilityService.signIn(newUserCred)
-          .then(function () {
-            // success
-            $state.go('app.counselor.home', {}, { reload: true });
-          }, function (errorMessage) {
-            // failure (signIn)
-            $log.debug(errorMessage);
-          });
-        }, function (hubError) {
-          // failure (createDemoCounselor)
-          $log.debug(hubError.errorMessage);
-        }).finally(function () {
-          $log.debug("createDemoCounselor() finally");
           $mdDialog.hide();
         });
       };

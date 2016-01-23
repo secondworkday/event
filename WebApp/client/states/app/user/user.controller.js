@@ -14,7 +14,7 @@ app.controller('ReportController', function ($scope, $log, utilityService, siteS
     }
 });
 
-app.controller('EventController', function ($scope, $log, $state, $mdDialog, utilityService, siteService, event, eventSessionsIndex, eventParticipantsIndex, eventParticipantGroupsIndex) {
+app.controller('EventController', function ($scope, $log, $state, $mdDialog, $msUI, utilityService, siteService, event, eventSessionsIndex, eventParticipantsIndex, eventParticipantGroupsIndex) {
   $scope.event = event;
   $scope.eventSessionsIndex = eventSessionsIndex;
   $scope.eventParticipantsIndex = eventParticipantsIndex;
@@ -27,11 +27,9 @@ app.controller('EventController', function ($scope, $log, $state, $mdDialog, uti
       return pgID == participantGroupID;
     }).length;
   };
-  
-
 });
 
-app.controller('UserController', function ($scope, $log, $state, $mdDialog, utilityService, siteService) {
+app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msUI, utilityService, siteService) {
   $log.debug('Loading UserController...');
   $scope.participantGroups = siteService.model.participantGroups;
 
@@ -90,6 +88,22 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, util
     $scope.generateRandomEvent = function () {
       siteService.generateRandomEvent();
     }
+
+    $scope.deleteEvent = function (event) {
+      siteService.deleteEvent(event)
+      .then(function (successData) {
+        // success
+        $msUI.showToast("Event Deleted");
+        $log.debug("Task completed.");
+        return successData;
+      }, function (failureData) {
+        // failure
+        $msUI.showToast(failureData.errorMessage);
+        $log.debug(failureData.errorMessage);
+        return failureData;
+      });
+    }
+
 
 
     $scope.searchParticipantViewOptions = {

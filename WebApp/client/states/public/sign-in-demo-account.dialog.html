@@ -23,7 +23,7 @@
     <div ng-hide="working" class="layout">
       <div flex style="max-height:400px;overflow-y:scroll;">
         <md-list>
-          <md-subheader class="md-no-sticky">Demo Job Seekers</md-subheader>
+          <md-subheader class="md-no-sticky">Admins</md-subheader>
           <md-list-item ng-click="loginAsDemoJobSeeker(user)" ng-repeat="user in demoTenant.users">
             <img ng-show="user.profilePhotoUrl" ng-src="{{user.profilePhotoUrl}}" alt="user img" class="mini-user-img" />
             <img ng-hide="user.profilePhotoUrl" ng-src="/images/user-img-placeholder.png" alt="user img" class="mini-user-img" />
@@ -33,7 +33,17 @@
       </div>
       <div flex style="max-height:400px;overflow-y:scroll;">
         <md-list>
-          <md-subheader class="md-no-sticky">Demo Counselors</md-subheader>
+          <md-subheader class="md-no-sticky">Event Planners</md-subheader>
+          <md-list-item ng-click="loginAsDemoCounselor(user)" ng-repeat="user in demoTenant.users | filter:{roles:'JobCounselor'}">
+            <img ng-show="user.profilePhotoUrl" ng-src="{{user.profilePhotoUrl}}" alt="user img" class="mini-user-img" />
+            <img ng-hide="user.profilePhotoUrl" ng-src="/images/user-img-placeholder.png" alt="user img" class="mini-user-img" />
+            <p>{{user.firstName}} {{user.lastName}}</p>
+          </md-list-item>
+        </md-list>
+      </div>
+      <div flex style="max-height:400px;overflow-y:scroll;">
+        <md-list>
+          <md-subheader class="md-no-sticky">Session Volunteers</md-subheader>
           <md-list-item ng-click="loginAsDemoCounselor(user)" ng-repeat="user in demoTenant.users | filter:{roles:'JobCounselor'}">
             <img ng-show="user.profilePhotoUrl" ng-src="{{user.profilePhotoUrl}}" alt="user img" class="mini-user-img" />
             <img ng-hide="user.profilePhotoUrl" ng-src="/images/user-img-placeholder.png" alt="user img" class="mini-user-img" />
@@ -45,11 +55,14 @@
   </md-dialog-content>
   <div class="md-actions" layout="row">
     <div flex>
-      <md-button ng-hide="working" ng-click="createNewDemoJobSeeker()" class="md-primary"><i class="fa fa-plus"></i> New Demo Job Seeker </md-button>
+      <md-button ng-hide="working" ng-click="createDemoUser('Admin')" class="md-primary"><i class="fa fa-plus"></i> New Admin </md-button>
       <md-button ng-show="working" class="md-primary" ng-disabled="true"> Working... </md-button>
     </div>
     <div flex>
-      <md-button ng-hide="working" ng-click="createNewDemoCounselor()" class="md-primary"><i class="fa fa-plus"></i> New Demo Counselor </md-button>
+      <md-button ng-hide="working" ng-click="createDemoUser('EventPlanner')" class="md-primary"><i class="fa fa-plus"></i> New Event Planner </md-button>
+    </div>
+    <div flex>
+      <md-button ng-hide="working" ng-click="createDemoUser('EventSessionVolunteer')" class="md-primary"><i class="fa fa-plus"></i> New Session Volunteer </md-button>
     </div>
   </div>
 </md-dialog>

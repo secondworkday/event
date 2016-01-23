@@ -509,7 +509,7 @@ namespace App.Library
 
             //!! I don't think we have a hierarchy of Tenant Groups do we?
 
-            if (authorizedBy.IsInRole(AppRole.EventManager) &&
+            if (authorizedBy.IsInRole(AppRole.Admin) &&
                 clientInfo.DescendentsAndSelf.Any(ci => ci.TenantGroupID == clientID))
             {
                 // Group Admins have access to any groups in their branch

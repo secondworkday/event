@@ -156,13 +156,6 @@ namespace App.Library
 
 
 
-
-
-
-
-
-
-
         public class SearchItem : ExtendedSearchItem
         {
             [JsonProperty("participantID")]
@@ -176,42 +169,116 @@ namespace App.Library
             [JsonProperty("eventSessionID")]
             public int? EventSessionID { get; internal set; }
 
+            [JsonProperty("firstName")]
+            public string FirstName { get; internal set; }
+            [JsonProperty("lastName")]
+            public string LastName { get; internal set; }
+            [JsonProperty("fullName")]
+            public string FullName { get; internal set; }
+
+            [JsonProperty("grade")]
+            public uint? Grade { get; internal set; }
+
             [JsonProperty("checkInTimestamp")]
             public DateTime? CheckInTimestamp { get; internal set; }
             [JsonProperty("checkOutTimestamp")]
             public DateTime? CheckOutTimestamp { get; internal set; }
 
-            [JsonProperty("contributionLimit")]
-            public Decimal? ContributionLimit { get; internal set; }
-            [JsonProperty("contributionAmount")]
-            public Decimal? ContributionAmount { get; internal set; }
+            [JsonProperty("donationLimit")]
+            public Decimal? DonationLimit { get; internal set; }
+            [JsonProperty("donationAmount")]
+            public Decimal? DonationAmount { get; internal set; }
 
-            public SearchItem(ExtendedItem<EventParticipant> exItem, SearchItemContext context)
+            public SearchItem(ExtendedEventParticipantItem exItem, SearchItemContext context)
                 : base(exItem, context)
             {
-                this.ParticipantID = exItem.item.ParticipantID;
+                this.ParticipantID = exItem.Participant.ID;
                 this.EventID = exItem.item.EventID;
 
                 this.CreatedTimestamp = exItem.item.CreatedTimestamp;
+
+                this.FirstName = exItem.Participant.FirstName;
 
                 this.EventSessionID = exItem.item.EventSessionID;
 
                 this.CheckInTimestamp = exItem.item.CheckInTimestamp;
                 this.CheckOutTimestamp = exItem.item.CheckOutTimestamp;
 
-                this.ContributionLimit = exItem.item.ContributionLimit;
-                this.ContributionAmount = exItem.item.ContributionAmount;
+                this.DonationLimit = exItem.item.DonationLimit;
+                this.DonationAmount = exItem.item.DonationAmount;
             }
 
-            public static SearchItem Create(ExtendedItem<EventParticipant> item, SearchItemContext context)
+            public static SearchItem Create(ExtendedEventParticipantItem item, params SearchItemContext[] searchItemContext)
             {
-                return new SearchItem(item, context);
+                var eventParticipantSearchItemContext = searchItemContext[0];
+                var userSearchItemContext = searchItemContext[1];
+
+
+                return new SearchItem(item, eventParticipantSearchItemContext);
             }
         }
 
 
+        // We need to join EventParticipant with Participant to make sense of things.
+        // This structure allows us to roundtrip that through the Search mechanism
+        public class ExtendedEventParticipantItem : ExtendedItem<EventParticipant>
+        {
+            public ExtendedItem<EventParticipant> ExEventParticipant { get; internal set; }
+            public Participant Participant { get; internal set; }
+        }
+
         public static SearchResult<SearchItem> Search(AppDC dc, SearchExpression searchExpression, string sortExpression, int startRowIndex, int maximumRows)
         {
+
+
+            var clientQuery =
+                from exEventParticipant in EventParticipant.ExtendedQuery(dc, searchExpression)
+                join participant in Participant.Query(dc) on exEventParticipant.item.ParticipantID equals participant.ID
+
+                select new ExtendedEventParticipantItem
+                {
+                    itemID = exEventParticipant.item.ID,
+                    item = exEventParticipant.item,
+
+                    ExEventParticipant = exEventParticipant,
+                    Participant = participant,
+                };
+
+            // Simple case - a trivial selector that retrieves the object as an ExtendedItem<T>
+            Func<object, Tuple<Type, int>>[] itemSelectors =
+            {
+                // (Put the 'main' type first ...)
+                objectItem => Tuple.Create(typeof(EventParticipant), ((dynamic)objectItem).itemID),
+                // (... and extra types after)
+                objectItem => Tuple.Create(typeof(Participant), ((dynamic)objectItem).itemID)
+            };
+
+
+
+            // Simple case - we passed in a single selector, so expect back single item arrays to be mapped
+            Func<object, SearchItemContext[], SearchItem> resultMapper = (itemObject, searchItemContexts) =>
+            {
+                var fda = itemObject as ExtendedEventParticipantItem;
+
+                var asdf = SearchItem.Create(fda, searchItemContexts);
+                return asdf;
+            };
+
+
+            //var searchResults = Search(dc, searchExpression, sortExpression, startRowIndex, maximumRows, clientQuery2, itemSelector.ToEnumerable(), SearchItem.Create);
+            var searchResults = Search(dc, searchExpression, sortExpression, startRowIndex, maximumRows, clientQuery, itemSelectors, resultMapper);
+
+            //var searchResults = SearchResult<SearchItem>.Create(searchResults.Items, searchResults.totalCount, searchResults.DeletedKeys);
+            return searchResults;
+
+
+
+
+
+
+
+
+#if false
             // basic query that determines the objects that pass the search expression.
             // (if the search expression contains Tags or other 1:many items, we'll need to do more work to filter down to those
             var resultSetQuery = ExtendedQuery(dc, searchExpression);
@@ -221,6 +288,7 @@ namespace App.Library
 
             var results = Search(dc, searchExpression, sortExpression, startRowIndex, maximumRows, resultSetQuery, SearchItem.Create);
             return results;
+#endif
         }
 
 
@@ -610,7 +678,9 @@ namespace App.Library
                 var eventID = (int)data.eventID;
                 var participantID = (int)data.participantID;
 
-                var newItem = new EventParticipant(createdTimestamp, teamEPScope, eventID, participantID);
+                var grade = (uint?)data.grade;
+
+                var newItem = new EventParticipant(createdTimestamp, teamEPScope, eventID, participantID, grade);
 
                 // optional parameters
                 var dataJToken = data as JToken;
@@ -625,7 +695,7 @@ namespace App.Library
             });
         }
 
-        protected EventParticipant(DateTime createdTimestamp, EPScope epScope, int eventID, int participantID)
+        protected EventParticipant(DateTime createdTimestamp, EPScope epScope, int eventID, int participantID, uint? grade)
             : this()
         {
             this.CreatedTimestamp = createdTimestamp;
@@ -634,6 +704,8 @@ namespace App.Library
 
             this.EventID = eventID;
             this.ParticipantID = participantID;
+
+            this.Grade = grade;
         }
 
 #if false

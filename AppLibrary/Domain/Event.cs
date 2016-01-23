@@ -324,6 +324,9 @@ namespace App.Library
                 {
                     eventID = randomEvent.ID,
                     participantID = participantInfo.Participant.ID,
+
+                    grade = random.Next(1, 12),
+
                 }.ToJson().FromJson())
                 .ForEach(eventParticipantData =>
                 {
@@ -410,7 +413,28 @@ namespace App.Library
             });
         }
 
+        public static HubResult Delete(AppDC dc, int itemID)
+        {
+            var deleteItem = dc.Events
+                .FirstOrDefault(item => item.ID == itemID);
+            Debug.Assert(deleteItem != null);
 
+            if (deleteItem == null)
+            {
+                return HubResult.CreateError("Not found");
+            }
+
+            dc.Events.DeleteOnSubmit(deleteItem);
+            //!! TODO remove any Tags that have their last reference with this Pipeline
+            //!! Should we have an ExtendedObject call to remove all extended properties?
+            dc.SubmitChanges();
+
+            var notifyExpression = new NotifyExpression();
+            notifyExpression.AddDeletedID(itemID);
+            NotifyClients(dc, notifyExpression);
+
+            return HubResult.Success;
+        }
 
 
 
@@ -864,20 +888,10 @@ namespace App.Library
             return WriteLock(dc, itemID, FindByID, NotifyClients, writeHandler);
         }
 
-
-
-
-
-
         internal static void NotifyClients(AppDC dc, NotifyExpression notifyExpression)
         {
-            var siteContext = SiteContext.Current;
-
             var notification = Event.Search(dc, notifyExpression, null, 0, int.MaxValue);
-
-            var hubClients = siteContext.ConnectionManager.GetHubContext("siteHub").Clients;
-            Debug.Assert(hubClients != null);
-            hubClients.All.updateShows(notification);
+            NotifyClients("siteHub", notifyExpression, notification, (hubClients, notificationItem) => hubClients.All.updateEvents(notificationItem));
         }
 
         public override string ToString()

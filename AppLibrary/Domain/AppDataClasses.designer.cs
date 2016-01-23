@@ -831,6 +831,12 @@ namespace App.Library
 		
 		private string _Sponsor;
 		
+		private System.Nullable<decimal> _Budget;
+		
+		private System.Nullable<int> _ParticipantGoal;
+		
+		private System.Nullable<int> _ParticipantCapacity;
+		
 		private EntitySet<EventSession> _EventSessions;
 		
     #region Extensibility Method Definitions
@@ -853,6 +859,12 @@ namespace App.Library
     partial void OnOverviewChanged();
     partial void OnSponsorChanging(string value);
     partial void OnSponsorChanged();
+    partial void OnBudgetChanging(System.Nullable<decimal> value);
+    partial void OnBudgetChanged();
+    partial void OnParticipantGoalChanging(System.Nullable<int> value);
+    partial void OnParticipantGoalChanged();
+    partial void OnParticipantCapacityChanging(System.Nullable<int> value);
+    partial void OnParticipantCapacityChanged();
     #endregion
 		
 		public Event()
@@ -1017,6 +1029,66 @@ namespace App.Library
 					this._Sponsor = value;
 					this.SendPropertyChanged("Sponsor");
 					this.OnSponsorChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Budget", DbType="Money")]
+		public System.Nullable<decimal> Budget
+		{
+			get
+			{
+				return this._Budget;
+			}
+			set
+			{
+				if ((this._Budget != value))
+				{
+					this.OnBudgetChanging(value);
+					this.SendPropertyChanging();
+					this._Budget = value;
+					this.SendPropertyChanged("Budget");
+					this.OnBudgetChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ParticipantGoal", DbType="Int")]
+		public System.Nullable<int> ParticipantGoal
+		{
+			get
+			{
+				return this._ParticipantGoal;
+			}
+			set
+			{
+				if ((this._ParticipantGoal != value))
+				{
+					this.OnParticipantGoalChanging(value);
+					this.SendPropertyChanging();
+					this._ParticipantGoal = value;
+					this.SendPropertyChanged("ParticipantGoal");
+					this.OnParticipantGoalChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ParticipantCapacity", DbType="Int")]
+		public System.Nullable<int> ParticipantCapacity
+		{
+			get
+			{
+				return this._ParticipantCapacity;
+			}
+			set
+			{
+				if ((this._ParticipantCapacity != value))
+				{
+					this.OnParticipantCapacityChanging(value);
+					this.SendPropertyChanging();
+					this._ParticipantCapacity = value;
+					this.SendPropertyChanged("ParticipantCapacity");
+					this.OnParticipantCapacityChanged();
 				}
 			}
 		}
@@ -1684,11 +1756,9 @@ namespace App.Library
 		
 		private System.DateTime _LastModifiedTimestamp;
 		
-		private System.Nullable<uint> _Grade;
+		private string _FirstName;
 		
-		private string _Name;
-		
-		private string _Overview;
+		private string _LastName;
 		
 		private int _ParticipantGroupID;
 		
@@ -1708,12 +1778,10 @@ namespace App.Library
     partial void OnCreatedTimestampChanged();
     partial void OnLastModifiedTimestampChanging(System.DateTime value);
     partial void OnLastModifiedTimestampChanged();
-    partial void OnGradeChanging(System.Nullable<uint> value);
-    partial void OnGradeChanged();
-    partial void OnNameChanging(string value);
-    partial void OnNameChanged();
-    partial void OnOverviewChanging(string value);
-    partial void OnOverviewChanged();
+    partial void OnFirstNameChanging(string value);
+    partial void OnFirstNameChanged();
+    partial void OnLastNameChanging(string value);
+    partial void OnLastNameChanged();
     partial void OnParticipantGroupIDChanging(int value);
     partial void OnParticipantGroupIDChanged();
     #endregion
@@ -1824,62 +1892,42 @@ namespace App.Library
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Grade", DbType="Int")]
-		public System.Nullable<uint> Grade
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FirstName", DbType="nvarchar(256)")]
+		public string FirstName
 		{
 			get
 			{
-				return this._Grade;
+				return this._FirstName;
 			}
 			set
 			{
-				if ((this._Grade != value))
+				if ((this._FirstName != value))
 				{
-					this.OnGradeChanging(value);
+					this.OnFirstNameChanging(value);
 					this.SendPropertyChanging();
-					this._Grade = value;
-					this.SendPropertyChanged("Grade");
-					this.OnGradeChanged();
+					this._FirstName = value;
+					this.SendPropertyChanged("FirstName");
+					this.OnFirstNameChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="nvarchar(256)")]
-		public string Name
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LastName", DbType="nvarchar(256)")]
+		public string LastName
 		{
 			get
 			{
-				return this._Name;
+				return this._LastName;
 			}
 			set
 			{
-				if ((this._Name != value))
+				if ((this._LastName != value))
 				{
-					this.OnNameChanging(value);
+					this.OnLastNameChanging(value);
 					this.SendPropertyChanging();
-					this._Name = value;
-					this.SendPropertyChanged("Name");
-					this.OnNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Overview", DbType="nvarchar(MAX)")]
-		public string Overview
-		{
-			get
-			{
-				return this._Overview;
-			}
-			set
-			{
-				if ((this._Overview != value))
-				{
-					this.OnOverviewChanging(value);
-					this.SendPropertyChanging();
-					this._Overview = value;
-					this.SendPropertyChanged("Overview");
-					this.OnOverviewChanged();
+					this._LastName = value;
+					this.SendPropertyChanged("LastName");
+					this.OnLastNameChanged();
 				}
 			}
 		}
@@ -1983,15 +2031,17 @@ namespace App.Library
 		
 		private System.DateTime _LastModifiedTimestamp;
 		
+		private System.Nullable<uint> _Grade;
+		
 		private System.Nullable<int> _EventSessionID;
 		
 		private System.Nullable<System.DateTime> _CheckInTimestamp;
 		
 		private System.Nullable<System.DateTime> _CheckOutTimestamp;
 		
-		private System.Nullable<decimal> _ContributionLimit;
+		private System.Nullable<decimal> _DonationLimit;
 		
-		private System.Nullable<decimal> _ContributionAmount;
+		private System.Nullable<decimal> _DonationAmount;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -2011,16 +2061,18 @@ namespace App.Library
     partial void OnCreatedTimestampChanged();
     partial void OnLastModifiedTimestampChanging(System.DateTime value);
     partial void OnLastModifiedTimestampChanged();
+    partial void OnGradeChanging(System.Nullable<uint> value);
+    partial void OnGradeChanged();
     partial void OnEventSessionIDChanging(System.Nullable<int> value);
     partial void OnEventSessionIDChanged();
     partial void OnCheckInTimestampChanging(System.Nullable<System.DateTime> value);
     partial void OnCheckInTimestampChanged();
     partial void OnCheckOutTimestampChanging(System.Nullable<System.DateTime> value);
     partial void OnCheckOutTimestampChanged();
-    partial void OnContributionLimitChanging(System.Nullable<decimal> value);
-    partial void OnContributionLimitChanged();
-    partial void OnContributionAmountChanging(System.Nullable<decimal> value);
-    partial void OnContributionAmountChanged();
+    partial void OnDonationLimitChanging(System.Nullable<decimal> value);
+    partial void OnDonationLimitChanged();
+    partial void OnDonationAmountChanging(System.Nullable<decimal> value);
+    partial void OnDonationAmountChanged();
     #endregion
 		
 		public EventParticipant()
@@ -2168,6 +2220,26 @@ namespace App.Library
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Grade", DbType="Int")]
+		public System.Nullable<uint> Grade
+		{
+			get
+			{
+				return this._Grade;
+			}
+			set
+			{
+				if ((this._Grade != value))
+				{
+					this.OnGradeChanging(value);
+					this.SendPropertyChanging();
+					this._Grade = value;
+					this.SendPropertyChanged("Grade");
+					this.OnGradeChanged();
+				}
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EventSessionID", DbType="Int")]
 		public System.Nullable<int> EventSessionID
 		{
@@ -2228,42 +2300,42 @@ namespace App.Library
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ContributionLimit", DbType="Money")]
-		public System.Nullable<decimal> ContributionLimit
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DonationLimit", DbType="Money")]
+		public System.Nullable<decimal> DonationLimit
 		{
 			get
 			{
-				return this._ContributionLimit;
+				return this._DonationLimit;
 			}
 			set
 			{
-				if ((this._ContributionLimit != value))
+				if ((this._DonationLimit != value))
 				{
-					this.OnContributionLimitChanging(value);
+					this.OnDonationLimitChanging(value);
 					this.SendPropertyChanging();
-					this._ContributionLimit = value;
-					this.SendPropertyChanged("ContributionLimit");
-					this.OnContributionLimitChanged();
+					this._DonationLimit = value;
+					this.SendPropertyChanged("DonationLimit");
+					this.OnDonationLimitChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ContributionAmount", DbType="Money")]
-		public System.Nullable<decimal> ContributionAmount
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DonationAmount", DbType="Money")]
+		public System.Nullable<decimal> DonationAmount
 		{
 			get
 			{
-				return this._ContributionAmount;
+				return this._DonationAmount;
 			}
 			set
 			{
-				if ((this._ContributionAmount != value))
+				if ((this._DonationAmount != value))
 				{
-					this.OnContributionAmountChanging(value);
+					this.OnDonationAmountChanging(value);
 					this.SendPropertyChanging();
-					this._ContributionAmount = value;
-					this.SendPropertyChanged("ContributionAmount");
-					this.OnContributionAmountChanged();
+					this._DonationAmount = value;
+					this.SendPropertyChanged("DonationAmount");
+					this.OnDonationAmountChanged();
 				}
 			}
 		}

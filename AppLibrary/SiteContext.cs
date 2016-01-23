@@ -77,9 +77,9 @@ namespace App.Library
             //-- Add app-specific startup configuration here
             if (siteContext.AccountsDatabase != null)
             {
-                siteContext.CreateDefaultAccountsOnlyDCSingleTenantJob<AppDC>(DateTime.UtcNow, (dc) =>
-                    {
-                    });
+                //siteContext.CreateDefaultAccountsOnlyDCSingleTenantJob<AppDC>(DateTime.UtcNow, (dc) =>
+                    //{
+                    //});
             }
 
             siteContext.JobManager.Run();

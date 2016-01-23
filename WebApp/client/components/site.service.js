@@ -84,6 +84,15 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
     });
   };
 
+
+  this.createDemoUser = function (appRole) {
+    return utilityService.callHub(function () {
+      return siteHub.server.createDemoUser(appRole);
+    });
+  };
+
+
+
   this.createDemoJobSeeker = function () {
     return utilityService.callHub(function () {
       return siteHub.server.createDemoJobSeeker();
@@ -121,7 +130,7 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
       ids: $.map(itemsData.items, function (item) {
         return item.id;
       }),
-      deletedKeys: itemsData.deletedKeys,
+      deletedIDs: itemsData.deletedIDs,
       totalCount: itemsData.totalCount,
       resolvedIDs: []
     };
@@ -678,6 +687,13 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
     });
   };
 
+  this.deleteEvent = function (event) {
+    return utilityService.callHub(function () {
+      return siteHub.server.deleteEvent(event.id);
+    });
+  };
+
+
 
   self.getEvent = function (itemID) {
     var searchExpression = "%" + itemID;
@@ -1167,12 +1183,22 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
     $rootScope.$apply($rootScope.$broadcast('updateCompanyLayTitles', itemsData, model.companyLayTitles));
 
 
+  }).on('updateEvents', function (itemsData) {
+    $rootScope.$apply($rootScope.$broadcast('updateEvents', utilityService.updateItemsModel(model.events, itemsData)));
+  }).on('updateEventSessions', function (itemsData) {
+    $rootScope.$apply($rootScope.$broadcast('updateEventSessions', utilityService.updateItemsModel(model.eventSessions, itemsData)));
+
 
   }).on('updateParticipantGroups', function (itemsData) {
     $rootScope.$apply($rootScope.$broadcast('updateParticipantGroups', utilityService.updateItemsModel(model.participantGroups, itemsData)));
 
   }).on('updateParticipants', function (itemsData) {
     $rootScope.$apply($rootScope.$broadcast('updateParticipants', utilityService.updateItemsModel(model.participants, itemsData)));
+
+
+
+
+
 
   }).on('updateOccupations', function (itemsData) {
     $rootScope.$apply($rootScope.$broadcast('updateOccupations', onOccupationsUpdated(itemsData)));
@@ -1189,6 +1215,8 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
   }).on('touchInit', function (touchData) {
     $rootScope.$apply(onTouchData(touchData));
   });
+
+
 
   $rootScope.$on(CONNECTION_EVENT.connectionStarting, function () {
     // Starting a new connection - ensure we don't leak any data fetched by the last user/connection

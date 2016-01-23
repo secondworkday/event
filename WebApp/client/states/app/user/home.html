@@ -35,7 +35,7 @@
         </md-card-content>
         <md-card-actions layout="row" layout-align="start center">
           <md-button ui-sref="app.user.event({eventID:event.id})" class="md-primary">View</md-button>
-          <md-button class="md-warn">Archive</md-button>
+          <md-button ng-click="deleteEvent(event)" class="md-warn">Delete</md-button>
         </md-card-actions>
       </md-card>
     </ms-search-view>

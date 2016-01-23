@@ -32,6 +32,11 @@ namespace App.Library
         protected override ExtendedPropertyScopeType objectScopeType { get { return this.ScopeType; } }
         protected override int? objectScopeID { get { return this.ScopeID; } }
 
+        public string FullName
+        {
+            get { return User.GenerateFullName(this.FirstName, this.LastName); }
+        }
+
 
         private static IQueryable<Participant> query(AppDC dc)
         {
@@ -55,7 +60,8 @@ namespace App.Library
         private static Func<IQueryable<Participant>, string, IQueryable<Participant>> termFilter = (query, searchTermLower) =>
         {
             return query.Where(item =>
-                item.Name.ToLower().Contains(searchTermLower));
+                item.FirstName.Contains(searchTermLower) ||
+                item.LastName.Contains(searchTermLower));
         };
 
         public static IQueryable<Participant> Query(AppDC dc, SearchExpression searchExpression)
@@ -166,8 +172,10 @@ namespace App.Library
 
         public class SearchItem : ExtendedSearchItem
         {
-            public string name { get; internal set; }
-            public string overview { get; internal set; }
+            [JsonProperty("firstName")]
+            public string FirstName { get; internal set; }
+            [JsonProperty("lastName")]
+            public string LastName { get; internal set; }
 
             [JsonProperty("participantGroupID")]
             public int ParticipantGroupID { get; internal set; }
@@ -178,8 +186,8 @@ namespace App.Library
             public SearchItem(ExtendedItem<Participant> exItem, SearchItemContext context)
                 : base(exItem, context)
             {
-                this.name = exItem.item.Name;
-                this.overview = exItem.item.Overview;
+                this.FirstName = exItem.item.FirstName;
+                this.LastName = exItem.item.LastName;
                 this.ParticipantGroupID = exItem.item.ParticipantGroupID;
 
                 this.CreatedTimestamp = exItem.item.CreatedTimestamp;
@@ -581,7 +589,7 @@ namespace App.Library
 
         public override string ToString()
         {
-            return this.Name;
+            return this.FullName;
         }
 
         public static Participant GenerateRandom(AppDC dc)
@@ -615,8 +623,9 @@ namespace App.Library
 
             var data = new
             {
-                name = firstNameCapitalized + " " + lastNameCapitalized,
-                grade = random.Next(1, 12),
+                firstName = firstNameCapitalized,
+                lastName = lastNameCapitalized,
+
                 participantGroupID = participantGroups.ChooseRandom(),
             }.ToJson().FromJson();
 
@@ -637,11 +646,15 @@ namespace App.Library
                 var createdTimestamp = dc.TransactionTimestamp;
                 var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
 
-                var name = (string)data.name;
-                var grade = (int)data.grade;
+                var firstName = (string)data.firstName;
+                var lastName = (string)data.lastName;
+
+                Debug.Assert(!string.IsNullOrEmpty(firstName));
+                Debug.Assert(!string.IsNullOrEmpty(lastName));
+
                 var participantGroupID = (int)data.participantGroupID;
 
-                var newItem = new Participant(createdTimestamp, teamEPScope, name, grade, participantGroupID);
+                var newItem = new Participant(createdTimestamp, teamEPScope, firstName, lastName, participantGroupID);
                 dc.Save(newItem);
 
                 Debug.Assert(newItem.ID > 0);
@@ -650,15 +663,19 @@ namespace App.Library
             });
         }
 
-        protected Participant(DateTime createdTimestamp, EPScope epScope, string name, int grade, int participantGroupID)
+        protected Participant(DateTime createdTimestamp, EPScope epScope, string firstName, string lastName, int participantGroupID)
             : this()
         {
+            Debug.Assert(!string.IsNullOrEmpty(firstName));
+            Debug.Assert(!string.IsNullOrEmpty(lastName));
+
             this.CreatedTimestamp = createdTimestamp;
             this.ScopeType = epScope.ScopeType;
             this.ScopeID = epScope.ID;
 
-            this.Name = name;
-            this.Grade = (uint)grade;
+            this.FirstName = firstName;
+            this.LastName = lastName;
+
             this.ParticipantGroupID = participantGroupID;
         }
 
@@ -694,7 +711,10 @@ namespace App.Library
 
             IEnumerable<ProviderTag> tags = new ProviderTag[]
             {
-                StringProviderTag.Create("StudentName", participant.Name),
+                StringProviderTag.Create("FirstName", participant.FirstName),
+                StringProviderTag.Create("LastName", participant.LastName),
+                StringProviderTag.Create("FullName", participant.FullName),
+
                 StringProviderTag.Create("SchoolName", participant.ParticipantGroup.Name),
                 StringProviderTag.Create("Address", "Main Street, Redmond WA 98052"),
             };
