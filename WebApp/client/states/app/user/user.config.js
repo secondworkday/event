@@ -74,8 +74,8 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       },
       views: {
         'sessions': {
-          templateUrl: '/client/states/app/user/participants.html',
-          controller: "EventParticipantsController"
+          templateUrl: '/client/states/app/user/event-sessions.html',
+          controller: "EventSessionsController"
         }
       }
     })
@@ -86,7 +86,8 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       },
       views: {
         'schools': {
-          templateUrl: '/client/states/app/user/participants.html'
+          templateUrl: '/client/states/app/user/schools.html',
+          controller: "SchoolsController"
         }
       }
     })
@@ -97,7 +98,8 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       },
       views: {
         'participants': {
-          templateUrl: '/client/states/app/user/participants.html'
+          templateUrl: '/client/states/app/user/participants.html',
+          controller: "EventParticipantsController"
         }
       }
     })
@@ -108,22 +110,17 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       },
       views: {
         'documents': {
-          templateUrl: '/client/states/app/user/participants.html'
+          templateUrl: '/client/states/app/user/documents.html'
         }
       }
     })
 
 
-
-
-
-
-
-    .state('app.user.event-participants', {
-      url: '/event/:eventID/participants',
-      templateUrl: '/client/states/app/user/participants.html',
-      controller: "EventParticipantsController"
-    })
+    //.state('app.user.event-participants', {
+    //  url: '/event/:eventID/participants',
+    //  templateUrl: '/client/states/app/user/participants.html',
+    //  controller: "EventParticipantsController"
+    //})
 
 
     ;// closes $stateProvider

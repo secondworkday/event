@@ -1,0 +1,64 @@
+<div layout>
+  <div flex>
+    <md-input-container class="md-block" flex-gt-sm>
+      <label><i class="fa fa-search"></i> Search for any text</label>
+      <input ng-model="searchViewOptions.userSearch">
+    </md-input-container>
+  </div>
+  <div hide-xs>
+    <md-menu md-position-mode="target-right target">
+      <md-button aria-label="Open sort menu" class="md-icon-button" ng-click="$mdOpenMenu()">
+        <i md-menu-origin class="fa fa-sort"></i>
+      </md-button>
+      <md-menu-content width="4">
+        <md-menu-item ng-repeat="sortOption in sortOptions">
+          <md-button ng-click="searchViewOptions.sort = sortOption">
+            {{sortOption.name}}
+          </md-button>
+        </md-menu-item>
+      </md-menu-content>
+    </md-menu>
+    <md-button ng-click="download()" class="md-icon-button" aria-label="download">
+      <i class="fa fa-download"></i>
+    </md-button>
+    <md-button ng-click="showAddSessionDialog($event)" class="md-fab md-primary" aria-label="new">
+      <i class="fa fa-plus fa-lg"></i>
+    </md-button>
+  </div>
+</div>
+
+<ms-search-view change-event="updateParticipants" search="searchHandler" options="searchViewOptions" user-search="userSearch">
+  <table class="md-data-table u-full-width">
+   <thead>
+     <tr>
+       <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
+       <th ms-debug-only>ID</th>
+       <th>Date</th>
+       <th class="md-data-table__cell--non-numeric">Session Name</th>
+       <th>Slots</th>
+       <th>Assigned</th>
+       <th>Session Manager</th>
+       <th>Checkin Code</th>
+     </tr>
+   </thead>
+   <tbody>
+     <tr ui-sref="app.system.tenant.dashboard({ tenantID:tenant.id })" 
+       ng-repeat="eventSession in $displayedIndex | objectLookup:$hashMap track by eventSession.id" >
+       <!--ng-init="eventParticipant = demandParticipant(eventParticipant.eventSessionID); 
+          participantGroup = demandParticipantGroup(eventParticipant.participantGroupID);" >-->
+       <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ eventSession| json }}</pre></td>
+       <td ms-debug-only>{{ eventSession.id }}</td>
+       <td>{{ eventSession.startDate | amCalendar}}</td>
+       <td class="md-data-table__cell--non-numeric">{{ eventSession.name }}</td>
+       <td>120</td>
+       <td>28</td>
+         <td>Lori Jones</td>
+         <td>Redmond315</td>
+     </tr>
+   </tbody>
+  </table>
+</ms-search-view>
+
+
+
+

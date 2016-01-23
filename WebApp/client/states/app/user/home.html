@@ -1,8 +1,8 @@
 <h2 class="md-display-1">
     Admin Main Page
 </h2>
-<md-divider></md-divider>
-<div class="u-sm-space"></div>
+<!--<md-divider></md-divider>-->
+<!--<div class="u-sm-space"></div>-->
 <section>
     <div layout layout-align="start center">
         <!--<div flex>
@@ -11,8 +11,8 @@
     </div>
 
     <div ng-cloak>
-        <md-content>
-            <md-tabs md-dynamic-height>
+        <!--<md-content>-->
+            <md-tabs md-dynamic-height md-border-bottom>
                 <md-tab label="Events">
                     <md-content class="tab-content-spacer">
                         <ms-search-view change-event="updateEvents" search="searchEvents" options="searchViewOptions" user-search="userSearch">
@@ -140,11 +140,10 @@
                     </md-content>
                 </md-tab>
             </md-tabs>
-        </md-content>
+        <!--</md-content>-->
         <!--<div>
             <md-button ng-click="generateRandomEvent()"><i class="fa fa-magic"></i> Create Demo Event</md-button>
             <md-button ng-click="showCreateEventDialog()" class="md-primary"><i class="fa fa-plus"></i> Create new event</md-button>
         </div>-->
-    </div>
     </div>
 </section>
