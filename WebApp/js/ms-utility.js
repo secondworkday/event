@@ -21,6 +21,13 @@ app.constant('AUTHORIZATION_ROLES', {
 
 app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'utilityService', 'AUTHORIZATION_ROLES', function ($rootScope, $state, $stateParams, $http, $templateCache, utilityService, AUTHORIZATION_ROLES) {
 
+  // this is the generic way to tell an md-tab that user changed to another tab
+  // as long as tabs are looking for 'currentTab' and the state definition file
+  // includes data for 'selectedTab' Index then this will work
+  $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+    $rootScope.currentTab = toState.data.selectedTab;
+  });
+
   $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
 
     // lots 'o debug info
