@@ -1,13 +1,13 @@
 app.controller('EventParticipantsController', function ($scope, $mdDialog, $log, $msUI, utilityService, siteService) {
   $log.debug('Loading EventParticipantsController...');
 
-  $scope.searchHandler = siteService.model.participants.search;
+  $scope.searchHandler = siteService.model.eventParticipants.search;
   $scope.demandParticipantGroup = siteService.demandParticipantGroup;
 
 
 
   $scope.sortOptions = [
-    { name: 'Name', serverTerm: 'item.name', clientFunction: utilityService.localeCompareByPropertyThenByID('name') },
+    { name: 'First Name', serverTerm: 'item.firstName', clientFunction: utilityService.localeCompareByPropertyThenByID('Participant.FirstName') },
     { name: 'Name Descending', serverTerm: 'item.name DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('name') }
   ];
 
