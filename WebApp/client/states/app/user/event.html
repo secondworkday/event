@@ -11,7 +11,46 @@
 <md-divider></md-divider>
 <div class="u-sm-space"></div>
 
-<section layout="column" layout-gt-sm="row">
+
+
+  <md-tabs class="u-expand-sm"
+      md-selected="currentTab"
+      md-dynamic-height
+      md-border-bottom>
+    <md-tab ui-sref=".sessions">
+        <md-tab-label>Sessions</md-tab-label>
+        <md-tab-body>
+          <div ui-view="sessions"></div>
+        </md-tab-body>
+    </md-tab>
+    <md-tab ui-sref=".schools">
+        <md-tab-label>Schools</md-tab-label>
+        <md-tab-body>
+          <div ui-view="schools"></div>
+        </md-tab-body>
+    </md-tab>
+    <md-tab ui-sref=".participants">
+      <md-tab-label>Participants</md-tab-label>
+      <md-tab-body>
+        <div ui-view="participants"></div>
+      </md-tab-body>
+    </md-tab>
+    <md-tab ui-sref=".documents">
+      <md-tab-label>Documents</md-tab-label>
+      <md-tab-body>
+        <div ui-view="documents"></div>
+      </md-tab-body>
+    </md-tab>
+  </md-tabs>
+
+
+
+
+
+
+
+
+<!--<section layout="column" layout-gt-sm="row">
   <div flex layout="column" layout-gt-sm="row">
     <div flex>
       <div layout layout-align="start center">
@@ -107,7 +146,7 @@
       </md-content>
     </div>
   </div>
-</section>
+</section>-->
 
 <div ms-debug-only>
   <h4>EventSessions</h4>
