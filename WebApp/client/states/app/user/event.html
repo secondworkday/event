@@ -72,10 +72,11 @@
         <md-list>
           <md-list-item class="md-3-line"
                         ng-click="DO_SOMETHING()"
-                        ng-repeat="ep in eventParticipantsIndex | objectLookup:model.eventParticipants.hashMap track by ep.id">
+                        ng-repeat="ep in eventParticipantsIndex | objectLookup:model.eventParticipants.hashMap track by ep.id"
+                        ng-init="participant = model.participants.hashMap[ep.participantID]; participantGroup = model.participantGroups.hashMap[model.participants.hashMap[ep.participantID].participantGroupID]">
             <div class="md-list-item-text">
-              <h3>{{model.participants.hashMap[ep.participantID].name}}</h3>
-              <h4>{{model.participantGroups.hashMap[model.participants.hashMap[ep.participantID].participantGroupID].name}}</h4>
+              <h3>{{participant.firstName}} {{participant.lastName}}</h3>
+              <h4>{{participantGroup.name}}</h4>
             </div>
           </md-list-item>
         </md-list>
