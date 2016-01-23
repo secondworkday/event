@@ -137,6 +137,7 @@ namespace App.Library
             //public string type { get; internal set; }
             public string name { get; internal set; }
             public string overview { get; internal set; }
+            public string sponsor { get; internal set; }
 
             [JsonProperty("createdTimestamp")]
             public DateTime CreatedTimestamp { get; internal set; }
@@ -149,6 +150,7 @@ namespace App.Library
                 //this.type = exItem.item.Ty
                 this.name = exItem.item.Name;
                 this.overview = exItem.item.Overview;
+                this.sponsor= exItem.item.Sponsor;
 
                 this.CreatedTimestamp = exItem.item.CreatedTimestamp;
                 this.LastModifiedTimestamp = exItem.item.LastModifiedTimestamp;

@@ -197,13 +197,6 @@
     display: inline-block;
   }
 
-  .card-event {
-    width: 300px;
-  }
-
-
-
-
 
 
 
@@ -470,3 +463,34 @@
 
   .md-data-table__cell--non-numeric.md-data-table__cell--non-numeric {
     text-align: left; }
+
+
+  .card-shortlist {
+  min-height: 220px;
+  width: 100%;
+}
+
+  @media (min-width: 600px) {
+    .card-shortlist {
+      width: 330px;
+    }
+  }
+  @media (min-width: 1280px) {
+    .card-shortlist {
+      width: 240px;
+    }
+  }
+
+.card-shortlist.shadow {
+  cursor: auto;
+  margin: 8px;
+  background-color: #e9e9e9;
+}
+
+.tab-content-spacer {
+    margin-top: 20px;
+}
+
+.coming-soon {
+    color: #ccc;
+}
