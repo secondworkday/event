@@ -44,13 +44,18 @@
    </thead>
    <tbody>
      <tr ui-sref="app.system.tenant.dashboard({ tenantID:tenant.id })" 
-       ng-repeat="participant in $displayedIndex | objectLookup:$hashMap track by participant.id" 
-       ng-init="participantGroup = demandParticipantGroup(participant.participantGroupID)" >
-       <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ participant | json }}</pre></td>
-       <td>{{ participant.id }}</td>
-       <td class="md-data-table__cell--non-numeric">{{ participant.name }}</td>
-       <td class="md-data-table__cell--non-numeric">{{ participant.name }}</td>
+       ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id" 
+       ng-init="eventSession = demandEventSession(eventParticipant.eventSessionID); 
+          participantGroup = demandParticipantGroup(eventParticipant.participantGroupID);" >
+       <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ eventParticipant | json }}</pre></td>
+       <td>{{ eventParticipant.id }}</td>
+       <td class="md-data-table__cell--non-numeric">{{ eventParticipant.firstName }}</td>
+       <td class="md-data-table__cell--non-numeric">{{ eventParticipant.lastName }}</td>
        <td>{{ participantGroup.name }}</td>
+       <td>{{ eventParticipant.grade }}</td>
+       <td>{{ eventParticipant.sex }}</td>
+       <td>{{ eventSession.name }}</td>
+       <td>{{ eventSession.startDate | amCalendar}}</td>
 
      </tr>
    </tbody>

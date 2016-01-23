@@ -160,6 +160,8 @@ namespace App.Library
         {
             [JsonProperty("participantID")]
             public int ParticipantID { get; internal set; }
+            [JsonProperty("participantGroupID")]
+            public int ParticipantGroupID { get; internal set; }
             [JsonProperty("eventID")]
             public int EventID { get; internal set; }
 
@@ -193,13 +195,18 @@ namespace App.Library
                 : base(exItem, context)
             {
                 this.ParticipantID = exItem.Participant.ID;
+                this.ParticipantGroupID = exItem.Participant.ParticipantGroupID;
                 this.EventID = exItem.item.EventID;
 
                 this.CreatedTimestamp = exItem.item.CreatedTimestamp;
 
-                this.FirstName = exItem.Participant.FirstName;
-
                 this.EventSessionID = exItem.item.EventSessionID;
+
+                this.FirstName = exItem.Participant.FirstName;
+                this.LastName = exItem.Participant.LastName;
+                this.FullName = exItem.Participant.FullName;
+
+                this.Grade = exItem.ExEventParticipant.item.Grade;
 
                 this.CheckInTimestamp = exItem.item.CheckInTimestamp;
                 this.CheckOutTimestamp = exItem.item.CheckOutTimestamp;
