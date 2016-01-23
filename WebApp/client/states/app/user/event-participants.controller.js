@@ -9,7 +9,9 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 
   $scope.sortOptions = [
     { name: 'First Name', serverTerm: 'Participant.FirstName', clientFunction: utilityService.localeCompareByPropertyThenByID('firstName') },
-    { name: 'Name Descending', serverTerm: 'item.name DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('name') }
+    { name: 'Last Name', serverTerm: 'Participant.LastName', clientFunction: utilityService.localeCompareByPropertyThenByID('lastName') },
+    { name: 'School', serverTerm: 'Participant.ParticipantGroup.Name', clientFunction: utilityService.localeCompareByPropertyThenByID('participantGroupID') },
+    { name: 'Grade', serverTerm: 'ExEventParticipant.item.Grade', clientFunction: utilityService.localeCompareByPropertyThenByID('grade') }
   ];
 
   var filterByStateFactory = function (includeState) {
