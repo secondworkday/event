@@ -8,9 +8,11 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
 
 
   $scope.sortOptions = [
-    { name: 'Session Name', serverTerm: 'EventSession.Name', clientFunction: utilityService.localeCompareByPropertyThenByID('name') },
-    { name: 'Session Name Descending', serverTerm: 'item.name DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('name') }
-  ];
+    { name: 'Session Date', serverTerm: 'item.StartDate', clientFunction: utilityService.localeCompareByPropertyThenByID('startDate') },
+    { name: 'Session Date Descending', serverTerm: 'item.StartDate DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('startDate') },
+    { name: 'Session Name', serverTerm: 'item.Name', clientFunction: utilityService.localeCompareByPropertyThenByID('name') },
+    { name: 'Session Name Descending', serverTerm: 'item.Name DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('name') }
+];
 
   var filterByStateFactory = function (includeState) {
     var includeStateLocal = includeState;

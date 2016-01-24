@@ -63,8 +63,8 @@ namespace App.Library
 
         private static Func<IQueryable<EventParticipant>, string, IQueryable<EventParticipant>> termFilter = (query, searchTermLower) =>
         {
-            return query.Where(item => true
-                /*item.Name.ToLower().Contains(searchTermLower)*/);
+            return query.Where(item => true);
+                //item.Grade.HasValue && item.Grade.Value.ToString().Contains(searchTermLower));
         };
 
         public static IQueryable<EventParticipant> Query(AppDC dc, SearchExpression searchExpression)
@@ -239,6 +239,7 @@ namespace App.Library
 
 
             var clientQuery =
+                // Note: We don't define a searchExpression termFilter above as we need to do the join first
                 from exEventParticipant in EventParticipant.ExtendedQuery(dc, searchExpression)
                 join participant in Participant.Query(dc) on exEventParticipant.item.ParticipantID equals participant.ID
 
@@ -250,6 +251,15 @@ namespace App.Library
                     ExEventParticipant = exEventParticipant,
                     Participant = participant,
                 };
+
+
+            clientQuery = searchExpression.FilterByTextTerms(clientQuery, (query, searchTermLower) => 
+            {
+                return query.Where(item => item.Participant.FirstName.Contains(searchTermLower)
+                    || item.Participant.LastName.Contains(searchTermLower)
+                    || (item.ExEventParticipant.item.Grade.HasValue && item.ExEventParticipant.item.Grade.Value.ToString().Contains(searchTermLower))
+                    ); 
+            });
 
             // Simple case - a trivial selector that retrieves the object as an ExtendedItem<T>
             Func<object, Tuple<Type, int>>[] itemSelectors =
