@@ -715,6 +715,82 @@ namespace App.Library
             this.Grade = grade;
         }
 
+        public static List<int> GetSessionEventParticipants(AppDC dc, int eventSessionID, int ParticipantGroupID)
+        {
+            var exQuery = from epEventParticipant in ExtendedQuery(dc)
+                          join epParticipant in Participant.Query(dc) on epEventParticipant.item.ParticipantID equals epParticipant.ID
+                          select new { epEventParticipant, epParticipant };
+
+            var exResult = exQuery
+                .Where(exItem => exItem.epEventParticipant.item.EventSessionID == eventSessionID && exItem.epParticipant.ParticipantGroupID == ParticipantGroupID);
+
+            List<int> eventParticipantIDs = new List<int>();
+
+            foreach (var p in exResult)
+            {
+                eventParticipantIDs.Add(p.epEventParticipant.item.ID);
+            }
+
+            return eventParticipantIDs;
+        }
+
+        public static ReportGenerator GetReportGenerator(AppDC appDC, string templateName, ReportFormat reportFormat, int itemID)
+        {
+            var siteContext = SiteContext.Current;
+
+            TagProvider tagProvider = null;
+            tagProvider = EventParticipant.createParticipantTagProvider(appDC, itemID);
+
+            ReportGenerator reportGenerator = null;
+            if (tagProvider != null)
+            {
+                var documentTemplate = DocumentTemplate.FromResource("AppLibrary.Reports." + templateName, null);
+                reportGenerator = siteContext.TemplateReports.Generate(reportFormat, tagProvider, documentTemplate);
+            }
+
+            return reportGenerator;
+        }
+
+        private static TagProvider createParticipantTagProvider(AppDC appDC, int itemID)
+        {
+            var exQuery = from epEventParticipant in ExtendedQuery(appDC)
+                          join epParticipant in Participant.Query(appDC) on epEventParticipant.item.ParticipantID equals epParticipant.ID
+                          join epParticipantGroup in ParticipantGroup.Query(appDC) on epParticipant.ParticipantGroupID equals epParticipantGroup.ID
+                          join epSession in EventSession.Query(appDC) on epEventParticipant.item.EventSessionID equals epSession.ID
+                          select new { epEventParticipant, epParticipant, epParticipantGroup, epSession };
+
+            var exResult = exQuery
+                .Where(exItem => exItem.epEventParticipant.item.ID == itemID)
+                .FirstOrDefault();
+
+            //var eventParticipant = exResult.epEventParticipant;
+
+            IEnumerable<ProviderTag> tags = new ProviderTag[]
+            {
+                StringProviderTag.Create("FirstName", exResult.epParticipant.FirstName),
+                StringProviderTag.Create("LastName", exResult.epParticipant.LastName),
+                StringProviderTag.Create("FullName", exResult.epParticipant.FullName),
+
+                StringProviderTag.Create("SchoolName", exResult.epParticipantGroup.Name),
+
+                DateTimeProviderTag.Create("EventDate", exResult.epSession.StartDate),
+                DateTimeProviderTag.Create("EventTime", exResult.epSession.StartDate),
+                StringProviderTag.Create("EventLocation", exResult.epSession.Location),
+                
+                StringProviderTag.Create("Address", "16722 NE 116th Street, Redmond WA 98052"),
+
+                StringProviderTag.Create("SchoolCounselorName", "Lorrie Smith"),
+
+                // Check in is between «CheckinTimeStart» and «CheckinTimeEnd». All shopping must be completed by «ShoppingTimeEnd».
+                DateTimeProviderTag.Create("CheckinTimeStart", exResult.epSession.StartDate.AddMinutes(-30)),
+                DateTimeProviderTag.Create("CheckinTimeEnd", exResult.epSession.StartDate.AddHours(1)),
+                DateTimeProviderTag.Create("ShoppingTimeEnd", exResult.epSession.StartDate.AddHours(2)),
+
+            };
+
+            return TagProvider.Create(tags);
+        }
+
 #if false
         public static ReportGenerator GetReportGenerator(AppDC appDC, string templateName, ReportFormat reportFormat, int itemID)
         {

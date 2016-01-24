@@ -61,10 +61,19 @@ namespace WebApp
                         return;
 
                     case "reminderFormForSchool":
-                        var participantGroupID = request.QueryString.GetNullableInt32("id");
+                        var participantGroupID = request.QueryString.GetNullableInt32("participantGroupID");
                         if (participantGroupID.HasValue)
                         {
                             downloadReminderFormForSchool(response, appDC, siteContext, participantGroupID.Value);
+                            return;
+                        }
+                        return;
+                    case "reminderFormForEventParticipant":
+                        participantGroupID = request.QueryString.GetNullableInt32("participantGroupID");
+                        var eventSessionID = request.QueryString.GetNullableInt32("eventSessionID");
+                        if (participantGroupID.HasValue && eventSessionID.HasValue)
+                        {
+                            downloadReminderFormForEventParticipants(response, appDC, siteContext, participantGroupID.Value, eventSessionID.Value);
                             return;
                         }
                         return;
@@ -135,6 +144,32 @@ namespace WebApp
                 {
                     var reportStream = reportGenerator.Generate();
                     //reportStream.Position = 0;
+                    individualPdfReportStreams.Add(reportStream);
+                }
+            }
+
+            var multipagePdfStream = PdfPlayground.MergePdfDocuments(individualPdfReportStreams);
+            multipagePdfStream.Position = 0;
+            response.DownloadToBrowser("ReminderForm" + DateTime.Now.ToString() + reportFileExtension, reportContentType, multipagePdfStream);
+        }
+
+        private void downloadReminderFormForEventParticipants(HttpResponse response, AppDC appDC, SiteContext siteContext, int participantGroupID, int eventSessionID)
+        {
+            var eventParticipantIDs = EventParticipant.GetSessionEventParticipants(appDC, eventSessionID, participantGroupID);
+
+            List<MemoryStream> individualPdfReportStreams = new List<MemoryStream>();
+            var reportFileExtension = ".pdf";
+            var reportContentType = "pdf";
+
+            foreach (int epID in eventParticipantIDs)
+            {
+                var reportGenerator = EventParticipant.GetReportGenerator(appDC, "OSB-Reminder-Form-2.docx", ReportFormat.Pdf, epID);
+                reportFileExtension = reportGenerator.ReportFileExtension;
+                reportContentType = reportGenerator.ReportContentType;
+
+                if (reportGenerator != null)
+                {
+                    var reportStream = reportGenerator.Generate();
                     individualPdfReportStreams.Add(reportStream);
                 }
             }

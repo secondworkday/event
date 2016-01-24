@@ -1,17 +1,84 @@
-app.controller('ReportController', function ($scope, $log, utilityService, siteService) {
+app.controller('ReportController', function ($scope, $log, $mdDialog, utilityService, siteService) {
   var participants = siteService.model.participants;
   var participantGroups = siteService.model.participantGroups;
+  
+  // hmmm.. should we assume we can always get to the right $parent?
+  $scope.eventParticipantGroupsIndex = $scope.$parent.eventParticipantGroupsIndex;  
+  $scope.eventSessionsIndex = $scope.$parent.eventSessionsIndex;
+  $scope.eventParticipantsIndex = $scope.$parent.eventParticipantsIndex;
+  
 
-  $scope.downloadReport = function () {
-    // TODO: Change! Hard-coded to first participant group for now
-    for (var key in participantGroups.hashMap) break;
+  $scope.showGenerateRemindersDialog = function (ev) {
+    $mdDialog.show({
+      controller: GenerateRemindersDialogController,
+      templateUrl: '/client/states/app/user/generate-reminders.dialog.html',
+      parent: angular.element(document.body),
+      targetEvent: ev,
+      clickOutsideToClose: true,
+      fullscreen: false,
+      locals: {
+        participantGroupsIndex: $scope.eventParticipantGroupsIndex,
+        eventSessionsIndex: $scope.eventSessionsIndex,
+        eventParticipantsIndex: $scope.eventParticipantsIndex
+      }
+    })
+    .then(function () {
+      // $scope.status = 'You said the information was "' + answer + '".';
+    }, function () {
+      // $scope.status = 'You cancelled the dialog.';
+    });
+  }
+  function GenerateRemindersDialogController($scope, $mdDialog, $filter, utilityService, participantGroupsIndex, eventSessionsIndex, eventParticipantsIndex) {
+    $scope.participantGroups = siteService.model.participantGroups;
+    $scope.eventSessions = siteService.model.eventSessions;
+    $scope.eventParticipants = siteService.model.eventParticipants;
 
-    var query = {
-        type: 'reminderFormForSchool',
-        id: key
-    };
-    utilityService.download(query);
+    $scope.participantGroupsIndex = participantGroupsIndex;
+    $scope.eventSessionsIndex = eventSessionsIndex;
+    $scope.eventParticipantsIndex = eventParticipantsIndex;
+
+    $scope.sessionParticipantGroupsIndex = [];
+
+    // find unique participantGroups for selected eventSession
+    $scope.eventSessionIDChanged = function () {
+      var flags = [];
+      $scope.sessionParticipantGroupsIndex = [];
+
+      $.each($scope.eventParticipantsIndex, function (index, value) {
+        var participant = $scope.eventParticipants.hashMap[value];
+        if ($scope.formData.eventSessionID == participant.eventSessionID) {
+          if (!flags[participant.participantGroupID]) {
+            flags[participant.participantGroupID] = true;
+            $scope.sessionParticipantGroupsIndex.push(participant.participantGroupID);
+          }
+        }
+      });
     }
+
+    $scope.hide = function () {
+      $mdDialog.hide();
+    };
+    $scope.cancel = function () {
+      $mdDialog.cancel();
+    };
+    
+    $scope.downloadReport = function (participantGroupID) {
+      var query = {
+        type: 'reminderFormForSchool',
+        participantGroupID: participantGroupID
+      };
+      utilityService.download(query);
+    }
+
+    $scope.downloadReminderForm = function (eventSessionID, participantGroupID) {
+      var query = {
+        type: 'reminderFormForEventParticipant',
+        participantGroupID: participantGroupID,
+        eventSessionID: eventSessionID
+      };
+      utilityService.download(query);
+    }
+  }
 });
 
 app.controller('EventController', function ($scope, $log, $state, $mdDialog, $msUI, utilityService, siteService, event, eventSessionsIndex, eventParticipantsIndex, eventParticipantGroupsIndex) {

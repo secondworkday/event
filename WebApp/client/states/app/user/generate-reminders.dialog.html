@@ -1,0 +1,46 @@
+<md-dialog aria-label="generate reminders" ng-cloak style="min-width:400px;">
+  <form>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>Generate Reminders</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <i class="fa fa-times"></i>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-dialog-content>
+      <div class="md-dialog-content">
+          <md-input-container class="md-block" flex-gt-sm>
+              <label>Session</label>
+              <md-select ng-model="formData.eventSessionID" ng-change="eventSessionIDChanged()">
+                  <md-option ng-repeat="eventSession in eventSessionsIndex | objectLookup:eventSessions.hashMap track by eventSession.id" value="{{eventSession.id}}">
+                      {{eventSession.name}}
+                  </md-option>
+              </md-select>
+          </md-input-container>
+        <md-input-container class="md-block" flex-gt-sm ng-if="formData.eventSessionID">
+          <label>School</label>
+          <md-select ng-model="formData.participantGroupID">
+            <md-option ng-repeat="participantGroup in sessionParticipantGroupsIndex | objectLookup:participantGroups.hashMap track by participantGroup.id" value="{{participantGroup.id}}">
+              {{participantGroup.name}}
+            </md-option>
+          </md-select>
+        </md-input-container>
+      </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row" layout-align="end center">
+      <md-button ng-click="cancel()">
+       Cancel
+      </md-button>
+      <md-button ng-disabled="!(formData.participantGroupID && formData.eventSessionID)" ng-click="downloadReminderForm(formData.eventSessionID, formData.participantGroupID); hide()"><i class="fa fa-magic"></i> OK</md-button>
+    </md-dialog-actions>
+    <div ms-debug-only>
+      <h1>Debug</h1>
+      <pre>{{formData | json}}</pre>
+      <!--<pre>{{participantGroupsIndex | json}}</pre>-->
+        <!--<pre>{{eventParticipantsIndex | json}}</pre>-->
+      <!--<pre>{{eventSessionsIndex | json}}</pre>-->
+    </div>
+  </form>
+</md-dialog>
