@@ -469,6 +469,11 @@ namespace WebApp
             });
         }
 
+
+
+
+
+
         public HubResult SearchEventParticipants(string searchExpressionString, string sortField, int startRowIndex, int maximumRows)
         {
             return accountsOnlyHeader((siteContext, dc) =>
@@ -478,6 +483,34 @@ namespace WebApp
                 return HubResult.CreateSuccessData(result);
             });
         }
+
+
+        public HubResult ParseEventParticipants(int eventID, string parseData)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var result = EventParticipant.Parse(dc, eventID, parseData);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
+
+        public HubResult UploadEventParticipants(int eventID, dynamic data)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var result = EventParticipant.Upload(dc, eventID, data);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
+
+
+
+
+
+
+
+
+
 
 
         public HubResult ModifyEventTag(int itemID, string tagName, bool isAssigned)

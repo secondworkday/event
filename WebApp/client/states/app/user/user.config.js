@@ -98,7 +98,7 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       },
       views: {
         'participants': {
-          templateUrl: '/client/states/app/user/participants.html',
+          templateUrl: '/client/states/app/user/event-participants.html',
           controller: "EventParticipantsController"
         }
       }

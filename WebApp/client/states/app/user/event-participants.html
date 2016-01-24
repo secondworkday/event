@@ -21,7 +21,13 @@
     <md-button ng-click="download()" class="md-icon-button" aria-label="download">
       <i class="fa fa-download"></i>
     </md-button>
-    <md-button ng-click="showAddParticipantsDialog($event)" class="md-fab md-primary" aria-label="new">
+
+    <md-button ng-click="showUploadParticipantsDialog($event, event)" class="md-icon-button" aria-label="upload">
+      <i class="fa fa-upload"></i>
+    </md-button>
+
+
+    <md-button ng-click="showAddParticipantsDialog($event, event)" class="md-fab md-primary" aria-label="new">
       <i class="fa fa-plus fa-lg"></i>
     </md-button>
   </div>

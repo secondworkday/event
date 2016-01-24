@@ -5,8 +5,6 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
   $scope.demandParticipantGroup = siteService.demandParticipantGroup;
   $scope.demandEventSession = siteService.demandEventSession;
 
-
-
   $scope.sortOptions = [
     { name: 'First Name', serverTerm: 'Participant.FirstName', clientFunction: utilityService.localeCompareByPropertyThenByID('firstName') },
     { name: 'Last Name', serverTerm: 'Participant.LastName', clientFunction: utilityService.localeCompareByPropertyThenByID('lastName') },

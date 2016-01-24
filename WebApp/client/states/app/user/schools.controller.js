@@ -8,8 +8,8 @@ app.controller('SchoolsController', function ($scope, $mdDialog, $log, $msUI, ut
 
 
   $scope.sortOptions = [
-    { name: 'Name', serverTerm: 'ParticipantGroup.Name', clientFunction: utilityService.localeCompareByPropertyThenByID('name') },
-    { name: 'Name Descending', serverTerm: 'item.name DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('name') }
+    { name: 'Name', serverTerm: 'item.Name', clientFunction: utilityService.localeCompareByPropertyThenByID('name') },
+    { name: 'Name Descending', serverTerm: 'item.Name DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('name') }
   ];
 
   var filterByStateFactory = function (includeState) {

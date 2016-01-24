@@ -648,6 +648,19 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
   }
 
 
+  self.parseEventParticipants = function (event, data) {
+    return utilityService.callHub(function () {
+      return siteHub.server.parseEventParticipants(event.id, data);
+    });
+  };
+
+  self.uploadEventParticipants = function (event, data) {
+    return utilityService.callHub(function () {
+      return siteHub.server.uploadEventParticipants(event.id, data);
+    });
+  };
+
+
 
 
 
@@ -1210,6 +1223,8 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
   }).on('updateParticipants', function (itemsData) {
     $rootScope.$apply($rootScope.$broadcast('updateParticipants', utilityService.updateItemsModel(model.participants, itemsData)));
 
+  }).on('updateEventParticipants', function (itemsData) {
+    $rootScope.$apply($rootScope.$broadcast('updateEventParticipants', utilityService.updateItemsModel(model.eventParticipants, itemsData)));
 
 
 

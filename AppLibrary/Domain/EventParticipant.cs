@@ -41,6 +41,190 @@ namespace App.Library
         protected override ExtendedPropertyScopeType objectScopeType { get { return this.ScopeType; } }
         protected override int? objectScopeID { get { return this.ScopeID; } }
 
+        protected EventParticipant(DateTime createdTimestamp, EPScope epScope, int eventID, int participantID, uint? grade)
+            : this()
+        {
+            this.CreatedTimestamp = createdTimestamp;
+            this.ScopeType = epScope.ScopeType;
+            this.ScopeID = epScope.ID;
+
+            this.EventID = eventID;
+            this.ParticipantID = participantID;
+
+            this.Grade = grade;
+        }
+
+        public static EventParticipant Create(AppDC dc, JToken data)
+        {
+            return EventParticipant.createLock(dc, () =>
+            {
+                var createdTimestamp = dc.TransactionTimestamp;
+                var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+
+                var eventID = data.Value<int>("eventID");
+                var participantID = data.Value<int>("participantID");
+
+                var grade = data.Value<uint?>("grade");
+
+
+                var newItem = new EventParticipant(createdTimestamp, teamEPScope, eventID, participantID, grade);
+
+                // optional parameters
+                var dataJToken = data as JToken;
+                Debug.Assert(dataJToken != null, "Need to call .ToJson().FromJson()?");
+
+                newItem.EventSessionID = dataJToken.Value<int?>("eventSessionID");
+
+                dc.Save(newItem);
+                Debug.Assert(newItem.ID > 0);
+
+                return newItem;
+            });
+        }
+
+
+        enum Column
+        {
+            FirstName,
+            LastName,
+            Gender,
+            School,
+            Grade
+        };
+
+        public static HubResult Parse(AppDC dc, int eventID, string parseData)
+        {
+            Debug.Assert(!string.IsNullOrEmpty(parseData));
+            if (string.IsNullOrEmpty(parseData))
+            {
+                return HubResult.NotFound;
+            }
+
+            var lines = parseData
+                // we want to count line numbers - include empty lines
+                .Split(UtilityExtensions.LineTerminators, StringSplitOptions.None);
+
+            Debug.Assert(lines != null);
+
+            bool hasHeaderRow = true;
+
+            // The order 
+            var columnOrder = new[] { Column.FirstName, Column.LastName, Column.Gender, Column.Grade, Column.School };
+
+            //!! if we're passed CSV?
+            //var rows2 = lines
+                //.Skip(hasHeaderRow ? 1 : 0)
+                //.Select(line => new { line, lineColumns = line.DecodeCsvLine() })
+                //.ToArray();
+
+
+            var rows = lines
+                .Skip(hasHeaderRow ? 1 : 0)
+                .Select((line, index) => new { line, lineNumber = index, lineColumns = line.Split('\t') })
+                //.Where(lineInfo => lineInfo.lineColumns.Length >= columnOrder.Length)
+                .Select(lineInfo =>
+                {
+                    if (string.IsNullOrWhiteSpace(lineInfo.line))
+                    {
+                        return new { status = "empty", lineInfo.line, lineInfo.lineNumber } as object;
+                    }
+
+                    if (lineInfo.lineColumns.Length == columnOrder.Length)
+                    {
+                        return new { status = "ok", lineInfo.line, lineInfo.lineNumber,
+                            firstName = lineInfo.lineColumns[0],
+                            lastName = lineInfo.lineColumns[1],
+                            gender = lineInfo.lineColumns[2],
+                            grade = lineInfo.lineColumns[3],
+                            participantGroupName = lineInfo.lineColumns[4],
+                        } as object;
+                    }
+
+                    return new { status = "error", lineInfo.line, lineInfo.lineNumber } as object;
+                })
+                .ToArray();
+
+            return HubResult.CreateSuccessData(rows);
+
+#if false
+        var uploadData = {
+          participantGroupID: 1,
+          eventParticipantsData: [
+            { firstName: 'betty', lastName: 'rubbles' },
+            { firstName: 'barney', lastName: 'rubble', participantGroupName: "Stella Schola" },
+            { firstName: 'fred', lastName: 'flintstone', participantGroupID: 3 }]
+        };
+#endif
+        }
+
+
+        public static HubResult Upload(AppDC dc, int eventID, JToken uploadData)
+        {
+            // take a submit lock
+            // go through each EventParticipant
+            // add them to the table
+            // return CRUD results
+
+            var hubResult = dc.SubmitLock<HubResult>(() =>
+            {
+#if false
+                JToken eventParticipantsData = new [] 
+                {
+                    new { firstName = "pepe" },
+                    new { firstName = "frank" },
+                }
+                .ToJson().FromJson() as JToken;
+#endif
+                var defaultParticipantGroupID = uploadData.Value<int?>("participantGroupID");
+                var defaultParticipantGroup = defaultParticipantGroupID.HasValue ? ParticipantGroup.FindByID(dc, defaultParticipantGroupID.Value) : null;
+
+                var eventParticipants = uploadData["eventParticipantsData"]
+                    .Select(eventParticipantData =>
+                    {
+                        var participantGroupID = eventParticipantData.Value<int?>("participantGroupID");
+                        var participantGroupName = eventParticipantData.Value<string>("participantGroupName");
+
+                        var participantGroup =
+                            (participantGroupID.HasValue ? ParticipantGroup.FindByID(dc, participantGroupID.Value) : null) ??
+                            (!string.IsNullOrEmpty(participantGroupName) ? ParticipantGroup.FindByName(dc, participantGroupName) : null) ??
+                            defaultParticipantGroup;
+
+                        Debug.Assert(participantGroup != null);
+                        if (participantGroup == null)
+                        {
+                            //!! should return a reason code here ...
+                            return (int?)null;
+                        }
+
+                        eventParticipantData["participantGroupID"] = participantGroup.ID;
+                        var participant = Participant.Create(dc, eventParticipantData);
+                        Debug.Assert(participant != null);
+                        if (participant == null)
+                        {
+                            //!! should return a reason code here ...
+                            return (int?)null;
+                        }
+
+                        eventParticipantData["eventID"] = eventID;
+                        eventParticipantData["participantID"] = participant.ID;
+                        var eventParticipant = EventParticipant.Create(dc, eventParticipantData);
+                        if (eventParticipant != null)
+                        {
+                            return (int?)eventParticipant.ID;
+                        }
+                        else
+                        {
+                            return (int?) null;
+                        }
+                    })
+                    .ToArray();
+
+                return HubResult.CreateSuccessData(eventParticipants);
+            });
+
+            return hubResult;
+        }
+
 
         private static IQueryable<EventParticipant> query(AppDC dc)
         {
@@ -684,87 +868,5 @@ namespace App.Library
                 /*0*/this.EventID,
                 /*1*/this.ParticipantID);
         }
-
-        public static EventParticipant Create(AppDC dc, dynamic data)
-        {
-            return EventParticipant.createLock(dc, () =>
-            {
-                var createdTimestamp = dc.TransactionTimestamp;
-                var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
-
-                var eventID = (int)data.eventID;
-                var participantID = (int)data.participantID;
-
-                var grade = (uint?)data.grade;
-
-                var newItem = new EventParticipant(createdTimestamp, teamEPScope, eventID, participantID, grade);
-
-                // optional parameters
-                var dataJToken = data as JToken;
-                Debug.Assert(dataJToken != null, "Need to call .ToJson().FromJson()?");
-
-                newItem.EventSessionID = dataJToken.Value<int?>("eventSessionID");
-
-                dc.Save(newItem);
-                Debug.Assert(newItem.ID > 0);
-
-                return newItem;
-            });
-        }
-
-        protected EventParticipant(DateTime createdTimestamp, EPScope epScope, int eventID, int participantID, uint? grade)
-            : this()
-        {
-            this.CreatedTimestamp = createdTimestamp;
-            this.ScopeType = epScope.ScopeType;
-            this.ScopeID = epScope.ID;
-
-            this.EventID = eventID;
-            this.ParticipantID = participantID;
-
-            this.Grade = grade;
-        }
-
-#if false
-        public static ReportGenerator GetReportGenerator(AppDC appDC, string templateName, ReportFormat reportFormat, int itemID)
-        {
-            var siteContext = SiteContext.Current;
-
-            TagProvider tagProvider = null;
-            tagProvider = Participant.createParticipantTagProvider(appDC, itemID);
-
-            ReportGenerator reportGenerator = null;
-            if (tagProvider != null)
-            {
-                var documentTemplate = DocumentTemplate.FromResource("AppLibrary.Reports." + templateName, null);
-                reportGenerator = siteContext.TemplateReports.Generate(reportFormat, tagProvider, documentTemplate);
-            }
-
-            return reportGenerator;
-        }
-
-        private static TagProvider createParticipantTagProvider(AppDC appDC, int itemID)
-        {
-            var exQuery =
-                from epParticipant in ExtendedQuery(appDC)
-                join school in ParticipantGroup.Query(appDC) on epParticipant.item.ParticipantGroupID equals school.ID
-                select new { epParticipant };
-
-            var exResult = exQuery
-                .Where(exItem => exItem.epParticipant.item.ID == itemID)
-                .FirstOrDefault();
-
-            var participant = exResult.epParticipant.item;
-
-            IEnumerable<ProviderTag> tags = new ProviderTag[]
-            {
-                StringProviderTag.Create("StudentName", participant.Name),
-                StringProviderTag.Create("SchoolName", participant.ParticipantGroup.Name),
-                StringProviderTag.Create("Address", "Main Street, Redmond WA 98052"),
-            };
-
-            return TagProvider.Create(tags);
-        }
-#endif
     }
 }

@@ -332,7 +332,7 @@ namespace App.Library
                 }.ToJson().FromJson())
                 .ForEach(eventParticipantData =>
                 {
-                    var eventParticipant = EventParticipant.Create(dc, eventParticipantData);
+                    var eventParticipant = EventParticipant.Create(dc, (JToken)eventParticipantData);
                     Debug.Assert(eventParticipant != null);
                 });
 
@@ -380,7 +380,7 @@ namespace App.Library
                         }.ToJson().FromJson())
                         .ForEach(eventParticipantData =>
                         {
-                            var eventParticipant = EventParticipant.Create(dc, eventParticipantData);
+                            var eventParticipant = EventParticipant.Create(dc, (JToken)eventParticipantData);
                             Debug.Assert(eventParticipant != null);
                         });
                 });

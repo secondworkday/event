@@ -203,6 +203,8 @@
     <Content Include="client\states\app\user\add-school.dialog.html" />
     <Content Include="client\states\app\user\add-session.dialog.html" />
     <Content Include="client\states\app\user\add-team-member.dialog.html" />
+    <Content Include="client\states\app\user\upload-participants.controller.js" />
+    <Content Include="client\states\app\user\upload-participants.dialog.html" />
     <Content Include="client\states\app\user\create-event.dialog.html" />
     <Content Include="client\states\app\user\documents.html" />
     <Content Include="client\states\app\user\schools.html" />
@@ -213,7 +215,7 @@
     <Content Include="client\states\app\user\home.html" />
     <Content Include="client\states\app\user\event-participants.controller.js" />
     <Content Include="client\states\app\user\event-sessions.html" />
-    <Content Include="client\states\app\user\participants.html" />
+    <Content Include="client\states\app\user\event-participants.html" />
     <Content Include="client\states\app\user\user-container.html" />
     <Content Include="client\states\app\user\user.config.js" />
     <Content Include="client\states\app\user\user.controller.js" />

@@ -2,7 +2,7 @@
   <form>
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <h2>Add Participants</h2>
+        <h2>Bulk Upload Participants</h2>
         <span flex></span>
         <md-button class="md-icon-button" ng-click="cancel()">
           <i class="fa fa-times"></i>
@@ -11,6 +11,16 @@
     </md-toolbar>
     <md-dialog-content>
       <div class="md-dialog-content">
+
+        <textarea ng-paste="paste($event)" placeholder='paste here' />
+
+        <div ng-repeat="eventParticipantRow in uploadData.eventParticipantsData">
+          {{eventParticipantRow}}
+        </div>
+        <div ms-debug-only><pre>{{uploadData | json}}</pre></div>
+
+
+
         <md-input-container class="md-block" flex-gt-sm>
           <label>Name</label>
           <input ng-model="formData.name">
