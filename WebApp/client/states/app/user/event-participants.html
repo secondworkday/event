@@ -49,8 +49,7 @@
      </tr>
    </thead>
    <tbody>
-     <tr ui-sref="app.system.tenant.dashboard({ tenantID:tenant.id })" 
-       ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id" 
+     <tr ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id" 
        ng-init="eventSession = demandEventSession(eventParticipant.eventSessionID); 
           participantGroup = demandParticipantGroup(eventParticipant.participantGroupID);" >
        <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ eventParticipant | json }}</pre></td>

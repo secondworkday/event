@@ -42,12 +42,11 @@
      </tr>
    </thead>
    <tbody>
-     <tr ui-sref="" 
-       ng-repeat="participantGroup in $displayedIndex | objectLookup:$hashMap track by participantGroup.id" >
+     <tr ng-repeat="participantGroup in $displayedIndex | objectLookup:$hashMap track by participantGroup.id" >
        <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ participantGroup | json }}</pre></td>
        <td ms-debug-only>{{ participantGroup.id }}</td>
        <td class="md-data-table__cell--non-numeric">{{ participantGroup.name }}</td>
-         <td>50</td>
+         <td>{{getParticipantCount(participantGroup.id)}}</td>
          <td>Lori Jones</td>
          <td>jones@school.edu</td>
          <td>206-434-2122</td>
