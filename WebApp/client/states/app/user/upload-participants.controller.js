@@ -11,6 +11,9 @@ app.controller('UploadParticipantsDialogController', function ($scope, $mdDialog
     $mdDialog.cancel();
   };
 
+  $scope.dataErrors = {
+    numberOfErrors: 0
+  }
 
   $scope.paste = function ($event) {
     var pastedTextData = $event.originalEvent.clipboardData.getData('text/plain');
@@ -22,6 +25,7 @@ app.controller('UploadParticipantsDialogController', function ($scope, $mdDialog
         //participantGroupID: 1,
         eventParticipantsData: successData.ResponseData
       };
+      checkPresenceOfErrors();
       return successData;
     }, function (failureData) {
       // failure
@@ -29,6 +33,15 @@ app.controller('UploadParticipantsDialogController', function ($scope, $mdDialog
       return failureData;
     });
 
+  }
+
+  function checkPresenceOfErrors() {
+    $scope.dataErrors.numberOfErrors = 0;
+    $.each($scope.uploadData.eventParticipantsData, function (index, value) {
+      if (value.errors) {
+        $scope.dataErrors.numberOfErrors++;
+      }
+    });
   }
 
   $scope.parseEventParticipants = function () {

@@ -494,3 +494,7 @@
 .coming-soon {
     color: #ccc;
 }
+
+.uploaddataerror {
+    color: red;
+}

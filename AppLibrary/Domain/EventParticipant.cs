@@ -1081,7 +1081,7 @@ namespace App.Library
                 // Check in is between «CheckinTimeStart» and «CheckinTimeEnd». All shopping must be completed by «ShoppingTimeEnd».
                 DateTimeProviderTag.Create("CheckinTimeStart", exResult.epSession.StartDate.AddMinutes(-30)),
                 DateTimeProviderTag.Create("CheckinTimeEnd", exResult.epSession.StartDate.AddHours(1)),
-                DateTimeProviderTag.Create("ShoppingTimeEnd", exResult.epSession.StartDate.AddHours(2)),
+                DateTimeProviderTag.Create("ShoppingTimeEnd", exResult.epSession.EndDate),
 
             };
 

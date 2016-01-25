@@ -15,7 +15,7 @@
               <label>Session</label>
               <md-select ng-model="formData.eventSessionID" ng-change="eventSessionIDChanged()">
                   <md-option ng-repeat="eventSession in eventSessionsIndex | objectLookup:eventSessions.hashMap track by eventSession.id" value="{{eventSession.id}}">
-                      {{eventSession.name}}
+                      {{eventSession.name}} - {{eventSession.startDate | date:'MM/dd/yyyy'}}
                   </md-option>
               </md-select>
           </md-input-container>
