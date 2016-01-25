@@ -395,25 +395,16 @@ namespace App.Library
             query = FilterBy(dc, query, searchExpression);
 
 
-            var searchQuery = 
+            // EventParticipants involve Partipants, ParticipantGroups & EventSessions, all of which can be involved with searches
+            // So we widen the query here so we can filter on all those things
+            var searchTermQuery = 
                 from eventParticipant in query
                 join participant in Participant.Query(dc) on eventParticipant.ParticipantID equals participant.ID
                 join participantGroup in ParticipantGroup.Query(dc) on participant.ParticipantGroupID equals participantGroup.ID
                 join session in EventSession.Query(dc) on eventParticipant.EventSessionID equals session.ID
                 select new {eventParticipant, participant, participantGroup, session };
 
-            //searchQuery = searchQuery
-                //.Where(searchItem => searchItem.participantGroup.Name.StartsWith("E"));
-
-            //return query.Where(item => item.Participant.FirstName.Contains(searchTermLower)
-            //|| item.Participant.LastName.Contains(searchTermLower)
-            //|| (item.ExEventParticipant.item.Grade.HasValue && item.ExEventParticipant.item.Grade.Value.ToString().Contains(searchTermLower))
-            //); 
-
-
-
-
-            searchQuery = searchExpression.FilterByTextTerms(searchQuery, (termQuery, searchTermLower) =>
+            searchTermQuery = searchExpression.FilterByTextTerms(searchTermQuery, (termQuery, searchTermLower) =>
             {
                 return termQuery.Where(item =>
                     (item.eventParticipant.Grade.HasValue && item.eventParticipant.Grade.Value.ToString().Contains(searchTermLower)) ||
@@ -424,10 +415,8 @@ namespace App.Library
                     );
             });
 
-
-            query = searchQuery
+            query = searchTermQuery
                 .Select(searchItem => searchItem.eventParticipant);
-
 
 
             // support filtering to a specific Event. eg. $event:{eventID}
@@ -523,13 +512,16 @@ namespace App.Library
         {
             [JsonProperty("participantID")]
             public int ParticipantID { get; internal set; }
-            [JsonProperty("participantGroupID")]
-            public int ParticipantGroupID { get; internal set; }
             [JsonProperty("eventID")]
             public int EventID { get; internal set; }
 
             [JsonProperty("createdTimestamp")]
             public DateTime CreatedTimestamp { get; internal set; }
+
+            [JsonProperty("participantGroupID")]
+            public int ParticipantGroupID { get; internal set; }
+            [JsonProperty("participantGroupName")]
+            public string ParticipantGroupName { get; internal set; }
 
             [JsonProperty("eventSessionID")]
             public int? EventSessionID { get; internal set; }
@@ -558,10 +550,13 @@ namespace App.Library
                 : base(exItem, context)
             {
                 this.ParticipantID = exItem.Participant.ID;
-                this.ParticipantGroupID = exItem.Participant.ParticipantGroupID;
                 this.EventID = exItem.item.EventID;
 
                 this.CreatedTimestamp = exItem.item.CreatedTimestamp;
+
+                Debug.Assert(exItem.Participant.ParticipantGroupID == exItem.ParticipantGroup.ID);
+                this.ParticipantGroupID = exItem.Participant.ParticipantGroupID;
+                this.ParticipantGroupName = exItem.ParticipantGroup.Name;
 
                 this.EventSessionID = exItem.item.EventSessionID;
 
@@ -595,16 +590,16 @@ namespace App.Library
         {
             public ExtendedItem<EventParticipant> ExEventParticipant { get; internal set; }
             public Participant Participant { get; internal set; }
+            public ParticipantGroup ParticipantGroup { get; internal set; }
         }
 
         public static SearchResult<SearchItem> Search(AppDC dc, SearchExpression searchExpression, string sortExpression, int startRowIndex, int maximumRows)
         {
-
-
             var clientQuery =
                 // Note: We don't define a searchExpression termFilter above as we need to do the join first
                 from exEventParticipant in EventParticipant.ExtendedQuery(dc, searchExpression)
                 join participant in Participant.Query(dc) on exEventParticipant.item.ParticipantID equals participant.ID
+                join participantGroup in ParticipantGroup.Query(dc) on participant.ParticipantGroupID equals participantGroup.ID
 
                 select new ExtendedEventParticipantItem
                 {
@@ -613,6 +608,7 @@ namespace App.Library
 
                     ExEventParticipant = exEventParticipant,
                     Participant = participant,
+                    ParticipantGroup = participantGroup,
                 };
 
 
