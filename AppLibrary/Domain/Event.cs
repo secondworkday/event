@@ -306,7 +306,7 @@ namespace App.Library
             int numParticipants = 50 + random.Next(350);
 
             //!! for debug - limit Participants
-            numParticipants = 15;
+            numParticipants = 150;
 
             // Create our Participants, sticking each into a ParticpantGroup, and dividing them into an EventSession (leaving some assigned to the Event but no EventSession).
 

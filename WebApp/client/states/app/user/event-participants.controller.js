@@ -6,10 +6,11 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
   $scope.demandEventSession = siteService.demandEventSession;
 
   $scope.sortOptions = [
-    { name: 'First Name', serverTerm: 'Participant.FirstName', clientFunction: utilityService.localeCompareByPropertyThenByID('firstName') },
-    { name: 'Last Name', serverTerm: 'Participant.LastName', clientFunction: utilityService.localeCompareByPropertyThenByID('lastName') },
-    { name: 'School', serverTerm: 'Participant.ParticipantGroup.Name', clientFunction: utilityService.localeCompareByPropertyThenByID('participantGroupID') },
-    { name: 'Grade', serverTerm: 'ExEventParticipant.item.Grade', clientFunction: utilityService.localeCompareByPropertyThenByID('grade') }
+    { name: 'First Name', serverTerm: 'Participant.FirstName', clientFunction: utilityService.compareByProperties('firstName', 'id') },
+    { name: 'Last Name', serverTerm: 'Participant.LastName', clientFunction: utilityService.compareByProperties('lastName', 'id') },
+    //!! this is currently broken - as we don't really want to sort by the ParticipantGroup ID
+    //{ name: 'School', serverTerm: 'Participant.ParticipantGroup.Name', clientFunction: utilityService.compareByProperties('participantGroupID', 'id') },
+    { name: 'Grade', serverTerm: 'ExEventParticipant.item.Grade', clientFunction: utilityService.compareByProperties('grade', 'id') }
   ];
 
   var filterByStateFactory = function (includeState) {
