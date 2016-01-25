@@ -1760,6 +1760,8 @@ namespace App.Library
 		
 		private string _LastName;
 		
+		private global::MS.Utility.UserGender? _Gender;
+		
 		private int _ParticipantGroupID;
 		
 		private EntityRef<ParticipantGroup> _ParticipantGroup;
@@ -1782,6 +1784,8 @@ namespace App.Library
     partial void OnFirstNameChanged();
     partial void OnLastNameChanging(string value);
     partial void OnLastNameChanged();
+    partial void OnGenderChanging(global::MS.Utility.UserGender? value);
+    partial void OnGenderChanged();
     partial void OnParticipantGroupIDChanging(int value);
     partial void OnParticipantGroupIDChanged();
     #endregion
@@ -1928,6 +1932,26 @@ namespace App.Library
 					this._LastName = value;
 					this.SendPropertyChanged("LastName");
 					this.OnLastNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Gender", DbType="Int", CanBeNull=true)]
+		public global::MS.Utility.UserGender? Gender
+		{
+			get
+			{
+				return this._Gender;
+			}
+			set
+			{
+				if ((this._Gender != value))
+				{
+					this.OnGenderChanging(value);
+					this.SendPropertyChanging();
+					this._Gender = value;
+					this.SendPropertyChanged("Gender");
+					this.OnGenderChanged();
 				}
 			}
 		}

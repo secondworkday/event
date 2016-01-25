@@ -389,16 +389,46 @@ namespace App.Library
             return result;
         }
 
-        private static Func<IQueryable<EventParticipant>, string, IQueryable<EventParticipant>> termFilter = (query, searchTermLower) =>
-        {
-            return query.Where(item => true);
-                //item.Grade.HasValue && item.Grade.Value.ToString().Contains(searchTermLower));
-        };
-
         public static IQueryable<EventParticipant> Query(AppDC dc, SearchExpression searchExpression)
         {
             var query = Query(dc);
-            query = FilterBy(dc, query, searchExpression, termFilter);
+            query = FilterBy(dc, query, searchExpression);
+
+
+            var searchQuery = 
+                from eventParticipant in query
+                join participant in Participant.Query(dc) on eventParticipant.ParticipantID equals participant.ID
+                join participantGroup in ParticipantGroup.Query(dc) on participant.ParticipantGroupID equals participantGroup.ID
+                join session in EventSession.Query(dc) on eventParticipant.EventSessionID equals session.ID
+                select new {eventParticipant, participant, participantGroup, session };
+
+            //searchQuery = searchQuery
+                //.Where(searchItem => searchItem.participantGroup.Name.StartsWith("E"));
+
+            //return query.Where(item => item.Participant.FirstName.Contains(searchTermLower)
+            //|| item.Participant.LastName.Contains(searchTermLower)
+            //|| (item.ExEventParticipant.item.Grade.HasValue && item.ExEventParticipant.item.Grade.Value.ToString().Contains(searchTermLower))
+            //); 
+
+
+
+
+            searchQuery = searchExpression.FilterByTextTerms(searchQuery, (termQuery, searchTermLower) =>
+            {
+                return termQuery.Where(item =>
+                    (item.eventParticipant.Grade.HasValue && item.eventParticipant.Grade.Value.ToString().Contains(searchTermLower)) ||
+                    item.participant.FirstName.Contains(searchTermLower) ||
+                    item.participant.LastName.Contains(searchTermLower) ||
+                    item.participantGroup.Name.Contains(searchTermLower) ||
+                    item.session.Name.Contains(searchTermLower)
+                    );
+            });
+
+
+            query = searchQuery
+                .Select(searchItem => searchItem.eventParticipant);
+
+
 
             // support filtering to a specific Event. eg. $event:{eventID}
             query = searchExpression.FilterByAnyNamedStateTerm2(query, "event",
@@ -586,13 +616,13 @@ namespace App.Library
                 };
 
 
-            clientQuery = searchExpression.FilterByTextTerms(clientQuery, (query, searchTermLower) => 
-            {
-                return query.Where(item => item.Participant.FirstName.Contains(searchTermLower)
-                    || item.Participant.LastName.Contains(searchTermLower)
-                    || (item.ExEventParticipant.item.Grade.HasValue && item.ExEventParticipant.item.Grade.Value.ToString().Contains(searchTermLower))
-                    ); 
-            });
+            //clientQuery = searchExpression.FilterByTextTerms(clientQuery, (query, searchTermLower) => 
+            //{
+                //return query.Where(item => item.Participant.FirstName.Contains(searchTermLower)
+                    //|| item.Participant.LastName.Contains(searchTermLower)
+                    //|| (item.ExEventParticipant.item.Grade.HasValue && item.ExEventParticipant.item.Grade.Value.ToString().Contains(searchTermLower))
+                    //); 
+            //});
 
             // Simple case - a trivial selector that retrieves the object as an ExtendedItem<T>
             Func<object, Tuple<Type, int>>[] itemSelectors =

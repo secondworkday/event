@@ -119,6 +119,9 @@
       <Column Name="FirstName" Type="System.String" DbType="nvarchar(256)" CanBeNull="true"/>
       <Column Name="LastName" Type="System.String" DbType="nvarchar(256)" CanBeNull="true"/>
 
+      <Column Name="Gender" Type="global::MS.Utility.UserGender?" DbType="Int" CanBeNull="true" />
+
+
       <Column Name="ParticipantGroupID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="ParticipantGroup_Participant" Member="ParticipantGroup" ThisKey="ParticipantGroupID" OtherKey="ID" Type="ParticipantGroup" IsForeignKey="true" />
 
