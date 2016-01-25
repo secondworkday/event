@@ -1,62 +1,93 @@
 <md-dialog aria-label="add team member" ng-cloak>
-  <form>
-    <md-toolbar>
-      <div class="md-toolbar-tools">
-        <h2>Bulk Upload Participants</h2>
-        <span flex></span>
-        <md-button class="md-icon-button" ng-click="cancel()">
-          <i class="fa fa-times"></i>
-        </md-button>
-      </div>
-    </md-toolbar>
-    <md-dialog-content>
-      <div class="md-dialog-content">
+    <form>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Bulk Upload Participants</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <i class="fa fa-times"></i>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <div ng-hide="uploadData.eventParticipantsData.length > 0">
+                    <md-input-container>
+                        <label>Paste text here</label>
+                        <textarea ng-model="formData.participantTextInput" rows="10" cols="70" ng-paste="paste($event)" />
+                    </md-input-container>
 
-        <textarea ng-paste="paste($event)" placeholder='paste here' />
+                    <div>
+                        <b>Tip:</b> Copy a table in Excel and paste it directly in this dialog.  The following header columns must be included:<br /><br />
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;First Name&nbsp;&nbsp;&nbsp;&nbsp;Last Name&nbsp;&nbsp;&nbsp;&nbsp;Gender&nbsp;&nbsp;&nbsp;&nbsp;Grade&nbsp;&nbsp;&nbsp;&nbsp;School<br />
+                    </div>
+                </div>
 
-        <div>Currently you must include headers and have exactly these columns: 
-          "First Name, Last Name, Gender, Grade, School"<br />
-          Hit "Bulk Upload" after you paste.
+                <div ng-show="uploadData.eventParticipantsData.length > 0">
+                    <h4>{{uploadData.eventParticipantsData.length}} participants found</h4>
+                    <h5 ng-if="dataErrors.numberOfErrors > 0" class="uploaddataerror">Unfortunately, {{dataErrors.numberOfErrors}} participants contain errors. Please fix your source data and try again.</h5>
+                    <h5 ng-if="dataErrors.numberOfErrors == 0">Click 'Bulk Upload' to complete data upload.</h5>
+                    <table class="md-data-table u-full-width">
+                        <thead>
+                            <tr>
+                                <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
+                                <th class="md-data-table__cell--non-numeric"></th>
+                                <th class="md-data-table__cell--non-numeric">First Name</th>
+                                <th class="md-data-table__cell--non-numeric">Last Name</th>
+                                <th>Gender</th>
+                                <th>Grade</th>
+                                <th>School</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="row in uploadData.eventParticipantsData" ng-class="{ 'uploaddataerror': row.errors }">
+                                <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ row | json }}</pre></td>
+                                <td class="md-data-table__cell--non-numeric">{{$index+1}}</td>
+                                <td class="md-data-table__cell--non-numeric">{{row.firstName}}</td>
+                                <td class="md-data-table__cell--non-numeric">{{row.lastName}}</td>
+                                <td class="md-data-table__cell--non-numeric">{{row.gender}}</td>
+                                <td class="md-data-table__cell--non-numeric">{{row.grade}}</td>
+                                <td class="md-data-table__cell--non-numeric">{{row.participantGroupName}}</td>
+                                <td><span ng-if="row.errors">{{row.errors}}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div ms-debug-only><pre>{{uploadData | json}}</pre></div>
+
+
+
+                <!--<md-input-container class="md-block" flex-gt-sm>
+                  <label>Name</label>
+                  <input ng-model="formData.name">
+                </md-input-container>
+                <md-input-container class="md-block" flex-gt-sm>
+                  <label>Grade</label>
+                  <input type="number" ng-model="formData.grade">
+                </md-input-container>
+                <md-input-container class="md-block" flex-gt-sm>
+                  <label>School</label>
+                  <md-select ng-model="formData.participantGroupID">
+                    <md-option ng-repeat="school in participantGroups.index | objectLookup:participantGroups.hashMap track by school.id" value="{{school.id}}">
+                      {{school.name}}
+                    </md-option>
+                  </md-select>
+                </md-input-container>
+                <br/>-->
+                <!--<md-button ng-disabled="true" ng-click="parseEventParticipants()" class="md-primary"><i class="fa fa-upload"></i> Bulk parse</md-button>-->
+                <!--<md-button ng-disabled="!formData.participantGroupID" ng-click="generateRandomParticipants(formData.participantGroupID, 25)"><i class="fa fa-magic"></i> Generate 25 participants</md-button>-->
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row" layout-align="end center">
+            <!--<md-button style="float:left;" ng-click="uploadData.eventParticipantsData = null; formData.participantTextInput = ''" ng-show="uploadData.eventParticipantsData.length > 0">Clear Data</md-button>-->
+            <md-button ng-click="cancel()">Cancel</md-button>
+            <md-button ng-disabled="dataErrors.numberOfErrors > 0 || !uploadData.eventParticipantsData" ng-click="uploadEventParticipants()" class="md-primary"><i class="fa fa-upload"></i> Bulk upload</md-button>
+            <!--<md-button ng-disabled="!(formData.participantGroupID && formData.name && formData.grade)" ng-click="createParticipant(formData)"><i class="fa fa-magic"></i> OK</md-button>-->
+        </md-dialog-actions>
+        <div ms-debug-only>
+            <h1>Debug</h1>
+            <pre>{{formData | json}}</pre>
         </div>
-
-        <div ng-repeat="eventParticipantRow in uploadData.eventParticipantsData">
-          {{eventParticipantRow}}
-        </div>
-        <div ms-debug-only><pre>{{uploadData | json}}</pre></div>
-
-
-
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>Name</label>
-          <input ng-model="formData.name">
-        </md-input-container>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>Grade</label>
-          <input type="number" ng-model="formData.grade">
-        </md-input-container>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>School</label>
-          <md-select ng-model="formData.participantGroupID">
-            <md-option ng-repeat="school in participantGroups.index | objectLookup:participantGroups.hashMap track by school.id" value="{{school.id}}">
-              {{school.name}}
-            </md-option>
-          </md-select>
-        </md-input-container>
-        <br/>
-        <md-button ng-disabled="true" ng-click="parseEventParticipants()" class="md-primary"><i class="fa fa-upload"></i> Bulk parse</md-button>
-        <md-button ng-click="uploadEventParticipants()" class="md-primary"><i class="fa fa-upload"></i> Bulk upload</md-button>
-        <md-button ng-disabled="!formData.participantGroupID" ng-click="generateRandomParticipants(formData.participantGroupID, 25)"><i class="fa fa-magic"></i> Generate 25 participants</md-button>
-      </div>
-    </md-dialog-content>
-    <md-dialog-actions layout="row" layout-align="end center">
-      <md-button ng-click="cancel()">
-       Cancel
-      </md-button>
-      <md-button ng-disabled="!(formData.participantGroupID && formData.name && formData.grade)" ng-click="createParticipant(formData)"><i class="fa fa-magic"></i> OK</md-button>
-    </md-dialog-actions>
-    <div ms-debug-only>
-      <h1>Debug</h1>
-      <pre>{{formData | json}}</pre>
-    </div>
-  </form>
+    </form>
 </md-dialog>
