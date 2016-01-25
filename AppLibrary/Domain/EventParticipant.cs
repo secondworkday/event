@@ -399,6 +399,11 @@ namespace App.Library
         {
             var query = Query(dc);
             query = FilterBy(dc, query, searchExpression, termFilter);
+
+            // support filtering to a specific Event. eg. $event:{eventID}
+            query = searchExpression.FilterByAnyNamedStateTerm2(query, "event",
+                searchTerm => item => item.EventID.ToString() == searchTerm);
+
             return query;
         }
 
