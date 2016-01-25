@@ -399,9 +399,12 @@ namespace App.Library
             // So we widen the query here so we can filter on all those things
             var searchTermQuery = 
                 from eventParticipant in query
+                // inner join - required
                 join participant in Participant.Query(dc) on eventParticipant.ParticipantID equals participant.ID
                 join participantGroup in ParticipantGroup.Query(dc) on participant.ParticipantGroupID equals participantGroup.ID
-                join session in EventSession.Query(dc) on eventParticipant.EventSessionID equals session.ID
+                // outer join - optional
+                join session in EventSession.Query(dc) on eventParticipant.EventSessionID equals session.ID into eventParticipantSessionGroup
+                from session in eventParticipantSessionGroup.DefaultIfEmpty()
                 select new {eventParticipant, participant, participantGroup, session };
 
             searchTermQuery = searchExpression.FilterByTextTerms(searchTermQuery, (termQuery, searchTermLower) =>
@@ -411,7 +414,7 @@ namespace App.Library
                     item.participant.FirstName.Contains(searchTermLower) ||
                     item.participant.LastName.Contains(searchTermLower) ||
                     item.participantGroup.Name.Contains(searchTermLower) ||
-                    item.session.Name.Contains(searchTermLower)
+                    (item.session != null && item.session.Name.Contains(searchTermLower))
                     );
             });
 
