@@ -24,16 +24,16 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
   $scope.filterOptions = [
     //{ name: 'Active', serverTerm: '$Active', clientFunction: filterByStateFactory("Active") },
     //{ name: 'Disabled', serverTerm: '$Disabled', clientFunction: filterByStateFactory("Disabled") },
-    { name: 'All' }
+    { name: 'All', serverTerm: '$event:Nnn' }
   ];
+
+  //!! fixup our event filter. Need a more robust way to handle this
+  $scope.filterOptions[0].serverTerm = '$event:' + $scope.event.id;
 
   $scope.searchViewOptions = {
     sort: $scope.sortOptions[0],
     filter: $scope.filterOptions[0]
   };
-
-
-
 
   $scope.download = function () {
     var query = {
