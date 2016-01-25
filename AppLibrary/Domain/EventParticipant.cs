@@ -88,9 +88,102 @@ namespace App.Library
             FirstName,
             LastName,
             Gender,
-            School,
-            Grade
+            Grade,
+            ParticipantGroupName,
         };
+
+        [Flags]
+        public enum ColumnOptions
+        {
+            None = 0,
+
+            Optional = 0x1,
+        }
+
+        public class NormalizationValue
+        {
+            public string NormalizedValue { get; private set; }
+            public string[] AlternateValues { get; private set; }
+
+            public IEnumerable<string> AcceptedValues { get { return this.NormalizedValue.ToEnumerable().Concat(this.AlternateValues); } }
+
+
+            public static NormalizationValue Create(string normalizedValue, params string[] alternateValues)
+            {
+                var normalizationValue = new NormalizationValue()
+                {
+                    NormalizedValue = normalizedValue,
+                    AlternateValues = alternateValues
+                };
+                return normalizationValue;
+            }
+        }
+
+        public class ColumnHandler
+        {
+            public ColumnOptions Options { get; private set; }
+
+            public string JsonName { get; private set; }
+
+            public string[] AlternateHeaderValues { get; private set; }
+            public IEnumerable<string> AcceptedHeaderValues { get { return this.JsonName.ToEnumerable().Concat(this.AlternateHeaderValues); } }
+
+
+            public NormalizationValue[] NormalizationValues { get; private set; }
+
+            public ColumnHandler(string jsonName, params string[] alternateHeaderValues)
+                : this(jsonName, ColumnOptions.None)
+            { }
+
+            public ColumnHandler(string jsonName, ColumnOptions options)
+                : this(jsonName, options, null)
+            { }
+
+            public ColumnHandler(string jsonName, NormalizationValue[] normalizationValues)
+                : this(jsonName, ColumnOptions.None, normalizationValues)
+            { }
+
+            public ColumnHandler(string jsonName, ColumnOptions options, NormalizationValue[] normalizationValues, params string[] alternateHeaderValues)
+            {
+                Debug.Assert(!string.IsNullOrEmpty(jsonName));
+
+                this.JsonName = jsonName;
+                this.Options = options;
+                this.NormalizationValues = normalizationValues;
+                this.AlternateHeaderValues = alternateHeaderValues;
+            }
+
+
+            public void ParseCell(JToken jToken, List<string> errorList, string cellValue)
+            {
+                Debug.Assert(jToken != null);
+                Debug.Assert(errorList != null);
+
+                string normalizedCellValue;
+                if (this.NormalizationValues == null)
+                {
+                    normalizedCellValue = cellValue != null ? cellValue.Trim() : null;
+                }
+                else
+                {
+                    normalizedCellValue = this.NormalizationValues
+                        .Where(normalizationValue => normalizationValue.AcceptedValues
+                            .Any(acceptedValue => string.Equals(acceptedValue, cellValue, StringComparison.CurrentCultureIgnoreCase) ))
+                        .Select(normalizationValue => normalizationValue.NormalizedValue)
+                        .FirstOrDefault();
+                }
+
+                if (!this.Options.HasFlag(ColumnOptions.Optional) && string.IsNullOrEmpty(normalizedCellValue))
+                {
+                    errorList.Add(string.Format("{0} not found",
+                        /*0*/this.JsonName));
+                    return;
+                }
+
+                jToken[this.JsonName] = normalizedCellValue;
+            }
+        }
+
 
         public static HubResult Parse(AppDC dc, int eventID, string parseData)
         {
@@ -108,8 +201,22 @@ namespace App.Library
 
             bool hasHeaderRow = true;
 
-            // The order 
-            var columnOrder = new[] { Column.FirstName, Column.LastName, Column.Gender, Column.Grade, Column.School };
+
+            var genderNormalizationValues = new[] {
+                NormalizationValue.Create("M", "masculine", "male", "man", "boy"),
+                NormalizationValue.Create("F", "feminine", "female", "woman", "girl"),
+                NormalizationValue.Create(" ", "transgender", "ftm", "mtf")
+            };
+
+            ColumnHandler[] columnHandlers = new[]
+            {
+                new ColumnHandler("firstName", "first name", "first"),
+                new ColumnHandler("lastName", "last name", "last"),
+                new ColumnHandler("gender", genderNormalizationValues),
+                new ColumnHandler("grade"),
+                new ColumnHandler("participantGroupName"),
+            };
+
 
             //!! if we're passed CSV?
             //var rows2 = lines
@@ -120,15 +227,42 @@ namespace App.Library
 
             var rows = lines
                 .Skip(hasHeaderRow ? 1 : 0)
-                .Select((line, index) => new { line, lineNumber = index, lineColumns = line.Split('\t') })
-                //.Where(lineInfo => lineInfo.lineColumns.Length >= columnOrder.Length)
+                .Select((line, index) => new { line, lineNumber = index + 1, lineColumns = line.Split('\t') })
                 .Select(lineInfo =>
                 {
+                    // Process each line we're given.
+
                     if (string.IsNullOrWhiteSpace(lineInfo.line))
                     {
-                        return new { status = "empty", lineInfo.line, lineInfo.lineNumber } as object;
+                        // No judgement - but we'll flag this an an empty line
+                        return new { status = "empty", lineNumber = lineInfo.lineNumber }.ToJson().FromJson();
                     }
 
+                    // Process each column in the line
+
+                    // (collect errors we find along the way)
+                    var errorList = new List<string>();
+                    // (aggregate together our json response)
+                    var lineJToken = JToken.Parse("{}");
+                    columnHandlers
+                        .ForEach((colunmHandler, index) =>
+                        {
+                            var cellValue = index < lineInfo.lineColumns.Length ? lineInfo.lineColumns[index] : null;
+                            colunmHandler.ParseCell(lineJToken, errorList, cellValue);
+                        });
+
+                    if (errorList.Any())
+                    {
+                        lineJToken["status"] = "errors";
+                        lineJToken["errors"] = errorList.Join(", ");
+                    }
+                    else
+                    {
+                        lineJToken["status"] = "ok";
+                    }
+
+                    return lineJToken;
+#if false
                     if (lineInfo.lineColumns.Length == columnOrder.Length)
                     {
                         return new { status = "ok", lineInfo.line, lineInfo.lineNumber,
@@ -141,10 +275,20 @@ namespace App.Library
                     }
 
                     return new { status = "error", lineInfo.line, lineInfo.lineNumber } as object;
+#endif
                 })
                 .ToArray();
 
-            return HubResult.CreateSuccessData(rows);
+            // Trim empty rows from the end - no need to bug users about those right?
+            var trimTrailingEmptyRows = rows
+                .Reverse()
+                .SkipWhile(row => ((dynamic)row).status == "empty")
+                .Reverse()
+                .ToArray();
+
+
+
+            return HubResult.CreateSuccessData(trimTrailingEmptyRows);
 
 #if false
         var uploadData = {

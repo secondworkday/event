@@ -14,6 +14,11 @@
 
         <textarea ng-paste="paste($event)" placeholder='paste here' />
 
+        <div>Currently you must include headers and have exactly these columns: 
+          "First Name, Last Name, Gender, Grade, School"<br />
+          Hit "Bulk Upload" after you paste.
+        </div>
+
         <div ng-repeat="eventParticipantRow in uploadData.eventParticipantsData">
           {{eventParticipantRow}}
         </div>
@@ -38,7 +43,7 @@
           </md-select>
         </md-input-container>
         <br/>
-        <md-button ng-click="parseEventParticipants()" class="md-primary"><i class="fa fa-upload"></i> Bulk parse</md-button>
+        <md-button ng-disabled="true" ng-click="parseEventParticipants()" class="md-primary"><i class="fa fa-upload"></i> Bulk parse</md-button>
         <md-button ng-click="uploadEventParticipants()" class="md-primary"><i class="fa fa-upload"></i> Bulk upload</md-button>
         <md-button ng-disabled="!formData.participantGroupID" ng-click="generateRandomParticipants(formData.participantGroupID, 25)"><i class="fa fa-magic"></i> Generate 25 participants</md-button>
       </div>
