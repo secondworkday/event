@@ -1,4 +1,4 @@
-app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileUploader, utilityService, siteService) {
+app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileUploader, $msUI, utilityService, siteService) {
   $log.debug('Loading SystemUsersController...');
 
   $scope.searchUsers = utilityService.model.users.search;
@@ -81,9 +81,21 @@ app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileU
        controller: NewSystemUserDialogController
     });
     function NewSystemUserDialogController($scope, $mdDialog) {
-      $scope.createUser = function(formData) {
-        // TODO add create User code
-        $log.warn( "You tried to create a user with email " + formData.newUser.email + ", but new user creation is not yet working." );
+      $scope.createUser = function () {
+
+        utilityService.createUser($scope.formData)
+        .then(function (successData) {
+          // success
+          $msUI.showToast("User Created");
+          $log.debug("User created.");
+          return successData;
+        }, function (failureData) {
+          // failure
+          $msUI.showToast(failureData.errorMessage);
+          $log.debug(failureData.errorMessage);
+          return failureData;
+        });
+
         $mdDialog.hide();
       };
       $scope.cancelDialog = function() {
@@ -101,7 +113,7 @@ app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileU
        templateUrl: '/client/states/app/site-admin/system-user.dialog.html',
        controller: SystemUserDialogController
     });
-    function SystemUserDialogController($scope, $mdDialog) {
+     function SystemUserDialogController($scope, $mdDialog, $msUI) {
       $scope.save = function(formData) {
         // TODO add save User code
         $log.warn("You tried to save:");

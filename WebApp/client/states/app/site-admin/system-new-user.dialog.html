@@ -16,17 +16,17 @@
           <div layout layout-sm="column">
             <md-input-container flex>
               <label>Email Address (required)</label>
-              <input ng-model="formData.newUser.email">
+              <input ng-model="formData.email">
             </md-input-container>
           </div>
           <div layout layout-sm="column">
             <md-input-container flex>
               <label>First Name</label>
-              <input ng-model="formData.newUser.firstName">
+              <input ng-model="formData.firstName">
             </md-input-container>
             <md-input-container flex>
               <label>Last Name</label>
-              <input ng-model="formData.newUser.lastName">
+              <input ng-model="formData.lastName">
             </md-input-container>
           </div>
         </div>
@@ -37,7 +37,7 @@
     <md-button ng-click="cancelDialog()">
       Cancel
     </md-button>
-    <md-button ng-click="createUser(formData)" class="md-primary" ng-disabled="form.$invalid">
+    <md-button ng-click="createUser()" class="md-primary" ng-disabled="form.$invalid">
       Create User
     </md-button>
   </div>
