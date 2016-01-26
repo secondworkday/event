@@ -394,6 +394,14 @@ namespace App.Library
             var query = Query(dc);
             query = FilterBy(dc, query, searchExpression);
 
+            // support filtering to a specific Event. eg. $event:{eventID}
+            query = searchExpression.FilterByAnyNamedStateTerm2(query, "event",
+                searchTerm => item => item.EventID.ToString() == searchTerm);
+
+            // support filtering to a specific EventSession. eg. eventSession:{eventSessionID}
+            query = searchExpression.FilterByAnyNamedStateTerm2(query, "eventSession",
+                searchTerm => item => item.EventSessionID.ToString() == searchTerm);
+
 
             // EventParticipants involve Partipants, ParticipantGroups & EventSessions, all of which can be involved with searches
             // So we widen the query here so we can filter on all those things
@@ -418,13 +426,16 @@ namespace App.Library
                     );
             });
 
+            // support filtering to a specific ParticipantGroup. eg. participantGroup:{participantGroupID}
+            searchTermQuery = searchExpression.FilterByAnyNamedStateTerm2(searchTermQuery, "participantGroup",
+                searchTerm => item => item.participantGroup.ID.ToString() == searchTerm);
+
+
             query = searchTermQuery
                 .Select(searchItem => searchItem.eventParticipant);
 
 
-            // support filtering to a specific Event. eg. $event:{eventID}
-            query = searchExpression.FilterByAnyNamedStateTerm2(query, "event",
-                searchTerm => item => item.EventID.ToString() == searchTerm);
+
 
             return query;
         }
@@ -1040,30 +1051,6 @@ namespace App.Library
             hubClients.All.updateEventParticipants(notification);
         }
 
-        public override string ToString()
-        {
-            return string.Format("EventID: {0}, ParticipantID: {1}",
-                /*0*/this.EventID,
-                /*1*/this.ParticipantID);
-        }
-        public static List<int> GetSessionEventParticipants(AppDC dc, int eventSessionID, int ParticipantGroupID)
-        {
-            var exQuery = from epEventParticipant in ExtendedQuery(dc)
-                          join epParticipant in Participant.Query(dc) on epEventParticipant.item.ParticipantID equals epParticipant.ID
-                          select new { epEventParticipant, epParticipant };
-
-            var exResult = exQuery
-                .Where(exItem => exItem.epEventParticipant.item.EventSessionID == eventSessionID && exItem.epParticipant.ParticipantGroupID == ParticipantGroupID);
-
-            List<int> eventParticipantIDs = new List<int>();
-
-            foreach (var p in exResult)
-            {
-                eventParticipantIDs.Add(p.epEventParticipant.item.ID);
-            }
-
-            return eventParticipantIDs;
-        }
 
         public static ReportGenerator GetReportGenerator(AppDC appDC, string templateName, ReportFormat reportFormat, int itemID)
         {
@@ -1122,5 +1109,11 @@ namespace App.Library
             return TagProvider.Create(tags);
         }
 
+        public override string ToString()
+        {
+            return string.Format("EventID: {0}, ParticipantID: {1}",
+                /*0*/this.EventID,
+                /*1*/this.ParticipantID);
+        }
     }
 }

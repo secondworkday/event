@@ -155,13 +155,18 @@ namespace WebApp
 
         private void downloadReminderFormForEventParticipants(HttpResponse response, AppDC appDC, SiteContext siteContext, int participantGroupID, int eventSessionID)
         {
-            var eventParticipantIDs = EventParticipant.GetSessionEventParticipants(appDC, eventSessionID, participantGroupID);
+            var searchExpressionString = string.Format("$participantGroup:{0} $eventSession:{1}",
+                /*0*/ participantGroupID,
+                /*1*/ eventSessionID);
+            var searchExpression = SearchExpression.Create(searchExpressionString);
+            var eventParticipantIDsQuery = EventParticipant.Query(appDC, searchExpression)
+                .Select(eventParticipant => eventParticipant.ID);
 
             List<MemoryStream> individualPdfReportStreams = new List<MemoryStream>();
             var reportFileExtension = ".pdf";
             var reportContentType = "pdf";
 
-            foreach (int epID in eventParticipantIDs)
+            foreach (int epID in eventParticipantIDsQuery)
             {
                 var reportGenerator = EventParticipant.GetReportGenerator(appDC, "OSB-Reminder-Form-2.docx", ReportFormat.Pdf, epID);
                 reportFileExtension = reportGenerator.ReportFileExtension;
