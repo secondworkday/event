@@ -390,6 +390,31 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       }
     }
 
+    self.filterByPropertyValue = function (propertyName, value) {
+      var value = value;
+      return function (item) {
+        return item[propertyName] === value;
+      };
+    };
+
+    self.filterByPropertyExists = function (propertyName) {
+      return function (item) {
+        if (propertyName[0] === "!") {
+          propertyName = propertyName.substr(1);
+          return !item[propertyName];
+        }
+        return item[propertyName];
+      };
+    };
+
+
+
+
+
+
+
+
+  //!! Think these are all depricated - in favor of compareByProperties() above!!!!!
 
 
     self.compareByPropertyThenByID = function (propertyName) {
