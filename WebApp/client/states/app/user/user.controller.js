@@ -207,9 +207,23 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
           $mdDialog.hide($scope.formData);
         };
 
-        $scope.createEvent = function (formData) {
-            $mdDialog.hide(formData);
-            $state.go('app.user.event');
+        $scope.createEvent = function () {
+
+          siteService.createEvent($scope.formData)
+          .then(function (successData) {
+            // success
+            $msUI.showToast("Event Created");
+            $log.debug("Task completed.");
+            return successData;
+          }, function (failureData) {
+            // failure
+            $msUI.showToast(failureData.errorMessage);
+            $log.debug(failureData.errorMessage);
+            return failureData;
+          });
+
+          $mdDialog.hide(formData);
+          $state.go('app.user.event.sessions');
         };
     }
 
