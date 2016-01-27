@@ -18,7 +18,7 @@ app.controller('SystemTenantsController', function ($scope, $mdDialog, $log, $ms
 
   $scope.filterOptions = [
     // We're calling utilityService.searchTenants, so that serves the function of the serverTerm parameter to fetch only top-level TenantGroups
-    { name: 'Tenants', clientFunction: utilityService.filterByPropertyExists("!parentID") }
+    { name: 'Tenants', clientFunction: utilityService.filterByPropertyHasValue("!parentID") }
 
     //{ name: 'Active', serverTerm: '$Active', clientFunction: filterByStateFactory("Active") },
     //{ name: 'Disabled', serverTerm: '$Disabled', clientFunction: filterByStateFactory("Disabled") },
