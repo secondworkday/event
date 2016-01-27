@@ -195,11 +195,14 @@ namespace App.Library
 
             var lines = parseData
                 // we want to count line numbers - include empty lines
-                .Split(UtilityExtensions.LineTerminators, StringSplitOptions.None);
+                .Split(UtilityExtensions.LineTerminators, StringSplitOptions.None)
+                .Select((line, index) => new { line, lineNumber = index + 1, lineColumns = line.Split('\t') });
 
             Debug.Assert(lines != null);
-
-            bool hasHeaderRow = true;
+            if (!lines.Any())
+            {
+                return HubResult.CreateSuccessData(new object[0]);
+            }
 
 
             var genderNormalizationValues = new[] {
@@ -208,14 +211,46 @@ namespace App.Library
                 NormalizationValue.Create(" ", "transgender", "ftm", "mtf")
             };
 
-            ColumnHandler[] columnHandlers = new[]
+            ColumnHandler[] availableColumnHandlers = new[]
             {
                 new ColumnHandler("firstName", "first name", "first"),
                 new ColumnHandler("lastName", "last name", "last"),
                 new ColumnHandler("gender", genderNormalizationValues),
-                new ColumnHandler("grade"),
-                new ColumnHandler("participantGroupName"),
+                new ColumnHandler("grade", ColumnOptions.Optional),
+                new ColumnHandler("participantGroupName", ColumnOptions.Optional),
             };
+
+            //!! put this stuff in a "dataSchemaCard" or something?
+            bool hasHeaderRow = false;
+            ColumnHandler[] columnHandlers = null;
+
+            // Grab the first row as a test row to see if we can identify the order of our columns
+            var testRow = lines.ElementAt(0);
+
+
+            // First see if it's a header row
+
+            var headerColumns = testRow.lineColumns.ToArray();
+
+
+
+            //!! Assume for now we did find a headerRow and it does include all the available columns.
+            hasHeaderRow = true;
+            columnHandlers = availableColumnHandlers;
+#if false
+            while (headerColumns.Any())
+            {
+                headerColumns
+                    .ForEach(headerCell =>
+                        {
+
+                        });
+                //!! Assume for now we did find a headerRow and it does include all the available columns.
+                hasHeaderRow = true;
+                columnHandlers = availableColumnHandlers;
+            };
+#endif
+
 
 
             //!! if we're passed CSV?
@@ -227,7 +262,7 @@ namespace App.Library
 
             var rows = lines
                 .Skip(hasHeaderRow ? 1 : 0)
-                .Select((line, index) => new { line, lineNumber = index + 1, lineColumns = line.Split('\t') })
+                //.Select((line, index) => new { line, lineNumber = index + 1, lineColumns = line.Split('\t') })
                 .Select(lineInfo =>
                 {
                     // Process each line we're given.

@@ -397,7 +397,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       };
     };
 
-    self.filterByPropertyExists = function (propertyName) {
+    self.filterByPropertyHasValue = function (propertyName) {
       return function (item) {
         if (propertyName[0] === "!") {
           propertyName = propertyName.substr(1);
