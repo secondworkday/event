@@ -122,7 +122,7 @@ namespace App.Library
 
         public class ColumnHandler
         {
-            public static ColumnHandler SkipColumnHandler = new ColumnHandler(null, ColumnOptions.None);
+            public static ColumnHandler SkipColumnHandler = new ColumnHandler();
 
             public ColumnOptions Options { get; private set; }
 
@@ -133,6 +133,9 @@ namespace App.Library
 
             // Normalizing allows us to ensure data values are all members of a well defined set. 
             public NormalizationValue[] NormalizationValues { get; private set; }
+
+            private ColumnHandler()
+            { }
 
             public ColumnHandler(string jsonName, ColumnOptions options, params string[] alternateHeaderValues)
                 : this(jsonName, options, null, alternateHeaderValues)
@@ -269,6 +272,14 @@ namespace App.Library
 
                             //!! shouldn't have any fighting yet - when we do need to have "who wants it best" resolution
                             Debug.Assert(candidateCellHandlers.Length < 2);
+
+                            if (candidateCellHandlers.Length == 0)
+                            {
+                                // nobody likes this cell - skip it
+                                return new ColumnHandler[] { ColumnHandler.SkipColumnHandler };
+                            }
+
+
                             return candidateCellHandlers;
 
                         })
