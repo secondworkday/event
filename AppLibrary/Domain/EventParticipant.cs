@@ -97,6 +97,7 @@ namespace App.Library
         {
             None = 0,
 
+            Required = 0,
             Optional = 0x1,
         }
 
@@ -121,6 +122,8 @@ namespace App.Library
 
         public class ColumnHandler
         {
+            public static ColumnHandler SkipColumnHandler = new ColumnHandler(null, ColumnOptions.None);
+
             public ColumnOptions Options { get; private set; }
 
             public string JsonName { get; private set; }
@@ -128,19 +131,15 @@ namespace App.Library
             public string[] AlternateHeaderValues { get; private set; }
             public IEnumerable<string> AcceptedHeaderValues { get { return this.JsonName.ToEnumerable().Concat(this.AlternateHeaderValues); } }
 
-
+            // Normalizing allows us to ensure data values are all members of a well defined set. 
             public NormalizationValue[] NormalizationValues { get; private set; }
 
-            public ColumnHandler(string jsonName, params string[] alternateHeaderValues)
-                : this(jsonName, ColumnOptions.None)
+            public ColumnHandler(string jsonName, ColumnOptions options, params string[] alternateHeaderValues)
+                : this(jsonName, options, null, alternateHeaderValues)
             { }
 
-            public ColumnHandler(string jsonName, ColumnOptions options)
-                : this(jsonName, options, null)
-            { }
-
-            public ColumnHandler(string jsonName, NormalizationValue[] normalizationValues)
-                : this(jsonName, ColumnOptions.None, normalizationValues)
+            public ColumnHandler(string jsonName, ColumnOptions options, NormalizationValue[] normalizationValues)
+                : this(jsonName, options, normalizationValues, null)
             { }
 
             public ColumnHandler(string jsonName, ColumnOptions options, NormalizationValue[] normalizationValues, params string[] alternateHeaderValues)
@@ -158,6 +157,12 @@ namespace App.Library
             {
                 Debug.Assert(jToken != null);
                 Debug.Assert(errorList != null);
+
+                if (this == ColumnHandler.SkipColumnHandler)
+                {
+                    // nothing to do
+                    return;
+                }
 
                 string normalizedCellValue;
                 if (this.NormalizationValues == null)
@@ -183,6 +188,145 @@ namespace App.Library
                 jToken[this.JsonName] = normalizedCellValue;
             }
         }
+
+
+        public enum MatchScore
+        {
+            Exact,
+            Good,
+            None
+        }
+
+        public class ColumnHandlerMatchItem
+        {
+            public MatchScore MatchScore { get; private set; }
+            public ColumnHandler ColumnHandler { get; private set; }
+        }
+
+        public class ColumnHandlerItem
+        {
+            //public ColumnHandler
+        }
+
+        public class ColumnMatcher
+        {
+            //public string[] columns
+
+            // each item captures handlers that have a claim on a column
+
+            // "column index"
+            // array of handlers that like this column
+            // score for how badly each handler wants it
+
+            public static bool TryMatchHeaders(IEnumerable<string[]> data, ColumnHandler[] allColumnHandlers, out ColumnHandler[] assignedColumnHandlers, out bool hasHeaders)
+            {
+                Debug.Assert(data != null);
+                Debug.Assert(data.Any());
+
+                var headerCheckRow = data.FirstOrDefault();
+
+                // No rows or columns? We're outa here
+                if (headerCheckRow == null || !headerCheckRow.Any())
+                {
+                    assignedColumnHandlers = new ColumnHandler[0];
+                    hasHeaders = false;
+                    return false;
+                }
+
+                var matchedColumnHandlers = new ColumnHandler[headerCheckRow.Length];
+
+                // keep going until we find a handler for each column
+                while (matchedColumnHandlers.Any(matchedColumnHandler => matchedColumnHandler == null))
+                {
+                    var remainingColumnHandlers = allColumnHandlers
+                        .Where(allColumnHandler => !matchedColumnHandlers.Contains(allColumnHandler))
+                        .ToArray()
+                        ;
+
+                    // apply each handler to each column and let them speak up about if they can't parse it
+                    var candidateColumnHandlers = headerCheckRow
+                        .Select((cell, index) =>
+                        {
+                            if (matchedColumnHandlers[index] != null)
+                            {
+                                return null;
+                            }
+
+                            var trimmedCell = cell.Trim();
+
+                            if (string.IsNullOrEmpty(trimmedCell))
+                            {
+                                return new ColumnHandler[] { ColumnHandler.SkipColumnHandler };
+                            }
+
+                            var candidateCellHandlers = remainingColumnHandlers
+                                .Where(columnHandler => columnHandler
+                                    .AcceptedHeaderValues
+                                    .Any(acceptedHeaderValue => string.Equals(acceptedHeaderValue.Trim(), trimmedCell, StringComparison.CurrentCultureIgnoreCase)))
+
+                                //!! check if a handler wants to throw their hat in the ring
+                                .ToArray();
+
+                            //!! shouldn't have any fighting yet - when we do need to have "who wants it best" resolution
+                            Debug.Assert(candidateCellHandlers.Length < 2);
+                            return candidateCellHandlers;
+
+                        })
+                        .ToArray()
+                        ;
+
+                    var progress = false;
+
+                    // see if we've succeeded in assigning any new columns
+                    candidateColumnHandlers
+                        .ForEach((candidateCellHandler, index) =>
+                            {
+                                Debug.Assert(matchedColumnHandlers[index] != null ^ candidateCellHandler != null);
+                                if (candidateCellHandler != null && candidateCellHandler.Length == 1)
+                                {
+                                    // single candidate! elected!
+                                    matchedColumnHandlers[index] = candidateCellHandler[0];
+                                    progress = true;
+                                }
+
+                            });
+
+                    if (progress == false)
+                    {
+                        //!! no joy - we can't seem to understand the presented data
+                        assignedColumnHandlers = new ColumnHandler[0];
+                        hasHeaders = false;
+                        return false;
+                    }
+                }
+
+                Debug.Assert(matchedColumnHandlers.All(matchedColumnHandler => matchedColumnHandler != null));
+
+
+                hasHeaders = true;
+                assignedColumnHandlers = matchedColumnHandlers;
+
+                return true;
+            }
+
+
+
+            public static ColumnHandler[] MatchHeadersYYY(ColumnHandler[] availableHandlers, string[] columnHeaders)
+            {
+                Debug.Assert(availableHandlers != null);
+                Debug.Assert(columnHeaders != null);
+
+
+
+
+                // stupid implementation
+                return availableHandlers
+                    .Take(columnHeaders.Length)
+                    .ToArray();
+            }
+
+        }
+
 
 
         public static HubResult Parse(AppDC dc, int eventID, string parseData)
@@ -213,16 +357,14 @@ namespace App.Library
 
             ColumnHandler[] availableColumnHandlers = new[]
             {
-                new ColumnHandler("firstName", "first name", "first"),
-                new ColumnHandler("lastName", "last name", "last"),
-                new ColumnHandler("gender", genderNormalizationValues),
+                new ColumnHandler("firstName", ColumnOptions.Required, "first name", "first"),
+                new ColumnHandler("lastName", ColumnOptions.Required, "last name", "last"),
+                new ColumnHandler("gender", ColumnOptions.Required, genderNormalizationValues, "sex"),
                 new ColumnHandler("grade", ColumnOptions.Optional),
-                new ColumnHandler("participantGroupName", ColumnOptions.Optional),
+                new ColumnHandler("participantGroupName", ColumnOptions.Optional, "school"),
             };
 
             //!! put this stuff in a "dataSchemaCard" or something?
-            bool hasHeaderRow = false;
-            ColumnHandler[] columnHandlers = null;
 
             // Grab the first row as a test row to see if we can identify the order of our columns
             var testRow = lines.ElementAt(0);
@@ -233,24 +375,20 @@ namespace App.Library
             var headerColumns = testRow.lineColumns.ToArray();
 
 
+            var sampleRows = lines
+                .Take(10)
+                .Select(line => line.lineColumns);
 
             //!! Assume for now we did find a headerRow and it does include all the available columns.
-            hasHeaderRow = true;
-            columnHandlers = availableColumnHandlers;
-#if false
-            while (headerColumns.Any())
+            bool hasHeaderRow;
+            ColumnHandler[] columnHandlers;
+            if (!ColumnMatcher.TryMatchHeaders(sampleRows, availableColumnHandlers, out columnHandlers, out hasHeaderRow))
             {
-                headerColumns
-                    .ForEach(headerCell =>
-                        {
+                return HubResult.Error;
+            }
 
-                        });
-                //!! Assume for now we did find a headerRow and it does include all the available columns.
-                hasHeaderRow = true;
-                columnHandlers = availableColumnHandlers;
-            };
-#endif
-
+            // We should have some 
+            Debug.Assert(columnHandlers.Any());
 
 
             //!! if we're passed CSV?
