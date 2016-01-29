@@ -21,6 +21,7 @@ namespace WebApp
                 .IncludeDirectory("~/client", "*.js", true);
             bundles.Add(clientJS);
 
+
             var clientTemplates = new NgTemplateBundle("myApp", "~/bundles/clientTemplates")
                 .IncludeDirectory("~/client", "*.html", true);
             bundles.Add(clientTemplates);

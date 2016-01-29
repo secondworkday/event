@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AngularJS-SignalR.Master" AutoEventWireup="true" CodeBehind="Material.aspx.cs" Inherits="WebApp.Spas.Material" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AngularJS-SignalR.Master" AutoEventWireup="true" CodeBehind="ClientSpa.aspx.cs" Inherits="WebApp.Spas.ClientSpaPage" %>
 <%@ Register Namespace="MS.WebUtility" Assembly="MS.WebUtility" TagPrefix="util" %>
 <%@ Register Namespace="App.Library" Assembly="AppLibrary" TagPrefix="lib" %>
 

@@ -168,6 +168,10 @@
     <Content Include="client\states\app\app.config.js" />
     <Content Include="client\states\app\app.controller.js" />
     <Content Include="client\states\app\app.html" />
+    <Content Include="client\states\app\event-session-volunteer\event-session-volunteer-container.html" />
+    <Content Include="client\states\app\event-session-volunteer\event-session-volunteer.config.js" />
+    <Content Include="client\states\app\event-session-volunteer\event-session-volunteer.controller.js" />
+    <Content Include="client\states\app\event-session-volunteer\check-in.html" />
     <Content Include="client\states\app\site-admin\database-dashboard.controller.js" />
     <Content Include="client\states\app\site-admin\database-dashboard.html" />
     <Content Include="client\states\app\site-admin\database-data-export.controller.js" />
@@ -296,7 +300,8 @@
     <Content Include="SignIn\signin.html" />
     <Content Include="SignIn\signin.js" />
     <Content Include="SignIn\welcome.html" />
-    <Content Include="Spas\Material.aspx" />
+    <Content Include="Spas\EventSessionVolunteerSpa.aspx" />
+    <Content Include="Spas\ClientSpa.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -347,12 +352,19 @@
       <DependentUpon>SiteLogin.ashx</DependentUpon>
     </Compile>
     <Compile Include="SiteHub.cs" />
-    <Compile Include="Spas\Material.aspx.cs">
-      <DependentUpon>Material.aspx</DependentUpon>
+    <Compile Include="Spas\EventSessionVolunteerSpa.aspx.cs">
+      <DependentUpon>EventSessionVolunteerSpa.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Spas\Material.aspx.designer.cs">
-      <DependentUpon>Material.aspx</DependentUpon>
+    <Compile Include="Spas\EventSessionVolunteerSpa.aspx.designer.cs">
+      <DependentUpon>EventSessionVolunteerSpa.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Spas\ClientSpa.aspx.cs">
+      <DependentUpon>ClientSpa.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Spas\ClientSpa.aspx.designer.cs">
+      <DependentUpon>ClientSpa.aspx</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
     <Compile Include="System\Impersonate.ashx.cs">

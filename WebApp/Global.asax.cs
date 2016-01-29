@@ -190,6 +190,20 @@ namespace WebApp
             }
 
 
+            var identity = context.GetIdentity();
+
+            //!! the application layer should be able to configure these paths.
+            // Html5 mode - our SPA will handle these requests
+            if (requestPathLower == "/check-in" ||
+                requestPathLower.StartsWith("/check-out")
+                )
+            {
+                context.RewritePath("/Spas/EventSessionVolunteerSpa.aspx");
+                // context.RewritePath("/app/default.aspx");
+                return true;
+            }
+
+
             //!! the application layer should be able to configure these paths.
             // Html5 mode - our SPA will handle these requests
             if (spaRootRequest ||
@@ -221,7 +235,7 @@ namespace WebApp
                 requestPathLower.StartsWith("/inbox")
                 )
             {
-                context.RewritePath("/Spas/Material.aspx");
+                context.RewritePath("/Spas/ClientSpa.aspx");
                 // context.RewritePath("/app/default.aspx");
                 return true;
             }

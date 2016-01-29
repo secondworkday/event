@@ -12,7 +12,7 @@ using App.Library;
 
 namespace WebApp.Spas
 {
-    public partial class Material : SitePage
+    public partial class ClientSpaPage : SitePage
     {
         protected string SignInPageDemoDataJson { get; private set; }
 
