@@ -2038,14 +2038,14 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
           var afterOffset = indexerBinarySearch(indexer, hashMap, item);
 
           // determine if we need to remove the existing index entry
-          if (beforeOffset && beforeOffset >= 0) {
+          if (beforeOffset != null && beforeOffset >= 0) {
             if (beforeOffset === afterOffset || beforeOffset === ~afterOffset || beforeOffset+1 === ~afterOffset) {
               // no sense removing and adding back at the same location
               afterOffset = null;
             } else {
               // remove the existing ID
               indexer.index.splice(beforeOffset, 1);
-              if (afterOffset) {
+              if (afterOffset != null) {
                 // fixup the afterOffset if it comes later in the list than the item we just removed, to account for the missing beforeID
                 if (afterOffset > beforeOffset) {
                   // (should never happen, if all Items are unique, we shouldn't have different before & after Offsets which are both *positive*!)
@@ -2057,7 +2057,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
             }
           }
           // determine if we need to add a new index entry
-          if (afterOffset) {
+          if (afterOffset != null) {
             var insertOffset = afterOffset >= 0 ? afterOffset : ~afterOffset;
             indexer.index.splice(insertOffset, 0, item.id);
           }
