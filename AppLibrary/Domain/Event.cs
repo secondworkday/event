@@ -199,6 +199,15 @@ namespace App.Library
             }.ChooseRandom();
 
 
+            // come up with a cool way to name events.
+
+            // 12 months - divide by winter, spring, summer, fall
+            // Divide each 13 week period into 
+
+            // 1-6 Early Summer { Fiesta, Carnival, Gathering, Event, Meetup, Show, Festival, Function }
+            // 7 Summer
+            // 8-13 Later Summer Fiesta
+
             var data = new
             {
                 name = "Demo Event " + DateTime.Now.ToString(),
@@ -288,7 +297,8 @@ namespace App.Library
             };
 
             int numParticipantGroups = 6 + random.Next(8);
-            var participantGroupNames = demoParticipantGroupNames.ChooseMultiple(numParticipantGroups);
+            var participantGroupNames = demoParticipantGroupNames.ChooseMultiple(numParticipantGroups)
+                .ToArray();
             var participantGroupBadgeNames = demoParticipantGroupBadgeNames.ChooseMultiple(numParticipantGroups)
                 .ToArray();
 
@@ -306,7 +316,7 @@ namespace App.Library
             int numParticipants = 50 + random.Next(350);
 
             //!! for debug - limit Participants
-            numParticipants = 150;
+            numParticipants = 15;
 
             // Create our Participants, sticking each into a ParticpantGroup, and dividing them into an EventSession (leaving some assigned to the Event but no EventSession).
 
@@ -319,7 +329,7 @@ namespace App.Library
 
 
             // Create a EventParticipant "ticket" for Participiants not yet assigned to any EventSession
-            participantInfos
+            var eventParticipantInfos = participantInfos
                 // (this is our + 1 bucket - for Participants with no EventSession)
                 .Where(participantInfo => participantInfo.EventSessionIndex == numSessions)
                 .Select(participantInfo => new
@@ -330,11 +340,10 @@ namespace App.Library
                     grade = random.Next(1, 12),
 
                 }.ToJson().FromJson())
-                .ForEach(eventParticipantData =>
-                {
-                    var eventParticipant = EventParticipant.Create(dc, (JToken)eventParticipantData);
-                    Debug.Assert(eventParticipant != null);
-                });
+                .Select(eventParticipantData => new {
+                    EventParticipant = EventParticipant.Create(dc, (JToken)eventParticipantData),
+                })
+                .ToArray();
 
 
 
@@ -369,20 +378,22 @@ namespace App.Library
                     Debug.Assert(eventSession != null);
 
                     // Create a EventParticipant "ticket" for Participiants assigned to this EventSession
-                    participantInfos
+                    var eventSessionEventParticipantInfos = participantInfos
                         .Where(participantInfo => participantInfo.EventSessionIndex == sessionIndex)
                         .Select(participantInfo => new
                         {
                             eventID = randomEvent.ID,
                             participantID = participantInfo.Participant.ID,
 
+                            grade = random.Next(1, 12),
+
                             eventSessionID = eventSession.ID,
                         }.ToJson().FromJson())
-                        .ForEach(eventParticipantData =>
+                        .Select(eventParticipantData => new
                         {
-                            var eventParticipant = EventParticipant.Create(dc, (JToken)eventParticipantData);
-                            Debug.Assert(eventParticipant != null);
-                        });
+                            EventParticipant = EventParticipant.Create(dc, (JToken)eventParticipantData)
+                        })
+                        .ToArray();
                 });
 
             return randomEvent;
@@ -426,7 +437,10 @@ namespace App.Library
                 return HubResult.CreateError("Not found");
             }
 
+            dc.EventParticipants.DeleteAllOnSubmit(deleteItem.EventParticipants);
+            dc.EventSessions.DeleteAllOnSubmit(deleteItem.EventSessions);
             dc.Events.DeleteOnSubmit(deleteItem);
+
             //!! TODO remove any Tags that have their last reference with this Pipeline
             //!! Should we have an ExtendedObject call to remove all extended properties?
             dc.SubmitChanges();

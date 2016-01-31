@@ -839,6 +839,8 @@ namespace App.Library
 		
 		private EntitySet<EventSession> _EventSessions;
 		
+		private EntitySet<EventParticipant> _EventParticipants;
+		
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -870,6 +872,7 @@ namespace App.Library
 		public Event()
 		{
 			this._EventSessions = new EntitySet<EventSession>(new Action<EventSession>(this.attach_EventSessions), new Action<EventSession>(this.detach_EventSessions));
+			this._EventParticipants = new EntitySet<EventParticipant>(new Action<EventParticipant>(this.attach_EventParticipants), new Action<EventParticipant>(this.detach_EventParticipants));
 			OnCreated();
 		}
 		
@@ -1106,6 +1109,19 @@ namespace App.Library
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Event_EventParticipant", Storage="_EventParticipants", ThisKey="ID", OtherKey="EventID")]
+		public EntitySet<EventParticipant> EventParticipants
+		{
+			get
+			{
+				return this._EventParticipants;
+			}
+			set
+			{
+				this._EventParticipants.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -1137,6 +1153,18 @@ namespace App.Library
 			this.SendPropertyChanging();
 			entity.Event = null;
 		}
+		
+		private void attach_EventParticipants(EventParticipant entity)
+		{
+			this.SendPropertyChanging();
+			entity.Event = this;
+		}
+		
+		private void detach_EventParticipants(EventParticipant entity)
+		{
+			this.SendPropertyChanging();
+			entity.Event = null;
+		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.EventSession")]
@@ -1155,6 +1183,8 @@ namespace App.Library
 		
 		private System.DateTime _LastModifiedTimestamp;
 		
+		private global::App.Library.EventSessionState _State;
+		
 		private string _Name;
 		
 		private string _Overview;
@@ -1166,6 +1196,8 @@ namespace App.Library
 		private System.DateTime _EndDate;
 		
 		private int _EventID;
+		
+		private EntitySet<EventParticipant> _EventParticipants;
 		
 		private EntityRef<Event> _Event;
 		
@@ -1183,6 +1215,8 @@ namespace App.Library
     partial void OnCreatedTimestampChanged();
     partial void OnLastModifiedTimestampChanging(System.DateTime value);
     partial void OnLastModifiedTimestampChanged();
+    partial void OnStateChanging(global::App.Library.EventSessionState value);
+    partial void OnStateChanged();
     partial void OnNameChanging(string value);
     partial void OnNameChanged();
     partial void OnOverviewChanging(string value);
@@ -1199,6 +1233,7 @@ namespace App.Library
 		
 		public EventSession()
 		{
+			this._EventParticipants = new EntitySet<EventParticipant>(new Action<EventParticipant>(this.attach_EventParticipants), new Action<EventParticipant>(this.detach_EventParticipants));
 			this._Event = default(EntityRef<Event>);
 			OnCreated();
 		}
@@ -1299,6 +1334,26 @@ namespace App.Library
 					this._LastModifiedTimestamp = value;
 					this.SendPropertyChanged("LastModifiedTimestamp");
 					this.OnLastModifiedTimestampChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_State", DbType="Int NOT NULL", CanBeNull=false)]
+		public global::App.Library.EventSessionState State
+		{
+			get
+			{
+				return this._State;
+			}
+			set
+			{
+				if ((this._State != value))
+				{
+					this.OnStateChanging(value);
+					this.SendPropertyChanging();
+					this._State = value;
+					this.SendPropertyChanged("State");
+					this.OnStateChanged();
 				}
 			}
 		}
@@ -1427,6 +1482,19 @@ namespace App.Library
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="EventSession_EventParticipant", Storage="_EventParticipants", ThisKey="ID", OtherKey="EventSessionID")]
+		public EntitySet<EventParticipant> EventParticipants
+		{
+			get
+			{
+				return this._EventParticipants;
+			}
+			set
+			{
+				this._EventParticipants.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Event_EventSession", Storage="_Event", ThisKey="EventID", OtherKey="ID", IsForeignKey=true)]
 		public Event Event
 		{
@@ -1479,6 +1547,18 @@ namespace App.Library
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
+		}
+		
+		private void attach_EventParticipants(EventParticipant entity)
+		{
+			this.SendPropertyChanging();
+			entity.EventSession = this;
+		}
+		
+		private void detach_EventParticipants(EventParticipant entity)
+		{
+			this.SendPropertyChanging();
+			entity.EventSession = null;
 		}
 	}
 	
@@ -2049,15 +2129,11 @@ namespace App.Library
 		
 		private int _ParticipantID;
 		
-		private int _EventID;
-		
 		private System.DateTime _CreatedTimestamp;
 		
 		private System.DateTime _LastModifiedTimestamp;
 		
 		private System.Nullable<uint> _Grade;
-		
-		private System.Nullable<int> _EventSessionID;
 		
 		private System.Nullable<System.DateTime> _CheckInTimestamp;
 		
@@ -2066,6 +2142,14 @@ namespace App.Library
 		private System.Nullable<decimal> _DonationLimit;
 		
 		private System.Nullable<decimal> _DonationAmount;
+		
+		private int _EventID;
+		
+		private System.Nullable<int> _EventSessionID;
+		
+		private EntityRef<Event> _Event;
+		
+		private EntityRef<EventSession> _EventSession;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -2079,16 +2163,12 @@ namespace App.Library
     partial void OnScopeIDChanged();
     partial void OnParticipantIDChanging(int value);
     partial void OnParticipantIDChanged();
-    partial void OnEventIDChanging(int value);
-    partial void OnEventIDChanged();
     partial void OnCreatedTimestampChanging(System.DateTime value);
     partial void OnCreatedTimestampChanged();
     partial void OnLastModifiedTimestampChanging(System.DateTime value);
     partial void OnLastModifiedTimestampChanged();
     partial void OnGradeChanging(System.Nullable<uint> value);
     partial void OnGradeChanged();
-    partial void OnEventSessionIDChanging(System.Nullable<int> value);
-    partial void OnEventSessionIDChanged();
     partial void OnCheckInTimestampChanging(System.Nullable<System.DateTime> value);
     partial void OnCheckInTimestampChanged();
     partial void OnCheckOutTimestampChanging(System.Nullable<System.DateTime> value);
@@ -2097,10 +2177,16 @@ namespace App.Library
     partial void OnDonationLimitChanged();
     partial void OnDonationAmountChanging(System.Nullable<decimal> value);
     partial void OnDonationAmountChanged();
+    partial void OnEventIDChanging(int value);
+    partial void OnEventIDChanged();
+    partial void OnEventSessionIDChanging(System.Nullable<int> value);
+    partial void OnEventSessionIDChanged();
     #endregion
 		
 		public EventParticipant()
 		{
+			this._Event = default(EntityRef<Event>);
+			this._EventSession = default(EntityRef<EventSession>);
 			OnCreated();
 		}
 		
@@ -2184,26 +2270,6 @@ namespace App.Library
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EventID", DbType="Int NOT NULL")]
-		public int EventID
-		{
-			get
-			{
-				return this._EventID;
-			}
-			set
-			{
-				if ((this._EventID != value))
-				{
-					this.OnEventIDChanging(value);
-					this.SendPropertyChanging();
-					this._EventID = value;
-					this.SendPropertyChanged("EventID");
-					this.OnEventIDChanged();
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedTimestamp", DbType="DATETIME2 NOT NULL")]
 		public System.DateTime CreatedTimestamp
 		{
@@ -2260,26 +2326,6 @@ namespace App.Library
 					this._Grade = value;
 					this.SendPropertyChanged("Grade");
 					this.OnGradeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EventSessionID", DbType="Int")]
-		public System.Nullable<int> EventSessionID
-		{
-			get
-			{
-				return this._EventSessionID;
-			}
-			set
-			{
-				if ((this._EventSessionID != value))
-				{
-					this.OnEventSessionIDChanging(value);
-					this.SendPropertyChanging();
-					this._EventSessionID = value;
-					this.SendPropertyChanged("EventSessionID");
-					this.OnEventSessionIDChanged();
 				}
 			}
 		}
@@ -2360,6 +2406,122 @@ namespace App.Library
 					this._DonationAmount = value;
 					this.SendPropertyChanged("DonationAmount");
 					this.OnDonationAmountChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EventID", DbType="Int NOT NULL")]
+		public int EventID
+		{
+			get
+			{
+				return this._EventID;
+			}
+			set
+			{
+				if ((this._EventID != value))
+				{
+					if (this._Event.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnEventIDChanging(value);
+					this.SendPropertyChanging();
+					this._EventID = value;
+					this.SendPropertyChanged("EventID");
+					this.OnEventIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EventSessionID", DbType="Int")]
+		public System.Nullable<int> EventSessionID
+		{
+			get
+			{
+				return this._EventSessionID;
+			}
+			set
+			{
+				if ((this._EventSessionID != value))
+				{
+					if (this._EventSession.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnEventSessionIDChanging(value);
+					this.SendPropertyChanging();
+					this._EventSessionID = value;
+					this.SendPropertyChanged("EventSessionID");
+					this.OnEventSessionIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Event_EventParticipant", Storage="_Event", ThisKey="EventID", OtherKey="ID", IsForeignKey=true)]
+		public Event Event
+		{
+			get
+			{
+				return this._Event.Entity;
+			}
+			set
+			{
+				Event previousValue = this._Event.Entity;
+				if (((previousValue != value) 
+							|| (this._Event.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Event.Entity = null;
+						previousValue.EventParticipants.Remove(this);
+					}
+					this._Event.Entity = value;
+					if ((value != null))
+					{
+						value.EventParticipants.Add(this);
+						this._EventID = value.ID;
+					}
+					else
+					{
+						this._EventID = default(int);
+					}
+					this.SendPropertyChanged("Event");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="EventSession_EventParticipant", Storage="_EventSession", ThisKey="EventSessionID", OtherKey="ID", IsForeignKey=true)]
+		public EventSession EventSession
+		{
+			get
+			{
+				return this._EventSession.Entity;
+			}
+			set
+			{
+				EventSession previousValue = this._EventSession.Entity;
+				if (((previousValue != value) 
+							|| (this._EventSession.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._EventSession.Entity = null;
+						previousValue.EventParticipants.Remove(this);
+					}
+					this._EventSession.Entity = value;
+					if ((value != null))
+					{
+						value.EventParticipants.Add(this);
+						this._EventSessionID = value.ID;
+					}
+					else
+					{
+						this._EventSessionID = default(Nullable<int>);
+					}
+					this.SendPropertyChanged("EventSession");
 				}
 			}
 		}

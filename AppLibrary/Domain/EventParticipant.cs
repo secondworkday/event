@@ -557,6 +557,34 @@ namespace App.Library
         }
 
 
+        public static HubResult CheckIn(AppDC dc, int itemID)
+        {
+            return WriteLock(dc, itemID, (item, notifyExpression) =>
+            {
+                Debug.Assert(!item.CheckInTimestamp.HasValue);
+                item.CheckInTimestamp = dc.TransactionTimestamp;
+
+                notifyExpression.AddModifiedID(item.ID);
+                return HubResult.Success;
+            });
+        }
+
+        public static HubResult CheckOut(AppDC dc, int itemID)
+        {
+            return WriteLock(dc, itemID, (item, notifyExpression) =>
+            {
+                Debug.Assert(item.CheckInTimestamp.HasValue);
+                Debug.Assert(!item.CheckOutTimestamp.HasValue);
+                item.CheckOutTimestamp = dc.TransactionTimestamp;
+
+                notifyExpression.AddModifiedID(item.ID);
+                return HubResult.Success;
+            });
+        }
+
+
+
+
         private static IQueryable<EventParticipant> query(AppDC dc)
         {
             var result = dc.EventParticipants

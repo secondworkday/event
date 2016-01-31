@@ -35,6 +35,10 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
     filter: $scope.filterOptions[0]
   };
 
+  $scope.setEventSessionState = function (eventSession, stateName) {
+    siteService.setEventSessionState(eventSession, stateName);
+  };
+
   $scope.download = function () {
     var query = {
       type: 'tenants'

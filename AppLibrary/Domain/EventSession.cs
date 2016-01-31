@@ -18,6 +18,17 @@ using MS.Utility;
 namespace App.Library
 {
 
+    public enum EventSessionState
+    {
+        // The date/time of the event session hasn't arrived, and nobody as hit the "run" button to kick off the event session yet
+        Plan = 1,
+        // The event session is underway! Let the participants flow
+        Active = 2,
+        Completed = 3,
+        Archived = 4,
+    }
+
+
     public partial class EventSession
     {
         partial void OnLoaded()
@@ -46,6 +57,9 @@ namespace App.Library
             this.ScopeID = epScope.ID;
 
             this.EventID = eventID;
+
+            this.State = EventSessionState.Plan;
+
             this.Name = name;
             this.Location = location;
             this.StartDate = startDate;
@@ -154,9 +168,14 @@ namespace App.Library
             [JsonProperty("lastModifiedTimestamp")]
             public DateTime LastModifiedTimestamp { get; internal set; }
 
+            [JsonProperty("state"), JsonConverter(typeof(StringEnumConverter))]
+            public EventSessionState State { get; internal set; }
+
             //public string type { get; internal set; }
-            public string name { get; internal set; }
-            public string overview { get; internal set; }
+            [JsonProperty("name")]
+            public string Name { get; internal set; }
+            [JsonProperty("overview")]
+            public string Overview { get; internal set; }
 
             [JsonProperty("startDate")]
             public DateTime StartDate { get; internal set; }
@@ -176,9 +195,10 @@ namespace App.Library
                 this.CreatedTimestamp = exItem.item.CreatedTimestamp;
                 this.LastModifiedTimestamp = exItem.item.LastModifiedTimestamp;
 
-                //this.type = exItem.item.Ty
-                this.name = exItem.item.Name;
-                this.overview = exItem.item.Overview;
+                this.State = exItem.item.State;
+
+                this.Name = exItem.item.Name;
+                this.Overview = exItem.item.Overview;
 
                 this.StartDate = exItem.item.StartDate;
                 this.EndDate = exItem.item.EndDate;
@@ -244,6 +264,19 @@ namespace App.Library
                 return newItem;
             });
         }
+
+
+        public static HubResult SetState(AppDC dc, int itemID, EventSessionState state)
+        {
+            return WriteLock(dc, itemID, (item, notifyExpression) =>
+            {
+                item.State = state;
+
+                notifyExpression.AddModifiedID(item.ID);
+                return HubResult.Success;
+            });
+        }
+
 
 
 
