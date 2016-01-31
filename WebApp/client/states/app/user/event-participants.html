@@ -47,31 +47,31 @@
 
        <th ng-if="!eventSession">Session Name</th>
        <th ng-if="!eventSession">Session Date</th>
-       <th ng-if="eventSession">Actions</th>
+       <th>Actions</th>
 
      </tr>
    </thead>
    <tbody>
      <tr ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id" 
-       ng-init="eventSession = demandEventSession(eventParticipant.eventSessionID); 
-          participantGroup = demandParticipantGroup(eventParticipant.participantGroupID);" >
+       ng-init="eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID); 
+          eventParticipantParticipantGroup = demandParticipantGroup(eventParticipant.participantGroupID);" >
        <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ eventParticipant | json }}</pre></td>
        <td>{{ eventParticipant.id }}</td>
        <td class="md-data-table__cell--non-numeric">{{ eventParticipant.firstName }}</td>
        <td class="md-data-table__cell--non-numeric">{{ eventParticipant.lastName }}</td>
-       <td>{{ participantGroup.name }}</td>
+       <td>{{ eventParticipantParticipantGroup.name }}</td>
        <td>{{ eventParticipant.grade }}</td>
        <td>{{ eventParticipant.sex }}</td>
 
 
 
-       <td ng-if="!eventSession">{{ eventSession.name }}</td>
-       <td ng-if="!eventSession">{{ eventSession.startDate | amCalendar}}</td>
-       <td ng-if="eventSession">
-          <md-button ng-if="eventSession.state == 'Active' && !eventParticipant.checkInTimestamp" ng-click="checkIn(eventParticipant)">
+       <td ng-if="!eventSession">{{ eventParticipantEventSession.name }}</td>
+       <td ng-if="!eventSession">{{ eventParticipantEventSession.startDate | amCalendar}}</td>
+       <td>
+          <md-button ng-if="eventParticipantEventSession.state == 'Active' && !eventParticipant.checkInTimestamp" ng-click="checkIn(eventParticipant)">
             Check In!
           </md-button>
-          <md-button ng-if="eventSession.state == 'Active' && eventParticipant.checkInTimestamp && !eventParticipant.checkOutTimestamp" ng-click="checkOut(eventParticipant)">
+          <md-button ng-if="eventParticipantEventSession.state == 'Active' && eventParticipant.checkInTimestamp && !eventParticipant.checkOutTimestamp" ng-click="checkOut(eventParticipant)">
             Check Out!
           </md-button>
        </td>
