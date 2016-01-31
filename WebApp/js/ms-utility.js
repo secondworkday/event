@@ -2137,8 +2137,16 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         }
       } else {
         if (includeInIndex) {
-          // currently in Index and required to be ... so think about a resort?
-          console.log("resort?", source);
+          // currently in Index and required to be in the Index ... so think about a resort?
+          if (destinationIndexOffset < destinationIndex.length && destinationIndex[destinationIndexOffset] == source) {
+            // noting to do - the item is already in the correct spot
+          } else {
+            // 
+            // Something changed about an element in our list that caused it to change position.
+            // TODO: Seems like the correct response is to move it to the new correct position.
+            // CONSIDER: But what if tons of stuff has changed - when do we panic and just do a complete resort?
+            console.log("resort?", source);
+          }
         } else {
           // currently in Index but not required to be ... so remove it
           destinationIndex.splice(destinationIndexOffset, 1);
