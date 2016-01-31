@@ -578,7 +578,24 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
           }
         });
       });
-  }
+  };
+
+
+
+
+  // returns a promise (not an Item - see demandXyz() for the delayed load Item variant)
+  self.ensureEventSession = function (itemID) {
+    var modelItems = model.eventSessions;
+    var item = modelItems.hashMap[itemID];
+    if (!item) {
+      return modelItems.search("%" + itemID, "", 0, 1)
+      .then(function (ignoredNotificationData) {
+        return modelItems.hashMap[itemID];
+      });
+    }
+
+    return $q.when(item);
+  };
 
   // returns an Item (not a promise - see ensureXyz() for the promise variant)
   self.demandEventSession = function (itemKey) {
@@ -589,6 +606,13 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
         utilityService.delayLoad2(modelItems, itemKey),
         modelItems.hashMap[itemKey]
       );
+  };
+
+
+  self.setEventSessionState = function (eventSession, stateName) {
+    return utilityService.callHub(function () {
+      return siteHub.server.setEventSessionState(eventSession.id, stateName);
+    });
   };
 
 
@@ -662,6 +686,16 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
 
 
 
+  self.checkInEventParticipant = function (item) {
+    return utilityService.callHub(function () {
+      return siteHub.server.checkInEventParticipant(item.id);
+    });
+  };
+  self.checkOutEventParticipant = function (item) {
+    return utilityService.callHub(function () {
+      return siteHub.server.checkOutEventParticipant(item.id);
+    });
+  };
 
 
 

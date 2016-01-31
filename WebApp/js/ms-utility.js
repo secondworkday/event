@@ -2230,10 +2230,26 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
     self.updateItemsModel = function(itemsModel, itemsData) {
-      // Update our main cache (model.xxx) and cacheIndex (model.xxxIndex)
 
-      self.purgeItems(itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index);
-      var newItemIDs = self.cacheItems(itemsData.items, itemsModel.hashMap, itemsModel.index);
+
+      // Purge any Indexers we've got
+
+
+      // Update our main cache (model.xxx) and cacheIndex (model.xxxIndex)
+      var purgeItemsArguments = [itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index];
+      if (itemsModel.indexers) {
+        purgeItemsArguments.push.apply(purgeItemsArguments, itemsModel.indexers);
+      }
+      self.purgeItems.apply(self, purgeItemsArguments);
+      //!!self.purgeItems(itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index);
+
+
+      var cacheItemsArguments = [itemsData.items, itemsModel.hashMap, itemsModel.index];
+      if (itemsModel.indexers) {
+        cacheItemsArguments.push.apply(cacheItemsArguments, itemsModel.indexers);
+      }
+      var newItemIDs = cacheSortedItems.apply(self, cacheItemsArguments);
+      //!!var newItemIDs = self.cacheItems(itemsData.items, itemsModel.hashMap, itemsModel.index);
 
       var notification = {
         hashMap: itemsModel.hashMap,
@@ -2248,6 +2264,36 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
       return notification;
     };
+
+
+
+
+
+
+
+
+  //!! INDEXER Helpers - so that controllers can keep things up-to-date based on the standard notifications we send from our services!! 
+
+    self.registerIndexer = function (modelItems, indexer) {
+
+      var modelItemsIndexers = modelItems.indexers;
+      if (!modelItemsIndexers) {
+        modelItems.indexers = modelItemsIndexers = [];
+      }
+
+      //!! should check if we really need to add it!!!
+      modelItemsIndexers.push(indexer);
+    };
+
+    self.unRegisterIndexer = function (modelItems, indexer) {
+      self.arrayRemove(modelItems.indexers, indexer);
+    };
+
+
+
+
+
+
 
 
 

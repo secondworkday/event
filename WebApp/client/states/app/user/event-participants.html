@@ -44,8 +44,11 @@
        <th>School</th>
        <th>Grade</th>
        <th>Gender</th>
-       <th>Session Name</th>
-       <th>Session Date</th>
+
+       <th ng-if="!eventSession">Session Name</th>
+       <th ng-if="!eventSession">Session Date</th>
+       <th ng-if="eventSession">Actions</th>
+
      </tr>
    </thead>
    <tbody>
@@ -59,8 +62,19 @@
        <td>{{ participantGroup.name }}</td>
        <td>{{ eventParticipant.grade }}</td>
        <td>{{ eventParticipant.sex }}</td>
-       <td>{{ eventSession.name }}</td>
-       <td>{{ eventSession.startDate | amCalendar}}</td>
+
+
+
+       <td ng-if="!eventSession">{{ eventSession.name }}</td>
+       <td ng-if="!eventSession">{{ eventSession.startDate | amCalendar}}</td>
+       <td ng-if="eventSession">
+          <md-button ng-if="eventSession.state == 'Active' && !eventParticipant.checkInTimestamp" ng-click="checkIn(eventParticipant)">
+            Check In!
+          </md-button>
+          <md-button ng-if="eventSession.state == 'Active' && eventParticipant.checkInTimestamp && !eventParticipant.checkOutTimestamp" ng-click="checkOut(eventParticipant)">
+            Check Out!
+          </md-button>
+       </td>
 
      </tr>
    </tbody>

@@ -472,6 +472,19 @@ namespace WebApp
 
 
 
+        public HubResult SetEventSessionState(int itemID, EventSessionState state)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var result = EventSession.SetState(dc, itemID, state);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
+
+
+
+
+
 
 
         public HubResult SearchEventParticipants(string searchExpressionString, string sortField, int startRowIndex, int maximumRows)
@@ -503,6 +516,24 @@ namespace WebApp
             });
         }
 
+
+        public HubResult CheckInEventParticipant(int itemID)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var result = EventParticipant.CheckIn(dc, itemID);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
+
+        public HubResult CheckOutEventParticipant(int itemID)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var result = EventParticipant.CheckOut(dc, itemID);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
 
 
 

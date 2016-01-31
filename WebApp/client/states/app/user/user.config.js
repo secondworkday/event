@@ -50,6 +50,9 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
           var eventID = $stateParams.eventID;
           return siteService.ensureEvent(eventID);
         },
+        eventSession: function () {
+          return null;
+        },
         eventSessionsIndex: function (siteService, $stateParams) {
           var eventID = $stateParams.eventID;
           return siteService.ensureEventSessions(eventID);
@@ -79,6 +82,40 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         }
       }
     })
+    .state('app.user.session', {
+      url: '/sessions/:eventSessionID',
+      templateUrl: '/client/states/app/user/event-session.html',
+      controller: 'EventSessionController',
+      resolve: {
+        eventSession: function ($stateParams, siteService) {
+          // careful - might be an invalid or unauthorized ID
+          var itemID = $stateParams.eventSessionID;
+          //!! should we use ensureXyz here - to rely on cached info if we've got it?
+          return siteService.ensureEventSession(itemID);
+        },
+        event: function ($stateParams, siteService, eventSession) {
+          var eventID = eventSession.eventID;
+          return siteService.ensureEvent(eventID);
+        }
+      },
+      data: {
+        stateMapName: 'Event Session',
+        stateMapComment: 'resolve :eventSessionID'
+      }
+    })
+    .state('app.user.session.participants', {
+      url: '/participants',
+      templateUrl: '/client/states/app/user/event-participants.html',
+      controller: 'EventParticipantsController',
+      data: {
+        stateMapName: 'Event Session Participants',
+        stateMapComment: ''
+      }
+    })
+
+
+
+
     .state('app.user.event.schools', {
       url: '/schools',
       data: {
@@ -114,6 +151,10 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         }
       }
     })
+
+
+
+
 
 
     //.state('app.user.event-participants', {
