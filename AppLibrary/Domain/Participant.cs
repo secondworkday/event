@@ -607,6 +607,7 @@ namespace App.Library
             dynamic userNameJson = randomContactJson.name;
             string firstName = userNameJson.first;
             string lastName = userNameJson.last;
+            string gender = randomContactJson.gender;
 
             dynamic userLocationJson = randomContactJson.location;
             string streetAddress = userLocationJson.street;
@@ -625,6 +626,8 @@ namespace App.Library
             {
                 firstName = firstNameCapitalized,
                 lastName = lastNameCapitalized,
+
+                gender = gender,
 
                 participantGroupID = participantGroups.ChooseRandom(),
             }.ToJson().FromJson();
@@ -655,6 +658,11 @@ namespace App.Library
                 var participantGroupID = (int)data.participantGroupID;
 
                 var newItem = new Participant(createdTimestamp, teamEPScope, firstName, lastName, participantGroupID);
+
+                var genderString = (string)data.gender;
+                UserGender? userGender = genderString.ParseUserGenderOrNull();
+                newItem.Gender = userGender;
+
                 dc.Save(newItem);
 
                 Debug.Assert(newItem.ID > 0);

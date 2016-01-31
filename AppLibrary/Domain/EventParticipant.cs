@@ -740,26 +740,34 @@ namespace App.Library
             var query =
                 from eventParticipant in EventParticipant.Query(dc)
                 join participant in Participant.Query(dc) on eventParticipant.ParticipantID equals participant.ID
-                select new { eventParticipant, participant };
+                join participantGroup in ParticipantGroup.Query(dc) on participant.ParticipantGroupID equals participantGroup.ID
+                join myEvent in Event.Query(dc) on eventParticipant.EventID equals myEvent.ID
+
+                // outer join - optional
+                join session in EventSession.Query(dc) on eventParticipant.EventSessionID equals session.ID into eventParticipantSessionGroup
+                from session in eventParticipantSessionGroup.DefaultIfEmpty()
+                select new {eventParticipant, participant, participantGroup, myEvent, session };
 
             var headerMap = new[]
             {
-                new { key = "First Name", value = "FirstName" },
-                new { key = "Last Name", value = "LastName" },
+                new { key = "First Name", value = "participant.FirstName" },
+                new { key = "Last Name", value = "participant.LastName" },
+                new { key = "Gender", value = "participant.Gender" },
+
+                new { key = "School", value = "participantGroup.Name" },
+
+                new { key = "Grade", value = "eventParticipant.Grade" },
+                new { key = "CheckInTimestamp", value = "eventParticipant.CheckInTimestamp" },
+                new { key = "CheckOutTimestamp", value = "eventParticipant.CheckOutTimestamp" },
+                new { key = "DonationLimit", value = "eventParticipant.DonationLimit" },
+                new { key = "DonationAmount", value = "eventParticipant.DonationAmount" },
+
+                new { key = "Event Name", value = "myEvent.Name" },
+                new { key = "Session Name", value = "session.Name" },
             }
             .ToDictionary(item => item.key, item => item.value);
-                              
-            var rows = query
-                .Select(eventParticipantInfo => new
-                {
-                    eventParticipantInfo.participant.FirstName,
-                    eventParticipantInfo.participant.LastName,
 
-                    eventParticipantInfo.eventParticipant.Grade,
-                })
-                .AsEnumerable();
-
-            response.SendCsvFileToBrowser("EventParticipants.csv", rows, headerMap);
+            response.SendCsvFileToBrowser("EventParticipants.csv", query, headerMap);
         }
 
 
@@ -787,6 +795,9 @@ namespace App.Library
             public string LastName { get; internal set; }
             [JsonProperty("fullName")]
             public string FullName { get; internal set; }
+
+            [JsonProperty("gender"), JsonConverter(typeof(StringEnumConverter))]
+            public UserGender? Gender { get; internal set; }
 
             [JsonProperty("grade")]
             public uint? Grade { get; internal set; }
@@ -818,6 +829,8 @@ namespace App.Library
                 this.FirstName = exItem.Participant.FirstName;
                 this.LastName = exItem.Participant.LastName;
                 this.FullName = exItem.Participant.FullName;
+
+                this.Gender = exItem.Participant.Gender;
 
                 this.Grade = exItem.ExEventParticipant.item.Grade;
 
