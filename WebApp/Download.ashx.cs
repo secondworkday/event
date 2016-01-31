@@ -60,6 +60,13 @@ namespace WebApp
                         }
                         return;
 
+
+                    case "eventParticipants":
+                        EventParticipant.GetExportRows(response, appDC);
+                        return;
+
+
+
                     case "reminderFormForSchool":
                         var participantGroupID = request.QueryString.GetNullableInt32("participantGroupID");
                         if (participantGroupID.HasValue)

@@ -40,7 +40,7 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 
   $scope.download = function () {
     var query = {
-      type: 'tenants'
+      type: 'eventParticipants'
     };
     utilityService.download(query);
   };

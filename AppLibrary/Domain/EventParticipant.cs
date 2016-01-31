@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,8 @@ using Newtonsoft.Json.Converters;
 
 using MS.Utility;
 using MS.TemplateReports;
+
+using MS.WebUtility;
 
 namespace App.Library
 {
@@ -704,6 +707,32 @@ namespace App.Library
         }
 
 
+        public static void GetExportRows(HttpResponse response, AppDC dc)
+        {
+            var query =
+                from eventParticipant in EventParticipant.Query(dc)
+                join participant in Participant.Query(dc) on eventParticipant.ParticipantID equals participant.ID
+                select new { eventParticipant, participant };
+
+            var headerMap = new[]
+            {
+                new { key = "First Name", value = "FirstName" },
+                new { key = "Last Name", value = "LastName" },
+            }
+            .ToDictionary(item => item.key, item => item.value);
+                              
+            var rows = query
+                .Select(eventParticipantInfo => new
+                {
+                    eventParticipantInfo.participant.FirstName,
+                    eventParticipantInfo.participant.LastName,
+
+                    eventParticipantInfo.eventParticipant.Grade,
+                })
+                .AsEnumerable();
+
+            response.SendCsvFileToBrowser("EventParticipants.csv", rows, headerMap);
+        }
 
 
         public class SearchItem : ExtendedSearchItem
