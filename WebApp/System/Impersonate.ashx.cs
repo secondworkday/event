@@ -15,9 +15,9 @@ namespace WebApp
     /// <summary>
     /// Summary description for Impersonate
     /// </summary>
-    public class Impersonate : IHttpHandler
+    public class Impersonate : HubResultHttpHandler
     {
-        public void ProcessRequest(HttpContext context)
+        public override HubResult ProcessRequest(HttpContext context)
         {
             Identity authorizedBy = context.GetIdentity();
             DateTime requestTimestamp = context.UtcTimestamp();
@@ -35,7 +35,7 @@ namespace WebApp
 
                     var tenant = TenantGroup.FindByID(dc, tenantID.Value);
                     MS.WebUtility.Authentication.WebIdentityAuthentication.ImpersonateSystem(authorizedBy, tenant);
-                    return;
+                    return HubResult.Success;
                 }
 
                 // Make sure we've got authoritity to impersonate
@@ -44,13 +44,8 @@ namespace WebApp
 
                 User impersonatedUser = context.Request.GetUserOrTransfer(dc, "uid", "/default.aspx");
                 WebIdentityAuthentication.ImpersonateUser(dc, authorizedBy, impersonatedUser);
-                return;
+                return HubResult.Success;
             }
-        }
-
-        public bool IsReusable
-        {
-            get { return true; }
         }
     }
 }

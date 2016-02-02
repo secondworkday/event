@@ -413,7 +413,6 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
-
   //!! Think these are all depricated - in favor of compareByProperties() above!!!!!
 
 
@@ -677,6 +676,22 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     });
   };
 
+
+
+
+
+
+  self.getReportTemplateInfo = function () {
+    return callHub(function () {
+      return utilityHub.server.getReportTemplateInfo();
+    });
+  };
+
+  self.removeReportTemplateOverrideFile = function (reportTemplate) {
+    return callHub(function () {
+      return utilityHub.server.removeReportTemplateOverrideFile(reportTemplate);
+    });
+  };
 
 
 
@@ -1530,7 +1545,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         stopConnection();
 
         var credentials = { authCode: authCode, newPassword: newPassword };
-        return $http({ method: 'POST', url: '/signin/resetpassword.ashx', data: credentials });
+        return $http({ method: 'POST', url: '/signin/reset-password.ashx', data: credentials });
         // Note we don't restart the connection ...
     };
 

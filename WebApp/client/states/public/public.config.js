@@ -27,6 +27,11 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       templateUrl: '/client/states/public/sign-in.html',
       controller: 'SignInController'
   })
+  .state('public.reset-password', {
+      url: '/reset-password/:authCode',
+      templateUrl: '/client/states/public/reset-password.html',
+      controller: 'ResetPasswordController'
+  })
   .state('public.wait', {
       url: '/wait',
       templateUrl: '/client/states/public/wait.html'

@@ -14,9 +14,9 @@ using MS.WebUtility.Authentication;
 
 namespace WebApp
 {
-    public class ResetPassword : IHttpHandler
+    public class ResetPassword : HubResultHttpHandler
     {
-        public void ProcessRequest(HttpContext context)
+        public override HubResult ProcessRequest(HttpContext context)
         {
             var utilityContext = UtilityContext.Current;
             HttpRequest request = context.Request;
@@ -37,7 +37,7 @@ namespace WebApp
 
                 if (string.IsNullOrEmpty(authCodeString) || string.IsNullOrEmpty(newPassword))
                 {
-                    return;
+                    return HubResult.NotFound;
                 }
 
                 //!! do we need to use this flavor?
@@ -46,30 +46,26 @@ namespace WebApp
 
                 try
                 {
-                    var user = MS.Utility.User.ResetPassword(authCode, newPassword);
-                    if (user != null)
+                    User passwordResetUser;
+                    var hubResult =  MS.Utility.User.ResetPassword(authCode, newPassword, out passwordResetUser);
+                    if (hubResult == HubResult.Success)
                     {
-                        WebIdentityAuthentication.LoginSession(user, rememberMe);
-                        return;
+                        Debug.Assert(passwordResetUser != null);
+                        WebIdentityAuthentication.LoginSession(passwordResetUser, rememberMe);
                     }
+
+                    return hubResult;
                 }
                 catch (SqlException)
                 {
                     // Bad news - we can't talk to SQL.
-                    response.ContentType = "text/plain";
-                    response.ContentEncoding = Encoding.UTF8;
-                    response.Write("Sorry, the site is temporarily not accessible");
 
                     // If this occurs with any regularity, we should have a separate error message saying we're temporarily offline.
                     utilityContext.EventLog.LogCritical("SQL error preventing passwordResets, site: " + utilityContext.SiteName);
-                    return;
+
+                    return HubResult.CreateError("Sorry, the site is temporarily not accessible.");
                 }
             }
-        }
-
-        public bool IsReusable
-        {
-            get { return true; }
         }
     }
 }

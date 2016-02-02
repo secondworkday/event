@@ -230,7 +230,9 @@
     <Content Include="client\states\app\user\user-container.html" />
     <Content Include="client\states\app\user\user.config.js" />
     <Content Include="client\states\app\user\user.controller.js" />
+    <Content Include="client\states\public\connection\disconnected.controller.js" />
     <Content Include="client\states\public\connection\disconnected.html" />
+    <Content Include="client\states\public\connection\reconnecting.controller.js" />
     <Content Include="client\states\public\connection\reconnecting.html" />
     <Content Include="client\states\public\create-account.controller.js" />
     <Content Include="client\states\public\create-account.html" />
@@ -238,6 +240,8 @@
     <Content Include="client\states\public\public.config.js" />
     <Content Include="client\states\public\public.controller.js" />
     <Content Include="client\states\public\public.html" />
+    <Content Include="client\states\public\reset-password.controller.js" />
+    <Content Include="client\states\public\reset-password.html" />
     <Content Include="client\states\public\sign-in-demo-account.dialog.html" />
     <Content Include="client\states\public\sign-in.controller.js" />
     <Content Include="client\states\public\sign-in.html" />
@@ -337,8 +341,8 @@
       <DependentUpon>Resource.ashx</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
-    <Compile Include="SignIn\ResetPassword.ashx.cs">
-      <DependentUpon>ResetPassword.ashx</DependentUpon>
+    <Compile Include="SignIn\Reset-Password.ashx.cs">
+      <DependentUpon>Reset-Password.ashx</DependentUpon>
     </Compile>
     <Compile Include="SignIn\ResetPassword.aspx.cs">
       <DependentUpon>ResetPassword.aspx</DependentUpon>
@@ -388,10 +392,10 @@
     <Content Include="Scripts\angular-sanitize.min.js.map" />
     <Content Include="Scripts\angular.min.js.map" />
     <Content Include="Scripts\jquery-2.1.4.min.map" />
-    <Content Include="SignIn\ResetPassword.ashx" />
     <Content Include="SignIn\Signout.ashx" />
     <Content Include="SignIn\SiteLogin.ashx" />
     <Content Include="templates\OSB-Reminder-Form.docx" />
+    <Content Include="SignIn\Reset-Password.ashx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

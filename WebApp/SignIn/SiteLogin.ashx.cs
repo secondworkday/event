@@ -18,9 +18,9 @@ namespace WebApp
     /// <summary>
     /// Allows clients to obtain a site auth cookie via username/password credentials
     /// </summary>
-    public class SiteLogin : IHttpHandler
+    public class SiteLogin : HubResultHttpHandler
     {
-        public void ProcessRequest(HttpContext context)
+        public override HubResult ProcessRequest(HttpContext context)
         {
             var utilityContext = UtilityContext.Current;
             HttpRequest request = context.Request;
@@ -38,20 +38,16 @@ namespace WebApp
 
                 if (string.IsNullOrEmpty(bodyString))
                 {
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.SubStatusCode = 2;
-                    response.Write("No credentials provided.");
-                    return;
+                    return HubResult.CreateError("No credentials provided.");
                 }
 
                 dynamic body = bodyString.FromJson();
 
                 if (body == null)
                 {
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.SubStatusCode = 3;
-                    response.Write("No credentials provided.");
-                    return;
+                    return HubResult.CreateError("No credentials provided.");
                 }
 
                 try
@@ -62,17 +58,15 @@ namespace WebApp
 
                     if (string.IsNullOrEmpty(userName))
                     {
-                        response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.SubStatusCode = 5;
-                        response.Write("No email provided.");
-                        return;
+                        return HubResult.CreateError("No email provided.");
                     }
 
                     var user = MS.Utility.User.AuthenticateUser(userName, password);
                     if (user != null)
                     {
                         WebIdentityAuthentication.LoginSession(user, rememberMe);
-                        return;
+                        return HubResult.Success;
                     }
 
 
@@ -106,14 +100,13 @@ namespace WebApp
                 }
                 catch (SqlException)
                 {
+                    // If this occurs with any regularity, we should have a separate error message saying we're temporarily offline.
+                    utilityContext.EventLog.LogCritical("SQL error preventing logins, site: " + utilityContext.SiteName);
+
                     // Bad news - we can't talk to SQL.
                     response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     context.Response.SubStatusCode = 43;
-                    response.Write("Sorry, the site is temporarily not accessible");
-
-                    // If this occurs with any regularity, we should have a separate error message saying we're temporarily offline.
-                    utilityContext.EventLog.LogCritical("SQL error preventing logins, site: " + utilityContext.SiteName);
-                    return;
+                    return HubResult.CreateError("Sorry, the site is temporarily not accessible.");
                 }
                 catch (Exception ex)
                 {
@@ -121,16 +114,9 @@ namespace WebApp
                     utilityContext.EventLog.LogException(ex);
                 }
 
-
-                response.StatusCode = (int)HttpStatusCode.Forbidden;
                 context.Response.SubStatusCode = 6;
-                response.Write("Sorry, that account was not recognized. Please try again.");
+                return HubResult.CreateError(HubResult.Forbidden, "Sorry, that account was not recognized. Please try again.");
             }
-        }
-
-        public bool IsReusable
-        {
-            get { return true; }
         }
     }
 }
