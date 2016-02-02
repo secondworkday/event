@@ -16,12 +16,13 @@ namespace WebApp
         {
             var webUtilityContext = WebUtilityContext.Current;
 
+            // Bundle up our client *.JS files so they can be fetched in a single request
             //!! using Bundle instead of ScriptBundle because our controllers aren't coded to be minified yet
             var clientJS = new Bundle("~/bundles/clientJS", new CacheBreakTransform())
                 .IncludeDirectory("~/client", "*.js", true);
             bundles.Add(clientJS);
 
-
+            // Bundle up our Angular Templates. Search for 'clientTemplates' to see where they are served.
             var clientTemplates = new NgTemplateBundle("myApp", "~/bundles/clientTemplates")
                 .IncludeDirectory("~/client", "*.html", true);
             bundles.Add(clientTemplates);

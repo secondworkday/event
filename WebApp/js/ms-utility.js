@@ -1437,6 +1437,13 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         });
     };
 
+    this.updateUser = function (userID, data) {
+      return callHub(function () {
+        return utilityHub.server.updateUser(userID, data);
+      });
+    };
+
+
     this.modifyUserSystemRole = function (user, systemRole, isAssigned) {
         return callHub(function () {
             return utilityHub.server.modifyUserSystemRole(user.id, systemRole, isAssigned);
