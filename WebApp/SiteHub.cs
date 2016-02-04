@@ -404,6 +404,14 @@ namespace WebApp
             });
         }
 
+        public HubResult EditEvent(int itemID, dynamic editEventData)
+        {
+            return accountsOnlyHeader((utilityContext, dc) =>
+            {
+                return Event.Edit(dc, itemID, editEventData);
+            });
+        }
+
 
         public HubResult GenerateRandomParticipants(int participantGroupID, int numberOfParticipants)
         {

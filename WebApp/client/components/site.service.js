@@ -749,6 +749,12 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
     });
   };
 
+  this.editEvent = function (eventID, eventData) {
+    return utilityService.callHub(function () {
+      return siteHub.server.editEvent(eventID, eventData);
+    });
+  };
+
   this.deleteEvent = function (event) {
     return utilityService.callHub(function () {
       return siteHub.server.deleteEvent(event.id);

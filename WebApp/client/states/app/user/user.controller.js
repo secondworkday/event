@@ -214,6 +214,7 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
             // success
             $msUI.showToast("Event Created");
             $log.debug("Task completed.");
+            //$state.go('app.user.event.sessions({ eventID: ' + successData + '})');
             return successData;
           }, function (failureData) {
             // failure
@@ -222,9 +223,57 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
             return failureData;
           });
 
-          $mdDialog.hide(formData);
-          $state.go('app.user.event.sessions');
+          $mdDialog.hide($scope.formData);
+          //$state.go('app.user.event.sessions');
         };
+    }
+
+    $scope.showEditEventDialog = function (event) {
+      $mdDialog.show({
+        controller: EditEventDialogController,
+        templateUrl: '/client/states/app/user/edit-event.dialog.html',
+        parent: angular.element(document.body),
+        //targetEvent: ev,
+        clickOutsideToClose: true,
+        fullscreen: false,
+        locals: {
+          event : angular.copy(event)
+        }
+      })
+      .then(function (successData) {
+        // $scope.status = 'You said the information was "' + answer + '".';
+      }, function () {
+        // $scope.status = 'You cancelled the dialog.';
+      });
+    }
+    function EditEventDialogController($scope, $mdDialog, event) {
+
+      $scope.event = event;
+
+      $scope.hide = function () {
+        $mdDialog.hide();
+      };
+      $scope.cancel = function () {
+        $mdDialog.cancel();
+      };
+
+      $scope.editEvent = function () {
+
+        siteService.editEvent($scope.event.id, $scope.event) // TODO
+        .then(function (successData) {
+          // success
+          $msUI.showToast("Event Updated");
+          $log.debug("Edit event completed.");
+          return successData;
+        }, function (failureData) {
+          // failure
+          $msUI.showToast(failureData.errorMessage);
+          $log.debug(failureData.errorMessage);
+          return failureData;
+        });
+
+        $mdDialog.hide();
+      };
     }
 
     $scope.showAddTeamMemberDialog = function (ev) {

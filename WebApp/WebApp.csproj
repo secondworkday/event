@@ -207,6 +207,7 @@
     <Content Include="client\states\app\site-admin\system-user.dialog.html" />
     <Content Include="client\states\app\site-admin\system-users.controller.js" />
     <Content Include="client\states\app\site-admin\system-users.html" />
+    <Content Include="client\states\app\user\edit-event.dialog.html" />
     <Content Include="client\states\app\user\event-session.controller.js" />
     <Content Include="client\states\app\user\event-session.html" />
     <Content Include="client\states\app\user\generate-reminders.dialog.html" />
