@@ -156,7 +156,7 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
       siteService.generateRandomEvent();
     }
 
-    $scope.deleteEvent = function (event) {
+    deleteEvent = function (event) {
       siteService.deleteEvent(event)
       .then(function (successData) {
         // success
@@ -275,6 +275,20 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
         $mdDialog.hide();
       };
     }
+
+    $scope.showDeleteConfirmationDialog = function (ev, event) {
+      var confirm = $mdDialog.confirm()
+        .title("Delete Event")
+        .textContent("Would you like to delete event '" + event.name + "'?")
+        .ariaLabel("Delete event")
+        .targetEvent(ev)
+        .ok("Yes")
+        .cancel("No");
+
+      $mdDialog.show(confirm).then(function () {
+        deleteEvent(event);
+      });
+    };
 
     $scope.showAddTeamMemberDialog = function (ev) {
         $mdDialog.show({
