@@ -23,7 +23,7 @@ app.controller('UploadParticipantsDialogController', function ($scope, $mdDialog
       // success
       $scope.uploadData = {
         //participantGroupID: 1,
-        eventParticipantsData: successData.ResponseData
+        itemsData: successData.ResponseData
       };
       checkPresenceOfErrors();
       return successData;
@@ -37,7 +37,7 @@ app.controller('UploadParticipantsDialogController', function ($scope, $mdDialog
 
   function checkPresenceOfErrors() {
     $scope.dataErrors.numberOfErrors = 0;
-    $.each($scope.uploadData.eventParticipantsData, function (index, value) {
+    $.each($scope.uploadData.itemsData, function (index, value) {
       if (value.errors) {
         $scope.dataErrors.numberOfErrors++;
       }
@@ -60,7 +60,7 @@ app.controller('UploadParticipantsDialogController', function ($scope, $mdDialog
       // success
       $scope.uploadData = {
         //participantGroupID: 1,
-        eventParticipantsData: successData.ResponseData
+        itemsData: successData.ResponseData
       };
       return successData;
     }, function (failureData) {
@@ -73,9 +73,9 @@ app.controller('UploadParticipantsDialogController', function ($scope, $mdDialog
 
   $scope.uploadEventParticipants = function () {
 
-    var uploadData = {
+    var sampleUploadData = {
       participantGroupID: 1,
-      eventParticipantsData: [
+      itemsData: [
         { firstName: 'betty', lastName: 'rubbles' },
         { firstName: 'barney', lastName: 'rubble', participantGroupName: "Stella Schola" },
         { firstName: 'fred', lastName: 'flintstone', participantGroupID: 3 }]

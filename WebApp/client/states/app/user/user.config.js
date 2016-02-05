@@ -123,8 +123,8 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       },
       views: {
         'schools': {
-          templateUrl: '/client/states/app/user/schools.html',
-          controller: "SchoolsController"
+          templateUrl: '/client/states/app/user/participant-groups.html',
+          controller: "ParticipantGroupsController"
         }
       }
     })

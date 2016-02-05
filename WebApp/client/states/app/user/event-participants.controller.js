@@ -58,6 +58,67 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 
 
 
+  $scope.showUploadParticipantsDialog = function (ev, event) {
+    $mdDialog.show({
+      controller: 'UploadParticipantsDialogController',
+      templateUrl: '/client/states/app/user/upload-participants.dialog.html',
+      locals: {
+        event: event
+      },
+      parent: angular.element(document.body),
+      targetEvent: ev,
+      clickOutsideToClose: true,
+      fullscreen: false
+    })
+    .then(function () {
+      // $scope.status = 'You said the information was "' + answer + '".';
+    }, function () {
+      // $scope.status = 'You cancelled the dialog.';
+    });
+  }
+
+  $scope.showAddParticipantsDialog = function (ev, event) {
+    $mdDialog.show({
+      controller: AddParticipantsDialogController,
+      templateUrl: '/client/states/app/user/add-participants.dialog.html',
+      locals: {
+        event: event
+      },
+      parent: angular.element(document.body),
+      targetEvent: ev,
+      clickOutsideToClose: true,
+      fullscreen: false
+    })
+    .then(function () {
+      // $scope.status = 'You said the information was "' + answer + '".';
+    }, function () {
+      // $scope.status = 'You cancelled the dialog.';
+    });
+  }
+  function AddParticipantsDialogController($scope, $mdDialog, event) {
+
+    $scope.participantGroups = siteService.model.participantGroups;
+    $scope.event = event;
+
+    $scope.hide = function () {
+      $mdDialog.hide();
+    };
+    $scope.cancel = function () {
+      $mdDialog.cancel();
+    };
+
+    $scope.generateRandomParticipants = function (participantGroupID, numberOfParticipants) {
+      siteService.generateRandomParticipants(participantGroupID, numberOfParticipants);
+      $mdDialog.hide();
+    };
+    $scope.createParticipant = function (formData) {
+      siteService.createParticipant(formData);
+      $mdDialog.hide();
+    }
+  }
+
+
+
   $scope.checkIn = function (eventParticipant) {
     siteService.checkInEventParticipant(eventParticipant)
     .then(function (successData) {

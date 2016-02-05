@@ -1144,6 +1144,29 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
     }
   };
 
+
+
+
+  self.parseParticipantGroups = function (event, data) {
+    return utilityService.callHub(function () {
+      return siteHub.server.parseParticipantGroups(event.id, data);
+    });
+  };
+
+  self.uploadParticipantGroups = function (event, data) {
+    return utilityService.callHub(function () {
+      return siteHub.server.uploadParticipantGroups(event.id, data);
+    });
+  };
+
+
+
+
+
+
+
+
+
   this.createParticipantGroup = function (formData) {
     return utilityService.callHub(function () {
       return siteHub.server.createParticipantGroup(formData);

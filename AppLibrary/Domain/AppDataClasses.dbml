@@ -104,6 +104,8 @@
       <Column Name="LastModifiedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
 
       <Column Name="Name" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
+      
+      <Column Name="ContactName" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />
       <Column Name="Overview" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true"/>
 
       <Column Name="BadgeName" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />

@@ -21,6 +21,11 @@
     <md-button ng-click="download()" class="md-icon-button" aria-label="download">
       <i class="fa fa-download"></i>
     </md-button>
+
+    <md-button ng-click="showUploadParticipantGroupsDialog($event, event)" class="md-icon-button" aria-label="upload">
+      <i class="fa fa-upload"></i>
+    </md-button>
+
     <md-button ng-click="showAddParticipantGroupDialog($event)" class="md-fab md-primary" aria-label="new">
       <i class="fa fa-plus fa-lg"></i>
     </md-button>
@@ -47,9 +52,9 @@
        <td ms-debug-only>{{ participantGroup.id }}</td>
        <td class="md-data-table__cell--non-numeric">{{ participantGroup.name }}</td>
          <td>{{getParticipantCount(participantGroup.id)}}</td>
-         <td>Lori Jones</td>
-         <td>jones@school.edu</td>
-         <td>206-434-2122</td>
+         <td>{{participantGroup.contactName}}</td>
+         <td>{{participantGroup.primaryEmail}}</td>
+         <td>{{participantGroup.primaryPhoneNumber}}</td>
          <td>Not Invited</td>
    </tbody>
   </table>

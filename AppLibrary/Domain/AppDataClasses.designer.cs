@@ -1580,6 +1580,8 @@ namespace App.Library
 		
 		private string _Name;
 		
+		private string _ContactName;
+		
 		private string _Overview;
 		
 		private string _BadgeName;
@@ -1602,6 +1604,8 @@ namespace App.Library
     partial void OnLastModifiedTimestampChanged();
     partial void OnNameChanging(string value);
     partial void OnNameChanged();
+    partial void OnContactNameChanging(string value);
+    partial void OnContactNameChanged();
     partial void OnOverviewChanging(string value);
     partial void OnOverviewChanged();
     partial void OnBadgeNameChanging(string value);
@@ -1730,6 +1734,26 @@ namespace App.Library
 					this._Name = value;
 					this.SendPropertyChanged("Name");
 					this.OnNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ContactName", DbType="nvarchar(128)")]
+		public string ContactName
+		{
+			get
+			{
+				return this._ContactName;
+			}
+			set
+			{
+				if ((this._ContactName != value))
+				{
+					this.OnContactNameChanging(value);
+					this.SendPropertyChanging();
+					this._ContactName = value;
+					this.SendPropertyChanged("ContactName");
+					this.OnContactNameChanged();
 				}
 			}
 		}

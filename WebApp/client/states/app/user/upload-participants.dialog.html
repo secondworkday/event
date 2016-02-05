@@ -11,7 +11,7 @@
         </md-toolbar>
         <md-dialog-content>
             <div class="md-dialog-content">
-                <div ng-hide="uploadData.eventParticipantsData.length > 0">
+                <div ng-hide="uploadData.itemsData.length > 0">
                     <md-input-container>
                         <label>Paste text here</label>
                         <textarea ng-model="formData.participantTextInput" rows="10" cols="70" ng-paste="paste($event)" />
@@ -23,8 +23,8 @@
                     </div>
                 </div>
 
-                <div ng-show="uploadData.eventParticipantsData.length > 0">
-                    <h4>{{uploadData.eventParticipantsData.length}} participants found</h4>
+                <div ng-show="uploadData.itemsData.length > 0">
+                    <h4>{{uploadData.itemsData.length}} participants found</h4>
                     <h5 ng-if="dataErrors.numberOfErrors > 0" class="uploaddataerror">Unfortunately, {{dataErrors.numberOfErrors}} participants contain errors. Please fix your source data and try again.</h5>
                     <h5 ng-if="dataErrors.numberOfErrors == 0">Click 'Bulk Upload' to complete data upload.</h5>
                     <table class="md-data-table u-full-width">
@@ -41,7 +41,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="row in uploadData.eventParticipantsData" ng-class="{ 'uploaddataerror': row.errors }">
+                            <tr ng-repeat="row in uploadData.itemsData" ng-class="{ 'uploaddataerror': row.errors }">
                                 <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ row | json }}</pre></td>
                                 <td class="md-data-table__cell--non-numeric">{{$index+1}}</td>
                                 <td class="md-data-table__cell--non-numeric">{{row.firstName}}</td>
@@ -80,9 +80,8 @@
             </div>
         </md-dialog-content>
         <md-dialog-actions layout="row" layout-align="end center">
-            <!--<md-button style="float:left;" ng-click="uploadData.eventParticipantsData = null; formData.participantTextInput = ''" ng-show="uploadData.eventParticipantsData.length > 0">Clear Data</md-button>-->
             <md-button ng-click="cancel()">Cancel</md-button>
-            <md-button ng-disabled="dataErrors.numberOfErrors > 0 || !uploadData.eventParticipantsData" ng-click="uploadEventParticipants()" class="md-primary"><i class="fa fa-upload"></i> Bulk upload</md-button>
+            <md-button ng-disabled="dataErrors.numberOfErrors > 0 || !uploadData.itemsData" ng-click="uploadEventParticipants()" class="md-primary"><i class="fa fa-upload"></i> Bulk upload</md-button>
             <!--<md-button ng-disabled="!(formData.participantGroupID && formData.name && formData.grade)" ng-click="createParticipant(formData)"><i class="fa fa-magic"></i> OK</md-button>-->
         </md-dialog-actions>
         <div ms-debug-only>

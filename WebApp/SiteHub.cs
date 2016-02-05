@@ -113,6 +113,33 @@ namespace WebApp
         }
 
 
+        public HubResult ParseParticipantGroups(int eventID, string parseData)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var result = ParticipantGroup.Parse(dc, eventID, parseData);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
+
+        public HubResult UploadParticipantGroups(int eventID, dynamic data)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var result = ParticipantGroup.Upload(dc, eventID, data);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
+
+
+
+
+
+
+
+
+
+
         public HubResult CreateParticipant(dynamic data)
         {
             return accountsOnlyHeader((siteContext, dc) =>

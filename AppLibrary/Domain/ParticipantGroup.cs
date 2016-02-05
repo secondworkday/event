@@ -59,7 +59,123 @@ namespace App.Library
             this.Name = name;
         }
 
-        public static List<int> GetParticipants(AppDC dc, int ParticipantGroupID)
+        public static ParticipantGroup GenerateRandom(AppDC dc)
+        {
+            JToken data = new
+            {
+                name = "Eastside Elementary"
+            }
+            .ToJson().FromJson() as JToken;
+
+            var result = ParticipantGroup.createLock(dc, () =>
+            {
+                var newParticipantGroup = ParticipantGroup.Create(dc, data);
+                return newParticipantGroup;
+            });
+
+            return result;
+        }
+
+        public static ParticipantGroup Create(AppDC dc, JToken data)
+        {
+            return ParticipantGroup.createLock(dc, () =>
+            {
+                var createdTimestamp = dc.TransactionTimestamp;
+                var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+
+                var name = data.Value<string>("name");
+
+                var newItem = new ParticipantGroup(createdTimestamp, teamEPScope, name);
+
+                // optional
+                var badgeName = data.Value<string>("badgeName");
+                newItem.BadgeName = badgeName;
+
+                var contactName = data.Value<string>("contactName");
+                newItem.ContactName = contactName;
+                var overview = data.Value<string>("overview");
+                newItem.Overview = overview;
+
+                dc.Save(newItem);
+                Debug.Assert(newItem.ID > 0);
+
+                var contactPhone = data.Value<string>("contactPhone");
+                if (!string.IsNullOrEmpty(contactPhone))
+                {
+                    newItem.SetContactPhoneNumber(dc, contactPhone);
+                }
+
+                var contactEmail = data.GetMailAddress("contactEmail");
+                if (contactEmail != null)
+                {
+                    newItem.AssignMailAddress(dc, contactEmail);
+                }
+
+                return newItem;
+            });
+        }
+
+
+
+
+
+
+        public static HubResult Parse(AppDC dc, int eventID, string parseData)
+        {
+            BulkUpload.ColumnHandler[] availableColumnHandlers = new[]
+            {
+                new BulkUpload.ColumnHandler("name", BulkUpload.ColumnOptions.Required, "school"),
+                new BulkUpload.ColumnHandler("contactName", BulkUpload.ColumnOptions.Optional, "counselor"),
+                new BulkUpload.ColumnHandler("contactPhone", BulkUpload.ColumnOptions.Optional, "phone"),
+                new BulkUpload.ColumnHandler("contactEmail", BulkUpload.ColumnOptions.Optional, "email"),
+            };
+
+            return BulkUpload.Parse(parseData, availableColumnHandlers);
+        }
+
+
+
+        public static HubResult Upload(AppDC dc, int eventID, JToken uploadData)
+        {
+            // take a submit lock
+            // go through each EventParticipant
+            // add them to the table
+            // return CRUD results
+
+            var hubResult = dc.SubmitLock<HubResult>(() =>
+            {
+                var items = uploadData["itemsData"]
+                    .Select(itemData =>
+                    {
+                        var eventParticipant = ParticipantGroup.Create(dc, itemData);
+                        if (eventParticipant != null)
+                        {
+                            return (int?)eventParticipant.ID;
+                        }
+                        else
+                        {
+                            return (int?)null;
+                        }
+                    })
+                    .ToArray();
+
+                return HubResult.CreateSuccessData(items);
+            });
+
+            return hubResult;
+        }
+
+
+
+
+
+
+
+
+
+
+
+        public static List<int> GetParticipantsYYY(AppDC dc, int ParticipantGroupID)
         {
             var myQuery = from epParticipantGroup in ExtendedQuery(dc)
                           join epParticipant in Participant.Query(dc) on epParticipantGroup.item.ID equals ParticipantGroupID
@@ -162,9 +278,14 @@ namespace App.Library
 
         public class SearchItem : ExtendedSearchItem
         {
-            //public string type { get; internal set; }
-            public string name { get; internal set; }
-            public string overview { get; internal set; }
+            [JsonProperty("name")]
+            public string Name { get; internal set; }
+            [JsonProperty("contactName")]
+            public string ContactName { get; internal set; }
+            [JsonProperty("badgeName")]
+            public string BadgeName { get; internal set; }
+            [JsonProperty("overview")]
+            public string Overview { get; internal set; }
 
             [JsonProperty("createdTimestamp")]
             public DateTime CreatedTimestamp { get; internal set; }
@@ -175,8 +296,10 @@ namespace App.Library
                 : base(exItem, context)
             {
                 //this.type = exItem.item.Ty
-                this.name = exItem.item.Name;
-                this.overview = exItem.item.Overview;
+                this.Name = exItem.item.Name;
+                this.ContactName = exItem.item.ContactName;
+                this.BadgeName = exItem.item.BadgeName;
+                this.Overview = exItem.item.Overview;
 
                 this.CreatedTimestamp = exItem.item.CreatedTimestamp;
                 this.LastModifiedTimestamp = exItem.item.LastModifiedTimestamp;
@@ -648,45 +771,6 @@ namespace App.Library
         public override string ToString()
         {
             return this.Name;
-        }
-
-        public static ParticipantGroup GenerateRandom(AppDC dc)
-        {
-            var data = new
-            {
-                name = "Eastside Elementary"
-            }
-            .ToJson().FromJson();
-
-            var result = ParticipantGroup.createLock(dc, () =>
-            {
-                var newParticipantGroup = ParticipantGroup.Create(dc, data);
-                return newParticipantGroup;
-            });
-
-            return result;
-        }
-
-        public static ParticipantGroup Create(AppDC dc, dynamic data)
-        {
-            return ParticipantGroup.createLock(dc, () =>
-            {
-                var createdTimestamp = dc.TransactionTimestamp;
-                var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
-
-                var name = (string)data.name;
-                var newItem = new ParticipantGroup(createdTimestamp, teamEPScope, name);
-
-                // optional
-                var badgeName = (string)data.badgeName;
-                newItem.BadgeName = badgeName;
-
-                dc.Save(newItem);
-
-                Debug.Assert(newItem.ID > 0);
-
-                return newItem;
-            });
         }
     }
 }

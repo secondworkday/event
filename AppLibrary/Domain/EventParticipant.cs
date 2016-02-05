@@ -81,12 +81,33 @@ namespace App.Library
                 dc.Save(newItem);
                 Debug.Assert(newItem.ID > 0);
 
+
+                var tagName = data.Value<string>("#");
+                if (!string.IsNullOrEmpty(tagName))
+                {
+                    tagName = tagName.TrimStart('#');
+                    newItem.ModifyGlobalTag(dc, EPCategory.UserAssigned, tagName, true);
+                }
+
+                var tagNames = data.Value<string[]>("tags");
+                if (tagNames != null && tagNames.Any())
+                {
+                    // newItem.ModifyGlobalTag(dc, EPCategory.UserAssigned, tagName, true);
+                }
+
+                var comment = data.Value<string>("comment");
+                if (!string.IsNullOrEmpty(comment))
+                {
+                    newItem.AddComment(dc, EPCategory.UserAssigned, comment);
+                }
+
+
                 return newItem;
             });
         }
 
 
-        enum Column
+        enum ColumnXXX
         {
             FirstName,
             LastName,
@@ -94,9 +115,6 @@ namespace App.Library
             Grade,
             ParticipantGroupName,
         };
-
-
-
 
 
         public static HubResult Parse(AppDC dc, int eventID, string parseData)
@@ -135,22 +153,14 @@ namespace App.Library
 
             var hubResult = dc.SubmitLock<HubResult>(() =>
             {
-#if false
-                JToken eventParticipantsData = new [] 
-                {
-                    new { firstName = "pepe" },
-                    new { firstName = "frank" },
-                }
-                .ToJson().FromJson() as JToken;
-#endif
                 var defaultParticipantGroupID = uploadData.Value<int?>("participantGroupID");
                 var defaultParticipantGroup = defaultParticipantGroupID.HasValue ? ParticipantGroup.FindByID(dc, defaultParticipantGroupID.Value) : null;
 
-                var eventParticipants = uploadData["eventParticipantsData"]
-                    .Select(eventParticipantData =>
+                var eventParticipants = uploadData["itemsData"]
+                    .Select(itemData =>
                     {
-                        var participantGroupID = eventParticipantData.Value<int?>("participantGroupID");
-                        var participantGroupName = eventParticipantData.Value<string>("participantGroupName");
+                        var participantGroupID = itemData.Value<int?>("participantGroupID");
+                        var participantGroupName = itemData.Value<string>("participantGroupName");
 
                         var participantGroup =
                             (participantGroupID.HasValue ? ParticipantGroup.FindByID(dc, participantGroupID.Value) : null) ??
@@ -164,8 +174,8 @@ namespace App.Library
                             return (int?)null;
                         }
 
-                        eventParticipantData["participantGroupID"] = participantGroup.ID;
-                        var participant = Participant.Create(dc, eventParticipantData);
+                        itemData["participantGroupID"] = participantGroup.ID;
+                        var participant = Participant.Create(dc, itemData);
                         Debug.Assert(participant != null);
                         if (participant == null)
                         {
@@ -173,9 +183,9 @@ namespace App.Library
                             return (int?)null;
                         }
 
-                        eventParticipantData["eventID"] = eventID;
-                        eventParticipantData["participantID"] = participant.ID;
-                        var eventParticipant = EventParticipant.Create(dc, eventParticipantData);
+                        itemData["eventID"] = eventID;
+                        itemData["participantID"] = participant.ID;
+                        var eventParticipant = EventParticipant.Create(dc, itemData);
                         if (eventParticipant != null)
                         {
                             return (int?)eventParticipant.ID;

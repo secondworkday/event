@@ -304,7 +304,8 @@ namespace App.Library
 
             var participantGroupIDs = participantGroupNames
                 .Select((participantGroupName, index) =>
-                    ParticipantGroup.FindByName(dc, participantGroupName) ?? ParticipantGroup.Create(dc, new { name = participantGroupName, badgeName = participantGroupBadgeNames[index] })
+                    ParticipantGroup.FindByName(dc, participantGroupName) ?? 
+                    ParticipantGroup.Create(dc, new { name = participantGroupName, badgeName = participantGroupBadgeNames[index] }.ToJson().FromJson() as JToken)
                 )
                 .Select(participantGroup => participantGroup.ID)
                 .ToArray();

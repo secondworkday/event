@@ -134,7 +134,7 @@ namespace WebApp
 
         private void downloadReminderFormForSchool(HttpResponse response, AppDC appDC, SiteContext siteContext, int participantGroupID)
         {
-            var participantIDs = ParticipantGroup.GetParticipants(appDC, participantGroupID);
+            var participantIDs = ParticipantGroup.GetParticipantsYYY(appDC, participantGroupID);
 
             List<MemoryStream> individualPdfReportStreams = new List<MemoryStream>();
 
