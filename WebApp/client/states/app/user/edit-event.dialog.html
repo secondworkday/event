@@ -1,8 +1,8 @@
-<md-dialog flex-gt-sm="60" aria-label="add school" ng-cloak>
+<md-dialog flex-gt-sm="60" aria-label="edit event" ng-cloak>
   <form>
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <h2>Create Event</h2>
+        <h2>Edit Event</h2>
         <span flex></span>
         <md-button class="md-icon-button" ng-click="cancel()">
           <i class="fa fa-times"></i>
@@ -16,28 +16,19 @@
           <div layout="column">
             <md-input-container class="md-block" flex-gt-sm>
               <label>Event name</label>
-              <input ng-model="formData.name">
+              <input ng-model="event.name">
             </md-input-container>
               <md-input-container class="md-block" flex-gt-sm>
                   <label>Sponsor</label>
-                  <input ng-model="formData.sponsor">
+                  <input ng-model="event.sponsor">
               </md-input-container>
-            <!--<md-input-container class="md-block" flex-gt-sm>
-              <label>Description</label>
-              <input ng-model="formData.description">
-            </md-input-container>-->
           </div>
         <!--</form>-->
       </div>
     </md-dialog-content>
     <md-dialog-actions layout="row" layout-align="end center">
-      <md-button ng-click="cancel()">
-       Cancel
-      </md-button>
-      <md-button ng-click="generateRandomEvent()"><i class="fa fa-magic"></i> Create Demo Event</md-button>
-      <md-button class="md-primary" ng-click="createEvent()" ng-disabled="!formData.name" >
-        Create Event
-      </md-button>
+      <md-button ng-click="cancel()">Cancel</md-button>
+      <md-button class="md-primary" ng-click="editEvent()" ng-disabled="!event.name" >Save</md-button>
     </md-dialog-actions>
   </form>
 </md-dialog>
