@@ -73,16 +73,22 @@ app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileU
 
 
   $scope.showNewSystemUserDialog = function ($event) {
-     var parentEl = angular.element(document.body);
-     $mdDialog.show({
-       parent: parentEl,
-       targetEvent: $event,
-       templateUrl: '/client/states/app/site-admin/system-new-user.dialog.html',
-       controller: NewSystemUserDialogController
+    var parentEl = angular.element(document.body);
+    $mdDialog.show({
+      parent: parentEl,
+      targetEvent: $event,
+      templateUrl: '/client/states/app/site-admin/system-new-user.dialog.html',
+      controller: NewSystemUserDialogController
     });
     function NewSystemUserDialogController($scope, $mdDialog) {
-      $scope.createUser = function () {
 
+      $scope.tenantGroups = utilityService.model.tenantGroups;
+
+      // Kick off a search to load up our TenantGroup cache
+      $scope.tenantGroups.search("", "", 0, 9999);
+
+
+      $scope.createUser = function () {
         utilityService.createUser($scope.formData)
         .then(function (successData) {
           // success
@@ -95,11 +101,10 @@ app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileU
           $log.debug(failureData.errorMessage);
           return failureData;
         });
-
         $mdDialog.hide();
       };
-      $scope.cancelDialog = function() {
-        $log.debug( "You canceled the dialog." );
+      $scope.cancelDialog = function () {
+        $log.debug("You canceled the dialog.");
         $mdDialog.hide();
       };
     }

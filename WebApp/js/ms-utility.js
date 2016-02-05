@@ -2033,9 +2033,14 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         return newItemsIndex;
       }
 
-      // create a customized compareBy that knows how to compare an Item with an ID in our index array
-      var rightIDCompareBy = function (left, rightID) {
-        return left.id - rightID;
+      // create a customized compareBy that knows how to compare an Item with a Key in our index array
+      // Remember, a Key can be an integer (id) or a string (code).
+      var rightKeyCompareBy = function (left, rightKey) {
+        var keyPropertyName = "id";
+        var result = (left[keyPropertyName] < rightKey) ? -1 : (left[keyPropertyName] > rightKey) ? 1 : 0;
+        return result;
+
+        //return left.id - rightID;
         //var right = hashMap[rightID];
         //return compareByID(left, right);
       };
@@ -2046,7 +2051,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         // ** Updated our primary hashMapIndex (sorted based on item.ID)
         if (hashMapIndex) {
           // (item IDs are immutable, so we don't have to worry about an item changing location in the hashMapIndex)
-          var hashMapIndexOffset = binarySearch(hashMapIndex, item, rightIDCompareBy);
+          var hashMapIndexOffset = binarySearch(hashMapIndex, item, rightKeyCompareBy);
           if (hashMapIndexOffset < 0) {
             var insertOffset = ~hashMapIndexOffset;
             hashMapIndex.splice(insertOffset, 0, item.id);
@@ -2085,7 +2090,8 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
           }
         });
 
-        // ** Update the actual hashMap
+        // ** Update the actual hashMap (so we have accurate records of the data we're storing)
+        //    And update newItemsIndex (so we can send out an accurate notification of any new items that have been added)
         if (existingItem) {
           angular.extend(existingItem, item);
         } else {
@@ -2176,6 +2182,8 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       }
     }
 
+
+  //!! this is deprecated in favor of cacheSortedItems()
     function cacheItems(items, hashMap, hashMapIndex, compareBy) {
       // track any new items we're adding to the hashMap
       var newItemsIndex = [];
@@ -2221,7 +2229,22 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       });
     }
 
-    //!! consider adding an outer optimization which looks to see if the item is added first/last - as is the very common case
+  //!! consider adding an outer optimization which looks to see if the item is added first/last - as is the very common case
+
+
+  /*
+   * Binary search in JavaScript.
+   * Returns the index of of the element in a sorted array or (-n-1) where n is the insertion point for the new element.
+   * Parameters:
+   *     ar - A sorted array
+   *     el - An element to search for
+   *     compare_fn - A comparator function. The function takes two arguments: (a, b) and returns:
+   *        a negative number  if a is less than b;
+   *        0 if a is equal to b;
+   *        a positive number of a is greater than b.
+   * The array may contain duplicate elements. If there are more than one equal elements in the array, 
+   * the returned value can be the index of any one of the equal elements.
+   */
     function binarySearch(ar, el, compare_fn) {
       var m = 0;
       var n = ar.length - 1;

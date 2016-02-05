@@ -13,6 +13,21 @@
           To create a new user, just enter an email address, select a tenant, and optionally add a first and last name.
         </p>
         <div>
+
+
+          Hi there: {{formData}}
+
+          <div layout layout-sm="column">
+            <md-input-container flex>
+              <label>Select Tenant Group</label>
+              <md-select ng-model="formData.tenantGroupID">
+                <md-option ng-repeat="tenantGroup in tenantGroups.index | objectLookup:tenantGroups.hashMap" value="{{tenantGroup.id}}">
+                  {{tenantGroup.name}}
+                </md-option>
+              </md-select>
+            </md-input-container>
+          </div>
+
           <div layout layout-sm="column">
             <md-input-container flex>
               <label>Email Address (required)</label>
