@@ -176,7 +176,6 @@
     <Content Include="client\states\app\site-admin\database-dashboard.html" />
     <Content Include="client\states\app\site-admin\database-data-export.controller.js" />
     <Content Include="client\states\app\site-admin\database-data-export.html" />
-    <Content Include="client\states\app\site-admin\database-data-import.controller.js" />
     <Content Include="client\states\app\site-admin\database-data-import.html" />
     <Content Include="client\states\app\site-admin\database-log.controller.js" />
     <Content Include="client\states\app\site-admin\database-log.html" />
