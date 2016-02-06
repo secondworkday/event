@@ -51,7 +51,7 @@
         app.config(['$locationProvider', '$stateProvider', '$urlRouterProvider', '$mdThemingProvider', 'AUTHORIZATION_ROLES', function ($locationProvider, $stateProvider, $urlRouterProvider, $mdThemingProvider, AUTHORIZATION_ROLES) {
 
             $locationProvider.html5Mode(true);
-            $urlRouterProvider.otherwise("/dashboard");
+            $urlRouterProvider.otherwise("/events");
 
             //Now set up the theme
             $mdThemingProvider.theme('default')
