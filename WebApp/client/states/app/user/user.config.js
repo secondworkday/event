@@ -16,7 +16,16 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
     .state('app.user.team', {
         url: '/team',
         templateUrl: '/client/states/app/user/team.html',
+        //!! did we just re-use this controller as a shortcut?
         controller: 'SystemUsersController'
+    })
+    .state('app.user.schools', {
+        url: '/schools',
+        templateUrl: '/client/states/app/user/schools.html'
+    })
+    .state('app.user.locations', {
+        url: '/locations',
+        templateUrl: '/client/states/app/user/locations.html'
     })
     .state('app.user.event-old', {
       url: '/event-old',
