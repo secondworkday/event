@@ -8,9 +8,9 @@
         <p><i class="fa fa-code"></i> Debug Mode: {{debugMode ? "On" : "Off"}}</p>
       </md-button>
     </md-menu-item>
-    <md-menu-item ng-repeat="tenant in sampleTenants">
-      <md-button ng-click="changeLanguage('{{tenant}}')">
-        <p><i class="fa fa-quote-left"></i> Use {{tenant}} terms</p>
+    <md-menu-item ng-repeat="tenantTerm in tenantTerms">
+      <md-button ng-click="changeLanguage(tenantTerm.langKey)">
+        <p><i class="fa fa-quote-left"></i> Use {{tenantTerm.name}}</p>
       </md-button>
     </md-menu-item>
     <md-menu-divider></md-menu-divider>
