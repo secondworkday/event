@@ -27,48 +27,79 @@
   </div>
 </div>
 
-<ms-search-view change-event="updateParticipants" search="searchHandler" options="searchViewOptions" user-search="userSearch">
-  <table class="md-data-table u-full-width">
-   <thead>
-     <tr>
-       <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
-       <th ms-debug-only>ID</th>
-       <th>Date</th>
-       <th class="md-data-table__cell--non-numeric">Session Name</th>
-       <th>State</th>
-       <th>Slots</th>
-       <th>Assigned</th>
-       <th>Session Manager</th>
-       <th>Checkin Code</th>
-     </tr>
-   </thead>
-   <tbody>
-     <tr ui-sref="app.system.tenant.dashboard({ tenantID:tenant.id })" 
-       ng-repeat="eventSession in $displayedIndex | objectLookup:$hashMap track by eventSession.id" >
-       <!--ng-init="eventParticipant = demandParticipant(eventParticipant.eventSessionID); 
-          participantGroup = demandParticipantGroup(eventParticipant.participantGroupID);" >-->
-       <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ eventSession| json }}</pre></td>
-       <td ms-debug-only>{{ eventSession.id }}</td>
-       <td>{{ eventSession.startDate | amCalendar}}</td>
-       <td class="md-data-table__cell--non-numeric">{{ eventSession.name }}</td>
-       <td>
-         {{ eventSession.state }}
-          <md-button ng-if="eventSession.state == 'Plan'" ng-click="setEventSessionState(eventSession, 'Active')">
-            Run!
-          </md-button>
-          <md-button ng-if="eventSession.state == 'Active'" ui-sref="^.^.session.participants({eventSessionID:eventSession.id})">
-            View!
-          </md-button>
-       </td>
-       <td>120</td>
-       <td>28</td>
-         <td>Lori Jones</td>
-         <td>Redmond315</td>
-     </tr>
-   </tbody>
-  </table>
-</ms-search-view>
+<section layout>
+  <div class="u-sm-margin-right">
+    <p class="md-body-2 text-support">
+      SESSIONS
+    </p>
+    <div layout="column">
+      <md-checkbox ng-model="filters.session1" aria-label="filter session">
+        Session Blue
+      </md-checkbox>
+      <md-checkbox ng-model="filters.session2" aria-label="filter session">
+        Session Green
+      </md-checkbox>
+      <md-checkbox ng-model="filters.session3" aria-label="filter session">
+        Session Orange
+      </md-checkbox>
+    </div>
+    <p class="md-body-2 text-support">
+      SCHOOLS
+    </p>
+    <div layout="column">
+      <md-checkbox ng-model="filters.session1" aria-label="filter session">
+        Eastside
+      </md-checkbox>
+      <md-checkbox ng-model="filters.session2" aria-label="filter session">
+        Southside
+      </md-checkbox>
+      <md-checkbox ng-model="filters.session3" aria-label="filter session">
+        Northside
+      </md-checkbox>
+    </div>
+  </div>
+  <div flex>
+    <ms-search-view change-event="updateParticipants" search="searchHandler" options="searchViewOptions" user-search="userSearch">
+      <table class="md-data-table u-full-width">
+       <thead>
+         <tr>
+           <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
+           <th ms-debug-only>ID</th>
+           <th>Date</th>
+           <th class="md-data-table__cell--non-numeric">Session Name</th>
+           <th>State</th>
+           <th>Slots</th>
+           <th>Assigned</th>
+           <th>Session Manager</th>
+           <th>Checkin Code</th>
+         </tr>
+       </thead>
+       <tbody>
+         <tr ui-sref="app.system.tenant.dashboard({ tenantID:tenant.id })"
+           ng-repeat="eventSession in $displayedIndex | objectLookup:$hashMap track by eventSession.id" >
+           <!--ng-init="eventParticipant = demandParticipant(eventParticipant.eventSessionID);
+              participantGroup = demandParticipantGroup(eventParticipant.participantGroupID);" >-->
+           <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ eventSession| json }}</pre></td>
+           <td ms-debug-only>{{ eventSession.id }}</td>
+           <td>{{ eventSession.startDate | amCalendar}}</td>
+           <td class="md-data-table__cell--non-numeric">{{ eventSession.name }}</td>
+           <td>
+             {{ eventSession.state }}
+              <md-button ng-if="eventSession.state == 'Plan'" ng-click="setEventSessionState(eventSession, 'Active')">
+                Run!
+              </md-button>
+              <md-button ng-if="eventSession.state == 'Active'" ui-sref="^.^.session.participants({eventSessionID:eventSession.id})">
+                View!
+              </md-button>
+           </td>
+           <td>120</td>
+           <td>28</td>
+             <td>Lori Jones</td>
+             <td>Redmond315</td>
+         </tr>
+       </tbody>
+      </table>
+    </ms-search-view>
 
-
-
-
+  </div>
+</section>
