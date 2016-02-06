@@ -5,7 +5,7 @@
     </h2>
   </div>
   <div>
-    <md-button ng-click="DO_SOMETHING()" class="md-primary"><i class="fa fa-plus"></i> New Event</md-button>
+    <md-button ng-click="showCreateEventDialog()" class="md-primary"><i class="fa fa-plus"></i> New Event</md-button>
   </div>
 </header>
 
@@ -33,17 +33,20 @@
             </md-card-actions>
         </md-card>
 
-        <md-card layout="" layout-align="center center" class="card-shortlist u-clickable" aria-hidden="false" ng-click="showCreateEventDialog()">
+        <!-- <md-card layout="" layout-align="center center" class="card-shortlist u-clickable" aria-hidden="false" ng-click="showCreateEventDialog()">
             <div class="text-center">
                 <i class="fa fa-plus fa-3x text-support"></i><br>
                 <p class="md-subhead text-support">Add Event</p>
             </div>
-        </md-card>
+        </md-card> -->
     </div>
 
 
 </ms-search-view>
 
+<div class="u-md-space">
+
+</div>
 
 <h2 class="md-subhead">
     Past Events
