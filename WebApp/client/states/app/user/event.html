@@ -29,7 +29,7 @@
         </md-tab-body>
     </md-tab>
     <md-tab ui-sref=".participants">
-      <md-tab-label>Participants</md-tab-label>
+      <md-tab-label>{{'PARTICIPANTS' | translate}}</md-tab-label>
       <md-tab-body>
         <div ui-view="participants"></div>
       </md-tab-body>
@@ -41,107 +41,6 @@
       </md-tab-body>
     </md-tab>
   </md-tabs>
-
-
-
-
-<!--<section layout="column" layout-gt-sm="row">
-  <div flex layout="column" layout-gt-sm="row">
-    <div flex>
-      <div layout layout-align="start center">
-        <div>
-          <h3 class="md-title">Team</h3>
-        </div>
-        <div>
-          <md-button ng-click="showAddTeamMemberDialog($event)" class="md-primary md-icon-button"><i class="fa fa-plus"></i></md-button>
-        </div>
-      </div>
-      <md-content>
-        <md-list>
-          <md-list-item class="md-3-line"
-                        ng-click="DO_SOMETHING()"
-                        ng-repeat="user in model.users.index | objectLookup:model.users.hashMap track by user.id">
-            <div class="md-list-item-text">
-              <h3>{{user.displayName}}</h3>
-              <h4>{{user.email}}</h4>
-            </div>
-          </md-list-item>
-        </md-list>
-      </md-content>
-    </div>
-
-    <div flex>
-      <div layout layout-align="start center">
-        <div>
-          <h3 class="md-title">Schools</h3>
-        </div>
-        <div>
-          <md-button ng-click="showAddParticipantGroupDialog($event)" class="md-primary md-icon-button"><i class="fa fa-plus"></i></md-button>
-        </div>
-      </div>
-      <md-content>
-        <md-list>
-          <md-list-item class="md-3-line"
-                        ng-click="DO_SOMETHING()"
-                        ng-repeat="participantGroup in eventParticipantGroupsIndex | objectLookup:model.participantGroups.hashMap track by participantGroup.id">
-            <div class="md-list-item-text">
-              <h3>{{participantGroup.name}}</h3>
-              <h4>{{getParticipantCount(participantGroup.id)}} participants</h4>
-            </div>
-          </md-list-item>
-        </md-list>
-      </md-content>
-    </div>
-
-    <div flex>
-      <div layout layout-align="start center">
-        <div>
-          <h3 class="md-title">Participants</h3>
-        </div>
-        <div>
-          <md-button ng-click="showAddParticipantsDialog($event)" class="md-primary md-icon-button"><i class="fa fa-plus"></i></md-button>
-        </div>
-      </div>
-      <md-content>
-        <md-list>
-          <md-list-item class="md-3-line"
-                        ng-click="DO_SOMETHING()"
-                        ng-repeat="ep in eventParticipantsIndex | objectLookup:model.eventParticipants.hashMap track by ep.id"
-                        ng-init="participant = model.participants.hashMap[ep.participantID]; participantGroup = model.participantGroups.hashMap[model.participants.hashMap[ep.participantID].participantGroupID]">
-            <div class="md-list-item-text">
-              <h3>{{participant.firstName}} {{participant.lastName}}</h3>
-              <h4>{{participantGroup.name}}</h4>
-            </div>
-          </md-list-item>
-        </md-list>
-      </md-content>
-    </div>
-
-    <div flex>
-      <div layout layout-align="start center">
-        <div>
-          <h3 class="md-title">Sessions</h3>
-        </div>
-        <div>
-          <md-button ng-click="showAddSessionDialog($event)" class="md-primary md-icon-button"><i class="fa fa-plus"></i></md-button>
-        </div>
-      </div>
-      <md-content>
-        <md-list>
-          <md-list-item class="md-3-line"
-                        ng-click="DO_SOMETHING()"
-                        ng-repeat="session in eventSessionsIndex | objectLookup:model.eventSessions.hashMap track by session.id">
-            <div class="md-list-item-text">
-              <h3>{{session.name}}</h3>
-              <h4>{{session.startDate | date:'MMM dd @ h:mma' }}</h4>
-              <p>{{session.location}}</p>
-            </div>
-          </md-list-item>
-        </md-list>
-      </md-content>
-    </div>
-  </div>
-</section>-->
 
 <div ms-debug-only>
   <h4>EventSessions</h4>

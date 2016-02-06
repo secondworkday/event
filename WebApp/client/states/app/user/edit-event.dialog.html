@@ -1,8 +1,8 @@
-<md-dialog flex-gt-sm="60" aria-label="edit event" ng-cloak>
+<md-dialog flex-gt-sm="60" aria-label="edit {{'EVENT' | translate}}" ng-cloak>
   <form>
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <h2>Edit Event</h2>
+        <h2>Edit {{'EVENT' | translate}}</h2>
         <span flex></span>
         <md-button class="md-icon-button" ng-click="cancel()">
           <i class="fa fa-times"></i>
@@ -15,7 +15,7 @@
         <!--<form name="form">-->
           <div layout="column">
             <md-input-container class="md-block" flex-gt-sm>
-              <label>Event name</label>
+              <label>{{'EVENT' | translate}} name</label>
               <input ng-model="event.name">
             </md-input-container>
               <md-input-container class="md-block" flex-gt-sm>

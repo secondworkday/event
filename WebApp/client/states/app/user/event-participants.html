@@ -41,12 +41,12 @@
        <th>ID</th>
        <th class="md-data-table__cell--non-numeric">First Name</th>
        <th class="md-data-table__cell--non-numeric">Last Name</th>
-       <th>School</th>
+       <th>{{'PARTICIPANT_GROUP' | translate}}</th>
        <th>Grade</th>
        <th>Gender</th>
 
-       <th ng-if="!eventSession">Session Name</th>
-       <th ng-if="!eventSession">Session Date</th>
+       <th ng-if="!eventSession">{{'EVENT_SESSION' | translate}} Name</th>
+       <th ng-if="!eventSession">{{'EVENT_SESSION' | translate}} Date</th>
        <th>Actions</th>
 
      </tr>

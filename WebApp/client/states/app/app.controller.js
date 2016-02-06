@@ -5,8 +5,9 @@ app.controller('AppController', function ($scope, $translate, $timeout, $mdSiden
 
   $scope.tenantTerms = [
     { name: "Demo Terms", langKey: 'demo' },
-    { name: "ALE Terms", langKey: 'ale' }
-  ];
+    { name: "ALE Terms", langKey: 'ale' },
+    { name: "Soccer Terms", langKey: 'soccer' }
+];
 
   $scope.months = [
     {name: "January", number: 00},

@@ -290,10 +290,10 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
       });
     };
 
-    $scope.showAddTeamMemberDialog = function (ev) {
+    $scope.showAddUserDialog = function (ev) {
         $mdDialog.show({
-            controller: AddTeamMemberDialogController,
-            templateUrl: '/client/states/app/user/add-team-member.dialog.html',
+            controller: AddUserDialogController,
+            templateUrl: '/client/states/app/user/add-user.dialog.html',
             parent: angular.element(document.body),
             targetEvent: ev,
             clickOutsideToClose: true,
@@ -305,22 +305,22 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
             // $scope.status = 'You cancelled the dialog.';
         });
     }
-    function AddTeamMemberDialogController($scope, $mdDialog) {
+    function AddUserDialogController($scope, $mdDialog) {
         $scope.hide = function () {
             $mdDialog.hide();
         };
         $scope.cancel = function () {
             $mdDialog.cancel();
         };
-        $scope.addTeamMember = function (formData) {
+        $scope.addUser = function (formData) {
             $mdDialog.hide(formData);
         };
     }
 
     $scope.showAddParticipantGroupDialog = function (ev) {
         $mdDialog.show({
-            controller: AddSchoolDialogController,
-            templateUrl: '/client/states/app/user/add-school.dialog.html',
+            controller: AddParticipantGroupDialogController,
+            templateUrl: '/client/states/app/user/add-participant-group.dialog.html',
             parent: angular.element(document.body),
             targetEvent: ev,
             clickOutsideToClose: true,
@@ -332,7 +332,7 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
             // $scope.status = 'You cancelled the dialog.';
         });
     }
-    function AddSchoolDialogController($scope, $mdDialog) {
+    function AddParticipantGroupDialogController($scope, $mdDialog) {
         $scope.hide = function () {
             $mdDialog.hide();
         };

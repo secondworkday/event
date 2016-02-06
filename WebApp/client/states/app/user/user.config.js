@@ -27,10 +27,6 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         url: '/locations',
         templateUrl: '/client/states/app/user/locations.html'
     })
-    .state('app.user.event-old', {
-      url: '/event-old',
-      templateUrl: '/client/states/app/user/event-old.html'
-    })
 /*
     .state('app.user.event', {
       url: '/event/:eventID/',

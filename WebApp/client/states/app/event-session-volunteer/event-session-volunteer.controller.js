@@ -131,60 +131,7 @@ app.controller('EventSessionVolunteerController', function ($scope, $log, $state
         };
     }
 
-    $scope.showAddTeamMemberDialog = function (ev) {
-        $mdDialog.show({
-            controller: AddTeamMemberDialogController,
-            templateUrl: '/client/states/app/user/add-team-member.dialog.html',
-            parent: angular.element(document.body),
-            targetEvent: ev,
-            clickOutsideToClose: true,
-            fullscreen: false
-        })
-        .then(function () {
-            // $scope.status = 'You said the information was "' + answer + '".';
-        }, function () {
-            // $scope.status = 'You cancelled the dialog.';
-        });
-    }
-    function AddTeamMemberDialogController($scope, $mdDialog) {
-        $scope.hide = function () {
-            $mdDialog.hide();
-        };
-        $scope.cancel = function () {
-            $mdDialog.cancel();
-        };
-        $scope.addTeamMember = function (formData) {
-            $mdDialog.hide(formData);
-        };
-    }
 
-    $scope.showAddParticipantGroupDialog = function (ev) {
-        $mdDialog.show({
-            controller: AddSchoolDialogController,
-            templateUrl: '/client/states/app/user/add-school.dialog.html',
-            parent: angular.element(document.body),
-            targetEvent: ev,
-            clickOutsideToClose: true,
-            fullscreen: false
-        })
-        .then(function () {
-            // $scope.status = 'You said the information was "' + answer + '".';
-        }, function () {
-            // $scope.status = 'You cancelled the dialog.';
-        });
-    }
-    function AddSchoolDialogController($scope, $mdDialog) {
-        $scope.hide = function () {
-            $mdDialog.hide();
-        };
-        $scope.cancel = function () {
-            $mdDialog.cancel();
-        };
-        $scope.addSchool = function (formData) {
-            siteService.createParticipantGroup(formData);
-            $mdDialog.hide(formData);
-        };
-    }
 
     $scope.showUploadParticipantsDialog = function (ev, event) {
       $mdDialog.show({

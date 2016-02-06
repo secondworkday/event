@@ -1,8 +1,8 @@
-<md-dialog aria-label="add session" ng-cloak>
+<md-dialog aria-label="add {{'EVENT_SESSION' | translate}}" ng-cloak>
   <form>
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <h2>Add Session</h2>
+        <h2>Add {{'EVENT_SESSION' | translate}}</h2>
         <span flex></span>
         <md-button class="md-icon-button" ng-click="cancel()">
           <i class="fa fa-times"></i>
@@ -14,7 +14,7 @@
         <form name="form">
           <div layout-gt-sm="row">
             <md-input-container class="md-block" flex-gt-sm>
-              <label>Session name</label>
+              <label>{{'EVENT_SESSION' | translate}} name</label>
               <input ng-model="formData.name">
             </md-input-container>
             <md-datepicker style="margin-top:1rem;" ng-model="formData.date" md-placeholder="Session date">
@@ -22,7 +22,7 @@
           </div>
           <div layout-gt-sm="row">
             <md-input-container class="md-block" flex-gt-sm>
-              <label>Location name</label>
+              <label>{{'LOCATION' | translate}} name</label>
               <input ng-model="formData.location">
             </md-input-container>
           </div>

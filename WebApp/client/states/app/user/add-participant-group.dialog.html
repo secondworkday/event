@@ -1,8 +1,8 @@
-<md-dialog aria-label="add school" ng-cloak>
+<md-dialog aria-label="add {{'PARTICIPANT_GROUP' | translate}}" ng-cloak>
   <form>
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <h2>Add School</h2>
+        <h2>Add {{'PARTICIPANT_GROUP' | translate}}</h2>
         <span flex></span>
         <md-button class="md-icon-button" ng-click="cancel()">
           <i class="fa fa-times"></i>
@@ -14,11 +14,11 @@
         <form name="form">
           <div layout-gt-sm="row">
             <md-input-container class="md-block" flex-gt-sm>
-              <label>School name</label>
+              <label>{{'PARTICIPANT_GROUP' | translate}} name</label>
               <input ng-model="formData.name">
             </md-input-container>
             <md-input-container class="md-block" flex-gt-sm>
-              <label>Total students</label>
+              <label>Total {{'PARTICIPANTS' | translate | lowercase}}</label>
               <input ng-model="formData.totalStudents">
             </md-input-container>
           </div>

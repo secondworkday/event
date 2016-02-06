@@ -1,8 +1,8 @@
-<md-dialog aria-label="add team member" ng-cloak>
+<md-dialog aria-label="add {{'PARTICIPANTS' | translate}}" ng-cloak>
   <form>
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <h2>Add Participants</h2>
+        <h2>Add {{'PARTICIPANTS' | translate}}</h2>
         <span flex></span>
         <md-button class="md-icon-button" ng-click="cancel()">
           <i class="fa fa-times"></i>
@@ -20,15 +20,15 @@
           <input type="number" ng-model="formData.grade">
         </md-input-container>
         <md-input-container class="md-block" flex-gt-sm>
-          <label>School</label>
+          <label>{{'PARTICIPANT_GROUP' | translate}}</label>
           <md-select ng-model="formData.participantGroupID">
-            <md-option ng-repeat="school in participantGroups.index | objectLookup:participantGroups.hashMap track by school.id" value="{{school.id}}">
-              {{school.name}}
+            <md-option ng-repeat="participantGroup in participantGroups.index | objectLookup:participantGroups.hashMap track by school.id" value="{{participantGroup.id}}">
+              {{participantGroup.name}}
             </md-option>
           </md-select>
         </md-input-container>
         <br/>
-        <md-button ng-disabled="!formData.participantGroupID" ng-click="generateRandomParticipants(formData.participantGroupID, 25)"><i class="fa fa-magic"></i> Generate 25 participants</md-button>
+        <md-button ng-disabled="!formData.participantGroupID" ng-click="generateRandomParticipants(formData.participantGroupID, 25)"><i class="fa fa-magic"></i> Generate 25 {{'PARTICIPANTS' | translate}}</md-button>
       </div>
     </md-dialog-content>
     <md-dialog-actions layout="row" layout-align="end center">
