@@ -64,6 +64,13 @@
     }
   }
 
+  .brand {
+    background-color: #7986CB;
+    color: #283593;
+    padding: 6px;
+    border-radius: 4px;
+  }
+
   md-content {
     background-color: #FAFAFA;
   }
