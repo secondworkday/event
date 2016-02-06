@@ -8,6 +8,11 @@
         <p><i class="fa fa-code"></i> Debug Mode: {{debugMode ? "On" : "Off"}}</p>
       </md-button>
     </md-menu-item>
+    <md-menu-item ng-repeat="tenant in sampleTenants">
+      <md-button ng-click="changeLanguage('{{tenant}}')">
+        <p><i class="fa fa-quote-left"></i> Use {{tenant}} terms</p>
+      </md-button>
+    </md-menu-item>
     <md-menu-divider></md-menu-divider>
     <md-menu-item>
       <md-button ng-click="goToState('app.user.events')">
