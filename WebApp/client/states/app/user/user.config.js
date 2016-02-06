@@ -20,11 +20,11 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         controller: 'SystemUsersController'
     })
     .state('app.user.participant-groups', {
-        url: '/' + CONSTANTS.tenantTerms.aleTerms.participantGroups,
+        url: '/participant-groups',
         templateUrl: '/client/states/app/user/participant-groups.html'
     })
     .state('app.user.locations', {
-        url: '/' + CONSTANTS.tenantTerms.aleTerms.locations,
+        url: '/locations',
         templateUrl: '/client/states/app/user/locations.html'
     })
     .state('app.user.event-old', {
