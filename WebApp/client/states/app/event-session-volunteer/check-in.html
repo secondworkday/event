@@ -1,18 +1,52 @@
-<h2 class="md-display-1">
-    Check-In Main Page
-</h2>
+<div class="text-center">
+  <p class="md-title text-support">
+      Fred Meyer Session B
+  </p>
+</div>
 
-<table class="md-data-table u-full-width">
-    <thead>
-        <tr>
-            <th class="md-data-table__cell--non-numeric">{{'PARTICIPANT' | translate}}</th>
-            <th class="md-data-table__cell--non-numeric">Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td class="md-data-table__cell--non-numeric">Sam Adams</td>
-            <td class="md-data-table__cell--non-numeric">Checked In</td>
-        </tr>
-    </tbody>
-</table>
+<div layout layout-align="center center">
+  <div flex class="text-center">
+    <h3 class="md-display-1">{{checkedInCount}}</h3>
+    <p class="md-body-1">
+      Checked In
+    </p>
+  </div>
+  <div flex class="text-center">
+    <h3 class="md-display-1">{{expectedCount}}</h3>
+    <p class="md-body-1">
+      Expected
+    </p>
+  </div>
+  <div flex class="text-center">
+    <h3 class="md-display-1">{{timeRemaining}}</h3>
+    <p class="md-body-1">
+      Time Remaining
+    </p>
+  </div>
+</div>
+
+<div class="u-md-space"></div>
+
+<div style="background-color:#FFF;">
+  <md-list>
+    <md-list-item class="md-2-line secondary-button-padding"
+      ng-repeat="participant in sampleParticipants"
+      ng-click="doSomething()">
+      <div class="md-list-item-text">
+        <h3>{{participant.firstName}} {{participant.lastName}}</h3>
+        <p>{{participant.grade}} grade at {{participant.school}}</p>
+      </div>
+
+      <md-button class="md-secondary md-primary"
+        ng-click="checkIn(participant)"
+        ng-show="participant.status=='expected'">
+        Check In
+      </md-button>
+      <md-button class="md-secondary"
+        ng-click="undoCheckIn(participant)"
+        ng-show="participant.status=='checkedIn'">
+        Undo
+      </md-button>
+    </md-list-item>
+  </md-list>
+</div>

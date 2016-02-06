@@ -71,6 +71,17 @@
     border-radius: 4px;
   }
 
+  .tag {
+    padding:3px 6px;
+    border-radius:3px;
+    background-color:#BDBDBD;
+    color:#FFF;
+  }
+
+  .tag.active {
+    background-color:#283593;
+  }
+
   md-content {
     background-color: #FAFAFA;
   }
