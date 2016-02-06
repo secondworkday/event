@@ -30,5 +30,19 @@ app.constant('CONSTANTS', {
     { name: "Pacific",  index: 6 },
     { name: "Alaska",   index: 7 },
     { name: "Hawaii",   index: 8 }
-  ]
+  ],
+  tenantTerms: {
+    defaultTerms: {
+      "participantGroup"  : "ParticipantGroup",
+      "participantGroups" : "ParticipantGroups",
+      "location"          : "Location",
+      "locations"         : "Locations"
+    },
+    aleTerms: {
+      "participantGroup"  : "School",
+      "participantGroups" : "Schools",
+      "location"          : "Store"
+      "locations"         : "Stores"
+    }
+  }
 });
