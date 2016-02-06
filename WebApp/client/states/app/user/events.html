@@ -1,0 +1,99 @@
+<header layout layout-align="start center">
+  <div>
+    <h2 class="md-display-1">
+        Events
+    </h2>
+  </div>
+  <div>
+    <md-button ng-click="DO_SOMETHING()" class="md-primary"><i class="fa fa-plus"></i> New Event</md-button>
+  </div>
+</header>
+
+<ms-search-view change-event="updateEvents" search="searchEvents" options="searchViewOptions" user-search="userSearch">
+
+    <div layout="" layout-wrap="" class="layout-wrap layout-row" aria-hidden="false">
+
+        <md-card class="card-shortlist u-clickable" ng-repeat="event in $displayedIndex | objectLookup:$hashMap track by event.id">
+            <md-card-title ui-sref="app.user.event.sessions({eventID:event.id})">
+                <md-card-title-text>
+                    <span class="md-headline">{{event.name}}</span>
+                    <span class="md-subhead">Mar 16 - 23, 2016 <br />{{event.sponsor}}</span>
+                </md-card-title-text>
+            </md-card-title>
+            <md-card-content class="layout-row" ui-sref="app.user.event.sessions({eventID:event.id})">
+                <div>
+                    <p><b>28/120</b><br /><span style="font-size: smaller;">Participants</span></p>
+                    <p><b>Planning</b><br /><span style="font-size: smaller;">Status</span></p>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="start center" class="layout-align-start-center layout-row">
+                <a class="md-primary md-button md-ink-ripple" ui-sref="app.user.event.sessions({eventID:event.id})"><span class="ng-scope">View</span></a>
+                <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditEventDialog(event)" aria-label="edit" tabindex="0"><i class="fa fa-pencil ng-scope"></i></button>
+                <button class="md-warn md-icon-button md-button md-ink-ripple" type="button" ng-click="showDeleteConfirmationDialog($event, event)" aria-label="remove" tabindex="1"><i class="fa fa-trash ng-scope"></i></button>
+            </md-card-actions>
+        </md-card>
+
+        <md-card layout="" layout-align="center center" class="card-shortlist u-clickable" aria-hidden="false" ng-click="showCreateEventDialog()">
+            <div class="text-center">
+                <i class="fa fa-plus fa-3x text-support"></i><br>
+                <p class="md-subhead text-support">Add Event</p>
+            </div>
+        </md-card>
+    </div>
+
+
+</ms-search-view>
+
+
+<h2 class="md-subhead">
+    Past Events
+</h2>
+
+<table class="md-data-table u-full-width">
+    <thead>
+        <tr>
+            <th class="md-data-table__cell--non-numeric">Event</th>
+            <th class="md-data-table__cell--non-numeric">Start Date</th>
+            <th class="md-data-table__cell--non-numeric">End Date</th>
+            <th>Expected</th>
+            <th>Attended</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="event in samplePastEvents">
+            <td class="md-data-table__cell--non-numeric">{{event.name}}</td>
+            <td class="md-data-table__cell--non-numeric">{{event.startDate | date}}</td>
+            <td class="md-data-table__cell--non-numeric">{{event.endDate | date}}</td>
+            <td>{{event.expectedParticipantCount | number}}</td>
+            <td>{{event.actualParticipantCount | number}}</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+
+
+
+<!--<div layout layout-wrap>
+<ms-search-view change-event="updateEvents" search="searchEvents" options="searchViewOptions" user-search="userSearch">
+<md-card class="card-event" ng-repeat="event in $displayedIndex | objectLookup:$hashMap track by event.id">
+<md-card-content ui-sref="app.user.event({eventID:event.id})" class="u-clickable">
+<h4 style="margin-top:0;" class="md-title">{{event.name}}</h4>
+<p class="md-body-1">{{event.description}}</p>
+</md-card-content>
+<md-card-actions layout="row" layout-align="start center">
+<md-button ui-sref="app.user.event({eventID:event.id})" class="md-primary">View</md-button>
+<md-button class="md-warn">Archive</md-button>
+</md-card-actions>
+</md-card>
+</ms-search-view>
+</div>-->
+
+<!--<md-divider></md-divider>-->
+<!--<div class="u-sm-space"></div>-->
+
+<!--<div>
+    <md-button ng-click="generateRandomEvent()"><i class="fa fa-magic"></i> Create Demo Event</md-button>
+    <md-button ng-click="showCreateEventDialog()" class="md-primary"><i class="fa fa-plus"></i> Create new event</md-button>
+</div>-->

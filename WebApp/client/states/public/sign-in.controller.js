@@ -7,7 +7,7 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
     utilityService.signIn(credentials)
       .then(function () {
         // success
-        $state.go('app.user.home', {}, { reload: true });
+        $state.go('app.user.events', {}, { reload: true });
         // $state.go('app.system.users', {}, { reload: true });
       }, function (failureData) {
         // failure
@@ -66,7 +66,7 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
         $mdDialog.hide();
         utilityService.signIn(user)
         .then(function () {
-          $state.go('app.user.home', {}, { reload: true });
+          $state.go('app.user.events', {}, { reload: true });
         });
 
       };
@@ -74,7 +74,7 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
         $mdDialog.hide();
         utilityService.signIn(user)
         .then(function () {
-          $state.go('app.user.home', {}, { reload: true });
+          $state.go('app.user.events', {}, { reload: true });
         });
 
       };
@@ -92,7 +92,7 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
           utilityService.signIn(newUserCred)
           .then(function () {
             // success
-            $state.go('app.user.home', {}, { reload: true });
+            $state.go('app.user.events', {}, { reload: true });
           }, function (errorMessage) {
             // failure (signIn)
             $log.debug(errorMessage);

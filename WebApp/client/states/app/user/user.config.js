@@ -8,13 +8,19 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         templateUrl: '/client/states/app/user/user-container.html',
         controller: 'UserController'
     })
-    .state('app.user.home', {
-        url: '/home',
-        templateUrl: '/client/states/app/user/home.html',
+    .state('app.user.events', {
+        url: '/events',
+        templateUrl: '/client/states/app/user/events.html',
+        controller: 'EventsController'
+    })
+    .state('app.user.team', {
+        url: '/team',
+        templateUrl: '/client/states/app/user/team.html',
+        controller: 'SystemUsersController'
     })
     .state('app.user.event-old', {
       url: '/event-old',
-      templateUrl: '/client/states/app/user/event-old.html',
+      templateUrl: '/client/states/app/user/event-old.html'
     })
 /*
     .state('app.user.event', {
@@ -97,25 +103,13 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
           var eventID = eventSession.eventID;
           return siteService.ensureEvent(eventID);
         }
-      },
-      data: {
-        stateMapName: 'Event Session',
-        stateMapComment: 'resolve :eventSessionID'
       }
     })
     .state('app.user.session.participants', {
       url: '/participants',
       templateUrl: '/client/states/app/user/event-participants.html',
-      controller: 'EventParticipantsController',
-      data: {
-        stateMapName: 'Event Session Participants',
-        stateMapComment: ''
-      }
+      controller: 'EventParticipantsController'
     })
-
-
-
-
     .state('app.user.event.schools', {
       url: '/schools',
       data: {
@@ -151,9 +145,6 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         }
       }
     })
-
-
-
 
 
 
