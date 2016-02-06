@@ -1,15 +1,27 @@
 <div class="appbar">
   <md-toolbar>
-    <div class="md-toolbar-tools">
-      <h2>
-        <a ui-sref="app.user.home">OSB</a></span>
-      </h2>
+    <div class="md-toolbar-tools" layout layout-align="start center">
+      <span class="md-title text-white">
+        ALE
+      </span>
+      <span hide-xs style="margin-top:4px;">
+        <md-button ui-sref="app.user.events">Events</md-button>
+        <md-button ui-sref="app.user.team">Team</md-button>
+        <md-button ui-sref="app.user.events">Schools</md-button>
+        <md-button ui-sref="app.user.events">Locations</md-button>
+      </span>
       <span flex></span>
       <md-menu>
         <md-button md-menu-origin aria-label="User menu" ng-click="$mdOpenMenu()">
-          <img ng-show="model.authenticatedUser.profilePhotoUrl" ng-src="{{model.authenticatedUser.profilePhotoUrl}}" alt="user img" class="mini-user-img" />
-          <img ng-hide="model.authenticatedUser.profilePhotoUrl" ng-src="/images/user-img-placeholder.png" alt="user img" class="mini-user-img" />
-          <span hide-xs>{{model.authenticatedUser.displayName}} </span><i class="fa fa-caret-down"></i>
+          <span layout layout-align="start center">
+            <img alt="user img" class="mini-user-img"
+              ng-show="model.authenticatedUser.profilePhotoUrl"
+              ng-src="{{model.authenticatedUser.profilePhotoUrl}}" />
+            <img alt="user img" class="mini-user-img"
+              ng-hide="model.authenticatedUser.profilePhotoUrl"
+              ng-src="/images/user-img-placeholder.png" />
+            <span hide-xs>{{model.authenticatedUser.displayName}} &nbsp;</span> <i class="fa fa-caret-down"></i>
+          </span>
         </md-button>
         <md-menu-content width="4">
           <md-menu-item>
