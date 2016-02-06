@@ -41,7 +41,7 @@ app.constant('CONSTANTS', {
     aleTerms: {
       "participantGroup"  : "School",
       "participantGroups" : "Schools",
-      "location"          : "Store"
+      "location"          : "Store",
       "locations"         : "Stores"
     }
   }
