@@ -166,6 +166,7 @@
     <Content Include="client\components\site.service.js" />
     <Content Include="client\states\app\app-bar-menu.html" />
     <Content Include="client\states\app\app.config.js" />
+    <Content Include="client\states\app\app.constants.js" />
     <Content Include="client\states\app\app.controller.js" />
     <Content Include="client\states\app\app.html" />
     <Content Include="client\states\app\event-session-volunteer\event-session-volunteer-container.html" />
@@ -206,6 +207,10 @@
     <Content Include="client\states\app\site-admin\system-user.dialog.html" />
     <Content Include="client\states\app\site-admin\system-users.controller.js" />
     <Content Include="client\states\app\site-admin\system-users.html" />
+    <Content Include="client\states\app\user\events.controller.js" />
+    <Content Include="client\states\app\user\events.html" />
+    <Content Include="client\states\app\user\locations.html" />
+    <Content Include="client\states\app\user\team.html" />
     <Content Include="client\states\app\user\upload-participant-groups.controller.js" />
     <Content Include="client\states\app\user\upload-participant-groups.dialog.html" />
     <Content Include="client\states\app\user\edit-event.dialog.html" />
@@ -225,7 +230,6 @@
     <Content Include="client\states\app\user\event-sessions.controller.js" />
     <Content Include="client\states\app\user\event.html" />
     <Content Include="client\states\app\user\event-old.html" />
-    <Content Include="client\states\app\user\home.html" />
     <Content Include="client\states\app\user\event-participants.controller.js" />
     <Content Include="client\states\app\user\event-sessions.html" />
     <Content Include="client\states\app\user\event-participants.html" />
