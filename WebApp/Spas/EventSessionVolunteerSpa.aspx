@@ -48,12 +48,12 @@
         app.config(['$locationProvider', '$stateProvider', '$urlRouterProvider', '$mdThemingProvider', 'AUTHORIZATION_ROLES', function ($locationProvider, $stateProvider, $urlRouterProvider, $mdThemingProvider, AUTHORIZATION_ROLES) {
 
             $locationProvider.html5Mode(true);
-            $urlRouterProvider.otherwise("/dashboard");
+            $urlRouterProvider.otherwise("/");
 
             //Now set up the theme
             $mdThemingProvider.theme('default')
-              .primaryPalette('light-green')
-              .accentPalette('deep-purple');
+              .primaryPalette('indigo')
+              .accentPalette('pink');
         }]);
 
 
@@ -64,12 +64,12 @@
 
     <% if (WebUtilityContext.Current.SiteBaseDomain.StartsWith("dev.") || WebUtilityContext.Current.SiteBaseDomain.StartsWith("rolling.")) { %>
 
-      <%--On Dev (dev.*) or Rolling (rolling.*) sites, we don't want to emit anything when optimizations are off. That allows Charles to work --%> 
+      <%--On Dev (dev.*) or Rolling (rolling.*) sites, we don't want to emit anything when optimizations are off. That allows Charles to work --%>
       <%: Scripts.Render("~/bundles/clientTemplates") %>
 
     <% } else { %>
 
-      <%--Everywhere else, we always want to our templates even when BundleTable.EnableOptimizations is off --%> 
+      <%--Everywhere else, we always want to our templates even when BundleTable.EnableOptimizations is off --%>
       <script src="<%: BundleTable.Bundles.ResolveBundleUrl("~/bundles/clientTemplates") %>" type="text/javascript"></script>
 
     <% } %>

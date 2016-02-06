@@ -1,30 +1,10 @@
 <div class="appbar">
   <md-toolbar>
-    <div class="md-toolbar-tools">
-      <h2>
-        <a ui-sref="app.user.events">OSB</a></span>
-      </h2>
+    <div class="md-toolbar-tools" layout layout-align="start center">
+      <span class="md-title text-white">
+        ALE Check-In
+      </span>
       <span flex></span>
-      <md-menu>
-        <md-button md-menu-origin aria-label="User menu" ng-click="$mdOpenMenu()">
-          <img ng-show="model.authenticatedUser.profilePhotoUrl" ng-src="{{model.authenticatedUser.profilePhotoUrl}}" alt="user img" class="mini-user-img" />
-          <img ng-hide="model.authenticatedUser.profilePhotoUrl" ng-src="/images/user-img-placeholder.png" alt="user img" class="mini-user-img" />
-          <span hide-xs>{{model.authenticatedUser.displayName}} </span><i class="fa fa-caret-down"></i>
-        </md-button>
-        <md-menu-content width="4">
-          <md-menu-item>
-            <md-button disabled ng-click="goToState('app.user.account')">
-              <i class="fa fa-user"></i> Your Account
-            </md-button>
-          </md-menu-item>
-          <md-menu-divider></md-menu-divider>
-          <md-menu-item>
-            <md-button ng-click="signOut()">
-              <i class="fa fa-sign-out"></i> Sign Out
-            </md-button>
-          </md-menu-item>
-        </md-menu-content>
-      </md-menu>
       <div ms-debug-only>
         <md-button ng-click="toggleDebugMode()" class="md-icon-button" aria-label="debug mode">
           <md-tooltip>Debug Mode</md-tooltip>
