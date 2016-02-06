@@ -34,6 +34,8 @@ namespace WebApp.Spas
             //master.includeAngularMaterial = false;
             //master.includeAngularMaterialCdnLatest = true;
 
+            master.includeAngularTranslate = true;
+
 
             var request = this.Request;
             Debug.Assert(request != null);
