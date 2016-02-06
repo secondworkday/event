@@ -19,12 +19,12 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         //!! did we just re-use this controller as a shortcut?
         controller: 'SystemUsersController'
     })
-    .state('app.user.schools', {
-        url: '/schools',
-        templateUrl: '/client/states/app/user/schools.html'
+    .state('app.user.participant-groups', {
+        url: '/' + CONSTANTS.tenantTerms.aleTerms.participantGroups,
+        templateUrl: '/client/states/app/user/participant-groups.html'
     })
     .state('app.user.locations', {
-        url: '/locations',
+        url: '/' + CONSTANTS.tenantTerms.aleTerms.locations,
         templateUrl: '/client/states/app/user/locations.html'
     })
     .state('app.user.event-old', {
