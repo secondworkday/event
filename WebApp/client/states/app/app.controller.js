@@ -3,6 +3,10 @@ app.controller('AppController', function ($scope, $translate, $timeout, $mdSiden
 
   $scope.model = siteService.getModel();
 
+  $scope.sampleTenants = [
+    "Tenant101", "Tenant202", "Tenant303"
+  ];
+
   $scope.months = [
     {name: "January", number: 00},
     {name: "February", number: 01},
