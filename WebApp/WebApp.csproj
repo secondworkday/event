@@ -169,6 +169,7 @@
     <Content Include="client\states\app\app.constants.js" />
     <Content Include="client\states\app\app.controller.js" />
     <Content Include="client\states\app\app.html" />
+    <Content Include="client\states\app\app.translate.js" />
     <Content Include="client\states\app\event-session-volunteer\event-session-volunteer-container.html" />
     <Content Include="client\states\app\event-session-volunteer\event-session-volunteer.config.js" />
     <Content Include="client\states\app\event-session-volunteer\event-session-volunteer.controller.js" />

@@ -1,4 +1,4 @@
-app.controller('AppController', function ($scope, $timeout, $mdSidenav, $mdDialog, $mdUtil, $log, $msUI, $stateParams, $state, utilityService, siteService, AUTHORIZATION_ROLES) {
+app.controller('AppController', function ($scope, $translate, $timeout, $mdSidenav, $mdDialog, $mdUtil, $log, $msUI, $stateParams, $state, utilityService, siteService, AUTHORIZATION_ROLES) {
   $log.debug('Loading AppController...');
 
   $scope.model = siteService.getModel();
@@ -44,6 +44,11 @@ app.controller('AppController', function ($scope, $timeout, $mdSidenav, $mdDialo
     $scope.debugMode = !$scope.debugMode;
     $state.go('.', { debug: $scope.debugMode ? true : undefined });
   };
+
+  $scope.changeLanguage = function (langKey) {
+    $translate.use(langKey);
+  };
+
 
   $scope.goToState = function(state) {
     $state.go(state);

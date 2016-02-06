@@ -24,6 +24,10 @@ namespace WebApp
         public bool includeAngularSwing = false;
 
 
+        public bool includeAngularTranslate = false;
+
+
+
         public bool includePlayingCards = false;
 
         protected string sysinfoObjectJson

@@ -104,6 +104,10 @@
 <% } %>
 
 
+<%if (this.includeAngularTranslate) { %>
+    <script src="<%=VersionedUri.MapPath("/bower_components/angular-translate/angular-translate.js")%>"></script>
+<% } %>
+
 
 
 
@@ -153,6 +157,12 @@
 <%if (this.includeD3) { %>
                 'nvd3',
 <% } %>
+
+                // Angular-Translate
+<%if (this.includeAngularTranslate) { %>
+                'pascalprecht.translate',
+<% } %>
+
 
 
 
