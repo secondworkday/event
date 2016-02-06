@@ -162,6 +162,8 @@
     <Content Include="Bootstrap\bootstrap.html" />
     <Content Include="Bootstrap\bootstrap.js" />
     <Content Include="Bootstrap\Default.aspx" />
+    <Content Include="bower_components\angular-translate\angular-translate.js" />
+    <Content Include="bower_components\angular-translate\angular-translate.min.js" />
     <Content Include="client\app.css" />
     <Content Include="client\components\site.service.js" />
     <Content Include="client\states\app\app-bar-menu.html" />
