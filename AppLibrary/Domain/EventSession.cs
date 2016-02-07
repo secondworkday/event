@@ -84,11 +84,19 @@ namespace App.Library
 
         public static IQueryable<EventSession> Query(AppDC dc)
         {
-            Debug.Assert(dc.TransactionAuthorizedBy != null);
+            var authorizedBy = dc.TransactionAuthorizedBy;
+            Debug.Assert(authorizedBy != null);
+
+            var query = EventSession.query(dc);
+
+            if (authorizedBy.IsSystem)
+            {
+                return query;
+            }
+
 
             var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrInvalid;
-
-            var result = query(dc)
+            var result = query
                 // http://stackoverflow.com/questions/586097/compare-nullable-types-in-linq-to-sql
                 .Where(item => item.ScopeType == ExtendedPropertyScopeType.Global ||
                     item.ScopeType == teamEPScope.ScopeType && object.Equals(item.ScopeID, teamEPScope.ID));
@@ -276,6 +284,33 @@ namespace App.Library
                 return HubResult.Success;
             });
         }
+
+
+
+
+
+        public static HubResult GetVolunteerAuthInfo(AppDC dc, int itemID)
+        {
+            Debug.Assert(dc != null);
+
+            return ReadLock(dc, itemID, item =>
+            {
+                // This verifies the Event Session really exists and we have access
+
+                var authToken = LoginAuthTemplate.ExtendOrCreateNew(dc, item, null, null);
+
+                var url = LoginAuthTemplate.Instance.GetUrl(authToken, UtilityContext.Current.RequireSslLogin);
+
+                var result = new
+                {
+                    authCode = authToken.AuthCodeValue,
+                    url = url.ToString()
+                };
+
+                return HubResult.CreateSuccessData(result);
+            });
+        }
+
 
 
 
@@ -678,6 +713,29 @@ namespace App.Library
             return newShow;
         }
 #endif
+
+
+        // Used to create a "EventSession Identity" - for a Volunteer 
+        public static IdentityData CreateIdentityData(AppDC dc, int itemID)
+        {
+            var eventSession = EventSession.FindByID(dc, itemID);
+
+            if (eventSession == null)
+            {
+                return null;
+            }
+
+            var itemEPScope = eventSession.ItemEPScope;
+            Debug.Assert(itemEPScope.ScopeType == ExtendedPropertyScopeType.TenantGroupID);
+
+            var tenantGroupID = itemEPScope.ID;
+            var timeZoneInfo = TenantGroup.GetCachedTimeZoneInfo(tenantGroupID);
+
+            IdentityData identityData = IdentityData.Create(itemEPScope, tenantGroupID, eventSession.Name, null, null, null, timeZoneInfo);
+            return identityData;
+        }
+
+
 
 
         public static EventSession FindByID(AppDC dc, int itemID)

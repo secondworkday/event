@@ -5,7 +5,7 @@
 
 //This handles retrieving data and is used by controllers. 3 options (server, factory, provider) with
 //each doing the same thing just structuring the functions/data differently.
-app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEMPLATE_URL', 'CONNECTION_EVENT', function ($rootScope, $q, $state, utilityService, TEMPLATE_URL, CONNECTION_EVENT) {
+app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msIdentity', 'TEMPLATE_URL', 'CONNECTION_EVENT', function ($rootScope, $q, $state, utilityService, msIdentity, TEMPLATE_URL, CONNECTION_EVENT) {
 
   var siteHub = $.connection.siteHub; // the generated client-side hub proxy
   var self = this;
@@ -111,6 +111,14 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
   this.redeemUserSignupInvitation = function (createUserAuthCode, password, options) {
     return utilityService.callHub(function () {
       return siteHub.server.redeemUserSignupInvitation(createUserAuthCode, password, options);
+    });
+  };
+
+
+
+  this.getEventSessionVolunteerAuthInfo = function (eventSession) {
+    return utilityService.callHub(function () {
+      return siteHub.server.getEventSessionVolunteerAuthInfo(eventSession.id);
     });
   };
 
@@ -234,52 +242,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
       return siteHub.server.setOccupationHeroImageFocalPoint(occupation.onetCode, x, y);
     });
   };
-
-
-
-  //** Occupation Major Group Related
-
-  model.occupationMajorGroups = {
-    "11-0000.00": { onetCode: "11-0000.00", title: "Management Occupations" },
-    "13-0000.00": { onetCode: "13-0000.00", title: "Business and Financial Operations Occupations" },
-    "15-0000.00": { onetCode: "15-0000.00", title: "Computer and Mathematical Occupations" },
-    "17-0000.00": { onetCode: "17-0000.00", title: "Architecture and Engineering Occupations" },
-    "19-0000.00": { onetCode: "19-0000.00", title: "Life, Physical, and Social Science Occupations" },
-    "21-0000.00": { onetCode: "21-0000.00", title: "Community and Social Services Occupations" },
-    "23-0000.00": { onetCode: "23-0000.00", title: "Legal Occupations" },
-    "25-0000.00": { onetCode: "25-0000.00", title: "Education, Training, and Library Occupations" },
-    "27-0000.00": { onetCode: "27-0000.00", title: "Arts, Design, Entertainment, Sports, and Media Occupations" },
-    "29-0000.00": { onetCode: "29-0000.00", title: "Healthcare Practitioners and Technical Occupations" },
-    "31-0000.00": { onetCode: "31-0000.00", title: "Healthcare Support Occupations" },
-    "33-0000.00": { onetCode: "33-0000.00", title: "Protective Service Occupations" },
-    "35-0000.00": { onetCode: "35-0000.00", title: "Food Preparation and Serving Related Occupations" },
-    "37-0000.00": { onetCode: "37-0000.00", title: "Building and Grounds Cleaning and Maintenance Occupations" },
-    "39-0000.00": { onetCode: "39-0000.00", title: "Personal Care and Service Occupations" },
-    "41-0000.00": { onetCode: "41-0000.00", title: "Sales and Related Occupations" },
-    "43-0000.00": { onetCode: "43-0000.00", title: "Office and Administrative Support Occupations" },
-    "45-0000.00": { onetCode: "45-0000.00", title: "Farming, Fishing, and Forestry Occupations" },
-    "47-0000.00": { onetCode: "47-0000.00", title: "Construction and Extraction Occupations" },
-    "49-0000.00": { onetCode: "49-0000.00", title: "Installation, Maintenance, and Repair Occupations" },
-    "51-0000.00": { onetCode: "51-0000.00", title: "Production Occupations" },
-    "53-0000.00": { onetCode: "53-0000.00", title: "Transportation and Material Moving Occupations" },
-    "55-0000.00": { onetCode: "55-0000.00", title: "Military Specific Occupations" }
-  };
-
-  // Note: we share various functions like setOccupationHeroImageSource() from the Occupation section above!
-
-  self.getOccupationAuxiliaryData = function (occupationCode) {
-    return utilityService.callHub(function () {
-      return siteHub.server.getOccupationAuxiliaryData(occupationCode);
-    }).then(function (auxiliaryItem) {
-      var modelItem = model.occupationMajorGroups[auxiliaryItem.onetCode];
-      // (overlay the new item data we were just provided on top of our existing item)
-      angular.extend(modelItem, auxiliaryItem);
-      return modelItem;
-    });
-  };
-
-
-
 
 
 
@@ -1266,6 +1228,10 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
 
   siteHub.on('updateSettings', function (settingsObject) {
     $rootScope.$apply(onSettingsUpdated(settingsObject));
+  }).on('setAuthenticatedEventSession', function (itemsData) {
+
+    $rootScope.$apply(onSetAuthenticatedEventSession(itemsData));
+
   }).on('updateProjects', function (projectsData) {
     //var notification = onProjectsUpdated(projectsData);
     $rootScope.$apply($rootScope.$broadcast('updateProjects', onProjectsUpdated(projectsData)));
@@ -1308,6 +1274,27 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'TEM
   }).on('touchInit', function (touchData) {
     $rootScope.$apply(onTouchData(touchData));
   });
+
+
+
+  function onSetAuthenticatedEventSession(itemsData) {
+    // usersData is expected to contain just one user - the authenticated user
+    //onUsersUpdated(usersData);
+    if (itemsData && itemsData.items) {
+
+      //!! TODO - this users' data might change - need to track that in onUsersUpdated() - but do that after we change the server notification
+      var authenticatedItem = itemsData.items[0];
+      model.authenticatedIdentity = msIdentity.create('eventSession', authenticatedItem.id, authenticatedItem.name, authenticatedItem.systemRoles, authenticatedItem.profilePhotoUrl);
+      model.authenticatedUser = null;
+
+      // head to Kiosk home page
+      $state.go('app.event-session-volunteer.check-in', {}, { reload: true });
+
+      $rootScope.$broadcast('authenticated:', model.authenticatedIdentity);
+    }
+  };
+
+
 
 
 

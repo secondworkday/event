@@ -25,7 +25,7 @@ namespace WebApp
         /// <summary>
         /// Authenticates based on Context identity, and uses provides routines to handle authenticated and anonymous cases
         /// </summary>
-        protected T standardHeaderXXX<T>(Func<SiteContext, AppDC, T> authenticatedHandler, Func<T> anonymousHandler)
+        protected T standardHeader<T>(Func<SiteContext, AppDC, T> authenticatedHandler, Func<T> anonymousHandler)
         {
             return IdentityHeader(BaseHub.AccountsOnlyDataContextFactory<AppDC>, dc => authenticatedHandler(SiteContext.Current, dc), anonymousHandler);
         }
@@ -86,6 +86,44 @@ namespace WebApp
             }
         }
 #endif
+
+
+        public override Task OnConnected()
+        {
+            // ** Good news. We've just had a client connect! In a SPA application, this is our opportunity to inform that client of their Identity.
+
+            // call the base first - to setup our tenant notification group
+            return standardHeader((siteContext, dc) =>
+            {
+                var authorizedBy = dc.TransactionAuthorizedBy;
+                if (authorizedBy != null)
+                {
+                    // (haven't tested non-Tenant identities yet - so asserting here so we can validate that code path)
+                    Debug.Assert(authorizedBy.TenantID.HasValue);
+                    Debug.Assert(authorizedBy.TenantGroupID.HasValue);
+
+                    var appDC = dc as AppDC;
+                    Debug.Assert(appDC != null);
+
+                    // Generate a notification which lets the client know their authenticated identity.
+                    if (authorizedBy.AuthorizedTableHashCode == EventSession.TableHashCode)
+                    {
+                        var authenticatedSearchExpression = SearchExpression.Create(authorizedBy.AuthorizedIDs.FirstOrDefault());
+                        var authenticatedNotification = EventSession.Search(appDC, authenticatedSearchExpression, string.Empty, 0, int.MaxValue);
+
+                        Clients.Caller.setAuthenticatedEventSession(authenticatedNotification);
+                    }
+
+                    // Send user stats
+                    //var result = Case.GetMyCasesReadStats(appDC, authorizedBy.GetAuthenticatedUser(appDC).ID);
+                    //Clients.Caller.updateUserStats(result);
+                }
+
+                return base.OnConnected();
+            },
+            () => base.OnConnected());
+        }
+
 
 
         public HubResult CreateParticipantGroup(dynamic data)
@@ -395,6 +433,39 @@ namespace WebApp
         }
 
 
+        public HubResult GetEventSessionVolunteerAuthInfo(int itemID)
+        {
+            return accountsOnlyHeader((utilityContext, dc) =>
+            {
+                return EventSession.GetVolunteerAuthInfo(dc, itemID);
+            });
+        }
+
+
+
+
+
+#if false
+        public HubResult SendSessionVolunteerInvitationEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return HubResult.CreateError("No email address provided.");
+            }
+
+            var mailAddress = email.ParseMailAddress();
+
+            if (mailAddress == null)
+            {
+                return HubResult.CreateError("Invalid email address provided.");
+            }
+
+            return systemIdentityHeader<WebUtilityDC, HubResult>(dc =>
+            {
+                return ResetPasswordAuthTemplate.SendResetPasswordEmail(dc, mailAddress);
+            });
+        }
+#endif
 
 
 

@@ -6,7 +6,7 @@
       </span>
 
       <span class="u-sm-margin-left">
-        Spring 2016 A <!-- event name goes here  -->
+        {{'EVENT' | translate}} - {{event.name}}
       </span>
       <span flex></span>
       <div ms-debug-only>
@@ -23,7 +23,15 @@
   </md-toolbar>
 </div>
 
+
+
 <div class="content-canvas" style="margin-left:auto;margin-right:auto;">
+
+<h2>Hello and welcome to the {{'EVENT_SESSION' | translate}} Page</h2>
+
+AuthInfo: {{authInfo}}
+
+
   <div class="content" ui-view></div>
 </div>
 

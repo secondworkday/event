@@ -29,12 +29,12 @@ namespace WebApp
             using (var dc = utilityContext.CreateDefaultAccountsOnlyDC<AppDC>(requestTimestamp, authorizedBy))
             {
                 var tenantID = context.Request.QueryString.GetNullableInt32("tid");
-                if (tenantID.HasValue)
+                var tenantGroupInfo = TenantGroup.GetCachedTenantGroupInfo(tenantID);
+                if (tenantGroupInfo != null)
                 {
                     WebAuthentication.AccessCheckOrRedirectToLoginPage(authorizedBy, SystemRole.SystemAdmin.ToEnumerable());
 
-                    var tenant = TenantGroup.FindByID(dc, tenantID.Value);
-                    MS.WebUtility.Authentication.WebIdentityAuthentication.ImpersonateSystem(authorizedBy, tenant);
+                    MS.WebUtility.Authentication.WebIdentityAuthentication.ImpersonateSystem(authorizedBy, tenantGroupInfo);
                     return HubResult.Success;
                 }
 
