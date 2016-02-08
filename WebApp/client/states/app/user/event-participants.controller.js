@@ -70,17 +70,17 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
       clientFunction: function (item) {
         return item.checkInTimestamp && !item.checkOutTimestamp;
       }
-    },
-    {
-      name: 'Checked-Out',
-      indexer: {
-        index: [],
-        sort: utilityService.compareByProperties('id'),
-        filter: utilityService.filterByPropertyHasValue('checkOutTimestamp')
-      },
-      serverTerm: '$checkedOut',
-      clientFunction: utilityService.filterByPropertyHasValue('checkOutTimestamp')
     }
+    // {
+    //   name: 'Checked-Out',
+    //   indexer: {
+    //     index: [],
+    //     sort: utilityService.compareByProperties('id'),
+    //     filter: utilityService.filterByPropertyHasValue('checkOutTimestamp')
+    //   },
+    //   serverTerm: '$checkedOut',
+    //   clientFunction: utilityService.filterByPropertyHasValue('checkOutTimestamp')
+    // }
   ];
   angular.forEach($scope.eventParticipantStateFilters, function (filter) {
     utilityService.registerIndexer($scope.model.eventParticipants, filter.indexer);

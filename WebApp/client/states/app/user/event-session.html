@@ -1,14 +1,20 @@
-<h2>Hello and welcome to the {{'EVENT_SESSION' | translate}} Page</h2>
+<h2>{{'EVENT_SESSION' | translate}}: {{eventSession.name}}</h2>
 
+<div ms-debug-only><pre>eventSession: {{eventSession | json}}</pre></div>
 
+<!--
 all Participants Indexer: {{eventSession.allParticipants}}<br />
 expected Participants Indexer: {{eventSession.expectedParticipants}}<br />
 checked-in Participants Indexer: {{eventSession.checkedInParticipants}}<br />
 checked-out Participants Indexer: {{eventSession.checkedOutParticipants}}<br />
 <br />
 
-AuthInfo: {{authInfo}}
+AuthInfo: {{authInfo}} -->
 
+<p class="md-body-1">
+  Check In URL: <a href="{{authInfo.url}}">{{authInfo.url}}</a><br/>
+  Volunteer Code:  <strong>4951</strong>
+</p>
 
 
 <div ui-view></div>
