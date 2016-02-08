@@ -63,5 +63,6 @@ app.controller('EventSessionVolunteerController', function ($scope, $translate, 
     participantSearch: null
   };
 
+ 
 
 });

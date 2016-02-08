@@ -543,6 +543,23 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
   };
 
 
+  this.createEventSession = function (eventSessionData) {
+    return utilityService.callHub(function () {
+      return siteHub.server.createEventSession(eventSessionData);
+    });
+  };
+
+  this.editEventSession = function (eventSessionID, eventSessionData) {
+    return utilityService.callHub(function () {
+      return siteHub.server.editEventSession(eventSessionID, eventSessionData);
+    });
+  };
+
+  this.deleteEventSession = function (eventSession) {
+    return utilityService.callHub(function () {
+      return siteHub.server.deleteEventSession(eventSession.id);
+    });
+  };
 
 
   // returns a promise (not an Item - see demandXyz() for the delayed load Item variant)

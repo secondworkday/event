@@ -66,6 +66,20 @@ namespace App.Library
             this.EndDate = endDate;
         }
 
+        protected EventSession(DateTime createdTimestamp, EPScope epScope, int eventID)
+            : this()
+        {
+            this.CreatedTimestamp = createdTimestamp;
+            this.LastModifiedTimestamp = createdTimestamp;
+
+            this.ScopeType = epScope.ScopeType;
+            this.ScopeID = epScope.ID;
+
+            this.EventID = eventID;
+
+            this.State = EventSessionState.Plan;
+        }
+
 
 
         private static Func<IQueryable<EventSession>, string, IQueryable<EventSession>> termFilter = (query, searchTermLower) =>
@@ -260,6 +274,8 @@ namespace App.Library
                 var endDate = (DateTime)data.endDate;
 
                 var newItem = new EventSession(createdTimestamp, teamEPScope, eventID, name, location, startDate, endDate);
+                //var newItem = new EventSession(createdTimestamp, teamEPScope, eventID);
+
                 dc.Save(newItem);
                 // (have to save to obtain an ID before we can save ExtendedProperties
                 Debug.Assert(newItem.ID > 0);
@@ -267,10 +283,51 @@ namespace App.Library
                 // After we've got our ID, advance Status to Opened
                 //!! newItem.setStatus(dc, ProjectStatus.Submitted);
 
-                //!! newItem.updateData(dc, data);
+                newItem.updateData(dc, data);
 
                 return newItem;
             });
+        }
+
+        private void updateData(AppDC dc, dynamic data)
+        {
+            this.Name = (string)data.name;
+            this.Location = (string)data.location;
+            this.StartDate = (DateTime)data.startDate;
+            this.EndDate = (DateTime)data.endDate;
+        }
+
+        public static HubResult Edit(AppDC dc, int itemID, dynamic data)
+        {
+            return WriteLock(dc, itemID, (item, notifyExpression) =>
+            {
+                item.updateData(dc, data);
+
+                notifyExpression.AddModifiedID(item.ID);
+                return HubResult.Success;
+            });
+        }
+
+        public static HubResult Delete(AppDC dc, int itemID)
+        {
+            var deleteItem = dc.EventSessions
+                .FirstOrDefault(item => item.ID == itemID);
+            Debug.Assert(deleteItem != null);
+
+            if (deleteItem == null)
+            {
+                return HubResult.CreateError("Not found");
+            }
+
+            //!! TODO remove any Tags that have their last reference with this Pipeline
+            //!! Should we have an ExtendedObject call to remove all extended properties?
+            dc.SubmitChanges();
+
+            var notifyExpression = new NotifyExpression();
+            notifyExpression.AddDeletedID(itemID);
+            NotifyClients(dc, notifyExpression);
+
+            return HubResult.Success;
         }
 
 

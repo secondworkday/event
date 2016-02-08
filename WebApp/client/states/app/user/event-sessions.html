@@ -1,5 +1,9 @@
 <ms-search-view change-event="updateParticipants" search="searchHandler" options="searchViewOptions" user-search="userSearch">
-
+  <div>
+      <md-button ng-click="showAddSessionDialog($event)" class="md-fab md-primary" aria-label="new" style="float:right;">
+        <i class="fa fa-plus fa-lg"></i>
+      </md-button>
+  </div>
   <div layout layout-wrap>
     <md-card
       ng-repeat="eventSession in $displayedIndex | objectLookup:$hashMap track by eventSession.id">
@@ -28,6 +32,7 @@
         </p>
       </md-card-content>
       <md-card-actions layout="row" layout-align="end center">
+        <md-button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditEventSessionDialog($event, eventSession)" aria-label="edit event session"><i class="fa fa-pencil ng-scope"></i></md-button>
         <md-button class="md-primary"
           ng-if="eventSession.state == 'Plan'"
           ng-click="setEventSessionState(eventSession, 'Active')">
@@ -38,8 +43,8 @@
           ng-if="eventSession.state == 'Active'">
           View
         </md-button>
+        
       </md-card-actions>
     </md-card>
   </div>
-
 </ms-search-view>

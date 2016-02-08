@@ -16,7 +16,7 @@
           <div layout="column">
             <md-input-container class="md-block" flex-gt-sm>
               <label>{{'EVENT' | translate}} name</label>
-              <input ng-model="formData.name">
+              <input ng-model="formData.name" md-autofocus>
             </md-input-container>
               <md-input-container class="md-block" flex-gt-sm>
                   <label>Sponsor</label>
@@ -35,7 +35,7 @@
        Cancel
       </md-button>
       <md-button ng-click="generateRandomEvent()"><i class="fa fa-magic"></i> Create Demo {{'EVENT' | translate}}</md-button>
-      <md-button class="md-primary" ng-click="createEvent()" ng-disabled="!formData.name" >
+      <md-button type="submit" class="md-primary" ng-click="createEvent()" ng-disabled="!formData.name" >
         Create {{'EVENT' | translate}}
       </md-button>
     </md-dialog-actions>

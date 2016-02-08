@@ -1,34 +1,35 @@
 <md-dialog flex-gt-sm="60" aria-label="edit {{'EVENT' | translate}}" ng-cloak>
-  <form>
-    <md-toolbar>
-      <div class="md-toolbar-tools">
+    <form>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
         <h2>Edit {{'EVENT' | translate}}</h2>
-        <span flex></span>
-        <md-button class="md-icon-button" ng-click="cancel()">
-          <i class="fa fa-times"></i>
-        </md-button>
-      </div>
-    </md-toolbar>
-    <md-dialog-content>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <i class="fa fa-times"></i>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
 
-      <div class="md-dialog-content">
-        <!--<form name="form">-->
-          <div layout="column">
-            <md-input-container class="md-block" flex-gt-sm>
+            <div class="md-dialog-content">
+                <!--<form name="form">-->
+                <div layout="column">
+                    <md-input-container class="md-block" flex-gt-sm>
               <label>{{'EVENT' | translate}} name</label>
-              <input ng-model="event.name">
-            </md-input-container>
-              <md-input-container class="md-block" flex-gt-sm>
-                  <label>Sponsor</label>
-                  <input ng-model="event.sponsor">
-              </md-input-container>
-          </div>
-        <!--</form>-->
-      </div>
-    </md-dialog-content>
-    <md-dialog-actions layout="row" layout-align="end center">
-      <md-button ng-click="cancel()">Cancel</md-button>
-      <md-button class="md-primary" ng-click="editEvent()" ng-disabled="!event.name" >Save</md-button>
-    </md-dialog-actions>
-  </form>
+                        <input ng-model="event.name" md-autofocus>
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Sponsor</label>
+                        <input ng-model="event.sponsor">
+                    </md-input-container>
+                </div>
+                <!--</form>-->
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row" layout-align="end center">
+            <md-button ng-click="">Delete User</md-button>
+            <md-button ng-click="cancel()">Cancel</md-button>
+            <md-button type="submit" class="md-primary" ng-click="editEvent()" ng-disabled="!event.name">Save</md-button>
+        </md-dialog-actions>
+    </form>
 </md-dialog>

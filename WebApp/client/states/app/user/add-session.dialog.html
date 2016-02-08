@@ -2,7 +2,7 @@
   <form>
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <h2>Add {{'EVENT_SESSION' | translate}}</h2>
+        <h2>{{newOrEdit}} {{'EVENT_SESSION' | translate}}</h2>
         <span flex></span>
         <md-button class="md-icon-button" ng-click="cancel()">
           <i class="fa fa-times"></i>
@@ -11,51 +11,92 @@
     </md-toolbar>
     <md-dialog-content>
       <div class="md-dialog-content">
-        <form name="form">
-          <div layout-gt-sm="row">
-            <md-input-container class="md-block" flex-gt-sm>
-              <label>{{'EVENT_SESSION' | translate}} name</label>
-              <input ng-model="formData.name">
-            </md-input-container>
-            <md-datepicker style="margin-top:1rem;" ng-model="formData.date" md-placeholder="Session date">
-            </md-datepicker>
-          </div>
-          <div layout-gt-sm="row">
-            <md-input-container class="md-block" flex-gt-sm>
-              <label>{{'LOCATION' | translate}} name</label>
-              <input ng-model="formData.location">
-            </md-input-container>
-          </div>
-          <div layout-gt-sm="row">
-            <md-input-container class="md-block" flex-gt-sm>
-              <label>Street address</label>
-              <input ng-model="formData.streetAddress">
-            </md-input-container>
-          </div>
-          <div layout-gt-sm="row">
-            <md-input-container class="md-block" flex-gt-sm>
-              <label>City</label>
-              <input ng-model="formData.city">
-            </md-input-container>
-            <md-input-container class="md-block" flex-gt-sm>
-              <label>State</label>
-              <input ng-model="formData.state">
-            </md-input-container>
-            <md-input-container class="md-block" flex-gt-sm>
-              <label>Zip code</label>
-              <input ng-model="formData.zipCode">
-            </md-input-container>
-          </div>
-        </form>
+
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>{{'EVENT_SESSION' | translate}} name</label>
+            <input ng-model="formData.name">
+          </md-input-container>
+        </div>
+        <div layout-gt-sm="row">
+          <md-datepicker style="margin-top:1rem;" ng-model="formData.startDate" md-placeholder="Session date" ng-change="startTimeChanged()" flex-gt-sm></md-datepicker>
+          <md-input-container flex-gt-sm>
+            <label>Start Time</label>
+            <md-select ng-model="formData.startTime" ng-change="startTimeChanged()" flex-gt-sm>
+              <md-option ng-repeat="tt in formInput.timeChoice" value="{{tt.value}}">
+                {{tt.display}}
+              </md-option>
+            </md-select>
+          </md-input-container>
+          <md-select ng-model="formData.startTimeAmPm" ng-change="startTimeChanged()" flex-gt-sm>
+            <md-option ng-repeat="ampm in formInput.ampm" value="{{ampm}}">
+              {{ampm}}
+            </md-option>
+          </md-select>
+        </div>
+
+        <div layout-gt-sm="row">
+          <md-input-container flex-gt-sm></md-input-container>
+          <md-input-container flex-gt-sm>
+            <label>End Time</label>
+            <md-select ng-model="formData.endTime" ng-change="endTimeChanged()" flex-gt-sm>
+              <md-option ng-repeat="time in formInput.timeChoice" value="{{time.value}}">
+                {{time.display}}
+              </md-option>
+            </md-select>
+          </md-input-container>
+          <md-select ng-model="formData.endTimeAmPm" ng-change="endTimeChanged()" flex-gt-sm>
+            <md-option ng-repeat="ampm in formInput.ampm" value="{{ampm}}">
+              {{ampm}}
+            </md-option>
+          </md-select>
+        </div>
+
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>{{'LOCATION' | translate}} name</label>
+            <input ng-model="formData.location">
+          </md-input-container>
+        </div>
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Street address</label>
+            <input ng-model="formData.streetAddress">
+          </md-input-container>
+        </div>
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>City</label>
+            <input ng-model="formData.city">
+          </md-input-container>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>State</label>
+            <input ng-model="formData.state">
+          </md-input-container>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Zip code</label>
+            <input ng-model="formData.zipCode">
+          </md-input-container>
+        </div>
       </div>
     </md-dialog-content>
     <md-dialog-actions layout="row" layout-align="end center">
-      <md-button ng-click="cancel()">
-       Cancel
+      <md-button ng-click="showDeleteConfirmationDialog($event, formData)" ng-if="newOrEdit == 'Edit'">
+        Delete {{'EVENT_SESSION' | translate}}
       </md-button>
-      <md-button ng-click="addSession(formData)">
+      <md-button ng-click="cancel()">
+        Cancel
+      </md-button>
+      <md-button ng-click="createEventSession(formData)" ng-if="newOrEdit == 'New'" ng-disabled="!formData.name || !formData.startDate">
         Add
+      </md-button>
+      <md-button ng-click="editEventSession()" ng-if="newOrEdit == 'Edit'" ng-disabled="!formData.name || !formData.startDate">
+        Save
       </md-button>
     </md-dialog-actions>
   </form>
+  <div ms-debug-only>
+    <pre>{{formData | json}}</pre>
+    <!--<pre>{{formInput | json}}</pre>-->
+  </div>
 </md-dialog>
