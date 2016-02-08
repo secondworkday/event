@@ -265,6 +265,30 @@ namespace App.Library
                 searchTerm => item => item.EventSessionID.ToString() == searchTerm);
 
 
+
+            // eg. $notCheckedIn, $checkedIn
+            query = searchExpression.FilterByAnyStateTerm2(query,
+                searchTerm =>
+                {
+                    System.Linq.Expressions.Expression<Func<EventParticipant, bool>> notCheckedInPredicate = item => !item.CheckInTimestamp.HasValue;
+                    System.Linq.Expressions.Expression<Func<EventParticipant, bool>> checkedInPredicate = item => item.CheckInTimestamp.HasValue && !item.CheckOutTimestamp.HasValue;
+                    System.Linq.Expressions.Expression<Func<EventParticipant, bool>> checkedOutPredicate = item => item.CheckOutTimestamp.HasValue;
+
+                    switch (searchTerm)
+                    {
+                        case "notCheckedIn":
+                            return notCheckedInPredicate;
+                        case "checkedIn":
+                            return checkedInPredicate;
+                        case "checkedOut":
+                            return checkedOutPredicate;
+                        default:
+                            Debug.Fail("Unexpected searchTerm: " + searchTerm);
+                            return exItem => false;
+                    }
+                });
+
+
             // EventParticipants involve Partipants, ParticipantGroups & EventSessions, all of which can be involved with searches
             // So we widen the query here so we can filter on all those things
             var searchTermQuery = 

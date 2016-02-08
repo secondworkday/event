@@ -324,6 +324,75 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
   var connectionLostState;
 
 
+  self.buildSearchExpression = function (/*filters*/) {
+    var filterHandler = function (searchTerms, filter) {
+      if (typeof filter === 'string') {
+        // direct search component like 'pete'
+        searchTerms.push(filter);
+      }
+      else if (typeof filter === 'object') {
+        if (filter.serverTerm) {
+          searchTerms.push(filter.serverTerm);
+        }
+        else {
+          $log.debug('object type?', filter);
+        }
+      }
+    };
+
+    var filterTerms = buildFilterTerms(arguments, filterHandler);
+    var searchExpression = filterTerms.join(' ');
+    return searchExpression;
+  };
+
+  self.buildClientFilter = function (/*filters*/) {
+    var clientFilterHandler = function (clientFilterTerms, filter) {
+      if (typeof filter === 'object') {
+        if (filter.clientFunction) {
+          clientFilterTerms.push(filter.clientFunction);
+        }
+        else {
+          $log.debug('object type?', filter);
+        }
+      }
+    };
+
+    var filterTerms = buildFilterTerms(arguments, clientFilterHandler);
+    return filterTerms;
+  };
+
+
+
+  function buildFilterTerms(hierarchy, filterHandler) {
+
+    var filterTermHandler = function (searchTerms, filter) {
+      if (typeof filter === 'undefined') {
+        // nothing to do
+      }
+      else if (typeof filter === 'string' || typeof filter === 'object') {
+        filterHandler(searchTerms, filter);
+      }
+      else {
+        $log.debug('type?', filter);
+      }
+    };
+
+    var filterTerms = [];
+    angular.forEach(hierarchy, function (filter) {
+      if (angular.isArray(filter)) {
+        angular.forEach(filter, function (filter) {
+          filterTermHandler(filterTerms, filter);
+        });
+      } else {
+        filterTermHandler(filterTerms, filter);
+      }
+    });
+    return filterTerms;
+  }
+
+
+
+
   // Some handy compare functions
 
     function compareByID(left, right) {
@@ -398,11 +467,14 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     };
 
     self.filterByPropertyHasValue = function (propertyName) {
-      return function (item) {
-        if (propertyName[0] === "!") {
-          propertyName = propertyName.substr(1);
+      var propertyName = propertyName;
+      if (propertyName[0] === "!") {
+        propertyName = propertyName.substr(1);
+        return function (item) {
           return !item[propertyName];
-        }
+        };
+      }
+      return function (item) {
         return item[propertyName];
       };
     };
@@ -2473,6 +2545,32 @@ app.directive('msSearchView', function ($parse, utilityService) {
       $scope.displayedIndex = [];
       $scope.totalCount = null;
 
+      $scope.updateClientFilter = function () {
+
+        var clientFilters = utilityService.buildClientFilter(
+          $scope.options.baseFilters,
+          $scope.options.stackFilters,
+
+          $scope.options.filter,
+          $scope.options.selectFilter,
+          $scope.options.userFilter,
+          $scope.options.userSearch);
+
+
+        $scope.clientFilterFunction = function (item) {
+
+          // If we fail any filter, return false
+          angular.forEach(clientFilters, function (clientFilter) {
+            if (!clientFilter(item)) {
+              return false;
+            }
+          });
+          // Otherwise return true
+          return true;
+        }
+      }
+
+
       $scope.onChangeEvent = function (eventData) {
 
         // Handle deleted items - no point showing the user things that don't exist any more
@@ -2499,7 +2597,8 @@ app.directive('msSearchView', function ($parse, utilityService) {
         // Otherwise fall back on the hashMap specified as a directive attribute
         var hashMap = eventData.hashMap || $scope.hashMap;
 
-        utilityService.indexMerge($scope.displayedIndex, eventData.ids, hashMap, $scope.options.filter.clientFunction, $scope.options.sort.clientFunction);
+        //!! utilityService.indexMerge($scope.displayedIndex, eventData.ids, hashMap, $scope.options.filter.clientFunction, $scope.options.sort.clientFunction);
+        utilityService.indexMerge($scope.displayedIndex, eventData.ids, hashMap, $scope.clientFilterFunction, $scope.options.sort.clientFunction);
 
         if ($scope.totalCount) {
           $scope.totalCount += eventData.ids.length;
@@ -2513,6 +2612,19 @@ app.directive('msSearchView', function ($parse, utilityService) {
 
         var searchStartIndex = $scope.displayedIndex.length;
 
+
+        var requestedSearchExpression = utilityService.buildSearchExpression(
+          $scope.options.baseFilters,
+          $scope.options.stackFilters,
+
+          $scope.options.filter,
+          $scope.options.selectFilter,
+          $scope.options.userFilter,
+          $scope.options.userSearch);
+
+
+
+/*
         var requestedSearchExpressionTerms = [];
         angular.forEach($scope.options.userFilters, function (value, key) {
           if (key && value) {
@@ -2522,7 +2634,7 @@ app.directive('msSearchView', function ($parse, utilityService) {
         requestedSearchExpressionTerms.push($scope.options.filter.serverTerm);
         requestedSearchExpressionTerms.push($scope.options.userSearch);
         var requestedSearchExpression = requestedSearchExpressionTerms.join(' ');
-
+*/
         var requestedSortExpression = $scope.options.sort.serverTerm;
 
         if ($scope.loadPageSortExpression !== requestedSortExpression || $scope.loadPageSearchExpression !== requestedSearchExpression) {
@@ -2574,8 +2686,12 @@ app.directive('msSearchView', function ($parse, utilityService) {
               // establish our hashMap - which contains our item objects
               var hashMap = searchData.hashMap || $scope.hashMap;
 
+
+
+
               if ($scope.displayedIndex && $scope.displayedIndex.length) {
-                utilityService.indexMerge($scope.displayedIndex, searchData.ids, hashMap, $scope.options.filter.clientFunction, $scope.options.sort.clientFunction);
+                //!! utilityService.indexMerge($scope.displayedIndex, searchData.ids, hashMap, $scope.options.filter.clientFunction, $scope.options.sort.clientFunction);
+                utilityService.indexMerge($scope.displayedIndex, searchData.ids, hashMap, $scope.clientFilterFunction, $scope.options.sort.clientFunction);
               } else {
                 // Special case loading the first page - no need to sort and/or filter as the server just did that for us
                 utilityService.indexMerge($scope.displayedIndex, searchData.ids);
@@ -2607,6 +2723,9 @@ app.directive('msSearchView', function ($parse, utilityService) {
       };
 
       $scope.reload = function () {
+
+        $scope.updateClientFilter();
+
         if ($scope.loadPageBusy) {
           $scope.loadPageAgain = true;
         } else {
@@ -2648,12 +2767,25 @@ app.directive('msSearchView', function ($parse, utilityService) {
           }
         });
 
-        // note 'deep' watch on this one
+        // note 'deep' watch on these ones
+        scope.$watch('options.baseFilters', function (newValue, oldValue, scope) {
+          if (newValue !== oldValue) {
+            scope.reload();
+          }
+        }, true);
+        scope.$watch('options.stackFilters', function (newValue, oldValue, scope) {
+          if (newValue !== oldValue) {
+            scope.reload();
+          }
+        }, true);
         scope.$watch('options.userFilters', function (newValue, oldValue, scope) {
           if (newValue !== oldValue) {
             scope.reload();
           }
         }, true);
+
+        scope.updateClientFilter();
+
       }
 
       scope.$on(scope.changeEvent, function (event, eventData) {

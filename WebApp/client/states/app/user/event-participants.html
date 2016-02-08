@@ -36,31 +36,23 @@
 <section layout>
   <div class="u-sm-margin-right">
     <p class="md-body-2 text-support">
-      {{'EVENT_SESSIONS' | translate | uppercase}}
+      STATE
     </p>
     <div layout="column">
-      <md-checkbox ng-model="filters.session1" aria-label="filter session">
-        Session Blue (12)
-      </md-checkbox>
-      <md-checkbox ng-model="filters.session2" aria-label="filter session">
-        Session Green (45)
-      </md-checkbox>
-      <md-checkbox ng-model="filters.session3" aria-label="filter session">
-        Session Orange (15)
+      <md-checkbox ng-repeat="filter in eventParticipantStateFilters"
+        ng-checked="exists(filter, searchViewOptions.stackFilters)" ng-click="toggle(filter, searchViewOptions.stackFilters)" aria-label="filter session">
+        {{filter.name}} ({{filter.indexer.index.length}})
       </md-checkbox>
     </div>
+
     <p class="md-body-2 text-support">
       {{'PARTICIPANT_GROUPS' | translate | uppercase}}
     </p>
     <div layout="column">
-      <md-checkbox ng-model="filters.session1" aria-label="filter session">
-        Eastside (31)
-      </md-checkbox>
-      <md-checkbox ng-model="filters.session2" aria-label="filter session">
-        Southside (12)
-      </md-checkbox>
-      <md-checkbox ng-model="filters.session3" aria-label="filter session">
-        Northside (0)
+      <md-checkbox ng-repeat="filter in participantGroupFilters"
+        ng-show="filter.indexer.index.length"
+        ng-checked="exists(filter, searchViewOptions.stackFilters)" ng-click="toggle(filter, searchViewOptions.stackFilters)" aria-label="filter session">
+        {{filter.name}} ({{filter.indexer.index.length}})
       </md-checkbox>
     </div>
   </div>
