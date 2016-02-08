@@ -72,7 +72,7 @@
 
     <% } else { %>
 
-      <%--Everywhere else, we always want to our templates even when BundleTable.EnableOptimizations is off --%>
+      <%--Everywhere else, we always want to bundle our templates even when BundleTable.EnableOptimizations is off --%>
       <script src="<%: BundleTable.Bundles.ResolveBundleUrl("~/bundles/clientTemplates") %>" type="text/javascript"></script>
 
     <% } %>
@@ -102,6 +102,7 @@
     <meta name="msapplication-TileColor" content="#2b5797">
     <meta name="msapplication-TileImage" content="/mstile-144x144.png?v=YAB9gwBN7x">
     <meta name="theme-color" content="#ffffff">
+    <meta name="spa" content="client">
 
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">

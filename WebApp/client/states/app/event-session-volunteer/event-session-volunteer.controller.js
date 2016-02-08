@@ -1,13 +1,14 @@
-app.controller('EventSessionVolunteerController', function ($scope, $translate, $log, $state, $mdDialog, $msUI, utilityService, siteService) {
+app.controller('EventSessionVolunteerController', function ($scope, $translate, $log, $state, $mdDialog, $msUI, utilityService, siteService, eventSession) {
   $log.debug('Loading EventSessionVolunteerController...');
   $log.debug('Loading ' + $state.name + '...');
 
   $scope.participantGroups = siteService.model.participantGroups;
 
-
   $scope.searchParticipantGroups = siteService.model.participantGroups.search;
   $scope.searchParticipants = siteService.model.participants.search;
   $scope.searchEvents = siteService.model.events.search;
+
+  $scope.eventSession = eventSession;
 
   $scope.checkedInCount = 0;
   $scope.expectedCount = 99;

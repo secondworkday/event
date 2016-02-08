@@ -6,7 +6,24 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
     .state('app.event-session-volunteer', {
         abstract: true,
         templateUrl: '/client/states/app/event-session-volunteer/event-session-volunteer-container.html',
-        controller: 'EventSessionVolunteerController'
+        controller: 'EventSessionController',
+        resolve: {
+          eventSession: function ($stateParams, utilityService, siteService) {
+
+            var authenticatedIdentity = utilityService.model.authenticatedIdentity;
+
+            if (authenticatedIdentity.type != 'eventSession') {
+              return null;
+            }
+
+            var eventSessionID = authenticatedIdentity.id;
+            return siteService.ensureEventSession(eventSessionID);
+          },
+          event: function (siteService, eventSession) {
+            var eventID = eventSession.eventID;
+            return siteService.ensureEvent(eventID);
+          }
+        }
     })
 
     .state('app.event-session-volunteer.check-in', {

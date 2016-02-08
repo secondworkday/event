@@ -82,6 +82,27 @@ namespace WebApp
 
 
 
+
+
+            appInfo.RefreshIdentityDataHandler = (dc, authenticatedTableHashCode, authenticatedID) =>
+            {
+                var appDC = dc as AppDC;
+                Debug.Assert(appDC != null);
+
+                Debug.Assert(authenticatedTableHashCode != MS.Utility.User.TableHashCode);
+                //if (authenticatedTableHashCode == MS.Utility.User.TableHashCode)
+                //{
+                //return MS.Utility.User.CreateIdentityData(dc, authenticatedID);
+                //}
+
+                Debug.Assert(authenticatedTableHashCode == EventSession.TableHashCode);
+                var identityData =  EventSession.CreateIdentityData(appDC, authenticatedID);
+                return identityData;
+            };
+
+
+
+
 #if false
             var appInfo = AppInfo.Create(
                 applicationAbbreviation: "actooba",

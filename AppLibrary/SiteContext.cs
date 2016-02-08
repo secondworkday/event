@@ -54,7 +54,7 @@ namespace App.Library
             var webAuthTemplates = new WebAuthTemplate[] 
             {
                 //!! nextgen - add in the compelte list here
-                //LoginAuthTemplate.Instance,
+                LoginAuthTemplate.Instance,
                 //CreateSsoUserAuthTemplate.Instance,
                 //CreateUserAuthTemplate.Instance
             };

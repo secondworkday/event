@@ -14,6 +14,7 @@ using System.Security.Cryptography;
 
 using MS.Utility;
 using MS.WebUtility;
+using MS.WebUtility.Authentication;
 
 namespace App.Library
 {
@@ -825,6 +826,97 @@ namespace App.Library
             return url;
         }
 
+
+#if false
+        public static Uri RevokeAndCreateNewItemUrl(AppDC accountsDC, Type targetType, int targetID, int? usageQuota, TimeSpan? validDuration)
+        {
+            var utilityContext = UtilityContext.Current;
+
+            //!! nextgen - do we need this access check?
+            //!! nextgen - does it help to pass in a Project so we can directly access check it?
+            //!! nextgen - do we need to change the Project.Get() call to pass a DC?
+
+            //var authCheckProject = Project.Get(accountsDC, projectID);
+            //if (authCheckProject == null)
+            //{
+                //return null;
+            //}
+
+            var projectLoginAuthToken = WebAuthTemplate.RevokeAndCreateNewAuthToken(accountsDC, () => QueryValidProjects(accountsDC, projectID), () => CreateAuthToken(accountsDC, typeof(Project), projectID, usageQuota, validDuration));
+
+            var url = Instance.GetUrl(projectLoginAuthToken, utilityContext.RequireSslLogin);
+            return url;
+        }
+
+        public static Uri ExtendOrCreateNewItemUrl(AppDC accountsDC, Type targetType, int targetID, int? usageQuota, TimeSpan? validDuration)
+        {
+            var utilityContext = UtilityContext.Current;
+
+            //!! nextgen - do we need this access check?
+            //!! nextgen - does it help to pass in a Project so we can directly access check it?
+            //!! nextgen - do we need to change the Project.Get() call to pass a DC?
+
+            //var authCheckProject = Project.Get(accountsDC, projectID);
+            //if (authCheckProject == null)
+            //{
+                //return null;
+            //}
+
+            var projectLoginAuthToken = WebAuthTemplate.ExtendOrCreateNewAuthToken(accountsDC, () => QueryValidEventSessions(accountsDC, projectID), () => CreateAuthToken(accountsDC, typeof(Project), projectID, usageQuota, validDuration), validDuration);
+
+            var url = Instance.GetUrl(projectLoginAuthToken, utilityContext.RequireSslLogin);
+            return url;
+        }
+#endif
+
+
+        public static AuthToken ExtendOrCreateNewEventSession(AppDC accountsDC, int targetID, int? usageQuota, TimeSpan? validDuration)
+        {
+            var utilityContext = UtilityContext.Current;
+
+            //!! nextgen - do we need this access check?
+            //!! nextgen - does it help to pass in a Project so we can directly access check it?
+            //!! nextgen - do we need to change the Project.Get() call to pass a DC?
+
+            //var authCheckProject = Project.Get(accountsDC, projectID);
+            //if (authCheckProject == null)
+            //{
+            //return null;
+            //}
+
+            var authToken = WebAuthTemplate.ExtendOrCreateNewAuthToken(accountsDC, () => QueryValidEventSessions(accountsDC, targetID), () => CreateAuthToken(accountsDC, typeof(EventSession), targetID, usageQuota, validDuration), validDuration);
+            return authToken;
+        }
+
+
+
+
+        public static AuthToken ExtendOrCreateNew<T>(AppDC accountsDC, T item, int? usageQuota, TimeSpan? validDuration)
+            where T : IObject
+        {
+            var authToken = WebAuthTemplate.ExtendOrCreateNewAuthToken(accountsDC, () => QueryValidItems(accountsDC, item), () => CreateAuthToken(accountsDC, typeof(T), item.ObjectID, usageQuota, validDuration), validDuration);
+            return authToken;
+        }
+
+        public static Uri ExtendOrCreateNewUrl<T>(AppDC accountsDC, T item, int? usageQuota, TimeSpan? validDuration)
+            where T : IObject
+        {
+            var authToken = ExtendOrCreateNew(accountsDC, item, usageQuota, validDuration);
+            var url = Instance.GetUrl(authToken, UtilityContext.Current.RequireSslLogin);
+            return url;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
         //!! think we can switch over from "Project" to "Event"!!!!
 #if false
         public static Uri RevokeAndCreateNewProjectUrl(AppDC accountsDC, int projectID, int? usageQuota, TimeSpan? validDuration)
@@ -922,6 +1014,27 @@ namespace App.Library
                 .Where(authToken => authToken.TargetID == userID);
         }
 
+        //!! we can specific ExtendedProperties on things that aren't actually database types
+        //   
+
+
+        public static IQueryable<AuthToken> QueryValidItems<T>(UtilityDC dc, T item)
+            where T : IObject
+        {
+            return AuthTemplate.QueryValidAuthTokens(dc, LoginAuthTemplate.authTokenTypeName)
+                .Where(authToken => authToken.TargetTable == typeof(T).Name)
+                .Where(authToken => authToken.TargetID == item.ObjectID);
+        }
+
+
+        public static IQueryable<AuthToken> QueryValidEventSessions(UtilityDC dc, int targetID)
+        {
+            return AuthTemplate.QueryValidAuthTokens(dc, LoginAuthTemplate.authTokenTypeName)
+                .Where(authToken => authToken.TargetTable == typeof(EventSession).Name)
+                .Where(authToken => authToken.TargetID == targetID);
+        }
+
+
 #if false
         public static IQueryable<AuthToken> QueryValidProjects(UtilityDC dc, int projectID)
         {
@@ -951,7 +1064,7 @@ namespace App.Library
 
 
 
-        protected override void OnTokenClicked(HttpContext context, WebUtilityDC dc, AuthToken authToken)
+        protected override AuthTokenState OnTokenClicked(HttpContext context, WebUtilityDC dc, AuthToken authToken)
         {
             UtilityContext utilityContext = UtilityContext.Current;
 
@@ -964,8 +1077,43 @@ namespace App.Library
                 Debug.Assert(context.Request.IsSecureConnection);
             }
 
-            base.OnTokenClicked(context, dc, authToken);
+            var authTokenState = base.OnTokenClicked(context, dc, authToken);
 
+
+            var authorizedBy = dc.TransactionAuthorizedBy;
+
+            if (authTokenState == AuthTokenState.Valid)
+            {
+                var itemEPScope = authToken.ItemEPScope;
+                Debug.Assert(itemEPScope.ScopeType == ExtendedPropertyScopeType.TenantGroupID);
+                Debug.Assert(authToken.TargetID.HasValue);
+
+
+                // Impersonate the TenantGroup "System" - so we're contrained to the correct EPScope
+                var tenantGroupID = itemEPScope.ID.Value;
+                var tenantGroupInfo = TenantGroup.GetCachedTenantGroupInfo(tenantGroupID);
+
+
+                Debug.Assert(authToken.ContextUserID.HasValue);
+                var contextUserID = authToken.ContextUserID.Value;
+
+                var authTokenAuthorizingIdentity = authorizedBy.GetImpersonatedIdentity(dc, contextUserID);
+
+
+                //var systemIdentity = authorizedBy.GetSystemIdentity(dc, tenantGroupInfo);
+                //Debug.Assert(systemIdentity != null);
+
+                dc.UsingIdentity<AppDC>(authTokenAuthorizingIdentity, tenantDC =>
+                    {
+                        if (authToken.TargetID.HasValue)
+                        {
+                            WebIdentityAuthentication.StartObjectSession(dc, context, TimeZones.Pacific, tenantGroupID, null, typeof(EventSession), authToken.TargetID.Value, null, null);
+                            context.Response.Redirect("/Spas/EventSessionVolunteerSpa.aspx");
+                            Debug.Fail("Shouldn't get here...");
+                        }
+                    });
+
+            }
 
             // (this page handles both valid and invalid clicks)
 
@@ -973,6 +1121,9 @@ namespace App.Library
                 /*0*/ FormatAuthCode(authToken.AuthCode, AuthCodeFormat.Url));
 
             context.RewritePath("/ResetPassword.aspx", string.Empty, queryString);
+
+
+            return authTokenState;
         }
 
 
