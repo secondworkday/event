@@ -1,4 +1,4 @@
-app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $msUI, utilityService, siteService) {
+app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $msUI, $translate, utilityService, siteService) {
   $log.debug('Loading EventSessionsController...');
 
   $scope.searchHandler = siteService.model.eventSessions.search;
@@ -68,6 +68,10 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
   }
 
   function AddSessionDialogController($scope, $mdDialog, eventSession, eventID, newOrEdit) {
+    var EVENT_SESSION = "Event Session";
+    $translate('EVENT_SESSION').then(function (event_session_text) {
+      EVENT_SESSION = event_session_text;
+    });
     $scope.newOrEdit = newOrEdit;
     $scope.formInput = {
       timeChoice: [
@@ -87,6 +91,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
       ampm: ["AM", "PM"]
     };
 
+    
     function differentDay(dateTime1, dateTime2) {
       var date1 = new Date(dateTime1.getFullYear(), dateTime1.getMonth(), dateTime1.getDate(), 0, 0, 0);
       var date2 = new Date(dateTime2.getFullYear(), dateTime2.getMonth(), dateTime2.getDate(), 0, 0, 0);
@@ -98,6 +103,9 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
     }
 
     $scope.startTimeChanged = function () {
+      // hack
+      $scope.formData.startTime = Number($scope.formData.startTime);
+
       //make core 'startDate' reflect control values
       var theDate = $scope.formData.startDate;
       var minutes = ($scope.formData.startTime % 1) * 60;
@@ -132,6 +140,9 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
     };
 
     $scope.endTimeChanged = function () {
+      // hack?? - md-option appears to set selected item as a string
+      $scope.formData.endTime = Number($scope.formData.endTime);
+
       var theDate = $scope.formData.endDate;
       var minutes = ($scope.formData.endTime % 1) * 60;
       var hour = (minutes == 30) ? $scope.formData.endTime - 0.5 : $scope.formData.endTime;
@@ -223,8 +234,8 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
       siteService.createEventSession(formData)
       .then(function (successData) {
         // success
-        $msUI.showToast("Event Created");
-        $log.debug("Task completed.");
+        $msUI.showToast(EVENT_SESSION + " Created");
+        $log.debug("Event Session Created.");
         //$state.go('app.user.event.sessions({ eventID: ' + successData + '})');
         return successData;
       }, function (failureData) {
@@ -241,7 +252,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
       siteService.editEventSession($scope.formData.id, $scope.formData)
         .then(function (successData) {
           // success
-          $msUI.showToast("EventSession Updated");
+          $msUI.showToast(EVENT_SESSION + " Updated");
           $log.debug("Edit eventSession completed.");
           return successData;
         }, function (failureData) {
@@ -258,8 +269,8 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
       $mdDialog.hide($scope.formData);
 
       var confirm = $mdDialog.confirm()
-        .title("Delete Session")
-        .textContent("Would you like to delete session '" + eventSession.name + "'?")
+        .title("Delete " + EVENT_SESSION)
+        .textContent("Would you like to delete " + EVENT_SESSION + " '" + eventSession.name + "'?")
         .ariaLabel("Delete event session")
         .targetEvent(ev)
         .ok("yes")

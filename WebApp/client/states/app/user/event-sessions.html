@@ -1,5 +1,9 @@
 <ms-search-view change-event="updateParticipants" search="searchHandler" options="searchViewOptions" user-search="userSearch">
-
+  <div>
+      <md-button ng-click="showAddSessionDialog($event)" class="md-fab md-primary" aria-label="new" style="float:right;">
+        <i class="fa fa-plus fa-lg"></i>
+      </md-button>
+  </div>
   <div layout layout-wrap>
     <md-card
       ng-repeat="eventSession in $displayedIndex | objectLookup:$hashMap track by eventSession.id">
