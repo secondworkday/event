@@ -2560,11 +2560,12 @@ app.directive('msSearchView', function ($parse, utilityService) {
         $scope.clientFilterFunction = function (item) {
 
           // If we fail any filter, return false
-          angular.forEach(clientFilters, function (clientFilter) {
-            if (!clientFilter(item)) {
+          for (var i = 0; i < clientFilters.length; i++) {
+            if (!clientFilters[i](item)) {
               return false;
             }
-          });
+          }
+
           // Otherwise return true
           return true;
         }
