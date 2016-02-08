@@ -259,7 +259,7 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
 
       $scope.editEvent = function () {
 
-        siteService.editEvent($scope.event.id, $scope.event) // TODO
+        siteService.editEvent($scope.event.id, $scope.event)
         .then(function (successData) {
           // success
           $msUI.showToast("Event Updated");
@@ -282,8 +282,8 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
         .textContent("Would you like to delete event '" + event.name + "'?")
         .ariaLabel("Delete event")
         .targetEvent(ev)
-        .ok("Yes")
-        .cancel("No");
+        .ok("yes")
+        .cancel("no");
 
       $mdDialog.show(confirm).then(function () {
         deleteEvent(event);
@@ -346,31 +346,5 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
     }
 
 
-    $scope.showAddSessionDialog = function (ev) {
-        $mdDialog.show({
-            controller: AddSessionDialogController,
-            templateUrl: '/client/states/app/user/add-session.dialog.html',
-            parent: angular.element(document.body),
-            targetEvent: ev,
-            clickOutsideToClose: true,
-            fullscreen: false
-        })
-        .then(function () {
-            // $scope.status = 'You said the information was "' + answer + '".';
-        }, function () {
-            // $scope.status = 'You cancelled the dialog.';
-        });
-    }
-    function AddSessionDialogController($scope, $mdDialog) {
-        $scope.hide = function () {
-            $mdDialog.hide();
-        };
-        $scope.cancel = function () {
-            $mdDialog.cancel();
-        };
-        $scope.addSession = function (formData) {
-            $mdDialog.hide(formData);
-        };
-    }
 
 });

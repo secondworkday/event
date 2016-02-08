@@ -2,6 +2,10 @@
 
   <div layout layout-wrap>
     <md-card
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
       ng-repeat="eventSession in $displayedIndex | objectLookup:$hashMap track by eventSession.id">
       <md-card-content>
         <p>
@@ -41,5 +45,17 @@
       </md-card-actions>
     </md-card>
   </div>
+        <td>
+          <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditEventSessionDialog($event, eventSession)" aria-label="edit event session"><i class="fa fa-pencil ng-scope"></i></button>
+        </td>
+        <td>
+          <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditEventSessionDialog($event, eventSession)" aria-label="edit event session"><i class="fa fa-pencil ng-scope"></i></button>
+        </td>
+        <td>
+          <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditEventSessionDialog($event, eventSession)" aria-label="edit event session"><i class="fa fa-pencil ng-scope"></i></button>
+        </td>
+        <td>
+          <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditEventSessionDialog($event, eventSession)" aria-label="edit event session"><i class="fa fa-pencil ng-scope"></i></button>
+        </td>
 
 </ms-search-view>

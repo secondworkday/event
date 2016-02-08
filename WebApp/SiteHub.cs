@@ -439,6 +439,31 @@ namespace WebApp
             });
         }
 
+        public HubResult CreateEventSession(dynamic formData)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var eventSession = EventSession.Create(dc, formData);
+                return HubResult.CreateSuccessData(eventSession.ID);
+            });
+        }
+
+        public HubResult DeleteEventSession(int itemID)
+        {
+            return accountsOnlyHeader((utilityContext, dc) =>
+            {
+                return EventSession.Delete(dc, itemID);
+            });
+        }
+
+        public HubResult EditEventSession(int itemID, dynamic editEventSessionData)
+        {
+            return accountsOnlyHeader((utilityContext, dc) =>
+            {
+                return EventSession.Edit(dc, itemID, editEventSessionData);
+            });
+        }
+
 
         public HubResult GenerateRandomParticipants(int participantGroupID, int numberOfParticipants)
         {
