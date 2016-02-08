@@ -330,7 +330,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         // direct search component like 'pete'
         searchTerms.push(filter);
       }
-      else if (typeof filter === 'object') {
+      else if (angular.isObject(filter)) {
         if (filter.serverTerm) {
           searchTerms.push(filter.serverTerm);
         }
@@ -347,7 +347,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
   self.buildClientFilter = function (/*filters*/) {
     var clientFilterHandler = function (clientFilterTerms, filter) {
-      if (typeof filter === 'object') {
+      if (angular.isObject(filter)) {
         if (filter.clientFunction) {
           clientFilterTerms.push(filter.clientFunction);
         }
