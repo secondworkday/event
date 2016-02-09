@@ -10,18 +10,19 @@
     <form name="form">
       <div>
         <p class="md-body-1">
-          To create a new user, just enter an email address, select a tenant, and optionally add a first and last name.
         </p>
         <div>
 
 
-          Hi there: {{formData}}
+          Hi there: {{formData}}<br />
 
-          <div layout layout-sm="column">
+          <!--show to SystemAdmins and show to TenantAdmins with multiple TenantGroups available--> 
+          <div layout layout-sm="column" 
+            ng-if="listContains(authenticatedUser.systemRoles, 'SystemAdmin') || (listContains(authenticatedUser.systemRoles, 'TenantAdmin') && tenantGroups.index.length > 1)">
             <md-input-container flex>
               <label>Select Tenant Group</label>
               <md-select ng-model="formData.tenantGroupID">
-                <md-option ng-repeat="tenantGroup in tenantGroups.index | objectLookup:tenantGroups.hashMap" value="{{tenantGroup.id}}">
+                <md-option ng-repeat="tenantGroup in tenantGroups.index | objectLookup:tenantGroups.hashMap track by tenantGroup.id" value="{{tenantGroup.id}}">
                   {{tenantGroup.name}}
                 </md-option>
               </md-select>
@@ -44,6 +45,48 @@
               <input ng-model="formData.lastName">
             </md-input-container>
           </div>
+
+          <!--show if user holds any system role (which include TenantAdmin)--> 
+          <div class="form-group" ng-if="authenticatedUser.systemRoles.length > 0">
+              <label for="roleInput">Roles</label>
+              <div class="row">
+                  <div class="col-xs-6">
+                      <div ng-repeat="appRoleItem in appRoleItems">
+                          <label>
+                              <input type="checkbox"
+                                      ng-checked="listContains(formData.appRoles, appRoleItem.value)"
+                                      ng-click="toggleList(formData.appRoles, appRoleItem.value)" />
+                              {{appRoleItem.name}}
+                          </label>
+                      </div>
+                  </div>
+
+                  <!--special handling for TenantAdmins to assigned the 'Admin' role (really TenantAdmin)--> 
+                  <label ng-if="listContains(authenticatedUser.systemRoles, 'TenantAdmin') && !listContains(authenticatedUser.systemRoles, 'SystemAdmin')">
+                      <input type="checkbox"
+                              ng-checked="listContains(formData.systemRoles, 'TenantAdmin')"
+                              ng-click="toggleList(formData.systemRoles, 'TenantAdmin')" />
+                      Admin
+                  </label>
+
+                  <!--show if user holds any system role (which excludes TenantAdmin)--> 
+                  <div class="col-xs-6">
+                      <div ng-repeat="systemRoleItem in systemRoleItems">
+                          <label ng-if="systemRoleItem">
+                              <input type="checkbox"
+                                      ng-disabled="!systemRoleItem.enabled"
+                                      ng-checked="listContains(formData.systemRoles, systemRoleItem.value)"
+                                      ng-click="toggleList(formData.systemRoles, systemRoleItem.value)" />
+                              {{systemRoleItem.name}}
+                          </label>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+
+
+
         </div>
       </div>
     </form>

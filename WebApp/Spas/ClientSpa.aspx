@@ -25,6 +25,12 @@
             tenantLogoResourceID: "<%=MS.Utility.EPCategory.TenantLogoResource.ID%>",
         });
 
+      app.constant('APP_ROLE_ITEMS', [
+        // note 'Admin' is the same as TenantAdmin, handled as a SystemRole so not listed here
+        { name: 'Manager', value: 'EventPlanner' },
+        { name: 'Volunteer', value: 'EventSessionVolunteer' }
+      ]);
+
       app.constant('AUTHORIZATION_ROLES', {
         // Other
         anonymous: "Anonymous",
@@ -37,11 +43,9 @@
 
         // AppRoles
 
-        //!! nextgen not sure what AppRoles we need to support
-        // is there a need for AccountAdmin?
-
-        jobSeeker: "JobSeeker",
-        jobCounselor: "JobCounselor"
+        admin: "Admin",
+        eventPlanner: "EventPlanner",
+        eventSessionVolunteer: "EventSessionVolunteer"
       });
 
       app.constant('US_STATES', <%=USStatesArrayJson%> );
