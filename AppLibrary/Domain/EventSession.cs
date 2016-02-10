@@ -316,8 +316,17 @@ namespace App.Library
 
             if (deleteItem == null)
             {
-                return HubResult.CreateError("Not found");
+                return HubResult.NotFound;
             }
+
+            var eventSessionParticipantsQuery = dc.EventParticipants
+                .Where(eventParticipant => eventParticipant.EventSessionID == itemID);
+            if (eventSessionParticipantsQuery.Any())
+            {
+                return HubResult.CreateError("Not empty");
+            }
+
+            dc.EventSessions.DeleteOnSubmit(deleteItem);
 
             //!! TODO remove any Tags that have their last reference with this Pipeline
             //!! Should we have an ExtendedObject call to remove all extended properties?
