@@ -44,19 +44,21 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
 
 
   $scope.showDemoAccountDialog = function ($event) {
-     var parentEl = angular.element(document.body);
-     $mdDialog.show({
-       parent: parentEl,
-       targetEvent: $event,
-       templateUrl: '/client/states/public/sign-in-demo-account.dialog.html',
-       locals:{
-         stateData : $scope.stateData,
-         working : $scope.working
-       },
-       controller: DemoAccountDialogController
+    var parentEl = angular.element(document.body);
+    $mdDialog.show({
+      parent: parentEl,
+      targetEvent: $event,
+      templateUrl: '/client/states/public/sign-in-demo-account.dialog.html',
+      locals: {
+        stateData: $scope.stateData,
+        working: $scope.working
+      },
+      controller: DemoAccountDialogController
     });
-    function DemoAccountDialogController($scope, $mdDialog, siteService, stateData, SIGNIN_INFO) {
+    function DemoAccountDialogController($scope, $mdDialog, siteService, stateData, SIGNIN_INFO, APP_ROLE_TRANSLATION) {
       $scope.signinData = SIGNIN_INFO;
+      $scope.APP_ROLE_TRANSLATION = APP_ROLE_TRANSLATION;
+
       if ($scope.signinData && $scope.signinData.demoTenants) {
         $scope.demoTenant = $scope.signinData.demoTenants[0];
       }
@@ -78,8 +80,8 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
         });
 
       };
-      $scope.cancelDialog = function() {
-        $log.debug( "You canceled the dialog." );
+      $scope.cancelDialog = function () {
+        $log.debug("You canceled the dialog.");
         $mdDialog.hide();
       };
 

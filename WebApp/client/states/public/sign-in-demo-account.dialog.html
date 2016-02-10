@@ -21,30 +21,10 @@
       <div class="u-sm-space"></div>
     </div>
     <div ng-hide="working" class="layout">
-      <div flex style="max-height:400px;overflow-y:scroll;">
+      <div flex style="max-height:400px;overflow-y:scroll;" ng-repeat="(key, value) in APP_ROLE_TRANSLATION">
         <md-list>
-          <md-subheader class="md-no-sticky">{{'TENANT_ADMINS_ROLE' | translate}}</md-subheader>
-          <md-list-item ng-click="loginAsDemoJobSeeker(user)" ng-repeat="user in demoTenant.users">
-            <img ng-show="user.profilePhotoUrl" ng-src="{{user.profilePhotoUrl}}" alt="user img" class="mini-user-img" />
-            <img ng-hide="user.profilePhotoUrl" ng-src="/images/user-img-placeholder.png" alt="user img" class="mini-user-img" />
-            <p>{{user.firstName}} {{user.lastName}}</p>
-          </md-list-item>
-        </md-list>
-      </div>
-      <div flex style="max-height:400px;overflow-y:scroll;">
-        <md-list>
-          <md-subheader class="md-no-sticky">{{'EVENT_PLANNERS_ROLE' | translate}}</md-subheader>
-          <md-list-item ng-click="loginAsDemoCounselor(user)" ng-repeat="user in demoTenant.users | filter:{roles:'JobCounselor'}">
-            <img ng-show="user.profilePhotoUrl" ng-src="{{user.profilePhotoUrl}}" alt="user img" class="mini-user-img" />
-            <img ng-hide="user.profilePhotoUrl" ng-src="/images/user-img-placeholder.png" alt="user img" class="mini-user-img" />
-            <p>{{user.firstName}} {{user.lastName}}</p>
-          </md-list-item>
-        </md-list>
-      </div>
-      <div flex style="max-height:400px;overflow-y:scroll;">
-        <md-list>
-          <md-subheader class="md-no-sticky">{{'SESSION_VOLUNTEERS_ROLE' | translate}}</md-subheader>
-          <md-list-item ng-click="loginAsDemoCounselor(user)" ng-repeat="user in demoTenant.users | filter:{roles:'JobCounselor'}">
+          <md-subheader class="md-no-sticky">{{value | translate}}</md-subheader>
+          <md-list-item ng-click="loginAsDemoJobSeeker(user)" ng-repeat="user in demoTenant.users | filter: key">
             <img ng-show="user.profilePhotoUrl" ng-src="{{user.profilePhotoUrl}}" alt="user img" class="mini-user-img" />
             <img ng-hide="user.profilePhotoUrl" ng-src="/images/user-img-placeholder.png" alt="user img" class="mini-user-img" />
             <p>{{user.firstName}} {{user.lastName}}</p>
@@ -54,15 +34,9 @@
     </div>
   </md-dialog-content>
   <div class="md-actions" layout="row">
-    <div flex>
-      <md-button ng-hide="working" ng-click="createDemoUser('Admin')" class="md-primary"><i class="fa fa-plus"></i> New {{'TENANT_ADMIN_ROLE' | translate}} </md-button>
+    <div flex ng-repeat="(key, value) in APP_ROLE_TRANSLATION">
+      <md-button ng-hide="working" ng-click="createDemoUser(key)" class="md-primary"><i class="fa fa-plus"></i> New {{value | translate}} </md-button>
       <md-button ng-show="working" class="md-primary" ng-disabled="true"> Working... </md-button>
-    </div>
-    <div flex>
-      <md-button ng-hide="working" ng-click="createDemoUser('EventPlanner')" class="md-primary"><i class="fa fa-plus"></i> New {{'EVENT_PLANNER_ROLE' | translate}} </md-button>
-    </div>
-    <div flex>
-      <md-button ng-hide="working" ng-click="createDemoUser('EventSessionVolunteer')" class="md-primary"><i class="fa fa-plus"></i> New {{'SESSION_VOLUNTEER_ROLE' | translate}} </md-button>
     </div>
   </div>
 </md-dialog>
