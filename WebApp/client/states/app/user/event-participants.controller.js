@@ -15,10 +15,10 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 
 
   // Establish our Base filtering (evaluatuating in order of most restrictive to least restrictive)
-  if (eventSession) {
+  if ($scope.eventSession) {
     // filter to one EventSession
     $scope.searchViewOptions.baseFilters = { serverTerm: '$eventSession:' + $scope.eventSession.id, clientFunction: utilityService.filterByPropertyValue('eventSessionID', $scope.eventSession.id) };
-  } else if (event) {
+  } else if ($scope.event) {
     // filter to one Event
     $scope.searchViewOptions.baseFilters = { serverTerm: '$event:' + $scope.event.id, clientFunction: utilityService.filterByPropertyValue('eventID', $scope.event.id) };
   } else {

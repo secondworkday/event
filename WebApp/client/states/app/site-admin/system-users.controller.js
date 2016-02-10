@@ -1,5 +1,7 @@
-app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileUploader, $msUI, utilityService, siteService) {
+app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileUploader, $msUI, utilityService, siteService, tenant) {
   $log.debug('Loading SystemUsersController...');
+
+  $scope.tenant = tenant;
 
   $scope.searchUsers = utilityService.model.users.search;
 
@@ -30,6 +32,17 @@ app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileU
     filter: $scope.filterOptions[0],
     userSearch: null
   };
+
+
+  // Establish our Base filtering (evaluatuating in order of most restrictive to least restrictive)
+  if ($scope.tenant) {
+    // filter to one EventSession
+    $scope.searchViewOptions.baseFilters = { serverTerm: '$tid:' + $scope.tenant.id, clientFunction: utilityService.filterByPropertyValue('tenantGroupID', $scope.tenant.id) };
+  } else {
+    // no filtering
+  }
+
+
 
   $scope.uploader = new FileUploader({
     url: '/upload.ashx',
@@ -80,7 +93,9 @@ app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileU
       templateUrl: '/client/states/app/site-admin/system-new-user.dialog.html',
       controller: NewSystemUserDialogController
     });
-    function NewSystemUserDialogController($scope, $filter, $mdDialog, utilityService, APP_ROLE_ITEMS) {
+    function NewSystemUserDialogController($scope, $filter, $mdDialog, utilityService, APP_ROLE_ITEMS, APP_ROLE_TRANSLATION) {
+
+      $scope.APP_ROLE_TRANSLATION = APP_ROLE_TRANSLATION;
 
       var model = utilityService.model;
       var authenticatedIdentity = model.authenticatedIdentity;

@@ -21,7 +21,13 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
     url: '/system',
     template: "<ui-view/>",
     resolve: {
-      // TODO check authorization for System Admin
+      // We're a system admin - gloves off, remove the tenant lock
+      tenant: function () { return null },
+    },
+    data: {
+      stateMapName: 'System Admin',
+      stateMapComment: 'check authorization',
+      allowedRoles: [AUTHORIZATION_ROLES.systemAdmin]
     }
   })
   .state('app.site-admin.system.dashboard', {

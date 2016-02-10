@@ -13,9 +13,6 @@
         </p>
         <div>
 
-
-          Hi there: {{formData}}<br />
-
           <!--show to SystemAdmins and show to TenantAdmins with multiple TenantGroups available--> 
           <div layout layout-sm="column" 
             ng-if="listContains(authenticatedUser.systemRoles, 'SystemAdmin') || (listContains(authenticatedUser.systemRoles, 'TenantAdmin') && tenantGroups.index.length > 1)">
@@ -56,7 +53,8 @@
                               <input type="checkbox"
                                       ng-checked="listContains(formData.appRoles, appRoleItem.value)"
                                       ng-click="toggleList(formData.appRoles, appRoleItem.value)" />
-                              {{appRoleItem.name}}
+                              <span ng-if="APP_ROLE_TRANSLATION">{{APP_ROLE_TRANSLATION[appRoleItem.value] | translate}}</span>
+                              <span ng-if="!APP_ROLE_TRANSLATION">{{appRoleItem.name}}</span>
                           </label>
                       </div>
                   </div>
@@ -66,7 +64,8 @@
                       <input type="checkbox"
                               ng-checked="listContains(formData.systemRoles, 'TenantAdmin')"
                               ng-click="toggleList(formData.systemRoles, 'TenantAdmin')" />
-                      Admin
+                    <span ng-if="APP_ROLE_TRANSLATION">{{APP_ROLE_TRANSLATION['Admin'] | translate}}</span>
+                    <span ng-if="!APP_ROLE_TRANSLATION">Admin</span>
                   </label>
 
                   <!--show if user holds any system role (which excludes TenantAdmin)--> 

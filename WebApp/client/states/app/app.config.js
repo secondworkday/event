@@ -21,6 +21,11 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
                 // (not sure if we also need to reference 'identity' to have it stick)
                 var myIdentity = identity;
                 return $q.when(utilityService.model.authenticatedUser);
+            },
+            tenant: function (utilityService, identity) {
+              // by default we want to restrict access to the logged in user's tenant. 
+              // resolving this here allows shared components to adhere to this.
+              return utilityService.ensureTenantGroup(utilityService.model.authenticatedGroup.id);
             }
         },
         data: {

@@ -31,6 +31,12 @@
         { name: 'Volunteer', value: 'EventSessionVolunteer' }
       ]);
 
+      app.constant('APP_ROLE_TRANSLATION', {
+        Admin: 'TENANT_ADMIN_ROLE',
+        EventPlanner: 'EVENT_PLANNER_ROLE',
+        EventSessionVolunteer: 'SESSION_VOLUNTEER_ROLE'
+      });
+
       app.constant('AUTHORIZATION_ROLES', {
         // Other
         anonymous: "Anonymous",
@@ -47,13 +53,6 @@
         eventPlanner: "EventPlanner",
         eventSessionVolunteer: "EventSessionVolunteer"
       });
-
-      app.constant('APP_ROLE_TRANSLATION', {
-        Admin: 'TENANT_ADMIN_ROLE',
-        EventPlanner: 'EVENT_PLANNER_ROLE',
-        EventSessionVolunteer: 'SESSION_VOLUNTEER_ROLE'
-      });
-
 
 
 

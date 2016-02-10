@@ -2,6 +2,12 @@
 // Define basic Authorization roles here.
 // They allow states to be protected based on Role. (Only SystemAdmins can enter system admin states, etc.)
 
+//app.constant('APP_ROLE_TRANSLATION', {
+  // Note: This is intended to be defined by the application
+//});
+
+
+
 app.constant('AUTHORIZATION_ROLES', {
   // Other
   anonymous: "Anonymous",
