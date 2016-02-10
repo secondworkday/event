@@ -1814,7 +1814,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
         //!! TODO - this users' data might change - need to track that in onUsersUpdated() - but do that after we change the server notification
         var authenticatedUser = usersData.items[0];
-        var roles = authenticatedUser.systemRoles.concat(authenticatedUser.roles);
+        var roles = authenticatedUser.systemRoles.concat(authenticatedUser.appRoles);
         model.authenticatedIdentity = msIdentity.create('user', authenticatedUser.id, authenticatedUser.displayName, roles, authenticatedUser.profilePhotoUrl);
         //!! retire this guy...
         model.authenticatedUser = authenticatedUser;

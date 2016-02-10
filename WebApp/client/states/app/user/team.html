@@ -64,7 +64,9 @@
                 <td>
                     99
                 </td>-->
-                <td>School Contact</td>
+                <td>
+                  <span style ="display:block" ng-repeat="appRole in user.appRoles">{{APP_ROLE_TRANSLATION[appRole] | translate}}</span>
+                </td>
                 <td>Active</td>
                 <td class="md-data-table__cell--non-numeric"><i ng-show="user.connectionState=='Online'" class="fa fa-circle text-green"></i></td>
             </tr>

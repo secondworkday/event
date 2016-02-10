@@ -1,7 +1,9 @@
-app.controller('AppController', function ($scope, $translate, $timeout, $mdSidenav, $mdDialog, $mdUtil, $log, $msUI, $stateParams, $state, utilityService, siteService, AUTHORIZATION_ROLES) {
+app.controller('AppController', function ($scope, $translate, $timeout, $mdSidenav, $mdDialog, $mdUtil, $log, $msUI, $stateParams, $state, utilityService, siteService, AUTHORIZATION_ROLES, APP_ROLE_TRANSLATION) {
   $log.debug('Loading AppController...');
 
   $scope.model = siteService.getModel();
+
+  $scope.APP_ROLE_TRANSLATION = APP_ROLE_TRANSLATION;
 
   $scope.tenantTerms = [
     { name: "Demo Terms", langKey: 'demo' },
