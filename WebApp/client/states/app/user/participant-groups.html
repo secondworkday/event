@@ -43,11 +43,12 @@
        <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
        <th ms-debug-only>ID</th>
          <th class="md-data-table__cell--non-numeric">Name</th>
-         <th>Slots</th>
+         <th hide-sm>Total {{'PARTICIPANTS' | translate }}</th>
          <th>Contact Name</th>
          <th>Email</th>
-         <th>Phone</th>
-         <th>Status</th>
+         <th hide-sm>Phone</th>
+         <th hide-sm>Status</th>
+         <th></th>
      </tr>
    </thead>
    <tbody>
@@ -55,11 +56,12 @@
        <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ participantGroup | json }}</pre></td>
        <td ms-debug-only>{{ participantGroup.id }}</td>
        <td class="md-data-table__cell--non-numeric">{{ participantGroup.name }}</td>
-         <td>{{getParticipantCount(participantGroup.id)}}</td>
+         <td hide-sm>{{getParticipantCount(participantGroup.id)}}</td>
          <td>{{participantGroup.contactName}}</td>
          <td>{{participantGroup.primaryEmail}}</td>
-         <td>{{participantGroup.primaryPhoneNumber}}</td>
-         <td>Not Invited</td>
+         <td hide-sm>{{participantGroup.primaryPhoneNumber}}</td>
+         <td hide-sm>Not Invited</td>
+         <td><md-button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditParticipantGroupDialog($event, participantGroup)" aria-label="edit participant group"><i class="fa fa-pencil ng-scope"></i></md-button></td>
    </tbody>
   </table>
 </ms-search-view>
