@@ -135,7 +135,23 @@ namespace WebApp
             });
         }
 
-        public HubResult SearchParticipantGroups(string searchExpressionString)
+        public HubResult EditParticipantGroup(int itemID, dynamic editParticipantGroupData)
+        {
+          return accountsOnlyHeader((utilityContext, dc) =>
+          {
+            return ParticipantGroup.Edit(dc, itemID, editParticipantGroupData);
+          });
+        }
+
+    public HubResult DeleteParticipantGroup(int itemID)
+    {
+      return accountsOnlyHeader((utilityContext, dc) =>
+      {
+        return ParticipantGroup.Delete(dc, itemID);
+      });
+    }
+
+    public HubResult SearchParticipantGroups(string searchExpressionString)
         {
             return SearchParticipantGroups(searchExpressionString, string.Empty, 0, int.MaxValue);
         }

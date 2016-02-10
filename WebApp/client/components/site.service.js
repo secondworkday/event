@@ -1158,6 +1158,19 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
     });
   };
 
+  this.editParticipantGroup = function (participantGroupID, participantGroupData) {
+    return utilityService.callHub(function () {
+      return siteHub.server.editParticipantGroup(participantGroupID, participantGroupData);
+    });
+  };
+
+  this.deleteParticipantGroup = function (participantGroup) {
+    return utilityService.callHub(function () {
+      return siteHub.server.deleteParticipantGroup(participantGroup.id);
+    });
+  };
+  
+
   this.generateRandomParticipants = function (participantGroupID, numberOfParticipants) {
     return utilityService.callHub(function () {
       return siteHub.server.generateRandomParticipants(participantGroupID, numberOfParticipants);

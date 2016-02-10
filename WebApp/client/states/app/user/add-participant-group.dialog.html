@@ -1,8 +1,8 @@
-<md-dialog aria-label="add {{'PARTICIPANT_GROUP' | translate}}" ng-cloak>
-  <form>
+<md-dialog aria-label="add {{'PARTICIPANT_GROUP' | translate}}" ng-cloak style="min-width:400px;">
+  <form name="participantGroupForm">
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <h2>Add {{'PARTICIPANT_GROUP' | translate}}</h2>
+        <h2>{{newOrEdit}} {{'PARTICIPANT_GROUP' | translate}}</h2>
         <span flex></span>
         <md-button class="md-icon-button" ng-click="cancel()">
           <i class="fa fa-times"></i>
@@ -11,27 +11,64 @@
     </md-toolbar>
     <md-dialog-content>
       <div class="md-dialog-content">
-        <form name="form">
-          <div layout-gt-sm="row">
-            <md-input-container class="md-block" flex-gt-sm>
-              <label>{{'PARTICIPANT_GROUP' | translate}} name</label>
-              <input ng-model="formData.name">
-            </md-input-container>
-            <md-input-container class="md-block" flex-gt-sm>
-              <label>Total {{'PARTICIPANTS' | translate | lowercase}}</label>
-              <input ng-model="formData.totalStudents">
-            </md-input-container>
-          </div>
-        </form>
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>{{'PARTICIPANT_GROUP' | translate}} name</label>
+            <input name="name" ng-model="formData.name" required>
+            <div style="color:red;" ng-show="participantGroupForm.name.$error.required && participantGroupForm.name.$dirty">
+              Please enter a {{'PARTICIPANT_GROUP' | translate}} name
+            </div>
+          </md-input-container>
+        </div>
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Contact Name</label>
+            <input ng-model="formData.contactName">
+          </md-input-container>
+        </div>
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Email</label>
+            <input type="email" ng-model="formData.email">
+          </md-input-container>
+        </div>
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Phone</label>
+            <input type="tel" ng-model="formData.phone">
+          </md-input-container>
+        </div>
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Total {{'PARTICIPANTS' | translate}}</label>
+            <input type="number" ng-model="formData.totalParticipants">
+          </md-input-container>
+        </div>
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Notes</label>
+            <textarea ng-model="formData.overview"></textarea>
+          </md-input-container>
+        </div>
       </div>
     </md-dialog-content>
     <md-dialog-actions layout="row" layout-align="end center">
-      <md-button ng-click="cancel()">
-       Cancel
+      <md-button ng-click="showDeleteConfirmationDialog($event, formData)" ng-if="newOrEdit == 'Edit'">
+        Delete {{'PARTICIPANT_GROUP' | translate}}
       </md-button>
-      <md-button ng-click="addSchool(formData)">
+      <md-button ng-click="cancel()">
+        Cancel
+      </md-button>
+      <md-button ng-click="addParticipantGroup(formData)" ng-disabled="participantGroupForm.$invalid" ng-if="newOrEdit == 'New'" type="submit">
         Add
       </md-button>
+      <md-button ng-click="editParticipantGroup(formData)" ng-disabled="participantGroupForm.$invalid" ng-if="newOrEdit == 'Edit'" type="submit">
+        Save
+      </md-button>
     </md-dialog-actions>
+    <div ms-debug-only>
+      <pre>{{participantGroupForm | json}}</pre>
+    </div>
   </form>
+  
 </md-dialog>
