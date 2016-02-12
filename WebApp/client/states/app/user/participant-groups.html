@@ -48,6 +48,7 @@
          <th>Email</th>
          <th hide-sm>Phone</th>
          <th hide-sm>Status</th>
+         <th hide-sm>Tags</th>
          <th></th>
      </tr>
    </thead>
@@ -61,6 +62,16 @@
          <td>{{participantGroup.primaryEmail}}</td>
          <td hide-sm>{{participantGroup.primaryPhoneNumber}}</td>
          <td hide-sm>Not Invited</td>
+         <td hide-sm>
+           <span class="md-caption tag u-sm-margin-right"
+              ng-repeat="tag in participantGroup.tags">
+             <strong>{{ tag }}</strong>
+           </span>
+           <span class="md-caption tag u-sm-margin-right"
+              ng-repeat="tag in participantGroup.myTags">
+             <strong>{{ tag }}</strong>
+           </span>
+         </td>
          <td><md-button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditParticipantGroupDialog($event, participantGroup)" aria-label="edit participant group"><i class="fa fa-pencil ng-scope"></i></md-button></td>
    </tbody>
   </table>
