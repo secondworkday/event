@@ -356,21 +356,10 @@ namespace App.Library
         var adsf = epQuery
             .ToArray();
 
-
-        var query =
-            from eventParticipant in EventParticipant.Query(dc)
-            join participant in Participant.Query(dc) on eventParticipant.ParticipantID equals participant.ID
-            join participantGroup in ParticipantGroup.Query(dc) on participant.ParticipantGroupID equals participantGroup.ID
-            join myEvent in Event.Query(dc) on eventParticipant.EventID equals myEvent.ID
-
-            // outer join - optional
-            join session in EventSession.Query(dc) on eventParticipant.EventSessionID equals session.ID into eventParticipantSessionGroup
-            from session in eventParticipantSessionGroup.DefaultIfEmpty()
-            select new { eventParticipant, participant, participantGroup, myEvent, session };
-
         var headerMap = new[]
             {
                 new { key = "Name", value = "participantGroup.Name" },
+                new { key = "Contact Name", value = "participantGroup.ContactName" },
                 new { key = "Tags", value = "tags" },
 
 /*
