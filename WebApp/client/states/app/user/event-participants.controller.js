@@ -234,14 +234,21 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
     });
   };
 
-
-
-
   $scope.download = function () {
+
+    var searchExpression = utilityService.buildSearchExpression(
+      $scope.searchViewOptions.baseFilters,
+      $scope.searchViewOptions.stackFilters,
+
+      $scope.searchViewOptions.filter,
+      $scope.searchViewOptions.selectFilter,
+      $scope.searchViewOptions.userFilter,
+      $scope.searchViewOptions.userSearch);
+
     var query = {
-      type: 'eventParticipants'
+      type: 'eventParticipants',
+      searchExpression: searchExpression
     };
     utilityService.download(query);
   };
-
 });

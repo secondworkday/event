@@ -62,7 +62,7 @@ namespace WebApp
 
 
                     case "eventParticipants":
-                        EventParticipant.GetExportRows(response, appDC);
+                        EventParticipant.GetExportRows(response, appDC, searchExpression);
                         return;
 
                     case "participantGroups":

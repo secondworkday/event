@@ -406,10 +406,10 @@ namespace App.Library
         }
 
 
-        public static void GetExportRows(HttpResponse response, AppDC dc)
+        public static void GetExportRows(HttpResponse response, AppDC dc, SearchExpression searchExpression)
         {
             var query =
-                from eventParticipant in EventParticipant.Query(dc)
+                from eventParticipant in EventParticipant.Query(dc, searchExpression)
                 join participant in Participant.Query(dc) on eventParticipant.ParticipantID equals participant.ID
                 join participantGroup in ParticipantGroup.Query(dc) on participant.ParticipantGroupID equals participantGroup.ID
                 join myEvent in Event.Query(dc) on eventParticipant.EventID equals myEvent.ID
