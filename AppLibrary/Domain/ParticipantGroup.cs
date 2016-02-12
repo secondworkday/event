@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,9 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 
 using MS.Utility;
+using MS.TemplateReports;
+
+using MS.WebUtility;
 
 namespace App.Library
 {
@@ -78,7 +82,7 @@ namespace App.Library
 
     public static ParticipantGroup Create(AppDC dc, JToken data)
     {
-      return ParticipantGroup.createLock(dc, () =>
+      return ParticipantGroup.exCreateLock(dc, data, () =>
       {
         var createdTimestamp = dc.TransactionTimestamp;
         var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
@@ -184,27 +188,23 @@ namespace App.Library
       // add them to the table
       // return CRUD results
 
-      var hubResult = dc.SubmitLock<HubResult>(() =>
-      {
-        var items = uploadData["itemsData"]
-                  .Select(itemData =>
-                  {
+        var hubResult = dc.SubmitLock<HubResult>(() =>
+        {
+            return Upload<ParticipantGroup>(dc, uploadData, itemData =>
+            {
                 var eventParticipant = ParticipantGroup.Create(dc, itemData);
                 if (eventParticipant != null)
                 {
-                  return (int?)eventParticipant.ID;
+                    return (int?)eventParticipant.ID;
                 }
                 else
                 {
-                  return (int?)null;
+                    return (int?)null;
                 }
-              })
-                  .ToArray();
+            });
+        });
 
-        return HubResult.CreateSuccessData(items);
-      });
-
-      return hubResult;
+        return hubResult;
     }
 
 
@@ -314,6 +314,85 @@ namespace App.Library
       var epQuery = ExtendedQuery(dc, searchExpression);
       epQuery = epQuery.SortBy(sortExpression, startRowIndex, maximumRows);
       return epQuery;
+    }
+
+
+
+    public static void GetExportRows(HttpResponse response, AppDC dc, SearchExpression searchExpression)
+    {
+        var epQuery =
+            from exParticipantGroup in ParticipantGroup.ExtendedQuery(dc, searchExpression)
+
+            // Join with our 1:many 
+            join tags in QueryGlobalEPTags2(dc, EPCategory.UserAssigned) on exParticipantGroup.itemID equals tags.TargetID into tagsGroup
+
+
+            //join epGlobalSystemRoleTags in User.QueryGlobalEPTags2(dc, EPCategory.SystemRoleCategory) on exParticipantGroup.itemID equals epGlobalSystemRoleTags.TargetID into epGlobalSystemRoleTagsGroup
+            //join epTeamSystemRoleTags in User.QueryItemEPTags2(dc, EPCategory.SystemRoleCategory, teamEPScope) on user.ID equals epTeamSystemRoleTags.TargetID into epTeamSystemRoleTagsGroup
+            //join epAppRoleTags in User.QueryItemEPTags2(dc, EPCategory.AppRoleCategory, teamEPScope) on user.ID equals epAppRoleTags.TargetID into epAppRoleTagsGroup
+
+            //join epOptionTags in User.QueryGlobalEPTags2(dc, EPCategory.OptionCategory) on user.ID equals epOptionTags.TargetID into epOptionTagsGroup
+
+            select new
+            {
+                exParticipantGroup,
+                participantGroup = exParticipantGroup.item,
+
+                exParticipantGroup.item.Name,
+                //user.DisplayName,
+                //user.TimeZoneIndex,
+
+                tags = tagsGroup
+                    .Select(mm => mm.Item.Name)
+                    .Join(", "),
+                
+
+
+
+                //GlobalSystemRoleNames = epGlobalSystemRoleTagsGroup
+                  //  .Select(epSystemRoleTag => epSystemRoleTag.Item.Name),
+            };
+
+        var adsf = epQuery
+            .ToArray();
+
+
+        var query =
+            from eventParticipant in EventParticipant.Query(dc)
+            join participant in Participant.Query(dc) on eventParticipant.ParticipantID equals participant.ID
+            join participantGroup in ParticipantGroup.Query(dc) on participant.ParticipantGroupID equals participantGroup.ID
+            join myEvent in Event.Query(dc) on eventParticipant.EventID equals myEvent.ID
+
+            // outer join - optional
+            join session in EventSession.Query(dc) on eventParticipant.EventSessionID equals session.ID into eventParticipantSessionGroup
+            from session in eventParticipantSessionGroup.DefaultIfEmpty()
+            select new { eventParticipant, participant, participantGroup, myEvent, session };
+
+        var headerMap = new[]
+            {
+                new { key = "Name", value = "participantGroup.Name" },
+                new { key = "Tags", value = "tags" },
+
+/*
+                new { key = "First Name", value = "participant.FirstName" },
+                new { key = "Last Name", value = "participant.LastName" },
+                new { key = "Gender", value = "participant.Gender" },
+
+                new { key = "School", value = "participantGroup.Name" },
+
+                new { key = "Grade", value = "eventParticipant.Grade" },
+                new { key = "CheckInTimestamp", value = "eventParticipant.CheckInTimestamp" },
+                new { key = "CheckOutTimestamp", value = "eventParticipant.CheckOutTimestamp" },
+                new { key = "DonationLimit", value = "eventParticipant.DonationLimit" },
+                new { key = "DonationAmount", value = "eventParticipant.DonationAmount" },
+
+                new { key = "Event Name", value = "myEvent.Name" },
+                new { key = "Session Name", value = "session.Name" },
+*/
+            }
+        .ToDictionary(item => item.key, item => item.value);
+
+        response.SendCsvFileToBrowser("ParticipantGroups.csv", epQuery, headerMap);
     }
 
 
@@ -765,18 +844,23 @@ namespace App.Library
 
     private static HubResult CreateLock(AppDC dc, Func<ParticipantGroup> createHandler)
     {
-      var newCase = createLock(dc, createHandler);
-      if (newCase != null)
-      {
-        return HubResult.CreateSuccessData(new { id = newCase.ID });
-      }
+        var newCase = createLock(dc, createHandler);
+        if (newCase != null)
+        {
+            return HubResult.CreateSuccessData(new { id = newCase.ID });
+        }
 
-      return HubResult.Error;
+        return HubResult.Error;
     }
 
     private static ParticipantGroup createLock(AppDC dc, Func<ParticipantGroup> createHandler)
     {
-      return CreateLock(dc, NotifyClients, createHandler);
+        return createLock(dc, NotifyClients, createHandler);
+    }
+
+    private static ParticipantGroup exCreateLock(AppDC dc, JToken data, Func<ParticipantGroup> createHandler)
+    {
+        return exCreateLock(dc, data, NotifyClients, createHandler);
     }
 
     internal static T ReadLock<T>(AppDC dc, int itemID, Func<ParticipantGroup, T> readHandler)

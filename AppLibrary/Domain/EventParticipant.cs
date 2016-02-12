@@ -883,7 +883,7 @@ namespace App.Library
 
         private static EventParticipant createLock(AppDC dc, Func<EventParticipant> createHandler)
         {
-            return CreateLock(dc, NotifyClients, createHandler);
+            return createLock(dc, NotifyClients, createHandler);
         }
 
         internal static T ReadLock<T>(AppDC dc, int itemID, Func<EventParticipant, T> readHandler)

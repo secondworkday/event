@@ -65,6 +65,10 @@ namespace WebApp
                         EventParticipant.GetExportRows(response, appDC);
                         return;
 
+                    case "participantGroups":
+                        ParticipantGroup.GetExportRows(response, appDC, searchExpression);
+                        return;
+
 
 
                     case "reminderFormForSchool":

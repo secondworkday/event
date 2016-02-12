@@ -95,8 +95,21 @@ app.controller('ParticipantGroupsController', function ($scope, $mdDialog, $log,
 
 
   $scope.download = function () {
+
+    var searchExpression = utilityService.buildSearchExpression(
+      $scope.searchViewOptions.baseFilters,
+      $scope.searchViewOptions.stackFilters,
+
+      $scope.searchViewOptions.filter,
+      $scope.searchViewOptions.selectFilter,
+      $scope.searchViewOptions.userFilter,
+      $scope.searchViewOptions.userSearch);
+
+
+
     var query = {
-      type: 'tenants'
+      type: 'participantGroups',
+      searchExpression: searchExpression
     };
     utilityService.download(query);
   };

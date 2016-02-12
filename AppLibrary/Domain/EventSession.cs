@@ -838,7 +838,7 @@ namespace App.Library
 
         private static EventSession createLock(AppDC dc, Func<EventSession> createHandler)
         {
-            return CreateLock(dc, NotifyClients, createHandler);
+            return createLock(dc, NotifyClients, createHandler);
         }
 
         internal static T ReadLock<T>(AppDC dc, int itemID, Func<EventSession, T> readHandler)

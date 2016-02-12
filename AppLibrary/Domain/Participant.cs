@@ -492,9 +492,14 @@ namespace App.Library
             return HubResult.Error;
         }
 
+        private static Participant exCreateLock(AppDC dc, JToken data, Func<Participant> createHandler)
+        {
+            return exCreateLock(dc, data, NotifyClients, createHandler);
+        }
+
         private static Participant createLock(AppDC dc, Func<Participant> createHandler)
         {
-            return CreateLock(dc, NotifyClients, createHandler);
+            return createLock(dc, NotifyClients, createHandler);
         }
 
         internal static T ReadLock<T>(AppDC dc, int itemID, Func<Participant, T> readHandler)
