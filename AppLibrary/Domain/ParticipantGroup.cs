@@ -171,7 +171,7 @@ namespace App.Library
       BulkUpload.ColumnHandler[] availableColumnHandlers = new[]
       {
                 new BulkUpload.ColumnHandler("name", BulkUpload.ColumnOptions.Required, "school"),
-                new BulkUpload.ColumnHandler("contactName", BulkUpload.ColumnOptions.Optional, "counselor"),
+                new BulkUpload.ColumnHandler("contactName", BulkUpload.ColumnOptions.Optional, "counselor", "contact name"),
                 new BulkUpload.ColumnHandler("contactPhone", BulkUpload.ColumnOptions.Optional, "phone"),
                 new BulkUpload.ColumnHandler("contactEmail", BulkUpload.ColumnOptions.Optional, "email"),
             };
@@ -326,6 +326,7 @@ namespace App.Library
             // Join with our 1:many 
             join tags in QueryGlobalEPTags2(dc, EPCategory.UserAssigned) on exParticipantGroup.itemID equals tags.TargetID into tagsGroup
 
+            join eventParticipant in EventParticipant.Query(dc) on exParticipantGroup.itemID equals eventParticipant.ParticipantID into eventParticipantsGroup
 
             //join epGlobalSystemRoleTags in User.QueryGlobalEPTags2(dc, EPCategory.SystemRoleCategory) on exParticipantGroup.itemID equals epGlobalSystemRoleTags.TargetID into epGlobalSystemRoleTagsGroup
             //join epTeamSystemRoleTags in User.QueryItemEPTags2(dc, EPCategory.SystemRoleCategory, teamEPScope) on user.ID equals epTeamSystemRoleTags.TargetID into epTeamSystemRoleTagsGroup
@@ -341,25 +342,25 @@ namespace App.Library
                 exParticipantGroup.item.Name,
                 //user.DisplayName,
                 //user.TimeZoneIndex,
+                Email = exParticipantGroup.PrimaryMailAddress.Address,
+                PhoneNumber = exParticipantGroup.PrimaryPhoneNumber.Proffered_CaseSensitive,
+
 
                 tags = tagsGroup
                     .Select(mm => mm.Item.Name)
                     .Join(", "),
-                
 
-
-
-                //GlobalSystemRoleNames = epGlobalSystemRoleTagsGroup
-                  //  .Select(epSystemRoleTag => epSystemRoleTag.Item.Name),
+                totalParticipants = eventParticipantsGroup.Count(),
             };
-
-        var adsf = epQuery
-            .ToArray();
 
         var headerMap = new[]
             {
                 new { key = "Name", value = "participantGroup.Name" },
+                //!! need to translate term
+                new { key = "Total Students", value = "totalParticipants" },
                 new { key = "Contact Name", value = "participantGroup.ContactName" },
+                new { key = "Email", value = "exParticipantGroup.PrimaryMailAddress.Address" },
+                new { key = "Phone", value = "exParticipantGroup.PrimaryPhoneNumber.Proffered_CaseSensitive" },
                 new { key = "Tags", value = "tags" },
 
 /*
