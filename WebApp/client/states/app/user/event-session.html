@@ -1,4 +1,11 @@
-<h2>{{'EVENT_SESSION' | translate}}: {{eventSession.name}}</h2>
+<div layout layout-align="start center">
+  <div>
+    <md-button ui-sref="app.user.event.sessions({eventID:event.id})"><i class="fa fa-chevron-left"></i> Back</md-button>
+  </div>
+  <div>
+    <h2>{{'EVENT_SESSION' | translate}}: {{eventSession.name}}</h2>
+  </div>
+</div>
 
 <div ms-debug-only><pre>eventSession: {{eventSession | json}}</pre></div>
 
