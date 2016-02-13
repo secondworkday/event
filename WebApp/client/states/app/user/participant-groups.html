@@ -1,5 +1,5 @@
 <h2 class="md-title">
-  {{'PARTICIPANT_GROUPS' | translate}}
+  {{'PARTICIPANT_GROUP_CONTACTS_ROLE' | translate}}
 </h2>
 
 <div layout>
@@ -42,13 +42,13 @@
      <tr>
        <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
        <th ms-debug-only>ID</th>
-         <th class="md-data-table__cell--non-numeric">Name</th>
-         <th hide-sm>Total {{'PARTICIPANTS' | translate }}</th>
-         <th>Contact Name</th>
-         <th>Email</th>
-         <th hide-sm>Phone</th>
-         <th hide-sm>Status</th>
-         <th hide-sm>Tags</th>
+         <th class="md-data-table__cell--non-numeric">{{'PARTICIPANT_GROUP' | translate }} Name</th>
+         <th class="md-data-table__cell--non-numeric">{{'PARTICIPANT_GROUP_CONTACT_ROLE' | translate}} Name</th>
+         <th hide-xs hide-sm class="md-data-table__cell--non-numeric">Email</th>
+         <th hide-xs hide-sm class="md-data-table__cell--non-numeric">Phone</th>
+         <th>Total {{'PARTICIPANTS' | translate }}</th>
+         <!-- <th hide-sm>Status</th> -->
+         <th hide-xs hide-sm class="md-data-table__cell--non-numeric">Tags</th>
          <th></th>
      </tr>
    </thead>
@@ -57,12 +57,12 @@
        <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ participantGroup | json }}</pre></td>
        <td ms-debug-only>{{ participantGroup.id }}</td>
        <td class="md-data-table__cell--non-numeric">{{ participantGroup.name }}</td>
-         <td hide-sm>{{getParticipantCount(participantGroup.id)}}</td>
-         <td>{{participantGroup.contactName}}</td>
-         <td>{{participantGroup.primaryEmail}}</td>
-         <td hide-sm>{{participantGroup.primaryPhoneNumber}}</td>
-         <td hide-sm>Not Invited</td>
-         <td hide-sm>
+         <td class="md-data-table__cell--non-numeric">{{participantGroup.contactName}}</td>
+         <td hide-xs hide-sm class="md-data-table__cell--non-numeric">{{participantGroup.primaryEmail}}</td>
+         <td hide-xs hide-sm class="md-data-table__cell--non-numeric">{{participantGroup.primaryPhoneNumber}}</td>
+         <td>{{getParticipantCount(participantGroup.id)}}</td>
+         <!-- <td hide-sm>[ ? ]</td> -->
+         <td hide-xs hide-sm class="md-data-table__cell--non-numeric">
            <span class="md-caption tag u-sm-margin-right"
               ng-repeat="tag in participantGroup.tags">
              <strong>{{ tag }}</strong>

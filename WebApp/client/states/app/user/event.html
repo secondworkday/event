@@ -4,9 +4,6 @@
       <span>{{event.name}}</span>
     </h2>
   </div>
-  <div>
-    <md-button ng-controller="ReportController" ng-click="showGenerateRemindersDialog($event)" class="md-primary">Generate Reminders</md-button>
-  </div>
 </header>
 <!--<md-divider></md-divider>-->
 <!--<div class="u-sm-space"></div>-->
@@ -23,7 +20,7 @@
         </md-tab-body>
     </md-tab>
     <md-tab ui-sref=".schools">
-        <md-tab-label>{{'PARTICIPANT_GROUPS' | translate}}</md-tab-label>
+        <md-tab-label>{{'PARTICIPANT_GROUP_CONTACTS_ROLE' | translate}}</md-tab-label>
         <md-tab-body>
           <div ui-view="schools"></div>
         </md-tab-body>
@@ -55,4 +52,3 @@
   <h4>Users</h4>
   <pre>{{model.users | json}}</pre>
 </div>
-

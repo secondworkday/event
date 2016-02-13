@@ -65,7 +65,7 @@ app.config(['$translateProvider', function ($translateProvider) {
     'PARTICIPANT': 'Student',
     'PARTICIPANTS': 'Students',
     'PARTICIPANT_GROUP': 'School',
-    'PARTICIPANT_GROUPS': 'Schools',
+    'PARTICIPANT_GROUPS': 'Schools', // issue: concepts are now a mismatch, name changed per Bob's request
     'LOCATION': 'Store',
     'LOCATIONS': 'Stores',
 
