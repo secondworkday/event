@@ -213,13 +213,21 @@ namespace WebApp
 
             var identity = context.GetIdentity();
 
+            bool isEventSessionVolunteer = false;
+            if (identity != null && identity.IsInExclusiveRole(AppRole.EventSessionVolunteer))
+            {
+                isEventSessionVolunteer = true;
+            }
+
+
             //!! the application layer should be able to configure these paths.
             // Html5 mode - our SPA will handle these requests
-            if (requestPathLower == "/check-in" ||
+            if (isEventSessionVolunteer ||
+                requestPathLower == "/check-in" ||
                 requestPathLower.StartsWith("/check-out")
                 )
             {
-                context.RewritePath("/Spas/EventSessionVolunteerSpa.aspx");
+                context.RewritePath("/Spas/VolunteerSpa.aspx");
                 // context.RewritePath("/app/default.aspx");
                 return true;
             }
@@ -258,7 +266,7 @@ namespace WebApp
                 requestPathLower.StartsWith("/inbox")
                 )
             {
-                context.RewritePath("/Spas/ClientSpa.aspx");
+                context.RewritePath("/Spas/UserSpa.aspx");
                 // context.RewritePath("/app/default.aspx");
                 return true;
             }

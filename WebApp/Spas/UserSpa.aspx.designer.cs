@@ -10,6 +10,6 @@
 namespace WebApp.Spas {
     
     
-    public partial class ClientSpaPage {
+    public partial class UserSpaPage {
     }
 }

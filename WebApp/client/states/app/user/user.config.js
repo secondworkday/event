@@ -3,6 +3,11 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
   // Now set up the states
   $stateProvider
 
+    .state('app.spa-landing', {
+      redirectTo: 'app.user.events',
+    })
+
+
     .state('app.user', {
         abstract: true,
         templateUrl: '/client/states/app/user/user-container.html',

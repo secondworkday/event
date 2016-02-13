@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AngularJS-SignalR.Master" AutoEventWireup="true" CodeBehind="ClientSpa.aspx.cs" Inherits="WebApp.Spas.ClientSpaPage" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AngularJS-SignalR.Master" AutoEventWireup="true" CodeBehind="VolunteerSpa.aspx.cs" Inherits="WebApp.Spas.VolunteerSpaPage" %>
 <%@ Register Namespace="MS.WebUtility" Assembly="MS.WebUtility" TagPrefix="util" %>
 <%@ Register Namespace="App.Library" Assembly="AppLibrary" TagPrefix="lib" %>
 
@@ -25,18 +25,6 @@
             tenantLogoResourceID: "<%=MS.Utility.EPCategory.TenantLogoResource.ID%>",
         });
 
-      app.constant('APP_ROLE_ITEMS', [
-        // note 'Admin' is the same as TenantAdmin, handled as a SystemRole so not listed here
-        { name: 'Manager', value: 'EventPlanner' },
-        { name: 'Volunteer', value: 'EventSessionVolunteer' }
-      ]);
-
-      app.constant('APP_ROLE_TRANSLATION', {
-        Admin: 'TENANT_ADMIN_ROLE',
-        EventPlanner: 'EVENT_PLANNER_ROLE',
-        EventSessionVolunteer: 'SESSION_VOLUNTEER_ROLE'
-      });
-
       app.constant('AUTHORIZATION_ROLES', {
         // Other
         anonymous: "Anonymous",
@@ -49,22 +37,18 @@
 
         // AppRoles
 
-        admin: "Admin",
-        eventPlanner: "EventPlanner",
-        eventSessionVolunteer: "EventSessionVolunteer"
+        //!! nextgen not sure what AppRoles we need to support
+        // is there a need for AccountAdmin?
+
+        jobSeeker: "JobSeeker",
+        jobCounselor: "JobCounselor"
       });
-
-
-
-
-      app.constant('US_STATES', <%=USStatesArrayJson%> );
-
 
 
         app.config(['$locationProvider', '$stateProvider', '$urlRouterProvider', '$mdThemingProvider', 'AUTHORIZATION_ROLES', function ($locationProvider, $stateProvider, $urlRouterProvider, $mdThemingProvider, AUTHORIZATION_ROLES) {
 
             $locationProvider.html5Mode(true);
-            $urlRouterProvider.otherwise("/events");
+            $urlRouterProvider.otherwise("/check-in");
 
             //Now set up the theme
             $mdThemingProvider.theme('default')
@@ -75,23 +59,21 @@
 
     </script>
 
-    <script src="<%=VersionedUri.MapPath("/SignIn/signin.js")%>"></script>
-
 
     <% if (WebUtilityContext.Current.SiteBaseDomain.StartsWith("dev.") || WebUtilityContext.Current.SiteBaseDomain.StartsWith("rolling.")) { %>
 
       <%--On Dev (dev.*) or Rolling (rolling.*) sites, we don't want to emit anything when optimizations are off. That allows Charles to work --%>
-      <%: Scripts.Render("~/bundles/clientTemplates") %>
+      <%: Scripts.Render("~/bundles/volunteerSpaTemplates") %>
 
     <% } else { %>
 
-      <%--Everywhere else, we always want to bundle our templates even when BundleTable.EnableOptimizations is off --%>
-      <script src="<%: BundleTable.Bundles.ResolveBundleUrl("~/bundles/clientTemplates") %>" type="text/javascript"></script>
+      <%--Everywhere else, we always want to bundler our templates even when BundleTable.EnableOptimizations is off --%>
+      <script src="<%: BundleTable.Bundles.ResolveBundleUrl("~/bundles/volunteerSpaTemplates") %>" type="text/javascript"></script>
 
     <% } %>
 
 
-    <%: Scripts.Render("~/bundles/clientJS") %>
+    <%: Scripts.Render("~/bundles/volunteerSpaJS") %>
 
 
 
@@ -115,7 +97,7 @@
     <meta name="msapplication-TileColor" content="#2b5797">
     <meta name="msapplication-TileImage" content="/mstile-144x144.png?v=YAB9gwBN7x">
     <meta name="theme-color" content="#ffffff">
-    <meta name="spa" content="client">
+    <meta name="spa" content="event-session-volunteer">
 
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">

@@ -1108,7 +1108,7 @@ namespace App.Library
                         if (authToken.TargetID.HasValue)
                         {
                             WebIdentityAuthentication.StartObjectSession(dc, context, TimeZones.Pacific, tenantGroupID, null, typeof(EventSession), authToken.TargetID.Value, null, null);
-                            context.Response.Redirect("/Spas/EventSessionVolunteerSpa.aspx");
+                            context.Response.Redirect("/Spas/VolunteerSpa.aspx");
                             Debug.Fail("Shouldn't get here...");
                         }
                     });

@@ -12,9 +12,11 @@ using App.Library;
 
 namespace WebApp.Spas
 {
-    public partial class EventSessionVolunteerSpaPage : SitePage
+    public partial class UserSpaPage : SitePage
     {
         protected string SignInPageDemoDataJson { get; private set; }
+
+        protected string USStatesArrayJson { get; private set; }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -42,6 +44,14 @@ namespace WebApp.Spas
             var hostDomainName = request.Url.Host;
 
             this.SignInPageDemoDataJson = ", demo:" + MS.Utility.TenantGroup.GetSigninPageCustomData(hostDomainName).ToJson();
+
+            this.USStatesArrayJson = MS.Utility.StateCodes.Data
+                .Select(state => new 
+                {
+                    name = state.Name,
+                    abbreviation = state.Abbreviation,
+                    code = state.Code,
+                }).ToJson();
 
 
 #if false

@@ -14,8 +14,8 @@
     <meta name="mobile-web-app-capable" content="yes">
 
 
-    <!-- Bootstrap -->
 <%if (includeAngularUI || includeAngularStrap || includeAngularStrapTypeahead) { %>
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="<%=VersionedUri.MapPath("/Content/bootstrap.css")%>">
 <% } %>
 

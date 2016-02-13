@@ -10,6 +10,6 @@
 namespace WebApp.Spas {
     
     
-    public partial class EventSessionVolunteerSpaPage {
+    public partial class VolunteerSpaPage {
     }
 }

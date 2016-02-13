@@ -63,6 +63,13 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
   });
 
   $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+
+
+    if (toState.redirectTo) {
+      event.preventDefault();
+      $state.go(toState.redirectTo, toParams)
+    }
+
     //set variables to false
     $rootScope.isAdminState = toState.name.indexOf(".admin.") > -1;
     $rootScope.isSystemState = toState.name.indexOf(".system.") > -1;

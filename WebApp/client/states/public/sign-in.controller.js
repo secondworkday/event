@@ -64,21 +64,12 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
       }
 
       $scope.working = false;
-      $scope.loginAsDemoJobSeeker = function (user) {
+      $scope.loginAsDemoUser = function (user) {
         $mdDialog.hide();
         utilityService.signIn(user)
         .then(function () {
-          $state.go('app.user.events', {}, { reload: true });
+          $state.go('app.spa-landing', {}, { reload: true });
         });
-
-      };
-      $scope.loginAsDemoCounselor = function (user) {
-        $mdDialog.hide();
-        utilityService.signIn(user)
-        .then(function () {
-          $state.go('app.user.events', {}, { reload: true });
-        });
-
       };
       $scope.cancelDialog = function () {
         $log.debug("You canceled the dialog.");
@@ -94,7 +85,7 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
           utilityService.signIn(newUserCred)
           .then(function () {
             // success
-            $state.go('app.user.events', {}, { reload: true });
+            $state.go('app.spa-landing', {}, { reload: true });
           }, function (errorMessage) {
             // failure (signIn)
             $log.debug(errorMessage);

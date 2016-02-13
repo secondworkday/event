@@ -24,7 +24,7 @@
       <div flex style="max-height:400px;overflow-y:scroll;" ng-repeat="(key, value) in APP_ROLE_TRANSLATION">
         <md-list>
           <md-subheader class="md-no-sticky">{{value | translate}}</md-subheader>
-          <md-list-item ng-click="loginAsDemoJobSeeker(user)" ng-repeat="user in demoTenant.users | filter: key">
+          <md-list-item ng-click="loginAsDemoUser(user)" ng-repeat="user in demoTenant.users | filter: key">
             <img ng-show="user.profilePhotoUrl" ng-src="{{user.profilePhotoUrl}}" alt="user img" class="mini-user-img" />
             <img ng-hide="user.profilePhotoUrl" ng-src="/images/user-img-placeholder.png" alt="user img" class="mini-user-img" />
             <p>{{user.firstName}} {{user.lastName}}</p>

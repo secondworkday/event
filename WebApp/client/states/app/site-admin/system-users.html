@@ -36,6 +36,8 @@
         <th></th>
         <th>UserID</th>
         <th>TenantID</th>
+        <th>AppRoles</th>
+        <th>SystemRoles</th>
         <th>30-day Sign ins</th>
         <th>Lifetime Sign ins</th>
         <th class="md-data-table__cell--non-numeric">Online</th>
@@ -53,6 +55,12 @@
         </td>
         <td>{{ user.id }}</td>
         <td>{{ user.tenantID }}</td>
+        <td>
+          <span style ="display:block" ng-repeat="appRole in user.appRoles">{{appRole}}</span>
+        </td>
+        <td>
+          <span style ="display:block" ng-repeat="systemRole in user.systemRoles">{{systemRole}}</span>
+        </td>
         <td>
           9 <span><i class="fa fa-arrow-up text-green"></i></span>
         </td>

@@ -314,8 +314,8 @@
     <Content Include="SignIn\signin.html" />
     <Content Include="SignIn\signin.js" />
     <Content Include="SignIn\welcome.html" />
-    <Content Include="Spas\EventSessionVolunteerSpa.aspx" />
-    <Content Include="Spas\ClientSpa.aspx" />
+    <Content Include="Spas\VolunteerSpa.aspx" />
+    <Content Include="Spas\UserSpa.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -366,19 +366,19 @@
       <DependentUpon>SiteLogin.ashx</DependentUpon>
     </Compile>
     <Compile Include="SiteHub.cs" />
-    <Compile Include="Spas\EventSessionVolunteerSpa.aspx.cs">
-      <DependentUpon>EventSessionVolunteerSpa.aspx</DependentUpon>
+    <Compile Include="Spas\VolunteerSpa.aspx.cs">
+      <DependentUpon>VolunteerSpa.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Spas\EventSessionVolunteerSpa.aspx.designer.cs">
-      <DependentUpon>EventSessionVolunteerSpa.aspx</DependentUpon>
+    <Compile Include="Spas\VolunteerSpa.aspx.designer.cs">
+      <DependentUpon>VolunteerSpa.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Spas\ClientSpa.aspx.cs">
-      <DependentUpon>ClientSpa.aspx</DependentUpon>
+    <Compile Include="Spas\UserSpa.aspx.cs">
+      <DependentUpon>UserSpa.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Spas\ClientSpa.aspx.designer.cs">
-      <DependentUpon>ClientSpa.aspx</DependentUpon>
+    <Compile Include="Spas\UserSpa.aspx.designer.cs">
+      <DependentUpon>UserSpa.aspx</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
     <Compile Include="System\Impersonate.ashx.cs">
