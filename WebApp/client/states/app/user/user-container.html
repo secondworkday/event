@@ -8,7 +8,7 @@
         <md-button ui-sref="app.user.events">{{'EVENTS' | translate}}</md-button>
         <md-button ui-sref="app.user.team">{{'USERS' | translate}}</md-button>
         <!-- <md-button ui-sref="app.user.participant-groups">{{'PARTICIPANT_GROUPS' | translate}}</md-button> -->
-        <md-button ui-sref="app.user.locations">{{'LOCATIONS' | translate}}</md-button>
+        <!-- <md-button ui-sref="app.user.locations">{{'LOCATIONS' | translate}}</md-button> -->
       </span>
       <span flex></span>
       <md-menu>
@@ -51,10 +51,10 @@
   </md-toolbar>
 </div>
 
-<div class="content-canvas" style="margin-left:auto;margin-right:auto;">
+<div class="content-canvas">
   <div class="content" ui-view></div>
 </div>
-
+<!--
 <div hide-xs layout layout-align="start center" class="footer">
   <nav>
     <ul>
@@ -62,4 +62,4 @@
       <li><a class="md-body-2" ng-click="showSiteInfoDialog($event)">Site Info</a></li>
     </ul>
   </nav>
-</div>
+</div> -->
