@@ -25,6 +25,13 @@
             tenantLogoResourceID: "<%=MS.Utility.EPCategory.TenantLogoResource.ID%>",
         });
 
+      app.constant('APP_ROLE_TRANSLATION', {
+        Admin: 'TENANT_ADMIN_ROLE',
+        EventPlanner: 'EVENT_PLANNER_ROLE',
+        EventSessionVolunteer: 'SESSION_VOLUNTEER_ROLE'
+      });
+
+
       app.constant('AUTHORIZATION_ROLES', {
         // Other
         anonymous: "Anonymous",
@@ -48,7 +55,7 @@
         app.config(['$locationProvider', '$stateProvider', '$urlRouterProvider', '$mdThemingProvider', 'AUTHORIZATION_ROLES', function ($locationProvider, $stateProvider, $urlRouterProvider, $mdThemingProvider, AUTHORIZATION_ROLES) {
 
             $locationProvider.html5Mode(true);
-            $urlRouterProvider.otherwise("/check-in");
+            $urlRouterProvider.otherwise("/");
 
             //Now set up the theme
             $mdThemingProvider.theme('default')

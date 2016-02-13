@@ -39,7 +39,7 @@
      </tr>
    </thead>
    <tbody>
-     <tr ui-sref="app.system.tenant.dashboard({ tenantID:tenant.id })" ng-repeat="tenant in $displayedIndex | objectLookup:$hashMap track by tenant.id">
+     <tr ui-sref="app.site-admin.system.tenant.account({ tenantID:tenant.id })" ng-repeat="tenant in $displayedIndex | objectLookup:$hashMap track by tenant.id">
        <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ tenant | json }}</pre></td>
        <td>{{ tenant.id }}</td>
        <td class="md-data-table__cell--non-numeric">{{ tenant.name }}</td>
