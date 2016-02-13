@@ -72,6 +72,20 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
     $translate('EVENT_SESSION').then(function (event_session_text) {
       EVENT_SESSION = event_session_text;
     });
+    var SESSION_MANAGER = "Session Manager";
+    $translate('SESSION_MANAGER').then(function (session_manager_text) {
+      SESSION_MANAGER = session_manager_text;
+    });
+
+    // these should be replaced with any of the users (aka "Team" members) who are eligible
+    // to be Session Managers (aka Store Leaders)
+    $scope.sampleUsers = [
+      {firstName: "Sam", lastName: "Adams", isSessionManager: false},
+      {firstName: "Jack", lastName: "Daniels", isSessionManager: false},
+      {firstName: "Johnny", lastName: "Walker", isSessionManager: false},
+      {firstName: "Lindsy", lastName: "Jones", isSessionManager: false}
+    ];
+
     $scope.newOrEdit = newOrEdit;
     $scope.formInput = {
       timeChoice: [
@@ -91,7 +105,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
       ampm: ["AM", "PM"]
     };
 
-    
+
     function differentDay(dateTime1, dateTime2) {
       var date1 = new Date(dateTime1.getFullYear(), dateTime1.getMonth(), dateTime1.getDate(), 0, 0, 0);
       var date2 = new Date(dateTime2.getFullYear(), dateTime2.getMonth(), dateTime2.getDate(), 0, 0, 0);
@@ -218,8 +232,8 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
       $scope.formData.endDate = new Date(eventSession.endDate);
       updateTimeDisplay();
     }
-    
-    
+
+
 
     $scope.hide = function () {
       $mdDialog.hide();
@@ -296,7 +310,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
       });
     }
 
-    
+
   }
 
   $scope.showEditEventSessionDialog = function (ev, eventSession) {
@@ -321,7 +335,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
   };
 
   //function EditSessionDialogController($scope, $mdDialog, eventSession) {
-    
+
   //  $scope.eventSession = eventSession;
   //  $scope.eventSession.startDate = new Date($scope.eventSession.startDate);
   //  $scope.eventSession.endDate = new Date($scope.eventSession.endDate);
