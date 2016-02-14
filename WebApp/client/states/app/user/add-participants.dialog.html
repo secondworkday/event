@@ -11,34 +11,55 @@
     </md-toolbar>
     <md-dialog-content>
       <div class="md-dialog-content">
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>First Name</label>
+            <input ng-model="formData.firstName">
+          </md-input-container>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Last Name</label>
+            <input ng-model="formData.lastName">
+          </md-input-container>
+        </div>
+
         <md-input-container class="md-block" flex-gt-sm>
-          <label>Name</label>
-          <input ng-model="formData.name">
+          <label>{{'PARTICIPANT_GROUP' | translate}}</label>
+          <md-select ng-model="formData.participantGroupID">
+            <md-option ng-repeat="participantGroup in participantGroups.index | objectLookup:participantGroups.hashMap track by participantGroup.id" value="{{participantGroup.id}}">
+              {{participantGroup.name}}
+            </md-option>
+          </md-select>
         </md-input-container>
         <md-input-container class="md-block" flex-gt-sm>
           <label>Grade</label>
           <input type="number" ng-model="formData.grade">
         </md-input-container>
         <md-input-container class="md-block" flex-gt-sm>
-          <label>{{'PARTICIPANT_GROUP' | translate}}</label>
-          <md-select ng-model="formData.participantGroupID">
-            <md-option ng-repeat="participantGroup in participantGroups.index | objectLookup:participantGroups.hashMap track by school.id" value="{{participantGroup.id}}">
-              {{participantGroup.name}}
+          <label>Gender</label>
+          <!--<input type="number" ng-model="formData.gender">-->
+          <md-select ng-model="formData.gender">
+            <md-option ng-repeat="gender in formInput.genders" value="{{gender}}">{{gender}}</md-option>
+          </md-select>
+        </md-input-container>
+        <md-input-container class="md-block" flex-gt-sm>
+          <label>{{'EVENT_SESSION' | translate}}</label>
+          <md-select ng-model="formData.eventSessionID">
+            <md-option ng-repeat="eventSession in eventSessionsIndex | objectLookup:eventSessions.hashMap track by eventSession.id" value="{{eventSession.id}}">
+              {{eventSession.name}} - {{eventSession.startDate | date:'MM/dd/yyyy'}}
             </md-option>
           </md-select>
         </md-input-container>
-        <br/>
-        <md-button ng-disabled="!formData.participantGroupID" ng-click="generateRandomParticipants(formData.participantGroupID, 25)"><i class="fa fa-magic"></i> Generate 25 {{'PARTICIPANTS' | translate}}</md-button>
+        <br />
+        <!--<md-button ng-disabled="!formData.participantGroupID" ng-click="generateRandomParticipants(formData.participantGroupID, 25)"><i class="fa fa-magic"></i> Generate 25 {{'PARTICIPANTS' | translate}}</md-button>-->
       </div>
     </md-dialog-content>
     <md-dialog-actions layout="row" layout-align="end center">
       <md-button ng-click="cancel()">
-       Cancel
+        Cancel
       </md-button>
-      <md-button ng-disabled="!(formData.participantGroupID && formData.name && formData.grade)" ng-click="createParticipant(formData)"><i class="fa fa-magic"></i> OK</md-button>
+      <md-button ng-disabled="!(formData.participantGroupID && formData.firstName && formData.lastName && formData.eventSessionID)" ng-click="createEventParticipant(event, formData)"><i class="fa fa-magic"></i> OK</md-button>
     </md-dialog-actions>
     <div ms-debug-only>
-      <h1>Debug</h1>
       <pre>{{formData | json}}</pre>
     </div>
   </form>

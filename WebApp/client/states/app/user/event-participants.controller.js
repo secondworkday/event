@@ -173,7 +173,8 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
       controller: AddParticipantsDialogController,
       templateUrl: '/client/states/app/user/add-participants.dialog.html',
       locals: {
-        event: event
+        event: event,
+        eventSessionsIndex: $scope.eventSessionsIndex
       },
       parent: angular.element(document.body),
       targetEvent: ev,
@@ -186,10 +187,17 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
       // $scope.status = 'You cancelled the dialog.';
     });
   }
-  function AddParticipantsDialogController($scope, $mdDialog, event) {
+  function AddParticipantsDialogController($scope, $mdDialog, event, eventSessionsIndex) {
 
+    $scope.eventSessions = siteService.model.eventSessions;
     $scope.participantGroups = siteService.model.participantGroups;
+    
     $scope.event = event;
+    $scope.eventSessionsIndex = eventSessionsIndex;
+
+    $scope.formInput = {
+      genders: [ "Male", "Female" ]
+    };
 
     $scope.hide = function () {
       $mdDialog.hide();
@@ -202,8 +210,8 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
       siteService.generateRandomParticipants(participantGroupID, numberOfParticipants);
       $mdDialog.hide();
     };
-    $scope.createParticipant = function (formData) {
-      siteService.createParticipant(formData);
+    $scope.createEventParticipant = function (event, formData) {
+      siteService.createEventParticipant(event, formData);
       $mdDialog.hide();
     }
   }

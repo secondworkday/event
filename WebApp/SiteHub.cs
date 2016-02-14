@@ -664,7 +664,17 @@ namespace WebApp
         }
 
 
-        public HubResult CheckInEventParticipant(int itemID)
+        public HubResult CreateEventParticipant(int eventID, dynamic data)
+        {
+          return accountsOnlyHeader((siteContext, dc) =>
+          {
+            var result = EventParticipant.CreateParticipantAndEventParticipant(dc, eventID, data);
+            return HubResult.CreateSuccessData(result);
+          });
+        }
+
+
+    public HubResult CheckInEventParticipant(int itemID)
         {
             return accountsOnlyHeader((siteContext, dc) =>
             {

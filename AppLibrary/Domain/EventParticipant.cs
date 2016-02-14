@@ -141,70 +141,80 @@ namespace App.Library
 
 
 
+    public static int? CreateParticipantAndEventParticipant(AppDC dc, int eventID, JToken data)
+    {
+      var defaultParticipantGroupID = data.Value<int?>("participantGroupID");
+      var defaultParticipantGroup = defaultParticipantGroupID.HasValue ? ParticipantGroup.FindByID(dc, defaultParticipantGroupID.Value) : null;
+
+      return CreateParticipantAndEventParticipant(dc, eventID, data, defaultParticipantGroup);
+    }
 
 
+    public static HubResult Upload(AppDC dc, int eventID, JToken uploadData)
+    {
+        // take a submit lock
+        // go through each EventParticipant
+        // add them to the table
+        // return CRUD results
 
-        public static HubResult Upload(AppDC dc, int eventID, JToken uploadData)
+        var hubResult = dc.SubmitLock<HubResult>(() =>
         {
-            // take a submit lock
-            // go through each EventParticipant
-            // add them to the table
-            // return CRUD results
+            var defaultParticipantGroupID = uploadData.Value<int?>("participantGroupID");
+            var defaultParticipantGroup = defaultParticipantGroupID.HasValue ? ParticipantGroup.FindByID(dc, defaultParticipantGroupID.Value) : null;
 
-            var hubResult = dc.SubmitLock<HubResult>(() =>
-            {
-                var defaultParticipantGroupID = uploadData.Value<int?>("participantGroupID");
-                var defaultParticipantGroup = defaultParticipantGroupID.HasValue ? ParticipantGroup.FindByID(dc, defaultParticipantGroupID.Value) : null;
+            var eventParticipants = uploadData["itemsData"]
+                .Select(itemData =>
+                {
+                  return CreateParticipantAndEventParticipant(dc, eventID, itemData, defaultParticipantGroup);
+                })
+                .ToArray();
 
-                var eventParticipants = uploadData["itemsData"]
-                    .Select(itemData =>
-                    {
-                        var participantGroupID = itemData.Value<int?>("participantGroupID");
-                        var participantGroupName = itemData.Value<string>("participantGroupName");
+            return HubResult.CreateSuccessData(eventParticipants);
+        });
 
-                        var participantGroup =
-                            (participantGroupID.HasValue ? ParticipantGroup.FindByID(dc, participantGroupID.Value) : null) ??
-                            (!string.IsNullOrEmpty(participantGroupName) ? ParticipantGroup.FindByName(dc, participantGroupName) : null) ??
-                            defaultParticipantGroup;
+        return hubResult;
+    }
 
-                        Debug.Assert(participantGroup != null);
-                        if (participantGroup == null)
-                        {
-                            //!! should return a reason code here ...
-                            return (int?)null;
-                        }
+    private static int? CreateParticipantAndEventParticipant(AppDC dc, int eventID, JToken itemData, ParticipantGroup defaultParticipantGroup)
+    {
+      var participantGroupID = itemData.Value<int?>("participantGroupID");
+      var participantGroupName = itemData.Value<string>("participantGroupName");
 
-                        itemData["participantGroupID"] = participantGroup.ID;
-                        var participant = Participant.Create(dc, itemData);
-                        Debug.Assert(participant != null);
-                        if (participant == null)
-                        {
-                            //!! should return a reason code here ...
-                            return (int?)null;
-                        }
+      var participantGroup =
+          (participantGroupID.HasValue ? ParticipantGroup.FindByID(dc, participantGroupID.Value) : null) ??
+          (!string.IsNullOrEmpty(participantGroupName) ? ParticipantGroup.FindByName(dc, participantGroupName) : null) ??
+          defaultParticipantGroup;
 
-                        itemData["eventID"] = eventID;
-                        itemData["participantID"] = participant.ID;
-                        var eventParticipant = EventParticipant.Create(dc, itemData);
-                        if (eventParticipant != null)
-                        {
-                            return (int?)eventParticipant.ID;
-                        }
-                        else
-                        {
-                            return (int?) null;
-                        }
-                    })
-                    .ToArray();
+      Debug.Assert(participantGroup != null);
+      if (participantGroup == null)
+      {
+        //!! should return a reason code here ...
+        return (int?)null;
+      }
 
-                return HubResult.CreateSuccessData(eventParticipants);
-            });
+      itemData["participantGroupID"] = participantGroup.ID;
+      var participant = Participant.Create(dc, itemData);
+      Debug.Assert(participant != null);
+      if (participant == null)
+      {
+        //!! should return a reason code here ...
+        return (int?)null;
+      }
 
-            return hubResult;
-        }
+      itemData["eventID"] = eventID;
+      itemData["participantID"] = participant.ID;
+      var eventParticipant = EventParticipant.Create(dc, itemData);
+      if (eventParticipant != null)
+      {
+        return (int?)eventParticipant.ID;
+      }
+      else
+      {
+        return (int?)null;
+      }
+    }
 
-
-        public static HubResult CheckIn(AppDC dc, int itemID)
+    public static HubResult CheckIn(AppDC dc, int itemID)
         {
             return WriteLock(dc, itemID, (item, notifyExpression) =>
             {

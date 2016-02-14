@@ -663,6 +663,12 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
     });
   };
 
+  self.createEventParticipant = function (event, data) {
+    return utilityService.callHub(function () {
+      return siteHub.server.createEventParticipant(event.id, data);
+    });
+  }
+
 
 
   self.checkInEventParticipant = function (item) {
