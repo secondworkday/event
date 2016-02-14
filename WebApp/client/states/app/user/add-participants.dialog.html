@@ -57,7 +57,7 @@
       <md-button ng-click="cancel()">
         Cancel
       </md-button>
-      <md-button ng-disabled="!(formData.participantGroupID && formData.firstName && formData.lastName && formData.eventSessionID)" ng-click="createEventParticipant(event, formData)"><i class="fa fa-magic"></i> OK</md-button>
+      <md-button ng-disabled="!(formData.participantGroupID && formData.firstName && formData.lastName)" ng-click="createEventParticipant(event, formData)">OK</md-button>
     </md-dialog-actions>
     <div ms-debug-only>
       <pre>{{formData | json}}</pre>
