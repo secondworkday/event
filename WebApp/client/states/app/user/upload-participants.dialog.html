@@ -11,6 +11,24 @@
         </md-toolbar>
         <md-dialog-content>
             <div class="md-dialog-content">
+              <div>
+                <md-input-container class="md-block" flex-gt-sm>
+                  <label>Default {{'PARTICIPANT_GROUP' | translate}}</label>
+                  <md-select ng-model="uploadData.participantGroupID">
+                    <md-option ng-repeat="participantGroup in participantGroups.index | objectLookup:participantGroups.hashMap track by participantGroup.id" value="{{participantGroup.id}}">
+                      {{participantGroup.name}}
+                    </md-option>
+                  </md-select>
+                </md-input-container>
+                <md-input-container class="md-block" flex-gt-sm>
+                  <label>{{'EVENT_SESSION' | translate}} (Optional)</label>
+                  <md-select ng-model="uploadData.eventSessionID">
+                    <md-option ng-repeat="eventSession in eventSessionsIndex | objectLookup:eventSessions.hashMap track by eventSession.id" value="{{eventSession.id}}">
+                      {{eventSession.name}} - {{eventSession.startDate | date:'MM/dd/yyyy'}}
+                    </md-option>
+                  </md-select>
+                </md-input-container>
+              </div>
                 <div ng-hide="uploadData.itemsData.length > 0">
                     <md-input-container>
                         <label>Paste text here</label>
@@ -23,10 +41,12 @@
                     </div>
                 </div>
 
-                <div ng-show="uploadData.itemsData.length > 0">
-                    <h4>{{uploadData.itemsData.length}} participants found</h4>
+                <div ng-if="uploadData.itemsData.length > 0">
+                    <div style="float:right; margin-top:10px;"><md-button ng-click="clearData()">Clear Data</md-button></div>
+                    <h4 style="margin-bottom:-1em;">{{uploadData.itemsData.length}} participants found</h4>
                     <h5 ng-if="dataErrors.numberOfErrors > 0" class="uploaddataerror">Unfortunately, {{dataErrors.numberOfErrors}} participants contain errors. Please fix your source data and try again.</h5>
                     <h5 ng-if="dataErrors.numberOfErrors == 0">Click 'Bulk Upload' to complete data upload.</h5>
+                    
                     <table class="md-data-table u-full-width">
                         <thead>
                             <tr>
@@ -81,7 +101,7 @@
         </md-dialog-content>
         <md-dialog-actions layout="row" layout-align="end center">
             <md-button ng-click="cancel()">Cancel</md-button>
-            <md-button ng-disabled="dataErrors.numberOfErrors > 0 || !uploadData.itemsData" ng-click="uploadEventParticipants()" class="md-primary"><i class="fa fa-upload"></i> Bulk upload</md-button>
+            <md-button ng-disabled="dataErrors.numberOfErrors > 0 || !uploadData.itemsData || !uploadData.participantGroupID" ng-click="uploadEventParticipants()" class="md-primary"><i class="fa fa-upload"></i> Bulk upload</md-button>
             <!--<md-button ng-disabled="!(formData.participantGroupID && formData.name && formData.grade)" ng-click="createParticipant(formData)"><i class="fa fa-magic"></i> OK</md-button>-->
         </md-dialog-actions>
         <div ms-debug-only>

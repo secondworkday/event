@@ -1,8 +1,12 @@
-app.controller('UploadParticipantsDialogController', function ($scope, $mdDialog, $log, $msUI, utilityService, siteService, event) {
+app.controller('UploadParticipantsDialogController', function ($scope, $mdDialog, $log, $msUI, $translate, utilityService, siteService, event, eventSessionsIndex) {
   $log.debug('Loading UploadParticipantsDialogController...');
 
   $scope.participantGroups = siteService.model.participantGroups;
   $scope.event = event;
+  $scope.eventSessionsIndex = eventSessionsIndex;
+  $scope.eventSessions = siteService.model.eventSessions;
+
+  $scope.uploadData = {};
 
   $scope.hide = function () {
     $mdDialog.hide();
@@ -15,16 +19,22 @@ app.controller('UploadParticipantsDialogController', function ($scope, $mdDialog
     numberOfErrors: 0
   }
 
+  $scope.clearData = function () {
+    $scope.formData.participantTextInput = "";
+    $scope.uploadData.itemsData = null;
+  }
+
   $scope.paste = function ($event) {
     var pastedTextData = $event.originalEvent.clipboardData.getData('text/plain');
 
     siteService.parseEventParticipants(event, pastedTextData)
     .then(function (successData) {
       // success
-      $scope.uploadData = {
-        //participantGroupID: 1,
-        itemsData: successData.ResponseData
-      };
+      $scope.uploadData.itemsData = successData.ResponseData;
+      //$scope.uploadData = {
+      //  //participantGroupID: 1,
+      //  itemsData: successData.ResponseData
+      //};
       checkPresenceOfErrors();
       return successData;
     }, function (failureData) {
@@ -58,10 +68,10 @@ app.controller('UploadParticipantsDialogController', function ($scope, $mdDialog
     siteService.parseEventParticipants(event, parseData)
     .then(function (successData) {
       // success
-      $scope.uploadData = {
-        //participantGroupID: 1,
-        itemsData: successData.ResponseData
-      };
+      $scope.uploadData.itemsData = successData.ResponseData;
+      //$scope.uploadData = {
+      //  itemsData: successData.ResponseData
+      //};
       return successData;
     }, function (failureData) {
       // failure

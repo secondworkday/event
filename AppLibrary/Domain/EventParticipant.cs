@@ -146,7 +146,8 @@ namespace App.Library
       var defaultParticipantGroupID = data.Value<int?>("participantGroupID");
       var defaultParticipantGroup = defaultParticipantGroupID.HasValue ? ParticipantGroup.FindByID(dc, defaultParticipantGroupID.Value) : null;
 
-      return CreateParticipantAndEventParticipant(dc, eventID, data, defaultParticipantGroup);
+      //return CreateParticipantAndEventParticipant(dc, eventID, data, defaultParticipantGroup, null);
+      return CreateParticipantAndEventParticipant(dc, eventID, data, null, null);
     }
 
     public static HubResult Edit(AppDC dc, int itemID, dynamic data)
@@ -212,10 +213,12 @@ namespace App.Library
             var defaultParticipantGroupID = uploadData.Value<int?>("participantGroupID");
             var defaultParticipantGroup = defaultParticipantGroupID.HasValue ? ParticipantGroup.FindByID(dc, defaultParticipantGroupID.Value) : null;
 
+            var defaultEventSessionID = uploadData.Value<int?>("eventSessionID"); 
+
             var eventParticipants = uploadData["itemsData"]
                 .Select(itemData =>
                 {
-                  return CreateParticipantAndEventParticipant(dc, eventID, itemData, defaultParticipantGroup);
+                  return CreateParticipantAndEventParticipant(dc, eventID, itemData, defaultParticipantGroup, defaultEventSessionID);
                 })
                 .ToArray();
 
@@ -225,7 +228,7 @@ namespace App.Library
         return hubResult;
     }
 
-    private static int? CreateParticipantAndEventParticipant(AppDC dc, int eventID, JToken itemData, ParticipantGroup defaultParticipantGroup)
+    private static int? CreateParticipantAndEventParticipant(AppDC dc, int eventID, JToken itemData, ParticipantGroup defaultParticipantGroup, int? defaultEventSessionID)
     {
       var participantGroupID = itemData.Value<int?>("participantGroupID");
       var participantGroupName = itemData.Value<string>("participantGroupName");
@@ -253,6 +256,10 @@ namespace App.Library
 
       itemData["eventID"] = eventID;
       itemData["participantID"] = participant.ID;
+      if (defaultEventSessionID.HasValue)
+      {
+        itemData["eventSessionID"] = defaultEventSessionID.Value;
+      }
       var eventParticipant = EventParticipant.Create(dc, itemData);
       if (eventParticipant != null)
       {

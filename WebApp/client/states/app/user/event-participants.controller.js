@@ -154,7 +154,8 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
       controller: 'UploadParticipantsDialogController',
       templateUrl: '/client/states/app/user/upload-participants.dialog.html',
       locals: {
-        event: event
+        event: event,
+        eventSessionsIndex: $scope.eventSessionsIndex
       },
       parent: angular.element(document.body),
       targetEvent: ev,
