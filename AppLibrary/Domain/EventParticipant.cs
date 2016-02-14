@@ -175,6 +175,31 @@ namespace App.Library
       this.Grade = (uint)data.grade;
     }
 
+    public static HubResult Delete(AppDC dc, int itemID)
+    {
+      var deleteItem = dc.EventParticipants
+          .FirstOrDefault(item => item.ID == itemID);
+      Debug.Assert(deleteItem != null);
+
+      if (deleteItem == null)
+      {
+        return HubResult.NotFound;
+      }
+
+      //!! We won't delete Participant
+      dc.EventParticipants.DeleteOnSubmit(deleteItem);
+
+      //!! TODO remove any Tags that have their last reference with this Pipeline
+      //!! Should we have an ExtendedObject call to remove all extended properties?
+      dc.SubmitChanges();
+
+      var notifyExpression = new NotifyExpression();
+      notifyExpression.AddDeletedID(itemID);
+      NotifyClients(dc, notifyExpression);
+
+      return HubResult.Success;
+    }
+
     public static HubResult Upload(AppDC dc, int eventID, JToken uploadData)
     {
         // take a submit lock

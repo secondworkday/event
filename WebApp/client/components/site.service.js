@@ -671,13 +671,20 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
     return utilityService.callHub(function () {
       return siteHub.server.createEventParticipant(event.id, data);
     });
-  }
+  };
 
   self.editEventParticipant = function (item) {
     return utilityService.callHub(function () {
       return siteHub.server.editEventParticipant(item.id, item);
     });
-  }
+  };
+
+  //deleteEventParticipant
+  this.deleteEventParticipant = function (item) {
+    return utilityService.callHub(function () {
+      return siteHub.server.deleteEventParticipant(item.id);
+    });
+  };
 
 
   self.checkInEventParticipant = function (item) {

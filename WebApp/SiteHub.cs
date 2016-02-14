@@ -681,6 +681,14 @@ namespace WebApp
       });
     }
 
+    public HubResult DeleteEventParticipant(int itemID)
+    {
+      return accountsOnlyHeader((utilityContext, dc) =>
+      {
+        return EventParticipant.Delete(dc, itemID);
+      });
+    }
+
 
     public HubResult CheckInEventParticipant(int itemID)
         {
