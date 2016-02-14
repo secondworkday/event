@@ -1001,8 +1001,6 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
-
-
     this.getTenants = function () {
       return model.tenantGroups.search("^", "", 0, 999999);
     };
@@ -1016,17 +1014,6 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       return model.tenantGroups.search("^" + parentGroup.id, "", 0, 999999);
     };
 
-    self.getTenant = function (tenantID) {
-      var searchExpression = "%" + tenantID;
-      return self.searchTenants(searchExpression, '', 0, 1)
-      .then(function (itemsData) {
-        var tenant = model.tenantGroups[tenantID];
-        if (tenant) {
-          return tenant;
-        }
-        return $q.reject("not found");
-      });
-    };
 
     self.searchTenants = function (searchExpression, sortExpression, startIndex, rowCount) {
       var searchTenantGroupExpression = "^";

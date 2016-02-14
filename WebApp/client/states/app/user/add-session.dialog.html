@@ -18,38 +18,93 @@
             <input ng-model="formData.name">
           </md-input-container>
         </div>
-        <div layout-gt-sm="row">
-          <md-datepicker style="margin-top:1rem;" ng-model="formData.startDate" md-placeholder="Session date" ng-change="startTimeChanged()" flex-gt-sm></md-datepicker>
-          <md-input-container flex-gt-sm>
-            <label>Start Time</label>
-            <md-select ng-model="formData.startTime" ng-change="startTimeChanged()" flex-gt-sm>
-              <md-option ng-repeat="tt in formInput.timeChoice" value="{{tt.value}}">
-                {{tt.display}}
-              </md-option>
-            </md-select>
-          </md-input-container>
-          <md-select ng-model="formData.startTimeAmPm" ng-change="startTimeChanged()" flex-gt-sm>
-            <md-option ng-repeat="ampm in formInput.ampm" value="{{ampm}}">
-              {{ampm}}
-            </md-option>
-          </md-select>
+        <div layout="column">
+          <div layout-gt-sm="row" layout-align="start center">
+            <div flex>
+              <p class="md-body-2">
+                {{'EVENT_SESSION' | translate}} date
+              </p>
+            </div>
+            <div flex>
+              <md-datepicker style="margin-top:1rem;" ng-model="formData.startDate" md-placeholder="Session date" ng-change="startTimeChanged()" flex-gt-sm></md-datepicker>
+            </div>
+          </div>
+          <div class="u-sm-space"></div>
+          <div layout-gt-sm="row" layout-align="start center">
+            <div flex>
+              <p class="md-body-2">
+                Start time
+              </p>
+            </div>
+            <div flex layout>
+              <md-input-container flex-gt-sm>
+                <md-select ng-model="formData.startTime" ng-change="startTimeChanged()" flex-gt-sm>
+                  <md-option ng-repeat="tt in formInput.timeChoice" value="{{tt.value}}">
+                    {{tt.display}}
+                  </md-option>
+                </md-select>
+              </md-input-container>
+              <md-select ng-model="formData.startTimeAmPm" ng-change="startTimeChanged()" flex-gt-sm>
+                <md-option ng-repeat="ampm in formInput.ampm" value="{{ampm}}">
+                  {{ampm}}
+                </md-option>
+              </md-select>
+            </div>
+          </div>
+          <div layout-gt-sm="row" layout-align="start center">
+            <div flex>
+              <p class="md-body-2">
+                End time
+              </p>
+            </div>
+            <div flex layout>
+              <md-input-container flex-gt-sm>
+                <md-select ng-model="formData.endTime" ng-change="endTimeChanged()" flex-gt-sm>
+                  <md-option ng-repeat="time in formInput.timeChoice" value="{{time.value}}">
+                    {{time.display}}
+                  </md-option>
+                </md-select>
+              </md-input-container>
+              <md-select ng-model="formData.endTimeAmPm" ng-change="endTimeChanged()" flex-gt-sm>
+                <md-option ng-repeat="ampm in formInput.ampm" value="{{ampm}}">
+                  {{ampm}}
+                </md-option>
+              </md-select>
+            </div>
+          </div>
+          <div layout-gt-sm="row" layout-align="start center">
+            <div flex>
+              <p class="md-body-2">
+                Total Slots
+              </p>
+            </div>
+            <div flex>
+              <md-input-container class="md-block" flex-gt-sm>
+                <input type="number" placeholder="i.e. 250" ng-model="formData.slots">
+              </md-input-container>
+            </div>
+          </div>
+          <div layout-gt-sm="row" layout-align="start center">
+            <div flex>
+              <p class="md-body-2">
+                Check In Code
+              </p>
+            </div>
+            <div flex>
+              <md-input-container class="md-block" flex-gt-sm>
+                <input type="text" placeholder="i.e. Redmond123" ng-model="formData.checkInCode">
+              </md-input-container>
+            </div>
+          </div>
         </div>
 
-        <div layout-gt-sm="row">
-          <md-input-container flex-gt-sm></md-input-container>
-          <md-input-container flex-gt-sm>
-            <label>End Time</label>
-            <md-select ng-model="formData.endTime" ng-change="endTimeChanged()" flex-gt-sm>
-              <md-option ng-repeat="time in formInput.timeChoice" value="{{time.value}}">
-                {{time.display}}
-              </md-option>
-            </md-select>
-          </md-input-container>
-          <md-select ng-model="formData.endTimeAmPm" ng-change="endTimeChanged()" flex-gt-sm>
-            <md-option ng-repeat="ampm in formInput.ampm" value="{{ampm}}">
-              {{ampm}}
-            </md-option>
-          </md-select>
+        <div layout="column">
+          <p class="md-subhead">
+            Select {{'SESSION_MANAGER' | translate}}(s)
+          </p>
+          <md-checkbox ng-repeat="user in sampleUsers" ng-model="user.isSessionManager" aria-label="{{user}} session manager checkbox">
+            {{user.firstName}} {{user.lastName}}
+          </md-checkbox>
         </div>
 
         <div layout-gt-sm="row">

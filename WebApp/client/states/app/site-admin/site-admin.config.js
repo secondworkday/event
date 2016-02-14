@@ -122,13 +122,12 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
     abstract: true,
     url: '/tenants/:tenantID',
     template: "<ui-view/>",
-    controller: 'TenantController',
+    //controller: 'TenantController',
     resolve: {
       tenant: function ($stateParams, utilityService) {
         // careful - might be an invalid or unauthorized tenantID
         var tenantID = $stateParams.tenantID;
-        //!! should we use ensureTenant here - to rely on cached info if we've got it?
-        return utilityService.getTenant(tenantID);
+        return utilityService.ensureTenantGroup(tenantID);
       }
     },
     data: {
@@ -148,7 +147,7 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
   })
   .state('app.site-admin.system.tenant.dashboard', {
     url: '/dashboard',
-    templateUrl: '/client/states/app/admin/tenant-dashboard.html',
+    templateUrl: '/client/states/app/site-admin/system-tenant-dashboard.html',
     controller: 'TenantDashboardController',
     data: {
       stateMapName: 'Tenant Dashboard (as System)',

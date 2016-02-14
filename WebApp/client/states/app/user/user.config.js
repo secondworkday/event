@@ -80,10 +80,6 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         eventParticipantGroupsIndex: function (siteService, eventParticipantsIndex) {
           return siteService.ensureEventParticipantGroups(siteService, eventParticipantsIndex);
         }
-      },
-      data: {
-        pageTitle: 'Back',
-        backState: 'app.job-seeker.career-step.home'
       }
     })
     .state('app.user.event.sessions', {

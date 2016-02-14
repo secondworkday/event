@@ -3,6 +3,10 @@
   user: 'user'
 });
 
+app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'utilityService', 'siteService', 'AUTHORIZATION_ROLES', function ($rootScope, $state, $stateParams, $http, $templateCache, utilityService, siteService, AUTHORIZATION_ROLES) {
+  // (Add a reference to siteService, so it loads early and we can register our .on handlers
+}]);
+
 //This handles retrieving data and is used by controllers. 3 options (server, factory, provider) with
 //each doing the same thing just structuring the functions/data differently.
 app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msIdentity', 'TEMPLATE_URL', 'CONNECTION_EVENT', function ($rootScope, $q, $state, utilityService, msIdentity, TEMPLATE_URL, CONNECTION_EVENT) {
@@ -748,18 +752,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
 
 
-  self.getEvent = function (itemID) {
-    var searchExpression = "%" + itemID;
-    //!! hmm - perhaps need a flag to indicate we want detailed information, not just overview information
-    return self.searchEvents(searchExpression, '', 0, 1)
-    .then(function (itemsData) {
-      var item = model.events.hashMap[itemID];
-      if (item) {
-        return item;
-      }
-      return $q.reject("not found");
-    });
-  };
 
   this.modifyEventTag = function (item, newTag, isAssigned) {
     return utilityService.callHub(function () {
@@ -820,18 +812,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
   };
 
 
-  self.getClient = function (clientID) {
-    var searchExpression = "%" + clientID;
-    //!! hmm - perhaps need a flag to indicate we want detailed information, not just overview information
-    return self.searchClients(searchExpression, '', 0, 1)
-    .then(function (itemsData) {
-      var item = model.clients.hashMap[clientID];
-      if (item) {
-        return item;
-      }
-      return $q.reject("not found");
-    });
-  };
 
   self.searchClients = function (searchExpression, sortExpression, startIndex, rowCount) {
     return utilityService.callHub(function () {
@@ -1266,7 +1246,11 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
     $rootScope.$apply(onSettingsUpdated(settingsObject));
   }).on('setAuthenticatedEventSession', function (itemsData) {
 
+
+    // please hit me...
     $rootScope.$apply(onSetAuthenticatedEventSession(itemsData));
+
+
 
   }).on('updateProjects', function (projectsData) {
     //var notification = onProjectsUpdated(projectsData);
@@ -1324,7 +1308,7 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
       model.authenticatedUser = null;
 
       // head to Kiosk home page
-      $state.go('app.event-session-volunteer.check-in', {}, { reload: true });
+      $state.go('app.spa-landing', {}, { reload: true });
 
       $rootScope.$broadcast('authenticated:', model.authenticatedIdentity);
     }
