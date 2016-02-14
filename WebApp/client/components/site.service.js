@@ -673,6 +673,11 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
     });
   }
 
+  self.editEventParticipant = function (item) {
+    return utilityService.callHub(function () {
+      return siteHub.server.editEventParticipant(item.id, item);
+    });
+  }
 
 
   self.checkInEventParticipant = function (item) {

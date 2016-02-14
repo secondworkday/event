@@ -149,6 +149,31 @@ namespace App.Library
       return CreateParticipantAndEventParticipant(dc, eventID, data, defaultParticipantGroup);
     }
 
+    public static HubResult Edit(AppDC dc, int itemID, dynamic data)
+    {
+      return WriteLock(dc, itemID, (item, notifyExpression) =>
+      {
+        item.updateData(dc, data);
+
+        notifyExpression.AddModifiedID(item.ID);
+        return HubResult.Success;
+      });
+    }
+
+    private void updateData(AppDC dc, dynamic data)
+    {
+      
+      // Update Participant
+      Participant.Edit(dc, this.ParticipantID, data);
+
+      // Update EventParticipant
+      var eventSessionID = (int?)data.eventSessionID;
+      if (eventSessionID.HasValue)
+      {
+        this.EventSessionID = eventSessionID;
+      }
+      this.Grade = (uint)data.grade;
+    }
 
     public static HubResult Upload(AppDC dc, int eventID, JToken uploadData)
     {

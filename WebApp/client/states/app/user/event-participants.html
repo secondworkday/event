@@ -92,6 +92,7 @@
            <td ng-if="!eventSession">{{ eventParticipantEventSession.name }}</td>
            <td ng-if="!eventSession">{{ eventParticipantEventSession.startDate | amCalendar}}</td>
            <td>
+             <md-button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditParticipantsDialog($event, event, eventParticipant)" aria-label="edit event participant"><i class="fa fa-pencil ng-scope"></i></md-button>
               <md-button ng-if="eventParticipantEventSession.state == 'Active' && !eventParticipant.checkInTimestamp" ng-click="checkIn(eventParticipant)">
                 Check In!
               </md-button>

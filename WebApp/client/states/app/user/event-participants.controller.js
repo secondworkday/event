@@ -170,11 +170,13 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 
   $scope.showAddParticipantsDialog = function (ev, event) {
     $mdDialog.show({
-      controller: AddParticipantsDialogController,
+      controller: AddEditParticipantsDialogController,
       templateUrl: '/client/states/app/user/add-participants.dialog.html',
       locals: {
         event: event,
-        eventSessionsIndex: $scope.eventSessionsIndex
+        eventSessionsIndex: $scope.eventSessionsIndex,
+        eventParticipant: null,
+        newOrEdit: "New"
       },
       parent: angular.element(document.body),
       targetEvent: ev,
@@ -187,16 +189,49 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
       // $scope.status = 'You cancelled the dialog.';
     });
   }
-  function AddParticipantsDialogController($scope, $mdDialog, event, eventSessionsIndex) {
+
+  $scope.showEditParticipantsDialog = function (ev, event, eventParticipant) {
+    $mdDialog.show({
+      controller: AddEditParticipantsDialogController,
+      templateUrl: '/client/states/app/user/add-participants.dialog.html',
+      locals: {
+        event: event,
+        eventSessionsIndex: $scope.eventSessionsIndex,
+        eventParticipant: angular.copy(eventParticipant),
+        newOrEdit: "Edit"
+      },
+      parent: angular.element(document.body),
+      targetEvent: ev,
+      clickOutsideToClose: true,
+      fullscreen: false
+    })
+    .then(function () {
+      // $scope.status = 'You said the information was "' + answer + '".';
+    }, function () {
+      // $scope.status = 'You cancelled the dialog.';
+    });
+  }
+
+  function AddEditParticipantsDialogController($scope, $mdDialog, $translate, event, eventSessionsIndex, eventParticipant, newOrEdit) {
+
+    var PARTICIPANT = "Event Participant";
+    $translate('PARTICIPANT').then(function (participant_text) {
+      PARTICIPANT = participant_text;
+    });
 
     $scope.eventSessions = siteService.model.eventSessions;
     $scope.participantGroups = siteService.model.participantGroups;
     
     $scope.event = event;
     $scope.eventSessionsIndex = eventSessionsIndex;
+    $scope.newOrEdit = newOrEdit;
+
+    if ($scope.newOrEdit == 'Edit') {
+      $scope.formData = eventParticipant;
+    }
 
     $scope.formInput = {
-      genders: [ "Male", "Female" ]
+      genders: [ "Masculine", "Feminine" ]
     };
 
     $scope.hide = function () {
@@ -213,6 +248,41 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
     $scope.createEventParticipant = function (event, formData) {
       siteService.createEventParticipant(event, formData);
       $mdDialog.hide();
+    };
+    $scope.editEventParticipant = function (formData) {
+      siteService.editEventParticipant(formData);
+      $mdDialog.hide();
+    };
+
+    $scope.showDeleteConfirmationDialog = function (ev, eventParticipant) {
+      $mdDialog.hide($scope.formData);
+
+      var confirm = $mdDialog.confirm()
+        .title("Delete " + PARTICIPANT)
+        .textContent("Would you like to delete " + PARTICIPANT + " '" + eventParticipant.firstName + " " + eventParticipant.lastName + "'?")
+        .ariaLabel("Delete event participant")
+        .targetEvent(ev)
+        .ok("yes")
+        .cancel("no");
+
+      $mdDialog.show(confirm).then(function () {
+        deleteEventParticipant(eventParticipant);
+      });
+    };
+
+    function deleteEventParticipant(item) {
+      siteService.deleteEventParticipant(item)
+      .then(function (successData) {
+        // success
+        $msUI.showToast(PARTICIPANT + " Deleted");
+        $log.debug("Event Participant Deleted.");
+        return successData;
+      }, function (failureData) {
+        // failure
+        $msUI.showToast(failureData.errorMessage);
+        $log.debug(failureData.errorMessage);
+        return failureData;
+      });
     }
   }
 

@@ -1,8 +1,8 @@
-<md-dialog aria-label="add {{'PARTICIPANTS' | translate}}" ng-cloak>
+<md-dialog aria-label="add {{'PARTICIPANT' | translate}}" ng-cloak>
   <form>
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <h2>Add {{'PARTICIPANTS' | translate}}</h2>
+        <h2>{{newOrEdit}} {{'PARTICIPANT' | translate}}</h2>
         <span flex></span>
         <md-button class="md-icon-button" ng-click="cancel()">
           <i class="fa fa-times"></i>
@@ -54,10 +54,14 @@
       </div>
     </md-dialog-content>
     <md-dialog-actions layout="row" layout-align="end center">
+      <md-button ng-click="showDeleteConfirmationDialog($event, formData)" ng-if="newOrEdit == 'Edit'">
+        Delete {{'PARTICIPANT' | translate}}
+      </md-button>
       <md-button ng-click="cancel()">
         Cancel
       </md-button>
-      <md-button ng-disabled="!(formData.participantGroupID && formData.firstName && formData.lastName)" ng-click="createEventParticipant(event, formData)">OK</md-button>
+      <md-button ng-if="newOrEdit == 'New'" ng-disabled="!(formData.participantGroupID && formData.firstName && formData.lastName)" ng-click="createEventParticipant(event, formData)">OK</md-button>
+      <md-button ng-if="newOrEdit == 'Edit'" ng-disabled="!(formData.participantGroupID && formData.firstName && formData.lastName)" ng-click="editEventParticipant(formData)">Save</md-button>
     </md-dialog-actions>
     <div ms-debug-only>
       <pre>{{formData | json}}</pre>

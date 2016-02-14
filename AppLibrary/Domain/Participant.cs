@@ -676,7 +676,38 @@ namespace App.Library
             });
         }
 
-        protected Participant(DateTime createdTimestamp, EPScope epScope, string firstName, string lastName, int participantGroupID)
+    private void updateData(AppDC dc, dynamic data)
+    {
+      this.FirstName = (string)data.firstName;
+      this.LastName = (string)data.lastName;
+
+      var genderString = (string)data.gender;
+      UserGender? userGender = genderString.ParseUserGenderOrNull();
+      this.Gender = userGender;
+
+      var participantGroupID = (int?)data.participantGroupID;
+      if (participantGroupID.HasValue)
+      {
+        var participantGroup = participantGroupID.HasValue ? ParticipantGroup.FindByID(dc, participantGroupID.Value) : null;
+        if (participantGroup != null)
+        {
+          this.ParticipantGroupID = participantGroupID.Value;
+        }
+      }
+    }
+
+    public static HubResult Edit(AppDC dc, int itemID, dynamic data)
+        {
+          return WriteLock(dc, itemID, (item, notifyExpression) =>
+          {
+            item.updateData(dc, data);
+
+            notifyExpression.AddModifiedID(item.ID);
+            return HubResult.Success;
+          });
+        }
+
+    protected Participant(DateTime createdTimestamp, EPScope epScope, string firstName, string lastName, int participantGroupID)
             : this()
         {
             Debug.Assert(!string.IsNullOrEmpty(firstName));

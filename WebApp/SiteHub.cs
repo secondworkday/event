@@ -673,6 +673,14 @@ namespace WebApp
           });
         }
 
+    public HubResult EditEventParticipant(int itemID, dynamic editEventParticipantData)
+    {
+      return accountsOnlyHeader((utilityContext, dc) =>
+      {
+        return EventParticipant.Edit(dc, itemID, editEventParticipantData);
+      });
+    }
+
 
     public HubResult CheckInEventParticipant(int itemID)
         {
