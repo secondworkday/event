@@ -855,17 +855,17 @@ namespace App.Library
 
     internal static T ReadLock<T>(AppDC dc, int itemID, Func<ParticipantGroup, T> readHandler)
     {
-      return ReadLock(dc, itemID, FindByID, readHandler);
+        return ReadLock(dc, itemID, FindByID, readHandler);
     }
 
     internal static HubResult ReadLock(AppDC dc, int itemID, Func<ParticipantGroup, HubResult> readHandler)
     {
-      return ReadLock(dc, itemID, FindByID, readHandler);
+        return ReadLock(dc, itemID, FindByID, readHandler);
     }
 
     internal static HubResult WriteLock(AppDC dc, int itemID, Func<ParticipantGroup, NotifyExpression, HubResult> writeHandler)
     {
-      return WriteLock(dc, itemID, FindByID, NotifyClients, writeHandler);
+        return WriteLock(dc, itemID, FindByID, NotifyClients, writeHandler);
     }
 
 
@@ -875,20 +875,13 @@ namespace App.Library
 
     internal static void NotifyClients(AppDC dc, NotifyExpression notifyExpression)
     {
-      var siteContext = SiteContext.Current;
-
-      var notification = ParticipantGroup.Search(dc, notifyExpression, null, 0, int.MaxValue);
-
-      //var hubClients = siteContext.ConnectionManager.GetHubContext("siteHub").Clients;
-      //Debug.Assert(hubClients != null);
-      //hubClients.All.updateParticipantGroups(notification);
-
-      NotifyClients("siteHub", notifyExpression, notification, (hubClients, notificationItem) => hubClients.All.updateParticipantGroups(notificationItem));
+        var notification = ParticipantGroup.Search(dc, notifyExpression, null, 0, int.MaxValue);
+        NotifyClients("siteHub", notifyExpression, notification, (hubClients, notificationItem) => hubClients.All.updateParticipantGroups(notificationItem));
     }
 
     public override string ToString()
     {
-      return this.Name;
+        return this.Name;
     }
   }
 }

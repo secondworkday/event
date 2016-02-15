@@ -90,7 +90,7 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 
   $scope.participantGroupFilters = [];
 
-  siteService.model.participantGroups.search($scope.searchViewOptions.baseFilters.serverTerm, "", 0, 99)
+  siteService.model.participantGroups.search($scope.searchViewOptions.baseFilters.serverTerm, "", 0, 999999)
   .then(function (itemsData) {
     console.log("search participantGroups", itemsData);
 
@@ -330,4 +330,15 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
     };
     utilityService.download(query);
   };
+
+
+  // init
+
+  // pre-load all our baseFilters participants - which loads up our Indexers
+
+  var searchExpression = utilityService.buildSearchExpression(
+    $scope.searchViewOptions.baseFilters);
+
+  $scope.searchHandler(searchExpression, "", 0, 99999);
+
 });
