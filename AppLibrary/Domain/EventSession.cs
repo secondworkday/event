@@ -863,13 +863,8 @@ namespace App.Library
 
         internal static void NotifyClients(AppDC dc, NotifyExpression notifyExpression)
         {
-            var siteContext = SiteContext.Current;
-
             var notification = EventSession.Search(dc, notifyExpression, null, 0, int.MaxValue);
-
-            var hubClients = siteContext.ConnectionManager.GetHubContext("siteHub").Clients;
-            Debug.Assert(hubClients != null);
-            hubClients.All.updateEventSessions(notification);
+            NotifyClients("siteHub", notifyExpression, notification, (hubClients, notificationItem) => hubClients.All.updateEventSessions(notificationItem));
         }
 
         public override string ToString()
