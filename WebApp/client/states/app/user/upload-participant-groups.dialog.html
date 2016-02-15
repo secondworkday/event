@@ -13,13 +13,13 @@
             <div class="md-dialog-content">
                 <div ng-hide="uploadData.itemsData.length > 0">
                     <md-input-container>
-                        <label>Paste text here</label>
+                        <label>Paste {{'PARTICIPANT_GROUP' | translate}} information here</label>
                         <textarea rows="10" cols="70" ng-paste="paste($event)" />
                     </md-input-container>
 
                     <div>
-                        <b>Tip:</b> Copy a table in Excel and paste it directly in this dialog.  The following header columns must be included:<br /><br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;School *&nbsp;&nbsp;&nbsp;&nbsp;Counselor&nbsp;&nbsp;&nbsp;&nbsp;Phone&nbsp;&nbsp;&nbsp;&nbsp;email<br />
+                        <b>Tip:</b> Copy a table in Excel and paste it directly in this dialog. <b>Bold</b> header columns must be included:<br /><br />
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>School</b>&nbsp;&nbsp;&nbsp;&nbsp;Counselor&nbsp;&nbsp;&nbsp;&nbsp;Phone&nbsp;&nbsp;&nbsp;&nbsp;email<br />
                     </div>
                 </div>
 
