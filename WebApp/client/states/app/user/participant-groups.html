@@ -5,7 +5,7 @@
 <div layout>
   <div flex>
     <md-input-container class="md-block" flex-gt-sm>
-      <label><i class="fa fa-search"></i> Search for any text</label>
+      <label><i class="fa fa-search"></i> Search for {{'PARTICIPANT_GROUP' | translate}} Name or {{'PARTICIPANT_GROUP' | translate}} Contact Name</label>
       <input ng-model="searchViewOptions.userSearch">
     </md-input-container>
   </div>
@@ -36,43 +36,47 @@
   </div>
 </div>
 
-<ms-search-view change-event="updateParticipantGroups" search="searchHandler" options="searchViewOptions" user-search="userSearch">
-  <table class="md-data-table u-full-width">
-   <thead>
-     <tr>
-       <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
-       <th ms-debug-only>ID</th>
-         <th class="md-data-table__cell--non-numeric">{{'PARTICIPANT_GROUP' | translate }} Name</th>
-         <th class="md-data-table__cell--non-numeric">{{'PARTICIPANT_GROUP_CONTACT_ROLE' | translate}} Name</th>
-         <th hide-xs hide-sm class="md-data-table__cell--non-numeric">Email</th>
-         <th hide-xs hide-sm class="md-data-table__cell--non-numeric">Phone</th>
-         <th>Total {{'PARTICIPANTS' | translate }}</th>
-         <!-- <th hide-sm>Status</th> -->
-         <th hide-xs hide-sm class="md-data-table__cell--non-numeric">Tags</th>
-         <th></th>
-     </tr>
-   </thead>
-   <tbody>
-     <tr ng-repeat="participantGroup in $displayedIndex | objectLookup:$hashMap track by participantGroup.id" >
-       <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ participantGroup | json }}</pre></td>
-       <td ms-debug-only>{{ participantGroup.id }}</td>
-       <td class="md-data-table__cell--non-numeric">{{ participantGroup.name }}</td>
-         <td class="md-data-table__cell--non-numeric">{{participantGroup.contactName}}</td>
-         <td hide-xs hide-sm class="md-data-table__cell--non-numeric">{{participantGroup.primaryEmail}}</td>
-         <td hide-xs hide-sm class="md-data-table__cell--non-numeric">{{participantGroup.primaryPhoneNumber}}</td>
-         <td>{{getParticipantCount(participantGroup.id)}}</td>
-         <!-- <td hide-sm>[ ? ]</td> -->
-         <td hide-xs hide-sm class="md-data-table__cell--non-numeric">
-           <span class="md-caption tag u-sm-margin-right"
-              ng-repeat="tag in participantGroup.tags">
-             <strong>{{ tag }}</strong>
-           </span>
-           <span class="md-caption tag u-sm-margin-right"
-              ng-repeat="tag in participantGroup.myTags">
-             <strong>{{ tag }}</strong>
-           </span>
-         </td>
-         <td><md-button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditParticipantGroupDialog($event, participantGroup)" aria-label="edit participant group"><i class="fa fa-pencil ng-scope"></i></md-button></td>
-   </tbody>
-  </table>
-</ms-search-view>
+<section layout>
+  <div flex>
+    <ms-search-view change-event="updateParticipantGroups" search="searchHandler" options="searchViewOptions" user-search="userSearch">
+      <table class="md-data-table u-full-width" id="datagrid2">
+        <thead fsm-sticky-header scroll-body="'#datagrid2'" scroll-stop="64" class="sticky-header-style">
+          <tr>
+            <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
+            <th ms-debug-only>ID</th>
+            <th class="md-data-table__cell--non-numeric">{{'PARTICIPANT_GROUP' | translate }} Name</th>
+            <th class="md-data-table__cell--non-numeric">{{'PARTICIPANT_GROUP_CONTACT_ROLE' | translate}} Name</th>
+            <th hide-xs hide-sm class="md-data-table__cell--non-numeric">Email</th>
+            <th hide-xs hide-sm class="md-data-table__cell--non-numeric">Phone</th>
+            <th>Total {{'PARTICIPANTS' | translate }}</th>
+            <!-- <th hide-sm>Status</th> -->
+            <th hide-xs hide-sm class="md-data-table__cell--non-numeric">Tags</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="participantGroup in $displayedIndex | objectLookup:$hashMap track by participantGroup.id">
+            <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ participantGroup | json }}</pre></td>
+            <td ms-debug-only>{{ participantGroup.id }}</td>
+            <td class="md-data-table__cell--non-numeric">{{ participantGroup.name }}</td>
+            <td class="md-data-table__cell--non-numeric">{{participantGroup.contactName}}</td>
+            <td hide-xs hide-sm class="md-data-table__cell--non-numeric">{{participantGroup.primaryEmail}}</td>
+            <td hide-xs hide-sm class="md-data-table__cell--non-numeric">{{participantGroup.primaryPhoneNumber}}</td>
+            <td>{{getParticipantCount(participantGroup.id)}}</td>
+            <!-- <td hide-sm>[ ? ]</td> -->
+            <td hide-xs hide-sm class="md-data-table__cell--non-numeric">
+              <span class="md-caption tag u-sm-margin-right"
+                    ng-repeat="tag in participantGroup.tags">
+                <strong>{{ tag }}</strong>
+              </span>
+              <span class="md-caption tag u-sm-margin-right"
+                    ng-repeat="tag in participantGroup.myTags">
+                <strong>{{ tag }}</strong>
+              </span>
+            </td>
+            <td><md-button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditParticipantGroupDialog($event, participantGroup)" aria-label="edit participant group"><i class="fa fa-pencil ng-scope"></i></md-button></td>
+        </tbody>
+      </table>
+    </ms-search-view>
+  </div>
+</section>

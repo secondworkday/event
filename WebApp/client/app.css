@@ -506,3 +506,10 @@
 .uploaddataerror {
     color: red;
 }
+
+.sticky-header-style {
+  background-color: white;
+  border: 1px solid #dadada;
+}
+
+

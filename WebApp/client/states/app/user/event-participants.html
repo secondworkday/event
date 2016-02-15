@@ -1,7 +1,7 @@
 <div layout>
   <div flex>
     <md-input-container class="md-block" flex-gt-sm>
-      <label><i class="fa fa-search"></i> Search for any text, &commat;name, or even &num;tag</label>
+      <label><i class="fa fa-search"></i> Search for {{'PARTICIPANT' | translate}} Name or {{'PARTICIPANT_GROUP' | translate}} Name</label>
       <input ng-model="searchViewOptions.userSearch">
     </md-input-container>
   </div>
@@ -58,52 +58,52 @@
   </div>
   <div flex>
     <ms-search-view change-event="updateEventParticipants" search="searchHandler" options="searchViewOptions" user-search="userSearch">
-      <table class="md-data-table u-full-width">
-       <thead>
-         <tr>
-           <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
-           <th>ID</th>
-           <th class="md-data-table__cell--non-numeric">First Name</th>
-           <th class="md-data-table__cell--non-numeric">Last Name</th>
-       <th>{{'PARTICIPANT_GROUP' | translate}}</th>
-           <th>Grade</th>
-           <th>Gender</th>
+        <table class="md-data-table u-full-width" id="datagrid">
+          <thead fsm-sticky-header scroll-body="'#datagrid'" scroll-stop="64" class="sticky-header-style">
+            <tr>
+              <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
+              <th>ID</th>
+              <th class="md-data-table__cell--non-numeric">First Name</th>
+              <th class="md-data-table__cell--non-numeric">Last Name</th>
+              <th>{{'PARTICIPANT_GROUP' | translate}}</th>
+              <th>Grade</th>
+              <th>Gender</th>
 
-       <th ng-if="!eventSession">{{'EVENT_SESSION' | translate}} Name</th>
-       <th ng-if="!eventSession">{{'EVENT_SESSION' | translate}} Date</th>
-           <th>Actions</th>
+              <th ng-if="!eventSession">{{'EVENT_SESSION' | translate}} Name</th>
+              <th ng-if="!eventSession">{{'EVENT_SESSION' | translate}} Date</th>
+              <th>Actions</th>
 
-         </tr>
-       </thead>
-       <tbody>
-         <tr ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id"
-           ng-init="eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID);
-              eventParticipantParticipantGroup = demandParticipantGroup(eventParticipant.participantGroupID);" >
-           <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ eventParticipant | json }}</pre></td>
-           <td>{{ eventParticipant.id }}</td>
-           <td class="md-data-table__cell--non-numeric">{{ eventParticipant.firstName }}</td>
-           <td class="md-data-table__cell--non-numeric">{{ eventParticipant.lastName }}</td>
-           <td>{{ eventParticipantParticipantGroup.name }}</td>
-           <td>{{ eventParticipant.grade }}</td>
-           <td>{{ eventParticipant.gender }}</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id"
+                ng-init="eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID);
+              eventParticipantParticipantGroup = demandParticipantGroup(eventParticipant.participantGroupID);">
+              <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ eventParticipant | json }}</pre></td>
+              <td>{{ eventParticipant.id }}</td>
+              <td class="md-data-table__cell--non-numeric">{{ eventParticipant.firstName }}</td>
+              <td class="md-data-table__cell--non-numeric">{{ eventParticipant.lastName }}</td>
+              <td>{{ eventParticipantParticipantGroup.name }}</td>
+              <td>{{ eventParticipant.grade }}</td>
+              <td>{{ eventParticipant.gender }}</td>
 
 
 
-           <td ng-if="!eventSession">{{ eventParticipantEventSession.name }}</td>
-           <td ng-if="!eventSession">{{ eventParticipantEventSession.startDate | amCalendar}}</td>
-           <td>
-             <md-button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditParticipantsDialog($event, event, eventParticipant)" aria-label="edit event participant"><i class="fa fa-pencil ng-scope"></i></md-button>
-              <md-button ng-if="eventParticipantEventSession.state == 'Active' && !eventParticipant.checkInTimestamp" ng-click="checkIn(eventParticipant)">
-                Check In!
-              </md-button>
-              <md-button ng-if="eventParticipantEventSession.state == 'Active' && eventParticipant.checkInTimestamp && !eventParticipant.checkOutTimestamp" ng-click="checkOut(eventParticipant)">
-                Check Out!
-              </md-button>
-           </td>
+              <td ng-if="!eventSession">{{ eventParticipantEventSession.name }}</td>
+              <td ng-if="!eventSession">{{ eventParticipantEventSession.startDate | amCalendar}}</td>
+              <td>
+                <md-button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditParticipantsDialog($event, event, eventParticipant)" aria-label="edit event participant"><i class="fa fa-pencil ng-scope"></i></md-button>
+                <md-button ng-if="eventParticipantEventSession.state == 'Active' && !eventParticipant.checkInTimestamp" ng-click="checkIn(eventParticipant)">
+                  Check In!
+                </md-button>
+                <md-button ng-if="eventParticipantEventSession.state == 'Active' && eventParticipant.checkInTimestamp && !eventParticipant.checkOutTimestamp" ng-click="checkOut(eventParticipant)">
+                  Check Out!
+                </md-button>
+              </td>
 
-         </tr>
-       </tbody>
-      </table>
+            </tr>
+          </tbody>
+        </table>
     </ms-search-view>
   </div>
 </section>
