@@ -1,16 +1,25 @@
-app.controller('ParticipantGroupsController', function ($scope, $mdDialog, $log, $msUI, utilityService, siteService, eventParticipantGroupsIndex) {
+app.controller('ParticipantGroupsController', function ($scope, $mdDialog, $log, $msUI, $translate, utilityService, siteService, eventParticipantGroupsIndex) {
   $log.debug('Loading ParticipantGroupsController...');
 
   $scope.searchHandler = siteService.model.participantGroups.search;
   $scope.demandParticipantGroup = siteService.demandParticipantGroup;
   $scope.demandEventSession = siteService.demandEventSession;
 
+  var PARTICIPANT_GROUP = "Participant Group";
+  $translate('PARTICIPANT_GROUP').then(function (participantGroupText) {
+    PARTICIPANT_GROUP = participantGroupText;
+  })
+    // sort UI depends on $translate service
+    .then(function () { 
+      $scope.sortOptions = [
+        { name: PARTICIPANT_GROUP + ' Name', serverTerm: 'item.Name', clientFunction: utilityService.localeCompareByPropertyThenByID('name') },
+        { name: PARTICIPANT_GROUP + ' Name Descending', serverTerm: 'item.Name DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('name') },
+        { name: 'Contact Name', serverTerm: 'item.ContactName', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('contactName') },
+        { name: 'Contact Name Descending', serverTerm: 'item.ContactName DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('contactName') }
+      ];
+    });
 
-
-  $scope.sortOptions = [
-    { name: 'Name', serverTerm: 'item.Name', clientFunction: utilityService.localeCompareByPropertyThenByID('name') },
-    { name: 'Name Descending', serverTerm: 'item.Name DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('name') }
-  ];
+  
 
   var filterByStateFactory = function (includeState) {
     var includeStateLocal = includeState;
