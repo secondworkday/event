@@ -232,7 +232,7 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
     }
 
     $scope.formInput = {
-      genders: [ "Masculine", "Feminine" ]
+      genders: [ "Male", "Female" ]
     };
 
     $scope.hide = function () {

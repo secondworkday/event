@@ -12,10 +12,10 @@ app.controller('ParticipantGroupsController', function ($scope, $mdDialog, $log,
     // sort UI depends on $translate service
     .then(function () { 
       $scope.sortOptions = [
-        { name: PARTICIPANT_GROUP + ' Name', serverTerm: 'item.Name', clientFunction: utilityService.localeCompareByPropertyThenByID('name') },
-        { name: PARTICIPANT_GROUP + ' Name Descending', serverTerm: 'item.Name DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('name') },
-        { name: 'Contact Name', serverTerm: 'item.ContactName', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('contactName') },
-        { name: 'Contact Name Descending', serverTerm: 'item.ContactName DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('contactName') }
+        { name: PARTICIPANT_GROUP + ' Name', serverTerm: 'item.Name', clientFunction: utilityService.compareByProperties('name', 'id') },
+        { name: PARTICIPANT_GROUP + ' Name Descending', serverTerm: 'item.Name DESC', clientFunction: utilityService.compareByProperties('name', 'id') },
+        { name: 'Contact Name', serverTerm: 'item.ContactName', clientFunction: utilityService.compareByProperties('contactName', 'id') },
+        { name: 'Contact Name Descending', serverTerm: 'item.ContactName DESC', clientFunction: utilityService.compareByProperties('contactName', 'id') }
       ];
     });
 
