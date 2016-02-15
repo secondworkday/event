@@ -103,16 +103,16 @@ namespace App.Library
         dc.Save(newItem);
         Debug.Assert(newItem.ID > 0);
 
-        var contactPhone = data.Value<string>("contactPhone");
-        if (!string.IsNullOrEmpty(contactPhone))
+        var primaryPhoneNumber = data.Value<string>("primaryPhoneNumber");
+        if (!string.IsNullOrEmpty(primaryPhoneNumber))
         {
-          newItem.SetContactPhoneNumber(dc, contactPhone);
+            newItem.SetContactPhoneNumber(dc, primaryPhoneNumber);
         }
 
-        var contactEmail = data.GetMailAddress("contactEmail");
-        if (contactEmail != null)
+        var primaryEmail = data.GetMailAddress("primaryEmail");
+        if (primaryEmail != null)
         {
-          newItem.AssignMailAddress(dc, contactEmail);
+            newItem.AssignMailAddress(dc, primaryEmail);
         }
 
         return newItem;
@@ -172,8 +172,8 @@ namespace App.Library
       {
                 new BulkUpload.ColumnHandler("name", BulkUpload.ColumnOptions.Required, "school"),
                 new BulkUpload.ColumnHandler("contactName", BulkUpload.ColumnOptions.Optional, "counselor", "contact name"),
-                new BulkUpload.ColumnHandler("contactPhone", BulkUpload.ColumnOptions.Optional, "phone"),
-                new BulkUpload.ColumnHandler("contactEmail", BulkUpload.ColumnOptions.Optional, "email"),
+                new BulkUpload.ColumnHandler("primaryPhoneNumber", BulkUpload.ColumnOptions.Optional, "phone"),
+                new BulkUpload.ColumnHandler("primaryEmail", BulkUpload.ColumnOptions.Optional, "email"),
             };
 
       return BulkUpload.Parse(parseData, availableColumnHandlers);
