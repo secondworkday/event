@@ -46,6 +46,21 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
   //!! fixup our event filter. Need a more robust way to handle this
 
 
+
+  //!! quick hack to watch for EventSession changes.
+  //   problem is ng-init values are only setup once, but we are initializing based on a property value that's mutable
+  // A probably better than this is to have a controller inside the ng-repeat
+  // B or perhaps have a directive that does this see: http://stackoverflow.com/questions/20024156/how-to-watch-changes-on-models-created-by-ng-repeat
+  $scope.watchEventParticipantEventSession = function (repeatScope, watchExpression) {
+    repeatScope.$watch(watchExpression, function (newValue, oldVaue, scope) {
+      if (newValue !== oldVaue) {
+        scope["eventParticipantEventSession"] = $scope.model.eventSessions.hashMap[newValue];
+      }
+    });
+  };
+
+
+
   $scope.eventParticipantStateFilters = [
     {
       name: 'Not Checked-In',

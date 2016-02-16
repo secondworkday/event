@@ -77,7 +77,7 @@
           </thead>
           <tbody>
             <tr ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id"
-                ng-init="eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID);
+                ng-init="eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID); watchEventParticipantEventSession(this, 'eventParticipant.eventSessionID');
               eventParticipantParticipantGroup = demandParticipantGroup(eventParticipant.participantGroupID);">
               <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ eventParticipant | json }}</pre></td>
               <td>{{ eventParticipant.id }}</td>
