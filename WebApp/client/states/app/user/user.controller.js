@@ -195,6 +195,9 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
     });
   }
   function CreateEventDialog($scope, $mdDialog) {
+
+    $scope.model = utilityService.model;
+
     $scope.hide = function () {
       $mdDialog.hide();
     };
