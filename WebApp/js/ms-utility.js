@@ -291,7 +291,7 @@ app.constant('CONNECTION_EVENT', {
   reconnecting: 'reconnecting'
 });
 
-// Authenticated Identity - generally represents a specific User
+// Authenticated Identity - generally represents a specific User, but could also be a Kiosk, one-time access User, etc.
 app.service('msIdentity', function () {
   this.create = function (type, id, displayName, roles, profilePhotoUrl) {
     if (!angular.isArray(roles)) {
@@ -314,6 +314,26 @@ app.service('msIdentity', function () {
   return this;
 });
 
+
+app.service('msAuthenticated', function () {
+
+  var self = this;
+
+  this.setAuthenticatedGroup = function () {
+  };
+
+  this.setAuthenticatedIdentity = function (msIdentity) {
+    self.identity = msIdentity;
+  };
+
+  return this;
+});
+
+
+
+
+
+
 app.constant('BADGE_COLORS', [
     '#950c00',
     '#006e3b',
@@ -325,7 +345,7 @@ app.constant('BADGE_COLORS', [
     '#8a3e0c'
 ]);
 
-app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window', '$log', 'msIdentity', 'SYSTEM_INFO', 'TEMPLATE_URL', 'CONNECTION_STATUS', 'CONNECTION_EVENT', 'USER_STATE', 'BADGE_COLORS', function ($rootScope, $q, $state, $http, $window, $log, msIdentity, SYSTEM_INFO, TEMPLATE_URL, CONNECTION_STATUS, CONNECTION_EVENT, USER_STATE, BADGE_COLORS) {
+app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window', '$log', 'msIdentity', 'msAuthenticated', 'SYSTEM_INFO', 'TEMPLATE_URL', 'CONNECTION_STATUS', 'CONNECTION_EVENT', 'USER_STATE', 'BADGE_COLORS', function ($rootScope, $q, $state, $http, $window, $log, msIdentity, msAuthenticated, SYSTEM_INFO, TEMPLATE_URL, CONNECTION_STATUS, CONNECTION_EVENT, USER_STATE, BADGE_COLORS) {
 
   var self = this;
 
@@ -1819,6 +1839,8 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         //!! retire this guy...
         model.authenticatedUser = authenticatedUser;
 
+        msAuthenticated.setAuthenticatedIdentity(authenticatedUser);
+
         $rootScope.$broadcast('authenticated:', model.authenticatedIdentity);
       }
     };
@@ -2977,6 +2999,30 @@ app.directive('msFacadeOnly', function ($stateParams, ngIfDirective) {
     }
   };
 });
+
+app.directive('msAdminOnly', function (msAuthenticated, ngIfDirective) {
+  var ngIf = ngIfDirective[0];
+  return {
+    transclude: ngIf.transclude,
+    priority: ngIf.priority,
+    terminal: ngIf.terminal,
+    restrict: ngIf.restrict,
+    link: function ($scope, $element, $attr) {
+      $attr.ngIf = function () {
+        var authenticatedIdentity = msAuthenticated.identity;
+        if (authenticatedIdentity && authenticatedIdentity.appRoles && authenticatedIdentity.appRoles.indexOf("Admin") > -1) {
+          return true;
+        }
+        return false;
+      };
+      ngIf.link.apply(ngIf, arguments);
+    }
+  };
+});
+
+
+
+
 app.directive('autoSaveForm', function ($timeout) {
 
   return {
