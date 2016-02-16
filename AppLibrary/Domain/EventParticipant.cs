@@ -1078,8 +1078,8 @@ namespace App.Library
 
                 StringProviderTag.Create("SchoolName", exResult.epParticipantGroup.Name),
 
-                DateTimeProviderTag.Create("EventDate", exResult.epSession.StartDate.ToLocalTime()),
-                DateTimeProviderTag.Create("EventTime", exResult.epSession.StartDate.ToLocalTime()),
+                DateTimeProviderTag.Create("EventDate", exResult.epSession.StartDate, TimeZones.Pacific),
+                DateTimeProviderTag.Create("EventTime", exResult.epSession.StartDate, TimeZones.Pacific),
                 StringProviderTag.Create("EventLocation", exResult.epSession.Location),
                 
                 StringProviderTag.Create("Address", "16722 NE 116th Street, Redmond WA 98052"),
@@ -1087,8 +1087,8 @@ namespace App.Library
                 StringProviderTag.Create("SchoolCounselorName", exResult.epParticipantGroup.ContactName),
 
                 // Check in is between «CheckinTimeStart» and «CheckinTimeEnd». All shopping must be completed by «ShoppingTimeEnd».
-                DateTimeProviderTag.Create("CheckinTimeStart", exResult.epSession.StartDate.AddMinutes(-30).ToLocalTime()),
-                DateTimeProviderTag.Create("CheckinTimeEnd", exResult.epSession.StartDate.AddHours(1).ToLocalTime()),
+                DateTimeProviderTag.Create("CheckinTimeStart", exResult.epSession.StartDate.AddMinutes(-30), TimeZones.Pacific),
+                DateTimeProviderTag.Create("CheckinTimeEnd", exResult.epSession.StartDate.AddHours(1), TimeZones.Pacific),
                 DateTimeProviderTag.Create("ShoppingTimeEnd", exResult.epSession.EndDate.ToLocalTime()),
 
             };
