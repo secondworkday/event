@@ -239,7 +239,8 @@ namespace App.Library
     private static Func<IQueryable<ParticipantGroup>, string, IQueryable<ParticipantGroup>> termFilter = (query, searchTermLower) =>
     {
       return query.Where(item =>
-              item.Name.Contains(searchTermLower));
+              item.Name.Contains(searchTermLower) ||
+              item.ContactName.Contains(searchTermLower));
     };
 
 
@@ -268,6 +269,7 @@ namespace App.Library
     {
       var query = Query(dc);
       query = FilterBy(dc, query, searchExpression, termFilter);
+
       return query;
     }
 
