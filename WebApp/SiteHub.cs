@@ -619,6 +619,16 @@ namespace WebApp
 
 
 
+        public HubResult SetEventSessionCheckInOpen(int itemID, bool isOpen)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var result = EventSession.SetCheckInOpen(dc, itemID, isOpen);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
+
+/*
         public HubResult SetEventSessionState(int itemID, EventSessionState state)
         {
             return accountsOnlyHeader((siteContext, dc) =>
@@ -627,7 +637,7 @@ namespace WebApp
                 return HubResult.CreateSuccessData(result);
             });
         }
-
+*/
 
 
 

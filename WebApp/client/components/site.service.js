@@ -599,13 +599,19 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
   };
 
 
+  self.setEventSessionCheckInOpen = function (eventSession, isOpen) {
+    return utilityService.callHub(function () {
+      return siteHub.server.setEventSessionCheckInOpen(eventSession.id, isOpen);
+    });
+  };
+
+/*
   self.setEventSessionState = function (eventSession, stateName) {
     return utilityService.callHub(function () {
       return siteHub.server.setEventSessionState(eventSession.id, stateName);
     });
   };
-
-
+*/
 
 
 

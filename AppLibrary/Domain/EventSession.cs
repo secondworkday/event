@@ -18,14 +18,20 @@ using MS.Utility;
 namespace App.Library
 {
 
-    public enum EventSessionState
+    public enum EventSessionStatus
     {
         // The date/time of the event session hasn't arrived, and nobody as hit the "run" button to kick off the event session yet
-        Plan = 1,
+        //Plan = 1,
         // The event session is underway! Let the participants flow
-        Active = 2,
-        Completed = 3,
-        Archived = 4,
+        //Active = 2,
+        //Completed = 3,
+        //Archived = 4,
+
+        Upcoming = 1,
+        Live = 2,
+        Past = 3,
+
+
     }
 
 
@@ -45,27 +51,6 @@ namespace App.Library
         protected override int? objectScopeID { get { return this.ScopeID; } }
 
 
-        protected EventSession(DateTime createdTimestamp, EPScope epScope, int eventID, string name, string location, DateTime startDate, DateTime endDate)
-            : this()
-        {
-            Debug.Assert(!string.IsNullOrEmpty(name));
-
-            this.CreatedTimestamp = createdTimestamp;
-            this.LastModifiedTimestamp = createdTimestamp;
-
-            this.ScopeType = epScope.ScopeType;
-            this.ScopeID = epScope.ID;
-
-            this.EventID = eventID;
-
-            this.State = EventSessionState.Plan;
-
-            this.Name = name;
-            this.Location = location;
-            this.StartDate = startDate;
-            this.EndDate = endDate;
-        }
-
         protected EventSession(DateTime createdTimestamp, EPScope epScope, int eventID)
             : this()
         {
@@ -77,10 +62,19 @@ namespace App.Library
 
             this.EventID = eventID;
 
-            this.State = EventSessionState.Plan;
+            this.CheckInOpen = false;
         }
 
+        protected EventSession(DateTime createdTimestamp, EPScope epScope, int eventID, string name, string location, DateTime startDate, DateTime endDate)
+            : this(createdTimestamp, epScope, eventID)
+        {
+            Debug.Assert(!string.IsNullOrEmpty(name));
 
+            this.Name = name;
+            this.Location = location;
+            this.StartDate = startDate;
+            this.EndDate = endDate;
+        }
 
         private static Func<IQueryable<EventSession>, string, IQueryable<EventSession>> termFilter = (query, searchTermLower) =>
         {
@@ -190,8 +184,11 @@ namespace App.Library
             [JsonProperty("lastModifiedTimestamp")]
             public DateTime LastModifiedTimestamp { get; internal set; }
 
-            [JsonProperty("state"), JsonConverter(typeof(StringEnumConverter))]
-            public EventSessionState State { get; internal set; }
+            //!! [JsonProperty("status"), JsonConverter(typeof(StringEnumConverter))]
+            //!! public EventSessionStatus State { get; internal set; }
+
+            [JsonProperty("checkInOpen")]
+            public bool CheckInOpen { get; internal set; }
 
             //public string type { get; internal set; }
             [JsonProperty("name")]
@@ -217,7 +214,9 @@ namespace App.Library
                 this.CreatedTimestamp = exItem.item.CreatedTimestamp;
                 this.LastModifiedTimestamp = exItem.item.LastModifiedTimestamp;
 
-                this.State = exItem.item.State;
+                //!! this.State = exItem.item.State;
+
+                this.CheckInOpen = exItem.item.CheckInOpen;
 
                 this.Name = exItem.item.Name;
                 this.Overview = exItem.item.Overview;
@@ -340,6 +339,18 @@ namespace App.Library
         }
 
 
+        public static HubResult SetCheckInOpen(AppDC dc, int itemID, bool isOpen)
+        {
+            return WriteLock(dc, itemID, (item, notifyExpression) =>
+            {
+                item.CheckInOpen = isOpen;
+
+                notifyExpression.AddModifiedID(item.ID);
+                return HubResult.Success;
+            });
+        }
+
+#if false
         public static HubResult SetState(AppDC dc, int itemID, EventSessionState state)
         {
             return WriteLock(dc, itemID, (item, notifyExpression) =>
@@ -350,9 +361,7 @@ namespace App.Library
                 return HubResult.Success;
             });
         }
-
-
-
+#endif
 
 
         public static HubResult GetVolunteerAuthInfo(AppDC dc, int itemID)

@@ -4,6 +4,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
   $scope.searchHandler = siteService.model.eventSessions.search;
   $scope.demandParticipantGroup = siteService.demandParticipantGroup;
   $scope.demandEventSession = siteService.demandEventSession;
+  $scope.setEventSessionCheckInOpen = siteService.setEventSessionCheckInOpen;
 
 
 
@@ -38,6 +39,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
   $scope.setEventSessionState = function (eventSession, stateName) {
     siteService.setEventSessionState(eventSession, stateName);
   };
+
 
   $scope.download = function () {
     var query = {

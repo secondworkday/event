@@ -74,8 +74,6 @@
       <Column Name="CreatedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
       <Column Name="LastModifiedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
 
-      <Column Name="State" Type="global::App.Library.EventSessionState" DbType="Int NOT NULL" CanBeNull="false" />
-
       <Column Name="Name" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
       <Column Name="Overview" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true"/>
 
@@ -83,6 +81,11 @@
 
       <Column Name="StartDate" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
       <Column Name="EndDate" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+
+      <Column Name="CheckInOpen" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+
+      <Column Name="ParticipantGoal" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ParticipantCapacity" Type="System.Int32" DbType="Int" CanBeNull="true" />
 
       <Association Name="EventParticipant_EventSession" Member="EventParticipants" ThisKey="ID" OtherKey="EventSessionID" Type="EventParticipant" />
 
