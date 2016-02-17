@@ -36,8 +36,13 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
     filter: $scope.filterOptions[0]
   };
 
+
   $scope.setEventSessionState = function (eventSession, stateName) {
     siteService.setEventSessionState(eventSession, stateName);
+  };
+
+  $scope.setEventSessionCheckInOpen = function (eventSession) {
+    siteService.setEventSessionCheckInOpen(eventSession, eventSession.checkInOpen);
   };
 
 

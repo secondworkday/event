@@ -17,10 +17,10 @@
           <strong>{{ eventSession.state }}</strong>
         </span>
         <div>
-          <md-switch ng-model="eventSession.checkInState" aria-label="check in">
+          <md-switch ng-change="setEventSessionCheckInOpen(eventSession)" ng-model="eventSession.checkInOpen" aria-label="check in">
             Check In
-            <span ng-show="eventSession.checkInState">(open)</span>
-            <span ng-show="!eventSession.checkInState">(closed)</span>
+            <span ng-show="eventSession.checkInOpen">(open)</span>
+            <span ng-show="!eventSession.checkInOpen">(closed)</span>
           </md-switch>
         </div>
         <p class="md-body-1">
@@ -39,13 +39,7 @@
       <md-card-actions layout="row" layout-align="end center">
         <md-button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditEventSessionDialog($event, eventSession)" aria-label="edit event session"><i class="fa fa-pencil ng-scope"></i></md-button>
         <md-button class="md-primary"
-          ng-if="eventSession.state == 'Plan'"
-          ng-click="setEventSessionState(eventSession, 'Active')">
-          Run
-        </md-button>
-        <md-button class="md-primary"
-          ui-sref="^.^.session.participants({eventSessionID:eventSession.id})"
-          ng-if="eventSession.state == 'Active'">
+          ui-sref="^.^.session.participants({eventSessionID:eventSession.id})">
           View
         </md-button>
       </md-card-actions>

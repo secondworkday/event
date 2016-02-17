@@ -170,6 +170,7 @@
     <Content Include="client\states\app\app.config.js" />
     <Content Include="client\states\app\app.constants.js" />
     <Content Include="client\states\app\app.controller.js" />
+    <Content Include="client\states\app\app.directives.js" />
     <Content Include="client\states\app\app.html" />
     <Content Include="client\states\app\app.translate.js" />
     <Content Include="client\states\app\event-session-volunteer\event-session-volunteer-container.html" />
