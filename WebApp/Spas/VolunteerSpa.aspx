@@ -44,11 +44,9 @@
 
         // AppRoles
 
-        //!! nextgen not sure what AppRoles we need to support
-        // is there a need for AccountAdmin?
-
-        jobSeeker: "JobSeeker",
-        jobCounselor: "JobCounselor"
+        admin: "Admin",
+        eventPlanner: "EventPlanner",
+        eventSessionVolunteer: "EventSessionVolunteer"
       });
 
 

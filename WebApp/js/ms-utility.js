@@ -315,16 +315,59 @@ app.service('msIdentity', function () {
 });
 
 
-app.service('msAuthenticated', function () {
+app.service('msAuthenticated', function (AUTHORIZATION_ROLES) {
 
   var self = this;
 
-  this.setAuthenticatedGroup = function () {
+  self.setAuthenticatedGroup = function () {
   };
 
-  this.setAuthenticatedIdentity = function (msIdentity) {
+  self.setAuthenticatedIdentity = function (msIdentity) {
     self.identity = msIdentity;
   };
+
+
+  self.authorizeRole = function (allowedRoles) {
+    // anyone can enter a state which allows AUTHORIZATION_ROLES.anonymous
+    if (allowedRoles.indexOf(AUTHORIZATION_ROLES.anonymous) > -1) {
+      return true;
+    }
+
+    if (!self.identity) {
+      // deny if we don't have an identity
+      return false;
+    }
+
+    // anyone authenticated can enter a state which allows (the default) AUTHORIZATION_ROLES.authenticated
+    if (allowedRoles.indexOf(AUTHORIZATION_ROLES.authenticated) > -1) {
+      return true;
+    }
+
+    var identitySystemRoles = self.identity.systemRoles;
+    if (identitySystemRoles) {
+      // See if identitySystemRoles has any roles in common with allowedRoles
+      var intersection = allowedRoles.filter(function (n) {
+        return identitySystemRoles.indexOf(n) > -1;
+      });
+      if (intersection.length > 0) {
+        return true;
+      }
+    }
+
+    var identityAppRoles = self.identity.appRoles;
+    if (identityAppRoles) {
+      // See if identityAppRoles has any roles in common with allowedRoles
+      var intersection = allowedRoles.filter(function (n) {
+        return identityAppRoles.indexOf(n) > -1;
+      });
+      if (intersection.length > 0) {
+        return true;
+      }
+    }
+
+    // If we can't find a reason to allow - we've got to deny
+    return false;
+  }
 
   return this;
 });
@@ -3000,25 +3043,46 @@ app.directive('msFacadeOnly', function ($stateParams, ngIfDirective) {
   };
 });
 
-app.directive('msAdminOnly', function (msAuthenticated, ngIfDirective) {
+
+
+app.directive('msShow', function (msAuthenticated, ngIfDirective) {
   var ngIf = ngIfDirective[0];
   return {
     transclude: ngIf.transclude,
     priority: ngIf.priority,
     terminal: ngIf.terminal,
     restrict: ngIf.restrict,
-    link: function ($scope, $element, $attr) {
-      $attr.ngIf = function () {
-        var authenticatedIdentity = msAuthenticated.identity;
-        if (authenticatedIdentity && authenticatedIdentity.appRoles && authenticatedIdentity.appRoles.indexOf("Admin") > -1) {
-          return true;
-        }
-        return false;
+    link: function (scope, element, attrs, ngModel) {
+      var parse = $parse(attrs.msShow);
+      var expression = parse(scope);
+      var allowedRoles = angular.isObject(expression) && angular.isArray(expression) ? expression : [expression];
+      attrs.ngIf = function () {
+        return msAuthenticated.authorizeRole(allowedRoles);
       };
       ngIf.link.apply(ngIf, arguments);
     }
   };
 });
+
+app.directive('msHide', function ($parse, msAuthenticated, ngIfDirective) {
+  var ngIf = ngIfDirective[0];
+  return {
+    transclude: ngIf.transclude,
+    priority: ngIf.priority,
+    terminal: ngIf.terminal,
+    restrict: ngIf.restrict,
+    link: function (scope, element, attrs, ngModel) {
+      var parse = $parse(attrs.msHide);
+      var expression = parse(scope);
+      var allowedRoles = angular.isObject(expression) && angular.isArray(expression) ? expression : [expression];
+      attrs.ngIf = function () {
+        return !msAuthenticated.authorizeRole(allowedRoles);
+      };
+      ngIf.link.apply(ngIf, arguments);
+    }
+  };
+});
+
 
 
 

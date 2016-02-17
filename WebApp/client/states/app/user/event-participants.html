@@ -18,8 +18,8 @@
         </md-menu-item>
       </md-menu-content>
     </md-menu>
-    <!-- //!! TODO make sure the ms-hide directive is hiding these buttons  -->
-    <span ms-hide="volunteer">
+    <!-- //!! TODO make sure the ms-hide directive is hiding these buttons     <span ms-hide="['EventPlanner', 'EventSessionVolunteer']">   -->
+    <span ms-hide="'EventSessionVolunteer'">
       <md-button ng-click="download()" class="md-icon-button" aria-label="download">
         <i class="fa fa-download"></i>
       </md-button>
