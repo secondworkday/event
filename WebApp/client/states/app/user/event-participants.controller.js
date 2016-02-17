@@ -43,7 +43,31 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
     { name: 'All' }
   ];
 
-  //!! fixup our event filter. Need a more robust way to handle this
+
+  // Create an Indexer for the EventSessions in this Event. Useful for filtering & providing the options when selection an EventSession in the UI.
+  $scope.eventSessionsIndexer = {
+    index: [],
+    //!! probably want to sort based on chronological order of when the sessions happen
+    sort: utilityService.compareByProperties('id'),
+    filter: function (item) {
+      // only interested in EventSessions in our Event
+      return item.eventID === $scope.event.id;
+    }
+  };
+  utilityService.registerIndexer($scope.model.eventSessions, $scope.eventSessionsIndexer);
+
+  //!! quick hack to watch for EventSession changes.
+  //   problem is ng-init values are only setup once, but we are initializing based on a property value that's mutable
+  // A probably better than this is to have a controller inside the ng-repeat
+  // B or perhaps have a directive that does this see: http://stackoverflow.com/questions/20024156/how-to-watch-changes-on-models-created-by-ng-repeat
+  $scope.watchEventParticipantEventSession = function (repeatScope, watchExpression) {
+    repeatScope.$watch(watchExpression, function (newValue, oldVaue, scope) {
+      if (newValue !== oldVaue) {
+        scope["eventParticipantEventSession"] = $scope.model.eventSessions.hashMap[newValue];
+      }
+    });
+  };
+
 
 
   $scope.eventParticipantStateFilters = [
@@ -127,6 +151,8 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 */
   $scope.$on("$destroy", function () {
     //!! utilityService.unRegisterIndexer($scope.model.eventParticipants, $scope.redmondParticipantsIndexer);
+
+    utilityService.unRegisterIndexer($scope.model.eventSessions, $scope.eventSessionsIndexer);
 
     angular.forEach($scope.participantGroupFilters, function (filter) {
       utilityService.unRegisterIndexer($scope.model.eventParticipants, filter.indexer);
@@ -222,7 +248,7 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 
     $scope.eventSessions = siteService.model.eventSessions;
     $scope.participantGroups = siteService.model.participantGroups;
-    
+
     $scope.event = event;
     $scope.eventSessionsIndex = eventSessionsIndex;
     $scope.newOrEdit = newOrEdit;
@@ -301,6 +327,19 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
     });
   };
 
+  //!! TODO -- wire up the ability to Undo a check in
+  $scope.undoCheckIn = function (eventParticipant) {
+    siteService.undoCheckInEventParticipant(eventParticipant)
+    .then(function (successData) {
+      // success
+      return successData;
+    }, function (failureData) {
+      // failure
+      $log.debug(failureData.errorMessage);
+      return failureData;
+    });
+  };
+
   $scope.checkOut = function (eventParticipant) {
     siteService.checkOutEventParticipant(eventParticipant)
     .then(function (successData) {
@@ -334,11 +373,13 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 
   // init
 
-  // pre-load all our baseFilters participants - which loads up our Indexers
+  // load our eventSeeions indexer
+  var searchExpression = "$event:" + $scope.event.id;
+  siteService.model.eventSessions.search(searchExpression, "", 0, 99999);
 
+  // pre-load all our baseFilters participants - which loads up our Indexers
   var searchExpression = utilityService.buildSearchExpression(
     $scope.searchViewOptions.baseFilters);
-
   $scope.searchHandler(searchExpression, "", 0, 99999);
 
 });
