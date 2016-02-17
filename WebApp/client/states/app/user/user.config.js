@@ -18,7 +18,9 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         templateUrl: '/client/states/app/user/events.html',
         controller: 'EventsController',
         resolve: {
-          eventSessions: function (siteService, $stateParams) { return siteService.ensureAllEventSessions() }
+          eventSessions: function (siteService, $stateParams) { return siteService.ensureAllEventSessions() },
+          eventParticipants: function (siteService) { return siteService.ensureAllEventParticipants() },
+          eventParticipantCounts: function (siteService) { return siteService.countEventParticipantsPerEvent() }
         }
     })
     .state('app.user.team', {

@@ -539,6 +539,32 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
       });
   };
 
+  this.ensureAllEventParticipants = function () {
+    return model.eventParticipants.search("", "", 0, 999999)    // TODO: search("EventID:" + eventID, ...
+      .then(function (itemsData) {
+        return model.eventParticipants;
+      });
+  };
+
+  this.countEventParticipantsPerEvent = function () {
+    return model.eventParticipants.search("", "", 0, 999999)    // TODO: search("EventID:" + eventID, ...
+      .then(function (itemsData) {
+        var epCounts = new Array();
+        for (i = 0; i < model.eventParticipants.index.length; i++) {
+          var epID = model.eventParticipants.index[i];
+          var eventID = model.eventParticipants.hashMap[epID].eventID;
+          if (!epCounts[eventID]) {
+            epCounts[eventID] = 1;
+          }
+          else {
+            epCounts[eventID] = epCounts[eventID] + 1;
+          }
+          
+        }
+        return epCounts;
+      });
+  };
+
   this.ensureEventSessions = function (eventID) {
     // Find EventSessions that belong to EventID (foreign key)
     // Always load latest from server because we can't know if we have them all on the client
