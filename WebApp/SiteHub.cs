@@ -691,7 +691,7 @@ namespace WebApp
       });
     }
 
-    public HubResult DeleteEventParticipant(int itemID)
+        public HubResult DeleteEventParticipant(int itemID)
     {
       return accountsOnlyHeader((utilityContext, dc) =>
       {
@@ -700,7 +700,7 @@ namespace WebApp
     }
 
 
-    public HubResult CheckInEventParticipant(int itemID)
+        public HubResult CheckInEventParticipant(int itemID)
         {
             return accountsOnlyHeader((siteContext, dc) =>
             {
@@ -708,6 +708,16 @@ namespace WebApp
                 return HubResult.CreateSuccessData(result);
             });
         }
+
+        public HubResult UndoCheckInEventParticipant(int itemID)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var result = EventParticipant.UndoCheckIn(dc, itemID);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
+
 
         public HubResult CheckOutEventParticipant(int itemID)
         {

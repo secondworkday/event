@@ -230,71 +230,83 @@ namespace App.Library
 
     private static int? CreateParticipantAndEventParticipant(AppDC dc, int eventID, JToken itemData, ParticipantGroup defaultParticipantGroup, int? defaultEventSessionID)
     {
-      var participantGroupID = itemData.Value<int?>("participantGroupID");
-      var participantGroupName = itemData.Value<string>("participantGroupName");
+        var participantGroupID = itemData.Value<int?>("participantGroupID");
+        var participantGroupName = itemData.Value<string>("participantGroupName");
 
-      var participantGroup =
-          (participantGroupID.HasValue ? ParticipantGroup.FindByID(dc, participantGroupID.Value) : null) ??
-          (!string.IsNullOrEmpty(participantGroupName) ? ParticipantGroup.FindByName(dc, participantGroupName) : null) ??
-          defaultParticipantGroup;
+        var participantGroup =
+            (participantGroupID.HasValue ? ParticipantGroup.FindByID(dc, participantGroupID.Value) : null) ??
+            (!string.IsNullOrEmpty(participantGroupName) ? ParticipantGroup.FindByName(dc, participantGroupName) : null) ??
+            defaultParticipantGroup;
 
-      Debug.Assert(participantGroup != null);
-      if (participantGroup == null)
-      {
-        //!! should return a reason code here ...
-        return (int?)null;
-      }
+        Debug.Assert(participantGroup != null);
+        if (participantGroup == null)
+        {
+            //!! should return a reason code here ...
+            return (int?)null;
+        }
 
-      itemData["participantGroupID"] = participantGroup.ID;
-      var participant = Participant.Create(dc, itemData);
-      Debug.Assert(participant != null);
-      if (participant == null)
-      {
-        //!! should return a reason code here ...
-        return (int?)null;
-      }
+        itemData["participantGroupID"] = participantGroup.ID;
+        var participant = Participant.Create(dc, itemData);
+        Debug.Assert(participant != null);
+        if (participant == null)
+        {
+            //!! should return a reason code here ...
+            return (int?)null;
+        }
 
-      itemData["eventID"] = eventID;
-      itemData["participantID"] = participant.ID;
-      if (defaultEventSessionID.HasValue)
-      {
-        itemData["eventSessionID"] = defaultEventSessionID.Value;
-      }
-      var eventParticipant = EventParticipant.Create(dc, itemData);
-      if (eventParticipant != null)
-      {
-        return (int?)eventParticipant.ID;
-      }
-      else
-      {
-        return (int?)null;
-      }
+        itemData["eventID"] = eventID;
+        itemData["participantID"] = participant.ID;
+        if (defaultEventSessionID.HasValue)
+        {
+            itemData["eventSessionID"] = defaultEventSessionID.Value;
+        }
+        var eventParticipant = EventParticipant.Create(dc, itemData);
+        if (eventParticipant != null)
+        {
+            return (int?)eventParticipant.ID;
+        }
+        else
+        {
+            return (int?)null;
+        }
     }
 
     public static HubResult CheckIn(AppDC dc, int itemID)
+    {
+        return WriteLock(dc, itemID, (item, notifyExpression) =>
         {
-            return WriteLock(dc, itemID, (item, notifyExpression) =>
-            {
-                Debug.Assert(!item.CheckInTimestamp.HasValue);
-                item.CheckInTimestamp = dc.TransactionTimestamp;
+            Debug.Assert(!item.CheckInTimestamp.HasValue);
+            item.CheckInTimestamp = dc.TransactionTimestamp;
 
-                notifyExpression.AddModifiedID(item.ID);
-                return HubResult.Success;
-            });
-        }
+            notifyExpression.AddModifiedID(item.ID);
+            return HubResult.Success;
+        });
+    }
 
-        public static HubResult CheckOut(AppDC dc, int itemID)
+    public static HubResult UndoCheckIn(AppDC dc, int itemID)
+    {
+        return WriteLock(dc, itemID, (item, notifyExpression) =>
         {
-            return WriteLock(dc, itemID, (item, notifyExpression) =>
-            {
-                Debug.Assert(item.CheckInTimestamp.HasValue);
-                Debug.Assert(!item.CheckOutTimestamp.HasValue);
-                item.CheckOutTimestamp = dc.TransactionTimestamp;
+            Debug.Assert(item.CheckInTimestamp.HasValue);
+            item.CheckInTimestamp = null;
 
-                notifyExpression.AddModifiedID(item.ID);
-                return HubResult.Success;
-            });
-        }
+            notifyExpression.AddModifiedID(item.ID);
+            return HubResult.Success;
+        });
+    }
+
+    public static HubResult CheckOut(AppDC dc, int itemID)
+    {
+        return WriteLock(dc, itemID, (item, notifyExpression) =>
+        {
+            Debug.Assert(item.CheckInTimestamp.HasValue);
+            Debug.Assert(!item.CheckOutTimestamp.HasValue);
+            item.CheckOutTimestamp = dc.TransactionTimestamp;
+
+            notifyExpression.AddModifiedID(item.ID);
+            return HubResult.Success;
+        });
+    }
 
 
 

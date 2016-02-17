@@ -731,6 +731,13 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
       return siteHub.server.checkInEventParticipant(item.id);
     });
   };
+
+  self.undoCheckInEventParticipant = function (item) {
+    return utilityService.callHub(function () {
+      return siteHub.server.undoCheckInEventParticipant(item.id);
+    });
+  };
+
   self.checkOutEventParticipant = function (item) {
     return utilityService.callHub(function () {
       return siteHub.server.checkOutEventParticipant(item.id);
