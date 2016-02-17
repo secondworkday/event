@@ -22,16 +22,16 @@ app.controller('EventsController', function ($scope, $log, moment, utilityServic
     for (i = 0; i < eventSessionsIndex.length; i++) {
       var eventSession = eventSessions.hashMap[eventSessionsIndex[i]];
       if (startDate == null) {
-        startDate = moment(eventSession.startDate);
+        startDate = eventSession.startDate;
       }
       else {
-        startDate = moment(eventSession.startDate) < startDate ? moment(eventSession.startDate) : startDate;
+        startDate = eventSession.startDate < startDate ? eventSession.startDate : startDate;
       }
       if (endDate == null) {
-        endDate = moment(eventSession.endDate);
+        endDate = eventSession.endDate;
       }
       else {
-        endDate = moment(eventSession.endDate) > endDate ? moment(eventSession.endDate) : endDate;
+        endDate = eventSession.endDate > endDate ? eventSession.endDate : endDate;
       }
     }
 
@@ -41,24 +41,27 @@ app.controller('EventsController', function ($scope, $log, moment, utilityServic
       return "";
     }
 
-    var firstPart = startDate.format("MMM D");
+    localStartDate = moment(moment.utc(startDate).toDate());
+    localEndDate = moment(moment.utc(endDate).toDate());
+
+    var firstPart = localStartDate.format("MMM D");
     var secondPart = "";
 
-    if (startDate.month() == endDate.month()) {
-      if (startDate.day() == endDate.day()) {
+    if (localStartDate.month() == localEndDate.month()) {
+      if (localStartDate.day() == localEndDate.day()) {
         // Feb 26
       }
       else {
         // Feb 26 - 28
-        secondPart = " - " + endDate.format("D");
+        secondPart = " - " + localEndDate.format("D");
       }
     }
     else {
       // Feb 26 - Mar 6 
-      secondPart = " - " + endDate.format("MMM D");
+      secondPart = " - " + localEndDate.format("MMM D");
     }
 
-    return firstPart + secondPart;
+    return firstPart + secondPart + ", " + localEndDate.format("YYYY");
   }
 
   $scope.samplePastEvents = [
