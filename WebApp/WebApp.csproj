@@ -261,6 +261,7 @@
     <Content Include="default.html" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />
+    <Content Include="images\logo-eastside.png" />
     <Content Include="images\user-img-placeholder.png" />
     <Content Include="js\mk-editable-span.js" />
     <Content Include="js\mk-editable-span.min.js" />

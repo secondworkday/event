@@ -532,6 +532,13 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
     }
   };
 
+  this.ensureAllEventSessions = function () {
+    return model.eventSessions.search("", "", 0, 999999)
+      .then(function (itemsData) {
+        return model.eventSessions;
+      });
+  };
+
   this.ensureEventSessions = function (eventID) {
     // Find EventSessions that belong to EventID (foreign key)
     // Always load latest from server because we can't know if we have them all on the client

@@ -17,7 +17,7 @@
             <md-card-title ui-sref="app.user.event.sessions({eventID:event.id})">
                 <md-card-title-text>
                     <span class="md-headline">{{event.name}}</span>
-                    <span class="md-subhead">Mar 16 - 23, 2016 <br />{{event.sponsor}}</span>
+                    <span class="md-subhead">{{getEventDatesString(event.id)}}<br/>{{event.sponsor}}</span>
                 </md-card-title-text>
             </md-card-title>
             <md-card-content class="layout-row" ui-sref="app.user.event.sessions({eventID:event.id})">

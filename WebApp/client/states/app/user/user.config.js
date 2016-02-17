@@ -16,7 +16,10 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
     .state('app.user.events', {
         url: '/events',
         templateUrl: '/client/states/app/user/events.html',
-        controller: 'EventsController'
+        controller: 'EventsController',
+        resolve: {
+          eventSessions: function (siteService, $stateParams) { return siteService.ensureAllEventSessions() }
+        }
     })
     .state('app.user.team', {
         url: '/team',
