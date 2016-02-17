@@ -248,7 +248,7 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 
     $scope.eventSessions = siteService.model.eventSessions;
     $scope.participantGroups = siteService.model.participantGroups;
-    
+
     $scope.event = event;
     $scope.eventSessionsIndex = eventSessionsIndex;
     $scope.newOrEdit = newOrEdit;
@@ -317,6 +317,19 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 
   $scope.checkIn = function (eventParticipant) {
     siteService.checkInEventParticipant(eventParticipant)
+    .then(function (successData) {
+      // success
+      return successData;
+    }, function (failureData) {
+      // failure
+      $log.debug(failureData.errorMessage);
+      return failureData;
+    });
+  };
+
+  //!! TODO -- wire up the ability to Undo a check in
+  $scope.undoCheckIn = function (eventParticipant) {
+    siteService.undoCheckInEventParticipant(eventParticipant)
     .then(function (successData) {
       // success
       return successData;
