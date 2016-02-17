@@ -12,15 +12,20 @@
           <span class="md-headline">{{ eventSession.name }}</span><br/>
           <span class="md-body-1">  {{ eventSession.startDate | amCalendar}}</span>
         </p>
-        <span class="md-caption tag active"
-          ng-show="eventSession.state == 'Active'">
-          <strong>{{ eventSession.state }}</strong>
-        </span>
         <span class="md-caption tag"
-          ng-hide="eventSession.state == 'Active'">
+          ng-class="{live: eventSession.state == 'Live'}">
           <strong>{{ eventSession.state }}</strong>
         </span>
-        <div ms-debug-only><pre>eventSession: {{eventSession | json}}</pre></div>
+        <div>
+          <md-switch ng-model="eventSession.checkInState" aria-label="check in">
+            Check In
+            <span ng-show="eventSession.checkInState">(open)</span>
+            <span ng-show="!eventSession.checkInState">(closed)</span>
+          </md-switch>
+        </div>
+        <p class="md-body-1">
+          Location: {{eventSession.location}}
+        </p>
         <p class="md-body-1">
           Store Leader(s): Sam Adams, Sarah Adams
         </p>
@@ -43,8 +48,8 @@
           ng-if="eventSession.state == 'Active'">
           View
         </md-button>
-        
       </md-card-actions>
+      <div ms-debug-only><pre>eventSession: {{eventSession | json}}</pre></div>
     </md-card>
   </div>
 </ms-search-view>
