@@ -22,9 +22,10 @@
             </md-card-title>
             <md-card-content class="layout-row" ui-sref="app.user.event.sessions({eventID:event.id})">
                 <div>
-                    <p><b>28/120</b><br /><span style="font-size: smaller;">{{ 'PARTICIPANTS' | translate}}</span></p>
+                    <p><b>{{getNumberOfEventParticipants(event.id)}}/{{totalEventParticipants}}</b><br /><span style="font-size: smaller;">{{ 'PARTICIPANTS' | translate}}</span></p>
                     <p><b>Planning</b><br /><span style="font-size: smaller;">Status</span></p>
                 </div>
+                <pre ms-debug-only>{{event | json}}</pre>
             </md-card-content>
             <md-card-actions layout="row" layout-align="start center" class="layout-align-start-center layout-row">
                 <a class="md-primary md-button md-ink-ripple" ui-sref="app.user.event.sessions({eventID:event.id})"><span class="ng-scope">View</span></a>

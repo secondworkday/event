@@ -40,20 +40,20 @@
     </p>
     <div layout="column">
       <md-checkbox ng-repeat="filter in eventParticipantStateFilters"
-        ng-checked="exists(filter, searchViewOptions.stackFilters)" ng-click="toggle(filter, searchViewOptions.stackFilters)" aria-label="filter name">
+                   ng-checked="exists(filter, searchViewOptions.stackFilters)" ng-click="toggle(filter, searchViewOptions.stackFilters)" aria-label="filter name">
         {{filter.name}} ({{filter.indexer.index.length}})
       </md-checkbox>
     </div>
 
     <p class="md-body-2 text-support"
-      ng-if="!eventSession">
+       ng-if="!eventSession">
       {{'EVENT_SESSIONS' | translate | uppercase}}
     </p>
     <div layout="column"
-      ng-if="!eventSession">
+         ng-if="!eventSession">
       <!-- //!! TODO add support for the eventSessionFilters  -->
       <md-checkbox ng-repeat="filter in eventSessionFilters"
-        ng-checked="exists(filter, searchViewOptions.stackFilters)" ng-click="toggle(filter, searchViewOptions.stackFilters)" aria-label="filter event ession">
+                   ng-checked="exists(filter, searchViewOptions.stackFilters)" ng-click="toggle(filter, searchViewOptions.stackFilters)" aria-label="filter event ession">
         {{filter.name}} ({{filter.indexer.index.length}})
       </md-checkbox>
       <!-- //!! TODO remove this sample eventSessionFilter  -->
@@ -67,8 +67,8 @@
     </p>
     <div layout="column">
       <md-checkbox ng-repeat="filter in participantGroupFilters"
-        ng-show="filter.indexer.index.length"
-        ng-checked="exists(filter, searchViewOptions.stackFilters)" ng-click="toggle(filter, searchViewOptions.stackFilters)" aria-label="filter participant group">
+                   ng-show="filter.indexer.index.length"
+                   ng-checked="exists(filter, searchViewOptions.stackFilters)" ng-click="toggle(filter, searchViewOptions.stackFilters)" aria-label="filter participant group">
         {{filter.name}} ({{filter.indexer.index.length}})
       </md-checkbox>
     </div>
@@ -76,69 +76,69 @@
   </div>
   <div flex>
     <ms-search-view change-event="updateEventParticipants" search="searchHandler" options="searchViewOptions" user-search="userSearch">
-        <table class="md-data-table u-full-width" id="datagrid">
-          <thead fsm-sticky-header scroll-body="'#datagrid'" scroll-stop="64" class="sticky-header-style">
-            <tr>
-              <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
-              <th class="md-data-table__cell--non-numeric">Last Name</th>
-              <th class="md-data-table__cell--non-numeric">First Name</th>
-              <th class="md-data-table__cell--non-numeric">{{'PARTICIPANT_GROUP' | translate}}</th>
-              <th class="md-data-table__cell--non-numeric">Grade</th>
-              <th class="md-data-table__cell--non-numeric">Gender</th>
-              <th class="md-data-table__cell--non-numeric" ng-if="!eventSession">{{'EVENT_SESSION' | translate}} Name</th>
-              <th class="md-data-table__cell--non-numeric" ng-if="!eventSession">{{'EVENT_SESSION' | translate}} Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="u-hover-container"
-                ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id"
-                ng-init="eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID); watchEventParticipantEventSession(this, 'eventParticipant.eventSessionID');
+      <table class="md-data-table u-full-width" id="datagrid">
+        <thead fsm-sticky-header scroll-body="'#datagrid'" scroll-stop="64" class="sticky-header-style">
+          <tr>
+            <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
+            <th class="md-data-table__cell--non-numeric">Last Name</th>
+            <th class="md-data-table__cell--non-numeric">First Name</th>
+            <th class="md-data-table__cell--non-numeric">{{'PARTICIPANT_GROUP' | translate}}</th>
+            <th class="md-data-table__cell--non-numeric">Grade</th>
+            <th class="md-data-table__cell--non-numeric">Gender</th>
+            <th class="md-data-table__cell--non-numeric" ng-if="!eventSession">{{'EVENT_SESSION' | translate}} Name</th>
+            <th class="md-data-table__cell--non-numeric" ng-if="!eventSession">{{'EVENT_SESSION' | translate}} Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="u-hover-container"
+              ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id"
+              ng-init="eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID); watchEventParticipantEventSession(this, 'eventParticipant.eventSessionID');
               eventParticipantParticipantGroup = demandParticipantGroup(eventParticipant.participantGroupID);">
-              <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ eventParticipant | json }}</pre></td>
-              <td class="md-data-table__cell--non-numeric">{{ eventParticipant.lastName }}</td>
-              <td class="md-data-table__cell--non-numeric">{{ eventParticipant.firstName }}</td>
-              <td class="md-data-table__cell--non-numeric">{{ eventParticipantParticipantGroup.name }}</td>
-              <td class="md-data-table__cell--non-numeric">{{ eventParticipant.grade }}</td>
-              <td class="md-data-table__cell--non-numeric">{{ eventParticipant.gender }}</td>
-              <td class="md-data-table__cell--non-numeric" ng-if="!eventSession">{{ eventParticipantEventSession.name }}</td>
-              <td class="md-data-table__cell--non-numeric" ng-if="!eventSession">{{ eventParticipantEventSession.startDate | amCalendar}}</td>
-              <td>
-                <span class="u-display-hover" ms-hide-volunteer>
-                  <md-button class="md-icon-button" style="margin-top:-6px;margin-bottom:0;"
-                    ng-click="showEditParticipantsDialog($event, event, eventParticipant)">
-                    <md-tooltip>Edit {{'PARTICIPANT' | translate | lowercase}}</md-tooltip>
-                    <i class="fa fa-pencil"></i>
-                  </md-button>
-                </span>
-                <span
-                  osb-volunteer-check-in-open="eventParticipantEventSession"
-                  osb-event-session-live="eventParticipantEventSession"
-                  ng-if="eventParticipantEventSession.state == 'Active' && !eventParticipant.checkInTimestamp">
+            <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ eventParticipant | json }}</pre></td>
+            <td class="md-data-table__cell--non-numeric">{{ eventParticipant.lastName }}</td>
+            <td class="md-data-table__cell--non-numeric">{{ eventParticipant.firstName }}</td>
+            <td class="md-data-table__cell--non-numeric">{{ eventParticipantParticipantGroup.name }}</td>
+            <td class="md-data-table__cell--non-numeric">{{ eventParticipant.grade }}</td>
+            <td class="md-data-table__cell--non-numeric">{{ eventParticipant.gender }}</td>
+            <td class="md-data-table__cell--non-numeric" ng-if="!eventSession">{{ eventParticipantEventSession.name }}</td>
+            <td class="md-data-table__cell--non-numeric" ng-if="!eventSession">{{ eventParticipantEventSession.startDate | amCalendar}}</td>
+            <td>
+              <span class="u-display-hover" ms-hide-volunteer>
+                <md-button class="md-icon-button" style="margin-top:-6px;margin-bottom:0;"
+                           ng-click="showEditParticipantsDialog($event, event, eventParticipant)">
+                  <md-tooltip>Edit {{'PARTICIPANT' | translate | lowercase}}</md-tooltip>
+                  <i class="fa fa-pencil"></i>
+                </md-button>
+              </span>
+              <span osb-event-session-live="eventParticipantEventSession">
+                <span osb-volunteer-check-in-open="eventParticipantEventSession"
+                      
+                      ng-if="eventParticipantEventSession.state == 'Active' && !eventParticipant.checkInTimestamp">
                   <span class="u-hide-hover text-hint">Not checked in</span>
                   <span class="u-display-hover">
                     <md-button class="md-icon-button md-accent" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
-                      ng-click="checkIn(eventParticipant)">
+                               ng-click="checkIn(eventParticipant)">
                       <md-tooltip>Check in {{'PARTICIPANT' | translate | lowercase}}</md-tooltip>
                       <i class="fa fa-check"></i>
                     </md-button>
                   </span>
                 </span>
-                <span
-                  ng-if="eventParticipantEventSession.state == 'Active' && eventParticipant.checkInTimestamp">
-                  <span class="u-hide-hover text-support"><strong><i class="fa fa-check"></i> Checked in <span am-time-ago="eventParticipant.checkInTimestamp"></span></strong></span>
-                  <span class="u-display-hover">
-                    <md-button class="md-icon-button" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
-                      ng-click="undoCheckIn(eventParticipant)">
-                      <md-tooltip>Undo check in</md-tooltip>
-                      <i class="fa fa-undo"></i>
-                    </md-button>
-                  </span>
+              </span>
+              <span ng-if="eventParticipantEventSession.state == 'Active' && eventParticipant.checkInTimestamp">
+                <span class="u-hide-hover text-support"><strong><i class="fa fa-check"></i> Checked in <span am-time-ago="eventParticipant.checkInTimestamp"></span></strong></span>
+                <span class="u-display-hover">
+                  <md-button class="md-icon-button" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
+                             ng-click="undoCheckIn(eventParticipant)">
+                    <md-tooltip>Undo check in</md-tooltip>
+                    <i class="fa fa-undo"></i>
+                  </md-button>
                 </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </ms-search-view>
   </div>
 </section>
