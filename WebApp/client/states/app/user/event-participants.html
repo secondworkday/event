@@ -100,7 +100,7 @@
             <td class="md-data-table__cell--non-numeric" ng-if="!eventSession">{{ eventParticipantEventSession.name }}</td>
             <td class="md-data-table__cell--non-numeric" ng-if="!eventSession">{{ eventParticipantEventSession.startDate | amCalendar}}</td>
             <td>
-              <span class="u-display-hover" ms-hide-volunteer>
+              <span class="u-display-hover" ms-hide="'EventSessionVolunteer'">
                 <md-button class="md-icon-button" style="margin-top:-6px;margin-bottom:0;"
                            ng-click="showEditParticipantsDialog($event, event, eventParticipant)">
                   <md-tooltip>Edit {{'PARTICIPANT' | translate | lowercase}}</md-tooltip>
@@ -109,7 +109,8 @@
               </span>
               <span osb-event-session-live="eventParticipantEventSession">
                 <span ng-hide="eventParticipant.checkInTimestamp" class="u-hide-hover text-hint">Not checked in</span>
-                <span osb-can-check-in="eventParticipantEventSession">
+                <span osb-can-check-in="eventParticipantEventSession"><i class="fa fa-check-circle text-green"></i></span>
+                <span>
                   <span ng-if="!eventParticipant.checkInTimestamp" class="u-display-hover">
                     <md-button class="md-icon-button md-accent" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
                                ng-click="checkIn(eventParticipant)">
