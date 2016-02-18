@@ -45,6 +45,7 @@ namespace WebApp
                 .IncludeDirectory("~/client/states/app", "*.js")
                 .IncludeDirectory("~/client/states/app/event-session-volunteer", "*.js", true)
                 .Include("~/client/states/app/user/event-session.controller.js")
+                .Include("~/client/states/app/user/event-participants.controller.js")
                 ;
             bundles.Add(volunteerSpaJS);
 
