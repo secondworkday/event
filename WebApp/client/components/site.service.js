@@ -1362,8 +1362,9 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
       //!! TODO - this users' data might change - need to track that in onUsersUpdated() - but do that after we change the server notification
       var authenticatedItem = itemsData.items[0];
-      var roles = ['EventSessionVolunteer'];
-      model.authenticatedIdentity = msIdentity.create('eventSession', authenticatedItem.id, authenticatedItem.name, roles, authenticatedItem.profilePhotoUrl);
+      var appRoles = ['EventSessionVolunteer'];
+      var systemRoles = [];
+      model.authenticatedIdentity = msIdentity.create('eventSession', authenticatedItem.id, authenticatedItem.name, appRoles, systemRoles, authenticatedItem.profilePhotoUrl);
       model.authenticatedUser = null;
 
       msAuthenticated.setAuthenticatedIdentity(model.authenticatedIdentity);

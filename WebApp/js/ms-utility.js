@@ -293,15 +293,24 @@ app.constant('CONNECTION_EVENT', {
 
 // Authenticated Identity - generally represents a specific User, but could also be a Kiosk, one-time access User, etc.
 app.service('msIdentity', function () {
-  this.create = function (type, id, displayName, roles, profilePhotoUrl) {
-    if (!angular.isArray(roles)) {
-      roles = [roles];
+  this.create = function (type, id, displayName, appRoles, systemRoles, profilePhotoUrl) {
+    if (!angular.isArray(appRoles)) {
+      appRoles = [appRoles];
+    }
+    if (!angular.isArray(systemRoles)) {
+      systemRoles = [systemRoles];
     }
     this.type = type;
     this.id = id;
     this.displayName = displayName;
-    this.roles = roles;
+    this.appRoles = appRoles;
+    this.systemRoles = systemRoles;
     this.profilePhotoUrl = profilePhotoUrl;
+
+    //!! do we still require this?
+    this.roles = systemRoles.concat(appRoles);
+
+
     return this;
   };
   this.destroy = function () {
@@ -343,6 +352,18 @@ app.service('msAuthenticated', function (AUTHORIZATION_ROLES) {
     if (allowedRoles.indexOf(AUTHORIZATION_ROLES.authenticated) > -1) {
       return true;
     }
+
+    var identityRoles = self.identity.roles;
+    if (identityRoles) {
+      // See if identityAppRoles has any roles in common with allowedRoles
+      var intersection = allowedRoles.filter(function (n) {
+        return identityRoles.indexOf(n) > -1;
+      });
+      if (intersection.length > 0) {
+        return true;
+      }
+    }
+
 
     var identitySystemRoles = self.identity.systemRoles;
     if (identitySystemRoles) {
@@ -1882,8 +1903,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
         //!! TODO - this users' data might change - need to track that in onUsersUpdated() - but do that after we change the server notification
         var authenticatedUser = usersData.items[0];
-        var roles = authenticatedUser.systemRoles.concat(authenticatedUser.appRoles);
-        model.authenticatedIdentity = msIdentity.create('user', authenticatedUser.id, authenticatedUser.displayName, roles, authenticatedUser.profilePhotoUrl);
+        model.authenticatedIdentity = msIdentity.create('user', authenticatedUser.id, authenticatedUser.displayName, authenticatedUser.appRoles, authenticatedUser.systemRoles, authenticatedUser.profilePhotoUrl);
         //!! retire this guy...
         model.authenticatedUser = authenticatedUser;
 
@@ -1894,7 +1914,9 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     };
 
     function onSetSystemAuthenticated(tenantID) {
-      model.authenticatedIdentity = msIdentity.create('tenant', tenantID, "System Admin", ["SystemAdmin", "TenantAdmin"], null);
+      var appRoles = ['Admin'];
+      var systemRoles = ["SystemAdmin", "TenantAdmin"];
+      model.authenticatedIdentity = msIdentity.create('tenant', tenantID, "System Admin", appRoles, systemRoles, null);
       model.authenticatedUser = null;
 
         msAuthenticated.setAuthenticatedIdentity(authenticatedUser);
