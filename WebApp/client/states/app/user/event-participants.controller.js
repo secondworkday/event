@@ -112,11 +112,75 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 
 
 
+
+
+  $scope.eventSessionFilters = [];
+
+  //
+  siteService.model.eventSessions.search($scope.searchViewOptions.baseFilters.serverTerm, "", 0, 999999)
+  .then(function (itemsData) {
+    console.log("setting up eventSessionFilters", itemsData);
+
+
+    var indexer = {
+      index: [],
+      sort: utilityService.compareByProperties('id'),
+      filter: utilityService.filterByPropertyHasValue('!eventSessionID')
+    };
+    utilityService.registerIndexer($scope.model.eventParticipants, indexer);
+    // Push a filter on the filter stack
+    $scope.eventSessionFilters.push(
+    {
+      name: "Unregistered",
+      indexer: indexer,
+      serverTerm: '$eventSession:',
+      clientFunction: utilityService.filterByPropertyHasValue('!eventSessionID')
+    });
+
+
+
+    angular.forEach(itemsData.ids, function (itemID) {
+      var item = itemsData.hashMap[itemID];
+      // create and register an indexer - so we can track the membership count in this group
+      // (remember to unregister them in $scope.$on("$destroy");
+      var indexer = {
+        index: [],
+        sort: utilityService.compareByProperties('id'),
+        filter: utilityService.filterByPropertyValue('eventSessionID', itemID)
+      };
+      utilityService.registerIndexer($scope.model.eventParticipants, indexer);
+      // Push a filter on the filter stack
+      $scope.eventSessionFilters.push(
+      {
+        name: item.name,
+        indexer: indexer,
+        serverTerm: '$eventSession:' + itemID,
+        clientFunction: utilityService.filterByPropertyValue('eventSessionID', itemID)
+      });
+    });
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   $scope.participantGroupFilters = [];
 
   siteService.model.participantGroups.search($scope.searchViewOptions.baseFilters.serverTerm, "", 0, 999999)
   .then(function (itemsData) {
-    console.log("search participantGroups", itemsData);
+    console.log("setting up participantGroupsFilters", itemsData);
 
     angular.forEach(itemsData.ids, function (itemID) {
       var item = itemsData.hashMap[itemID];
@@ -130,12 +194,12 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
       utilityService.registerIndexer($scope.model.eventParticipants, indexer);
       // Push a filter on the filter stack
       $scope.participantGroupFilters.push(
-        {
-          name: item.name,
-          indexer: indexer,
-          serverTerm: '$participantGroup:' + itemID,
-          clientFunction: utilityService.filterByPropertyValue('participantGroupID', itemID)
-        });
+      {
+        name: item.name,
+        indexer: indexer,
+        serverTerm: '$participantGroup:' + itemID,
+        clientFunction: utilityService.filterByPropertyValue('participantGroupID', itemID)
+      });
     });
   });
 
@@ -157,6 +221,11 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
     angular.forEach($scope.participantGroupFilters, function (filter) {
       utilityService.unRegisterIndexer($scope.model.eventParticipants, filter.indexer);
     });
+
+    angular.forEach($scope.eventSessionFilters, function (filter) {
+      utilityService.unRegisterIndexer($scope.model.eventParticipants, filter.indexer);
+    });
+
     angular.forEach($scope.eventParticipantStateFilters, function (filter) {
       utilityService.unRegisterIndexer($scope.model.eventParticipants, filter.indexer);
     });
@@ -373,7 +442,7 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 
   // init
 
-  // load our eventSeeions indexer
+  // load our eventSessions indexer
   var searchExpression = "$event:" + $scope.event.id;
   siteService.model.eventSessions.search(searchExpression, "", 0, 99999);
 

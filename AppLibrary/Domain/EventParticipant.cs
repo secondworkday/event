@@ -341,7 +341,8 @@ namespace App.Library
 
             // support filtering to a specific EventSession. eg. eventSession:{eventSessionID}
             query = searchExpression.FilterByAnyNamedStateTerm2(query, "eventSession",
-                searchTerm => item => item.EventSessionID.ToString() == searchTerm);
+                searchTerm => item => item.EventSessionID.ToString() == searchTerm || 
+                    (!item.EventSessionID.HasValue && string.IsNullOrEmpty(searchTerm)));
 
 
 
