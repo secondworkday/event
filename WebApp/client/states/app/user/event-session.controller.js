@@ -15,7 +15,7 @@ app.controller('EventSessionController', function ($scope, $translate, $log, $st
 
   $scope.checkedInCount = 0;
   $scope.expectedCount = 99;
-  $scope.timeRemaining = "3h 45m"
+  $scope.timeRemaining = "3h 45m";
 
   $scope.sampleParticipants = [
     { firstName: "Johnny", lastName: "Walker", school: "Eastside Elementary", grade: "3rd", status: "expected" },
