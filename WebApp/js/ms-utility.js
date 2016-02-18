@@ -319,7 +319,8 @@ app.service('msAuthenticated', function (AUTHORIZATION_ROLES) {
 
   var self = this;
 
-  self.setAuthenticatedGroup = function () {
+  self.setAuthenticatedGroup = function (group) {
+    self.group = group;
   };
 
   self.setAuthenticatedIdentity = function (msIdentity) {
@@ -1867,6 +1868,10 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       onTenantGroupsUpdated(model.tenantGroups, tenantGroupsData);
       if (tenantGroupsData && tenantGroupsData.items) {
         model.authenticatedGroup = tenantGroupsData.items[0];
+
+        msAuthenticated.setAuthenticatedGroup(model.authenticatedGroup);
+
+
       }
     };
 
@@ -1882,7 +1887,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         //!! retire this guy...
         model.authenticatedUser = authenticatedUser;
 
-        msAuthenticated.setAuthenticatedIdentity(authenticatedUser);
+        msAuthenticated.setAuthenticatedIdentity(model.authenticatedIdentity);
 
         $rootScope.$broadcast('authenticated:', model.authenticatedIdentity);
       }
@@ -1891,6 +1896,9 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     function onSetSystemAuthenticated(tenantID) {
       model.authenticatedIdentity = msIdentity.create('tenant', tenantID, "System Admin", ["SystemAdmin", "TenantAdmin"], null);
       model.authenticatedUser = null;
+
+        msAuthenticated.setAuthenticatedIdentity(authenticatedUser);
+
 
       $rootScope.$broadcast('authenticated:', model.authenticatedIdentity);
     };

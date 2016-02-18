@@ -9,7 +9,7 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
 
 //This handles retrieving data and is used by controllers. 3 options (server, factory, provider) with
 //each doing the same thing just structuring the functions/data differently.
-app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msIdentity', 'TEMPLATE_URL', 'CONNECTION_EVENT', function ($rootScope, $q, $state, utilityService, msIdentity, TEMPLATE_URL, CONNECTION_EVENT) {
+app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msIdentity', 'msAuthenticated', 'TEMPLATE_URL', 'CONNECTION_EVENT', function ($rootScope, $q, $state, utilityService, msIdentity, msAuthenticated, TEMPLATE_URL, CONNECTION_EVENT) {
 
   var siteHub = $.connection.siteHub; // the generated client-side hub proxy
   var self = this;
@@ -1362,8 +1362,12 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
       //!! TODO - this users' data might change - need to track that in onUsersUpdated() - but do that after we change the server notification
       var authenticatedItem = itemsData.items[0];
-      model.authenticatedIdentity = msIdentity.create('eventSession', authenticatedItem.id, authenticatedItem.name, authenticatedItem.systemRoles, authenticatedItem.profilePhotoUrl);
+      var roles = ['EventSessionVolunteer'];
+      model.authenticatedIdentity = msIdentity.create('eventSession', authenticatedItem.id, authenticatedItem.name, roles, authenticatedItem.profilePhotoUrl);
       model.authenticatedUser = null;
+
+      msAuthenticated.setAuthenticatedIdentity(model.authenticatedIdentity);
+
 
       // head to Kiosk home page
       $state.go('app.spa-landing', {}, { reload: true });
