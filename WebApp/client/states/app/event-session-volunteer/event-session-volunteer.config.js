@@ -65,7 +65,8 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
 
     .state('app.event-session.check-in', {
       url: '/check-in',
-      templateUrl: '/client/states/app/event-session-volunteer/check-in.html',
+      controller: 'EventSessionVolunteerController',
+      templateUrl: '/client/states/app/event-session-volunteer/check-in.html'
     })
 
 

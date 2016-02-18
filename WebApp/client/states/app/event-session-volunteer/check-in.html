@@ -2,11 +2,16 @@
   <p class="md-title text-support">
       {{'EVENT_SESSION' | translate}} - {{eventSession.name}}
   </p>
+  <p class="md-body-1">
+    {{'EVENT_SESSION' | translate}} URL: <a href="{{authInfo.url}}">{{authInfo.url}}</a>
+  </p>
 </div>
 
 <div ms-debug-only><pre>{{eventSession | json}}</pre></div>
 
+<div ng-include="'/client/states/app/user/event-participants.html'"></div>
 
+<!--
 <div layout layout-align="center center">
   <div flex class="text-center">
     <h3 class="md-display-1">{{eventSession.expectedParticipants.index.length}}</h3>
@@ -56,4 +61,4 @@
       </md-button>
     </md-list-item>
   </md-list>
-</div>
+</div> -->
