@@ -108,8 +108,8 @@
                 </md-button>
               </span>
               <span osb-event-session-live="eventParticipantEventSession">
+                <span ng-hide="eventParticipant.checkInTimestamp" class="u-hide-hover text-hint">Not checked in</span>
                 <span osb-can-check-in="eventParticipantEventSession">
-                  <span class="u-hide-hover text-hint">Not checked in</span>
                   <span ng-if="!eventParticipant.checkInTimestamp" class="u-display-hover">
                     <md-button class="md-icon-button md-accent" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
                                ng-click="checkIn(eventParticipant)">
