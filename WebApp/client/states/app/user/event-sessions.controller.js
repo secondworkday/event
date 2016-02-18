@@ -36,10 +36,29 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
     filter: $scope.filterOptions[0]
   };
 
-
-  $scope.setEventSessionState = function (eventSession, stateName) {
-    siteService.setEventSessionState(eventSession, stateName);
+  //!! TODO improve this so that it automatically checks every 10 seconds or so
+  // it's a cheap fix to set the eventSession state to Upcoming, Live, or Past
+  // but we need to make this more robust with a timer or something
+  $scope.setEventSessionState = function(eventSession) {
+    var currentDate = new Date();
+    var eventStart = new Date(eventSession.startDate);
+    var eventEnd = new Date(eventSession.endDate);
+    var state;
+    if (eventEnd < currentDate) {
+      state = "Past";
+    } else if (eventStart > currentDate) {
+      state = "Upcoming";
+    } else if (eventStart < currentDate && eventEnd > currentDate) {
+      state = "Live";
+    }
+    return state;
   };
+
+
+
+  // $scope.setEventSessionState = function (eventSession, stateName) {
+  //   siteService.setEventSessionState(eventSession, stateName);
+  // };
 
   $scope.setEventSessionCheckInOpen = function (eventSession) {
     siteService.setEventSessionCheckInOpen(eventSession, eventSession.checkInOpen);
@@ -72,7 +91,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
     }, function () {
       // $scope.status = 'You cancelled the dialog.';
     });
-  }
+  };
 
   function AddSessionDialogController($scope, $mdDialog, eventSession, eventID, newOrEdit) {
     var EVENT_SESSION = "Event Session";
@@ -158,7 +177,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
         }
       }
       return true;
-    };
+    }
 
     $scope.endTimeChanged = function () {
       // hack?? - md-option appears to set selected item as a string
@@ -192,7 +211,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
         }
       }
       $scope.endTimeChanged();
-    };
+    }
 
     function initializeTime() {
       $scope.formData = {};
@@ -203,7 +222,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
       $scope.formData.endDate = $scope.formData.startDate;
       $scope.formData.endTime = 8;
       $scope.formData.endTimeAmPm = "PM";
-    };
+    }
 
     function updateTimeDisplay() {
       $scope.formData.startTime = $scope.formData.startDate.getHours();
@@ -225,7 +244,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
       if ($scope.formData.endDate.getMinutes() > 0) {
         $scope.formData.endTime += 0.5;
       }
-    };
+    }
 
     // initialize
     if (newOrEdit == "New") {

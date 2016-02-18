@@ -13,8 +13,8 @@
           <span class="md-body-1">  {{ eventSession.startDate | amCalendar}}</span>
         </p>
         <span class="md-caption tag"
-          ng-class="{live: eventSession.state == 'Live'}">
-          <strong>{{ eventSession.state }}</strong>
+          ng-class="{live: state == 'Live'}">
+          <strong ng-repeat="state in setEventSessionState(eventSession)">{{ state }}</strong>
         </span>
         <div>
           <md-switch ng-change="setEventSessionCheckInOpen(eventSession)" ng-model="eventSession.checkInOpen" aria-label="check in">
