@@ -5,7 +5,7 @@
       <input ng-model="searchViewOptions.userSearch">
     </md-input-container>
   </div>
-  <div hide-xs>
+  <div>
     <md-menu md-position-mode="target-right target">
       <md-button aria-label="Open sort menu" class="md-icon-button" ng-click="$mdOpenMenu()">
         <i md-menu-origin class="fa fa-sort"></i>
@@ -33,14 +33,28 @@
   </div>
 </div>
 
+<div layout
+  ng-show="showMultiSelectActions">
+  <div flex="15"></div>
+  <div flex layout layout-align="end center">
+    <span class="tag">99 Selected <i ng-click="unselectAll()" class="fa fa-times u-clickable"></i></span>
+    <md-button ng-click="DO_SOMETHING()"><i class="fa fa-pencil"></i> Bulk Edit</md-button>
+    <md-button ng-click="DO_SOMETHING()"><i class="fa fa-check"></i> Check-In</md-button>
+    <md-button ng-click="DO_SOMETHING()"><i class="fa fa-undo"></i> Set Not Checked-In</md-button>
+    <md-button ng-click="DO_SOMETHING()" class="md-warn"><i class="fa fa-remove"></i> Delete</md-button>
+  </div>
+</div>
+
 <section layout>
-  <div class="u-sm-margin-right">
+  <div class="u-sm-margin-right" flex="15">
     <p class="md-body-2 text-support">
       STATE
     </p>
-    <div layout="column">
-      <md-checkbox ng-repeat="filter in eventParticipantStateFilters"
-                   ng-checked="exists(filter, searchViewOptions.stackFilters)" ng-click="toggle(filter, searchViewOptions.stackFilters)" aria-label="filter name">
+    <div layout="column" class="md-caption">
+      <md-checkbox aria-label="filter name"
+        ng-repeat="filter in eventParticipantStateFilters"
+        ng-checked="exists(filter, searchViewOptions.stackFilters)"
+        ng-click="toggle(filter, searchViewOptions.stackFilters)">
         {{filter.name}} ({{filter.indexer.index.length}})
       </md-checkbox>
     </div>
@@ -49,7 +63,7 @@
        ng-if="!eventSession">
       {{'EVENT_SESSIONS' | translate | uppercase}}
     </p>
-    <div layout="column"
+    <div layout="column" class="md-caption"
          ng-if="eventSessionFilters && eventSessionFilters.length > 0">
       <md-checkbox ng-repeat="filter in eventSessionFilters"
                    ng-show="filter.indexer.index.length"
@@ -61,8 +75,8 @@
     <p class="md-body-2 text-support">
       {{'PARTICIPANT_GROUPS' | translate | uppercase}}
     </p>
-    <div layout="column">
-      <md-checkbox ng-repeat="filter in participantGroupFilters"
+    <div layout="column" class="md-caption">
+      <md-checkbox ng-repeat="filter in participantGroupFilters | orderBy:'name'"
                    ng-show="filter.indexer.index.length"
                    ng-checked="exists(filter, searchViewOptions.stackFilters)" ng-click="toggle(filter, searchViewOptions.stackFilters)" aria-label="filter participant group">
         {{filter.name}} ({{filter.indexer.index.length}})
@@ -72,34 +86,38 @@
   </div>
   <div flex>
     <ms-search-view change-event="updateEventParticipants" search="searchHandler" options="searchViewOptions" user-search="userSearch">
-      <table class="md-data-table u-full-width" id="datagrid">
+      <table class="u-full-width table" id="datagrid" style="padding:3px;">
         <thead fsm-sticky-header scroll-body="'#datagrid'" scroll-stop="64" class="sticky-header-style">
-          <tr>
-            <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
-            <th class="md-data-table__cell--non-numeric">Last Name</th>
-            <th class="md-data-table__cell--non-numeric">First Name</th>
-            <th class="md-data-table__cell--non-numeric">{{'PARTICIPANT_GROUP' | translate}}</th>
-            <th class="md-data-table__cell--non-numeric">Grade</th>
-            <th class="md-data-table__cell--non-numeric">Gender</th>
-            <th class="md-data-table__cell--non-numeric" ng-if="!eventSession">{{'EVENT_SESSION' | translate}} Name</th>
-            <th class="md-data-table__cell--non-numeric" ng-if="!eventSession">{{'EVENT_SESSION' | translate}} Date</th>
-            <th>Status</th>
+          <tr layout layout-align="start center" class="table-header md-body-2 text-support">
+            <th flex="5" class="text-center">
+              <md-checkbox style="margin:0;"  ng-model="selectAll" ng-click="multiSelectOn()" aria-label="select all"></md-checkbox>
+            </th>
+            <th flex="10" class="text-left">Last Name</th>
+            <th flex="10" class="text-left">First Name</th>
+            <th flex="15" class="text-left">{{'PARTICIPANT_GROUP' | translate}}</th>
+            <th flex="10" class="text-center">Grade</th>
+            <th flex="10" class="text-left" hide-xs hide-sm>Gender</th>
+            <th flex="10" class="text-left" hide-xs hide-sm ng-if="!eventSession">Location</th>
+            <th flex="10" class="text-left" ng-if="!eventSession">Date</th>
+            <th flex class="text-center">Status</th>
           </tr>
         </thead>
         <tbody>
-          <tr class="u-hover-container"
+          <tr layout layout-align="start center" class="u-hover-container table-row" ng-class="{'is-selected': eventParticipant.isSelected}"
               ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id"
               ng-init="eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID); watchEventParticipantEventSession(this, 'eventParticipant.eventSessionID');
               eventParticipantParticipantGroup = demandParticipantGroup(eventParticipant.participantGroupID);">
-            <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ eventParticipant | json }}</pre></td>
-            <td class="md-data-table__cell--non-numeric">{{ eventParticipant.lastName }}</td>
-            <td class="md-data-table__cell--non-numeric">{{ eventParticipant.firstName }}</td>
-            <td class="md-data-table__cell--non-numeric">{{ eventParticipantParticipantGroup.name }}</td>
-            <td class="md-data-table__cell--non-numeric">{{ eventParticipant.grade }}</td>
-            <td class="md-data-table__cell--non-numeric">{{ eventParticipant.gender }}</td>
-            <td class="md-data-table__cell--non-numeric" ng-if="!eventSession">{{ eventParticipantEventSession.name }}</td>
-            <td class="md-data-table__cell--non-numeric" ng-if="!eventSession">{{ eventParticipantEventSession.startDate | amCalendar}}</td>
-            <td>
+            <td flex="5" class="table-data text-center">
+              <md-checkbox style="margin:0;" ng-model="eventParticipant.isSelected" ng-click="multiSelectOn()" aria-label="select {{eventParticipant.firstName}} {{eventParticipant.lastName}}"></md-checkbox>
+            </td>
+            <td flex="10" class="table-data text-left">{{ eventParticipant.lastName }}</td>
+            <td flex="10" class="table-data text-left">{{ eventParticipant.firstName }}</td>
+            <td flex="15" class="table-data text-left">{{ eventParticipantParticipantGroup.name }}</td>
+            <td flex="10" class="table-data text-center">{{ eventParticipant.grade }}</td>
+            <td flex="10" class="table-data text-left" hide-xs hide-sm>{{ eventParticipant.gender }}</td>
+            <td flex="10" class="table-data text-left" hide-xs hide-sm ng-if="!eventSession">{{ eventParticipantEventSession.location }}</td>
+            <td flex="10" class="table-data text-left" ng-if="!eventSession">{{ eventParticipantEventSession.startDate | amCalendar}}</td>
+            <td flex class="table-data text-center">
               <span class="u-display-hover" ms-hide="'EventSessionVolunteer'">
                 <md-button class="md-icon-button" style="margin-top:-6px;margin-bottom:0;"
                            ng-click="showEditParticipantsDialog($event, event, eventParticipant)">

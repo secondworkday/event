@@ -5,6 +5,29 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
   $scope.demandParticipantGroup = siteService.demandParticipantGroup;
   $scope.demandEventSession = siteService.demandEventSession;
 
+  var now = new Date();
+
+  $scope.sampleActivities = [
+    {
+      type: "New Session",
+      description: "Added a new Session to this Event",
+      actor: "Jerry Seinfeld",
+      timeStamp: "2016-02-20T19:21:34.525Z"
+    },
+    {
+      type: "New Participant",
+      description: "Added a new Participant to this Event",
+      actor: "Elaine Bennett",
+      timeStamp: "2016-02-19T19:21:34.525Z"
+    },
+    {
+      type: "New ParticipantGroup",
+      description: "Added a new ParticipantGroup to this Event",
+      actor: "George Costanza",
+      timeStamp: "2016-01-15T19:21:34.525Z"
+    },
+  ];
+
 
   $scope.event = event;
   // (optional - provided when we're looking at just one session, null when we're not)
@@ -24,6 +47,13 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
   } else {
     // no filtering
   }
+
+  $scope.showMultiSelectActions = false;
+  //!! TODO make show the showMultiSelectActions only when items are selected
+  // instead of using this little hack
+  $scope.multiSelectOn = function(){
+    $scope.showMultiSelectActions = true;
+  };
 
 
 
