@@ -36,6 +36,7 @@
   }
 
   #app {
+    min-width: 960px;
     background-color: #FAFAFA;
   }
 
@@ -277,6 +278,10 @@
     background-color: #E0E0E0;
   }
 
+  .bg-white {
+    background-color: #FFF;
+  }
+
 
   /* Utilities */
 
@@ -392,6 +397,37 @@
 
   .md-icon-button img.mini-user-img {
     margin: 0;
+  }
+
+  .table {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-collapse: collapse;
+    white-space: nowrap;
+    font-size: 13px;
+    background-color: rgb(255,255,255);
+  }
+
+  .table-header,
+  .table-row {
+    vertical-align: top;
+    height: 48px;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    padding: 6px;
+  }
+
+  .table-row:hover {
+    background-color: #eeeeee;
+  }
+
+  .table-row.is-selected {
+    background-color: #e0e0e0;
+  }
+
+  .table-data {
+    overflow: hidden;
+    padding-right: 2px;
+    text-overflow: ellipsis;
   }
 
 
