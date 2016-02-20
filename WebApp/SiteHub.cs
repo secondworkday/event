@@ -691,12 +691,12 @@ namespace WebApp
       });
     }
 
-        public HubResult DeleteEventParticipant(int itemID)
+    public HubResult DeleteEventParticipant(int itemID)
     {
-      return accountsOnlyHeader((utilityContext, dc) =>
-      {
-        return EventParticipant.Delete(dc, itemID);
-      });
+        return accountsOnlyHeader((utilityContext, dc) =>
+        {
+            return EventParticipant.Delete(dc, itemID);
+        });
     }
 
 

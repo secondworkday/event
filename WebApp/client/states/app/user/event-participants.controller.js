@@ -380,6 +380,24 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
         return failureData;
       });
     }
+
+    function deleteEventParticipants(itemIDs) {
+      siteService.deleteEventParticipant(itemIDs)
+      .then(function (successData) {
+        // success
+        //!! fix the pluralization here - or perhaps improve upon the Toast
+        $msUI.showToast(itemIDs.length + " " + PARTICIPANT + "(s) Deleted");
+        $log.debug(itemIDs.length + " Event Participant(s) Deleted.");
+        return successData;
+      }, function (failureData) {
+        // failure
+        $msUI.showToast(failureData.errorMessage);
+        $log.debug(failureData.errorMessage);
+        return failureData;
+      });
+    }
+
+
   }
 
 
