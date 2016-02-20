@@ -26,7 +26,18 @@
   }
 
   a {
+    color: #283593;
     cursor: pointer;
+  }
+
+  a.no-style,
+  a.no-style:visited,
+  a.no-style:active {
+    text-decoration: none;
+  }
+
+  a.no-style:hover {
+    text-decoration: underline;;
   }
 
   .app-wrapper,
@@ -81,6 +92,16 @@
 
   .tag.live {
     background-color:#283593;
+  }
+
+  .activity-log-details {
+    color:#FFF;
+    border-left:3px solid gray;
+    margin-left:3px;
+    padding-left:6px;
+    padding-top:6px;
+    padding-bottom:6px;
+    background-color:rgba(0,0,0,.30);
   }
 
   md-content {
@@ -215,6 +236,10 @@
 
   .text-right {
     text-align: right;
+  }
+
+  .text-bold {
+    font-weight: 700;
   }
 
   .text-red {
