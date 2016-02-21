@@ -54,7 +54,9 @@ app.controller('AppController', function ($scope, $translate, $timeout, $mdSiden
   };
 
   $scope.changeLanguage = function (langKey) {
-    $translate.use(langKey);
+    $translate.use(langKey).then(function () {
+      $state.go($state.current, $stateParams, { reload: true });
+    });
   };
 
 
