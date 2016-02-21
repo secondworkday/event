@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
@@ -290,6 +290,22 @@ namespace App.Library
 
             updateContent.message = "Successfully created " + (i-1).ToString() + " students";
             reportProjectScope.updateProgress(updateContent);
+
+
+
+            //!! create a bulk activity TAG
+            int bulkTagIDThingy = 0;
+
+            string activityDescription = string.Format("Bulk Create {0} EventParticipant(s)",
+                /*0*/ eventParticipants.Length);
+            var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+            var activityType = ActivityType.BulkCreated;
+            ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
+
+
+
+
+
             return HubResult.CreateSuccessData(eventParticipants);
         });
 
