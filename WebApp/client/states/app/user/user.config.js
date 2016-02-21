@@ -156,13 +156,13 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         }
       }
     })
-    .state('app.user.event.history', {
-      url: '/history',
+    .state('app.user.event.activity-log', {
+      url: '/activity-log',
       data: {
         'selectedTab': 4
       },
       views: {
-        'history': {
+        'activity-log': {
           templateUrl: '/client/states/app/user/activity-log.html',
           controller: 'ActivityLogController'
         }
