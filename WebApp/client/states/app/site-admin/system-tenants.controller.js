@@ -27,7 +27,7 @@ app.controller('SystemTenantsController', function ($scope, $mdDialog, $log, $ms
 
   $scope.searchViewOptions = {
     sort: $scope.sortOptions[0],
-    filter: $scope.filterOptions[0],
+    selectFilter: $scope.filterOptions[0],
     userSearch: null
   };
 

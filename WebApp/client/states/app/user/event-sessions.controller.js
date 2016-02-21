@@ -33,7 +33,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
 
   $scope.searchViewOptions = {
     sort: $scope.sortOptions[0],
-    filter: $scope.filterOptions[0]
+    selectFilter: $scope.filterOptions[0]
   };
 
   //!! TODO improve this so that it automatically checks every 10 seconds or so

@@ -29,7 +29,7 @@ app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileU
 
   $scope.searchViewOptions = {
     sort: $scope.sortOptions[2],
-    filter: $scope.filterOptions[0],
+    selectFilter: $scope.filterOptions[0],
     userSearch: null
   };
 
@@ -37,7 +37,7 @@ app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileU
   // Establish our Base filtering (evaluatuating in order of most restrictive to least restrictive)
   if ($scope.tenant) {
     // filter to one EventSession
-    $scope.searchViewOptions.baseFilters = { serverTerm: '$tid:' + $scope.tenant.id, clientFunction: utilityService.filterByPropertyValue('tenantGroupID', $scope.tenant.id) };
+    $scope.searchViewOptions.baseFilter = { serverTerm: '$tid:' + $scope.tenant.id, clientFunction: utilityService.filterByPropertyValue('tenantGroupID', $scope.tenant.id) };
   } else {
     // no filtering
   }

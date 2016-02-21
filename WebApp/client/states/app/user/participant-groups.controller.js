@@ -36,7 +36,7 @@ app.controller('ParticipantGroupsController', function ($scope, $mdDialog, $log,
 
   $scope.searchViewOptions = {
     sort: $scope.sortOptions[0],
-    filter: $scope.filterOptions[0]
+    selectFilter: $scope.filterOptions[0]
   };
 
 
@@ -106,12 +106,12 @@ app.controller('ParticipantGroupsController', function ($scope, $mdDialog, $log,
   $scope.download = function () {
 
     var searchExpression = utilityService.buildSearchExpression(
-      $scope.searchViewOptions.baseFilters,
+      $scope.searchViewOptions.baseFilter,
       $scope.searchViewOptions.stackFilters,
 
       $scope.searchViewOptions.filter,
       $scope.searchViewOptions.selectFilter,
-      $scope.searchViewOptions.userFilter,
+      $scope.searchViewOptions.objectFilter,
       $scope.searchViewOptions.userSearch);
 
 

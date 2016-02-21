@@ -214,7 +214,7 @@
     <Content Include="client\states\app\user\event-history.controller.js" />
     <Content Include="client\states\app\user\events.controller.js" />
     <Content Include="client\states\app\user\events.html" />
-    <Content Include="client\states\app\user\history.html" />
+    <Content Include="client\states\app\user\activity-log.html" />
     <Content Include="client\states\app\user\locations.html" />
     <Content Include="client\states\app\user\team.html" />
     <Content Include="client\states\app\user\upload-participant-groups.controller.js" />

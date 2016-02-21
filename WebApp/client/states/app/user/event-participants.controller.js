@@ -63,10 +63,10 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
   // Establish our Base filtering (evaluatuating in order of most restrictive to least restrictive)
   if ($scope.eventSession) {
     // filter to one EventSession
-    $scope.searchViewOptions.baseFilters = { serverTerm: '$eventSession:' + $scope.eventSession.id, clientFunction: utilityService.filterByPropertyValue('eventSessionID', $scope.eventSession.id) };
+    $scope.searchViewOptions.baseFilter = { serverTerm: '$eventSession:' + $scope.eventSession.id, clientFunction: utilityService.filterByPropertyValue('eventSessionID', $scope.eventSession.id) };
   } else if ($scope.event) {
     // filter to one Event
-    $scope.searchViewOptions.baseFilters = { serverTerm: '$event:' + $scope.event.id, clientFunction: utilityService.filterByPropertyValue('eventID', $scope.event.id) };
+    $scope.searchViewOptions.baseFilter = { serverTerm: '$event:' + $scope.event.id, clientFunction: utilityService.filterByPropertyValue('eventID', $scope.event.id) };
   } else {
     // no filtering
   }
@@ -162,7 +162,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
   $scope.eventSessionFilters = [];
 
   //
-  siteService.model.eventSessions.search($scope.searchViewOptions.baseFilters.serverTerm, "", 0, 999999)
+  siteService.model.eventSessions.search($scope.searchViewOptions.baseFilter.serverTerm, "", 0, 999999)
   .then(function (itemsData) {
     console.log("setting up eventSessionFilters", itemsData);
 
@@ -223,7 +223,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
 
   $scope.participantGroupFilters = [];
 
-  siteService.model.participantGroups.search($scope.searchViewOptions.baseFilters.serverTerm, "", 0, 999999)
+  siteService.model.participantGroups.search($scope.searchViewOptions.baseFilter.serverTerm, "", 0, 999999)
   .then(function (itemsData) {
     console.log("setting up participantGroupsFilters", itemsData);
 
@@ -492,12 +492,12 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
   $scope.download = function () {
 
     var searchExpression = utilityService.buildSearchExpression(
-      $scope.searchViewOptions.baseFilters,
+      $scope.searchViewOptions.baseFilter,
       $scope.searchViewOptions.stackFilters,
 
       $scope.searchViewOptions.filter,
       $scope.searchViewOptions.selectFilter,
-      $scope.searchViewOptions.userFilter,
+      $scope.searchViewOptions.objectFilter,
       $scope.searchViewOptions.userSearch);
 
     var query = {
@@ -516,7 +516,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
 
   // pre-load all our baseFilters participants - which loads up our Indexers
   var searchExpression = utilityService.buildSearchExpression(
-    $scope.searchViewOptions.baseFilters);
+    $scope.searchViewOptions.baseFilter);
   $scope.searchHandler(searchExpression, "", 0, 99999);
 
 });

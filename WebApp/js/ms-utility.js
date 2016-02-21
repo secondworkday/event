@@ -430,10 +430,19 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       }
       else if (angular.isObject(filter)) {
         if (filter.serverTerm) {
+          //!! consider what type of serverTerm we've got. If it's a string add it, else if it's an object, add its properties (as we do below)
           searchTerms.push(filter.serverTerm);
         }
         else {
-          $log.debug('object type?', filter);
+          // add the properties of this object as serverTerms (presumably there's no associated clientFilter as for immutable data)
+
+          angular.forEach(filter, function (value, key) {
+            if (key && value) {
+              searchTerms.push('$' + key + ':' + value);
+            }
+          });
+
+          // $log.debug('object type?', filter);
         }
       }
     };
@@ -1078,8 +1087,8 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     var modelItems = model.tenantGroups;
     return modelItems.hashMap[itemKey] ||
       (
-        modelItems.hashMap[itemID] = { id: itemKey, code: itemKey, displayTitle: 'loading...' },
-        utilityService.delayLoad2(modelItems, itemKey),
+        modelItems.hashMap[itemKey] = { id: itemKey, code: itemKey, displayTitle: 'loading...' },
+        self.delayLoad2(modelItems, itemKey),
         modelItems.hashMap[itemKey]
       );
   };
@@ -1263,8 +1272,8 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       var modelItems = model.users;
       return modelItems.hashMap[itemKey] ||
         (
-          modelItems.hashMap[itemID] = { id: itemKey, code: itemKey, displayTitle: 'loading...' },
-          utilityService.delayLoad2(modelItems, itemKey),
+          modelItems.hashMap[itemKey] = { id: itemKey, code: itemKey, displayTitle: 'loading...' },
+          self.delayLoad2(modelItems, itemKey),
           modelItems.hashMap[itemKey]
         );
     };
@@ -1846,6 +1855,71 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         return notification;
       });
     };
+
+
+
+
+
+
+
+  //** ActivityLog related
+
+    model.activityLog = {
+      hashMap: {},
+      index: [],
+
+      search: function (searchExpression, sortExpression, startIndex, rowCount) {
+        return callHub(function () {
+          return utilityHub.server.searchActivityLog(searchExpression, sortExpression, startIndex, rowCount);
+        }).then(function (itemsData) {
+          return onActivityLogUpdated(model.activityLog, itemsData);
+        });
+      }
+    };
+
+    function onActivityLogUpdated(itemsModel, itemsData) {
+      // Update our main cache (model.xxx) and cacheIndex (model.xxxIndex)
+
+      self.purgeItems(itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index);
+      var newItemIDs = cacheItems(itemsData.items, itemsModel.hashMap, itemsModel.index, self.compareByProperties('-id'));
+
+      var notification = {
+        hashMap: itemsModel.hashMap,
+        ids: $.map(itemsData.items, function (item) {
+          return item.id;
+        }),
+        newIDs: newItemIDs,
+        deletedIDs: itemsData.deletedIDs,
+        totalCount: itemsData.totalCount,
+        resolvedIDs: []
+      };
+
+      return notification;
+    };
+
+  // reference count of the number of callers that require server notifications of changes
+    var trackActivityLogCount = 0;
+    this.trackActivityLog = function () {
+      if (++trackActivityLogCount == 1) {
+        joinGroup("activityLog");
+      }
+    };
+    this.untrackActivityLog = function () {
+      if (--trackActivityLogCount == 0) {
+        leaveGroup("activityLog");
+      }
+    };
+
+    this.getActivityLog = function (startIndex, rowCount) {
+      return model.activityLog.search('', '', startIndex, rowCount);
+    };
+
+
+
+
+
+
+
 
 
 
@@ -2748,12 +2822,10 @@ app.directive('msSearchView', function ($parse, utilityService) {
       $scope.updateClientFilter = function () {
 
         var clientFilters = utilityService.buildClientFilter(
-          $scope.options.baseFilters,
+          $scope.options.baseFilter,
           $scope.options.stackFilters,
-
-          $scope.options.filter,
           $scope.options.selectFilter,
-          $scope.options.userFilter,
+          $scope.options.objectFilter,
           $scope.options.userSearch);
 
 
@@ -2815,27 +2887,12 @@ app.directive('msSearchView', function ($parse, utilityService) {
 
 
         var requestedSearchExpression = utilityService.buildSearchExpression(
-          $scope.options.baseFilters,
+          $scope.options.baseFilter,
           $scope.options.stackFilters,
-
-          $scope.options.filter,
           $scope.options.selectFilter,
-          $scope.options.userFilter,
+          $scope.options.objectFilter,
           $scope.options.userSearch);
 
-
-
-/*
-        var requestedSearchExpressionTerms = [];
-        angular.forEach($scope.options.userFilters, function (value, key) {
-          if (key && value) {
-            requestedSearchExpressionTerms.push('$' + key + ':' + value);
-          }
-        });
-        requestedSearchExpressionTerms.push($scope.options.filter.serverTerm);
-        requestedSearchExpressionTerms.push($scope.options.userSearch);
-        var requestedSearchExpression = requestedSearchExpressionTerms.join(' ');
-*/
         var requestedSortExpression = $scope.options.sort.serverTerm;
 
         if ($scope.loadPageSortExpression !== requestedSortExpression || $scope.loadPageSearchExpression !== requestedSearchExpression) {
@@ -2957,33 +3014,38 @@ app.directive('msSearchView', function ($parse, utilityService) {
             scope.reload();
           }
         });
-        scope.$watch('options.filter', function (newValue, oldValue, scope) {
-          if (newValue !== oldValue) {
-            scope.reload();
-          }
-        });
-        scope.$watch('options.userSearch', function (newValue, oldValue, scope) {
-          if (newValue !== oldValue) {
-            scope.reload();
-          }
-        });
 
-        // note 'deep' watch on these ones
-        scope.$watch('options.baseFilters', function (newValue, oldValue, scope) {
+        // note 'deep' watch used on some of these ...
+
+        scope.$watch('options.baseFilter', function (newValue, oldValue, scope) {
           if (newValue !== oldValue) {
             scope.reload();
           }
         }, true);
+
         scope.$watch('options.stackFilters', function (newValue, oldValue, scope) {
           if (newValue !== oldValue) {
             scope.reload();
           }
         }, true);
-        scope.$watch('options.userFilters', function (newValue, oldValue, scope) {
+
+        scope.$watch('options.selectFilter', function (newValue, oldValue, scope) {
+          if (newValue !== oldValue) {
+            scope.reload();
+          }
+        });
+
+        scope.$watch('options.objectFilter', function (newValue, oldValue, scope) {
           if (newValue !== oldValue) {
             scope.reload();
           }
         }, true);
+
+        scope.$watch('options.userSearch', function (newValue, oldValue, scope) {
+          if (newValue !== oldValue) {
+            scope.reload();
+          }
+        });
 
         scope.updateClientFilter();
 
