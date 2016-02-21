@@ -247,6 +247,7 @@
     <Content Include="client\states\public\connection\reconnecting.html" />
     <Content Include="client\states\public\create-account.controller.js" />
     <Content Include="client\states\public\create-account.html" />
+    <Content Include="client\states\public\forgot-password.dialog.html" />
     <Content Include="client\states\public\landing.html" />
     <Content Include="client\states\public\public.config.js" />
     <Content Include="client\states\public\public.controller.js" />
