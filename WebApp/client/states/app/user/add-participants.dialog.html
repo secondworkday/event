@@ -26,7 +26,7 @@
           <label>{{'PARTICIPANT_GROUP' | translate}}</label>
           <md-select ng-model="formData.participantGroupID">
             <md-option ng-repeat="participantGroup in participantGroups.index | objectLookup:participantGroups.hashMap | orderBy: 'name' track by participantGroup.id" value="{{participantGroup.id}}">
-              {{participantGroup.name}}
+              {{participantGroup.name}}<span ng-if="participantGroup.contactName"> ({{participantGroup.contactName}})</span>
             </md-option>
           </md-select>
         </md-input-container>

@@ -23,7 +23,7 @@
           <label>School</label>
           <md-select ng-model="formData.participantGroupID">
             <md-option ng-repeat="participantGroup in sessionParticipantGroupsIndex | objectLookup:participantGroups.hashMap track by participantGroup.id" value="{{participantGroup.id}}">
-              {{participantGroup.name}}
+              {{participantGroup.name}}<span ng-if="participantGroup.contactName"> ({{participantGroup.contactName}})</span>
             </md-option>
           </md-select>
         </md-input-container>

@@ -1,10 +1,11 @@
 <md-dialog aria-label="add {{'EVENT_SESSION' | translate}}" ng-cloak>
-  <form>
+  <form name="addEditSessionForm" novalidate>
     <md-toolbar>
       <div class="md-toolbar-tools">
         <h2>{{newOrEdit}} {{'EVENT_SESSION' | translate}}</h2>
         <span flex></span>
-        <md-button class="md-icon-button" ng-click="cancel()">
+        <md-button class="md-icon-button"
+          ng-click="cancel()">
           <i class="fa fa-times"></i>
         </md-button>
       </div>
@@ -15,7 +16,8 @@
         <div layout-gt-sm="row">
           <md-input-container class="md-block" flex-gt-sm>
             <label>{{'EVENT_SESSION' | translate}} name</label>
-            <input ng-model="formData.name">
+            <input name="name" required=""
+              ng-model="formData.name">
           </md-input-container>
         </div>
         <div layout="column">
@@ -26,7 +28,11 @@
               </p>
             </div>
             <div flex>
-              <md-datepicker style="margin-top:1rem;" ng-model="formData.startDate" md-placeholder="Session date" ng-change="startTimeChanged()" flex-gt-sm></md-datepicker>
+              <md-datepicker flex-gt-sm style="margin-top:1rem;" name="startDate" required=""
+                md-placeholder="Session date"
+                ng-model="formData.startDate"
+                ng-change="startTimeChanged()">
+              </md-datepicker>
             </div>
           </div>
           <div class="u-sm-space"></div>
@@ -38,14 +44,20 @@
             </div>
             <div flex layout>
               <md-input-container flex-gt-sm>
-                <md-select ng-model="formData.startTime" ng-change="startTimeChanged()" flex-gt-sm>
-                  <md-option ng-repeat="tt in formInput.timeChoice" value="{{tt.value}}">
+                <md-select flex-gt-sm required=""
+                  ng-model="formData.startTime"
+                  ng-change="startTimeChanged()">
+                  <md-option value="{{tt.value}}"
+                    ng-repeat="tt in formInput.timeChoice">
                     {{tt.display}}
                   </md-option>
                 </md-select>
               </md-input-container>
-              <md-select ng-model="formData.startTimeAmPm" ng-change="startTimeChanged()" flex-gt-sm>
-                <md-option ng-repeat="ampm in formInput.ampm" value="{{ampm}}">
+              <md-select flex-gt-sm required=""
+                ng-model="formData.startTimeAmPm"
+                ng-change="startTimeChanged()">
+                <md-option value="{{ampm}}"
+                  ng-repeat="ampm in formInput.ampm">
                   {{ampm}}
                 </md-option>
               </md-select>
@@ -59,14 +71,20 @@
             </div>
             <div flex layout>
               <md-input-container flex-gt-sm>
-                <md-select ng-model="formData.endTime" ng-change="endTimeChanged()" flex-gt-sm>
-                  <md-option ng-repeat="time in formInput.timeChoice" value="{{time.value}}">
+                <md-select flex-gt-sm required=""
+                  ng-model="formData.endTime"
+                  ng-change="endTimeChanged()">
+                  <md-option value="{{time.value}}"
+                    ng-repeat="time in formInput.timeChoice">
                     {{time.display}}
                   </md-option>
                 </md-select>
               </md-input-container>
-              <md-select ng-model="formData.endTimeAmPm" ng-change="endTimeChanged()" flex-gt-sm>
-                <md-option ng-repeat="ampm in formInput.ampm" value="{{ampm}}">
+              <md-select flex-gt-sm required=""
+                ng-model="formData.endTimeAmPm"
+                ng-change="endTimeChanged()">
+                <md-option value="{{ampm}}"
+                  ng-repeat="ampm in formInput.ampm">
                   {{ampm}}
                 </md-option>
               </md-select>
@@ -80,7 +98,8 @@
             </div>
             <div flex>
               <md-input-container class="md-block" flex-gt-sm>
-                <input type="number" placeholder="i.e. 250" ng-model="formData.slots">
+                <input type="number" placeholder="i.e. 250"
+                  ng-model="formData.slots">
               </md-input-container>
             </div>
           </div>
@@ -92,7 +111,8 @@
             </div>
             <div flex>
               <md-input-container class="md-block" flex-gt-sm>
-                <input type="text" placeholder="i.e. Redmond123" ng-model="formData.checkInCode">
+                <input type="text" placeholder="i.e. Redmond123"
+                  ng-model="formData.checkInCode">
               </md-input-container>
             </div>
           </div>
@@ -102,7 +122,9 @@
           <p class="md-subhead">
             Select {{'SESSION_MANAGER' | translate}}(s)
           </p>
-          <md-checkbox ng-repeat="user in sampleUsers" ng-model="user.isSessionManager" aria-label="{{user}} session manager checkbox">
+          <md-checkbox aria-label="{{user}} session manager checkbox"
+            ng-repeat="user in sampleUsers"
+            ng-model="user.isSessionManager">
             {{user.firstName}} {{user.lastName}}
           </md-checkbox>
         </div>
@@ -110,7 +132,7 @@
         <div layout-gt-sm="row">
           <md-input-container class="md-block" flex-gt-sm>
             <label>{{'LOCATION' | translate}} name</label>
-            <input ng-model="formData.location">
+            <input ng-model="formData.location" required="">
           </md-input-container>
         </div>
         <div layout-gt-sm="row">
@@ -136,16 +158,25 @@
       </div>
     </md-dialog-content>
     <md-dialog-actions layout="row" layout-align="end center">
-      <md-button ng-click="showDeleteConfirmationDialog($event, formData)" ng-if="newOrEdit == 'Edit'">
+      <md-button class="md-warn"
+        ng-click="showDeleteConfirmationDialog($event, formData)"
+        ng-if="newOrEdit == 'Edit'">
         Delete {{'EVENT_SESSION' | translate}}
       </md-button>
-      <md-button ng-click="cancel()">
+      <md-button
+        ng-click="cancel()">
         Cancel
       </md-button>
-      <md-button ng-click="createEventSession(formData)" ng-if="newOrEdit == 'New'" ng-disabled="!formData.name || !formData.startDate">
+      <md-button class="md-primary"
+        ng-click="createEventSession(formData)"
+        ng-if="newOrEdit == 'New'"
+        ng-disabled="addEditSessionForm.$invalid">
         Add
       </md-button>
-      <md-button ng-click="editEventSession()" ng-if="newOrEdit == 'Edit'" ng-disabled="!formData.name || !formData.startDate">
+      <md-button class="md-primary"
+        ng-click="editEventSession()"
+        ng-if="newOrEdit == 'Edit'"
+        ng-disabled="addEditSessionForm.$invalid">
         Save
       </md-button>
     </md-dialog-actions>
