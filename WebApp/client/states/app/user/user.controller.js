@@ -102,7 +102,7 @@ app.controller('EventController', function ($scope, $log, $state, $mdDialog, $ms
   });
 });
 
-app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msUI, utilityService, siteService) {
+app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msUI, $translate, utilityService, siteService) {
   $log.debug('Loading UserController...');
   $scope.participantGroups = siteService.model.participantGroups;
 
@@ -166,7 +166,7 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
     siteService.deleteEvent(event)
     .then(function (successData) {
       // success
-      $msUI.showToast("Event Deleted");
+      $msUI.showToast(EVENT + " Deleted");
       $log.debug("Task completed.");
       return successData;
     }, function (failureData) {
@@ -200,7 +200,12 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
       // $scope.status = 'You cancelled the dialog.';
     });
   }
-  function CreateEventDialog($scope, $mdDialog) {
+  function CreateEventDialog($scope, $mdDialog, $translate) {
+
+    var EVENT = "Event";
+    $translate('EVENT').then(function (event_text) {
+      EVENT = event_text;
+    });
 
     $scope.model = utilityService.model;
 
@@ -221,8 +226,8 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
       siteService.createEvent($scope.formData)
       .then(function (successData) {
         // success
-        $msUI.showToast("Event Created");
-        $log.debug("Task completed.");
+        $msUI.showToast(EVENT + " Created");
+        $log.debug("Event creation completed.");
         //$state.go('app.user.event.sessions({ eventID: ' + successData + '})');
         return successData;
       }, function (failureData) {
@@ -254,10 +259,16 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
     }, function () {
       // $scope.status = 'You cancelled the dialog.';
     });
-  }
-  function EditEventDialogController($scope, $mdDialog, event) {
+  };
+
+  function EditEventDialogController($scope, $mdDialog, $translate, event) {
 
     $scope.event = event;
+
+    var EVENT = "Event";
+    $translate('EVENT').then(function (event_text) {
+      EVENT = event_text;
+    });
 
     $scope.hide = function () {
       $mdDialog.hide();
@@ -271,7 +282,7 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
       siteService.editEvent($scope.event.id, $scope.event)
       .then(function (successData) {
         // success
-        $msUI.showToast("Event Updated");
+        $msUI.showToast(EVENT + " Updated");
         $log.debug("Edit event completed.");
         return successData;
       }, function (failureData) {
@@ -285,10 +296,15 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
     };
   }
 
+  var EVENT = "Event";
+  $translate('EVENT').then(function (event_text) {
+    EVENT = event_text;
+  });
+
   $scope.showDeleteConfirmationDialog = function (ev, event) {
     var confirm = $mdDialog.confirm()
-      .title("Delete Event")
-      .textContent("Would you like to delete event '" + event.name + "'?")
+      .title("Delete " + EVENT)
+      .textContent("Would you like to delete " + EVENT + " '" + event.name + "'?")
       .ariaLabel("Delete event")
       .targetEvent(ev)
       .ok("yes")
