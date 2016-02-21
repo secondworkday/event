@@ -5,29 +5,6 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
   $scope.demandParticipantGroup = siteService.demandParticipantGroup;
   $scope.demandEventSession = siteService.demandEventSession;
 
-  var now = new Date();
-
-  $scope.sampleActivities = [
-    {
-      type: "New Session",
-      description: "Added a new Session to this Event",
-      actor: "Jerry Seinfeld",
-      timeStamp: "2016-02-20T19:21:34.525Z"
-    },
-    {
-      type: "New Participant",
-      description: "Added a new Participant to this Event",
-      actor: "Elaine Bennett",
-      timeStamp: "2016-02-19T19:21:34.525Z"
-    },
-    {
-      type: "New ParticipantGroup",
-      description: "Added a new ParticipantGroup to this Event",
-      actor: "George Costanza",
-      timeStamp: "2016-01-15T19:21:34.525Z"
-    },
-  ];
-
 
   //!! multi-select stuff
   //!! I think we'll want to move this insde ms-search-view

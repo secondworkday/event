@@ -3,11 +3,54 @@ app.controller('EventHistoryController', function ($scope, $log, utilityService,
 
   $scope.sampleActivities = [
     {
-      type: "New Session",
-      description: "Added a new Session to this Event",
+      type: "bulkAddParticipants",
+      amount: "34",
+      target: "event",
       actor: "Jerry Seinfeld",
-      date: "Date"
-    }
+      timeStamp: "2016-02-20T19:21:34.525Z"
+    },
+    {
+      type: "singleAddParticipant",
+      participant: { firstName: "Jon", lastName: "Snow", participantGroup: "Parkside Elementary"},
+      target: "event",
+      actor: "George Constanza",
+      timeStamp: "2016-02-19T19:21:34.525Z"
+    },
+    {
+      type: "singleAddParticipant",
+      participant: { firstName: "Daenerys", lastName: "Targaryen", participantGroup: "Parkside Elementary"},
+      target: "event",
+      actor: "George Constanza",
+      timeStamp: "2016-02-19T19:21:34.525Z"
+    },
+    {
+      type: "singleAddParticipant",
+      participant: { firstName: "Arya", lastName: "Stark", participantGroup: "Greendale Middle School"},
+      target: "event",
+      actor: "George Constanza",
+      timeStamp: "2016-02-19T19:21:34.525Z"
+    },
+    {
+      type: "singleAddParticipant",
+      participant: { firstName: "Tyrion", lastName: "Lannister", participantGroup: "Greendale Middle School"},
+      target: "event",
+      actor: "George Constanza",
+      timeStamp: "2016-02-19T19:21:34.525Z"
+    },
+    {
+      type: "singleAddParticipant",
+      participant: { firstName: "Sansa", lastName: "Stark", participantGroup: "Parkside Elementary"},
+      target: "event",
+      actor: "George Constanza",
+      timeStamp: "2016-02-19T19:21:34.525Z"
+    },
+    {
+      type: "bulkDeleteParticipants",
+      amount: "12",
+      target: "event",
+      actor: "Elaine Bennett",
+      timeStamp: "2016-02-12T19:21:34.525Z"
+    },
   ];
 
 });

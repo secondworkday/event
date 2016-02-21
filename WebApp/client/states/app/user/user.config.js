@@ -164,8 +164,7 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       views: {
         'history': {
           templateUrl: '/client/states/app/user/history.html',
-          controller: "EventParticipantsController"
-          // controller: 'EventHistoryController'
+          controller: 'EventHistoryController'
         }
       }
     })
