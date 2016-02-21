@@ -220,25 +220,27 @@ namespace App.Library
             return HubResult.NotFound;
         }
 
-        var deleteItems = dc.EventParticipants
-            .Where(item => itemIDs.Contains(item.ID));
+        dc.SubmitLock(() =>
+        {
+            var deleteItems = dc.EventParticipants
+                .Where(item => itemIDs.Contains(item.ID));
 
-        //!! We won't delete Participant
-        dc.EventParticipants.DeleteAllOnSubmit(deleteItems);
-
-        //!! create a bulk delete TAG
-        int bulkTagIDThingy = 0;
-
-        string activityDescription = string.Format("Bulk Delete {0} EventParticipant(s)", 
-            /*0*/ itemIDs.Length);
-        var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
-        var activityType = ActivityType.BulkDeleted;
-        ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
+            //!! TODO remove any Tags that have their last reference with this Pipeline
+            //!! Should we have an ExtendedObject call to remove all extended properties?
 
 
-        //!! TODO remove any Tags that have their last reference with this Pipeline
-        //!! Should we have an ExtendedObject call to remove all extended properties?
-        dc.SubmitChanges();
+            //!! We won't delete Participant
+            dc.EventParticipants.DeleteAllOnSubmit(deleteItems);
+
+            //!! create a bulk delete TAG
+            int bulkTagIDThingy = 0;
+
+            string activityDescription = string.Format("Bulk Delete {0} EventParticipant(s)",
+                /*0*/ itemIDs.Length);
+            var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+            var activityType = ActivityType.BulkDeleted;
+            ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
+        });
 
         var notifyExpression = new NotifyExpression();
         itemIDs.ForEach(itemID =>
