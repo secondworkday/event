@@ -16,33 +16,6 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
   };
 
 
-  //!! Ok - there must be a way better way than passing fnHide as a parameter here. I'm missing something really basic.
-  $scope.sendPasswordResetEmail = function (email, fnHide) {
-    webUtilityService.sendResetPasswordEmail(email)
-      .then(function (successData) {
-        $mdToast.showSimple("Yessir.");
-
-        //var myAlert = $alert({ title: 'Password Reset', content: 'Password reset email sent to ' + email + '.', placement: 'top', type: 'info', show: true });
-        //fnHide();
-      }, function (failureData) {
-
-        if (failureData.StatusCode == 403) {
-          $mdToast.showSimple(failureData.errorMessage || failureData.StatusCodeDescription);
-
-          //var myAlert = $alert({ title: 'Password Reset', content: failureData.StatusCodeDescription, placement: 'top', container: 'body', type: 'info', duration: 3, show: true });
-          //fnHide();
-          return;
-        }
-
-        //!! TODO this should be displayed as an error on the email field
-        //var myAlert = $alert({ title: 'Password Reset', content: failureData.StatusCodeDescription, placement: 'top', type: 'info', show: true });
-
-        $mdToast.showSimple(failureData.errorMessage);
-
-      });
-  };
-
-
   $scope.showDemoAccountDialog = function ($event) {
     var parentEl = angular.element(document.body);
     $mdDialog.show({
@@ -98,6 +71,51 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
           $mdDialog.hide();
         });
       };
+    }
+  };
+
+  $scope.showForgotPasswordDialog = function ($event) {
+    var parentEl = angular.element(document.body);
+    $mdDialog.show({
+      parent: parentEl,
+      targetEvent: $event,
+      templateUrl: '/client/states/public/forgot-password.dialog.html',
+      controller: ForgotPasswordDialogController
+    });
+    function ForgotPasswordDialogController($scope, webUtilityService) {
+
+      $scope.cancel = function () {
+        $log.debug("You canceled the dialog.");
+        $mdDialog.hide();
+      };
+
+      //!! Ok - there must be a way better way than passing fnHide as a parameter here. I'm missing something really basic.
+      $scope.sendPasswordResetEmail = function (email, fnHide) {
+        webUtilityService.sendResetPasswordEmail(email)
+          .then(function (successData) {
+            $mdDialog.hide();
+            $mdToast.showSimple("Password reset email sent to " + email);
+
+            //var myAlert = $alert({ title: 'Password Reset', content: 'Password reset email sent to ' + email + '.', placement: 'top', type: 'info', show: true });
+            //fnHide();
+          }, function (failureData) {
+            $mdDialog.hide();
+            if (failureData.StatusCode == 403) {
+              $mdToast.showSimple(failureData.errorMessage || failureData.StatusCodeDescription);
+
+              //var myAlert = $alert({ title: 'Password Reset', content: failureData.StatusCodeDescription, placement: 'top', container: 'body', type: 'info', duration: 3, show: true });
+              //fnHide();
+              return;
+            }
+
+            //!! TODO this should be displayed as an error on the email field
+            //var myAlert = $alert({ title: 'Password Reset', content: failureData.StatusCodeDescription, placement: 'top', type: 'info', show: true });
+
+            $mdToast.showSimple(failureData.errorMessage);
+
+          });
+      };
+
     }
   };
 

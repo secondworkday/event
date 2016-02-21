@@ -14,7 +14,7 @@
             <label>Password</label>
             <input ng-model="formData.password" type="password">
           </md-input-container>
-          <span class="md-caption"><a ng-click="sendPasswordResetEmail(formData.email)">Forgot password?</a></span>
+          <span class="md-caption"><a ng-click="showForgotPasswordDialog($event)">Forgot password?</a></span>
         </div>
         <div layout layout-align="end center">
           <md-button type="submit" ng-click="signIn(formData)" class="md-raised md-primary">Sign In</md-button>

@@ -59,12 +59,10 @@
       </md-checkbox>
     </div>
 
-    <p class="md-body-2 text-support"
-       ng-if="!eventSession">
+    <p class="md-body-2 text-support" ng-if="eventSessionFilters.length">
       {{'EVENT_SESSIONS' | translate | uppercase}}
     </p>
-    <div layout="column" class="md-caption"
-         ng-if="eventSessionFilters && eventSessionFilters.length > 0">
+    <div layout="column" class="md-caption" ng-if="eventSessionFilters.length">
       <md-checkbox ng-repeat="filter in eventSessionFilters"
                    ng-show="filter.indexer.index.length"
                    ng-checked="exists(filter, searchViewOptions.stackFilters)" ng-click="toggle(filter, searchViewOptions.stackFilters)" aria-label="filter event session">
