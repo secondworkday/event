@@ -201,27 +201,38 @@ namespace App.Library
       return HubResult.Success;
     }
 
-    public static HubResult Upload(AppDC dc, int eventID, JToken uploadData)
+    public static HubResult Upload(AppDC dc, int eventID, JToken uploadData, dynamic reportProjectScope)
     {
         // take a submit lock
         // go through each EventParticipant
         // add them to the table
         // return CRUD results
-
+        dynamic updateContent = new System.Dynamic.ExpandoObject();
+        updateContent.message = "Uploading participants...";
+        updateContent.updateProgressType = "bulkEventParticipantUpload";
+        reportProjectScope.updateProgress(updateContent);
         var hubResult = dc.SubmitLock<HubResult>(() =>
         {
+            
             var defaultParticipantGroupID = uploadData.Value<int?>("participantGroupID");
             var defaultParticipantGroup = defaultParticipantGroupID.HasValue ? ParticipantGroup.FindByID(dc, defaultParticipantGroupID.Value) : null;
 
-            var defaultEventSessionID = uploadData.Value<int?>("eventSessionID"); 
+            var defaultEventSessionID = uploadData.Value<int?>("eventSessionID");
 
+            //var eventParticipantsCount = uploadData["itemsData"].Count;
+            var eventParticipantsCount = uploadData["itemsData"].Count();
+            var i = 1;
             var eventParticipants = uploadData["itemsData"]
                 .Select(itemData =>
                 {
-                  return CreateParticipantAndEventParticipant(dc, eventID, itemData, defaultParticipantGroup, defaultEventSessionID);
+                    updateContent.message = String.Format("Creating {0} of {1} students: {2} {3}", i++.ToString(), eventParticipantsCount, itemData["firstName"], itemData["lastName"]);
+                    reportProjectScope.updateProgress(updateContent);
+                    return CreateParticipantAndEventParticipant(dc, eventID, itemData, defaultParticipantGroup, defaultEventSessionID);
                 })
                 .ToArray();
 
+            updateContent.message = "Successfully created " + (i-1).ToString() + " students";
+            reportProjectScope.updateProgress(updateContent);
             return HubResult.CreateSuccessData(eventParticipants);
         });
 
