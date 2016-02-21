@@ -279,6 +279,17 @@ namespace App.Library
                 })
                 .ToArray();
 
+
+            //!! create a bulk delete TAG
+            int bulkTagIDThingy = 0;
+
+            string activityDescription = string.Format("Bulk Create {0} EventParticipant(s)",
+                /*0*/ eventParticipants.Length);
+            var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+            var activityType = ActivityType.BulkCreated;
+            ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
+
+
             return HubResult.CreateSuccessData(eventParticipants);
         });
 
