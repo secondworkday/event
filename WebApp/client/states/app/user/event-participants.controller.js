@@ -158,54 +158,52 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
 
 
 
+  // ** If we're not scoped to a single EventSession, provide filters to allow the User to filter by EventSession
 
   $scope.eventSessionFilters = [];
+  if (!$scope.eventSession) {
+    siteService.model.eventSessions.search($scope.searchViewOptions.baseFilter.serverTerm, "", 0, 999999)
+    .then(function (itemsData) {
+      console.log("setting up eventSessionFilters", itemsData);
 
-  //
-  siteService.model.eventSessions.search($scope.searchViewOptions.baseFilter.serverTerm, "", 0, 999999)
-  .then(function (itemsData) {
-    console.log("setting up eventSessionFilters", itemsData);
-
-
-    var indexer = {
-      index: [],
-      sort: utilityService.compareByProperties('id'),
-      filter: utilityService.filterByPropertyHasValue('!eventSessionID')
-    };
-    utilityService.registerIndexer($scope.model.eventParticipants, indexer);
-    // Push a filter on the filter stack
-    $scope.eventSessionFilters.push(
-    {
-      name: "Unregistered",
-      indexer: indexer,
-      serverTerm: '$eventSession:',
-      clientFunction: utilityService.filterByPropertyHasValue('!eventSessionID')
-    });
-
-
-
-    angular.forEach(itemsData.ids, function (itemID) {
-      var item = itemsData.hashMap[itemID];
-      // create and register an indexer - so we can track the membership count in this group
-      // (remember to unregister them in $scope.$on("$destroy");
+      // ** Create an "Unregistered" EventSession indexer
       var indexer = {
         index: [],
         sort: utilityService.compareByProperties('id'),
-        filter: utilityService.filterByPropertyValue('eventSessionID', itemID)
+        filter: utilityService.filterByPropertyHasValue('!eventSessionID')
       };
       utilityService.registerIndexer($scope.model.eventParticipants, indexer);
       // Push a filter on the filter stack
       $scope.eventSessionFilters.push(
       {
-        name: item.name,
+        name: "Unregistered",
         indexer: indexer,
-        serverTerm: '$eventSession:' + itemID,
-        clientFunction: utilityService.filterByPropertyValue('eventSessionID', itemID)
+        serverTerm: '$eventSession:',
+        clientFunction: utilityService.filterByPropertyHasValue('!eventSessionID')
+      });
+
+      // ** Create indexers for all the other EventSessions
+      angular.forEach(itemsData.ids, function (itemID) {
+        var item = itemsData.hashMap[itemID];
+        // create and register an indexer - so we can track the membership count in this group
+        // (remember to unregister them in $scope.$on("$destroy");
+        var indexer = {
+          index: [],
+          sort: utilityService.compareByProperties('id'),
+          filter: utilityService.filterByPropertyValue('eventSessionID', itemID)
+        };
+        utilityService.registerIndexer($scope.model.eventParticipants, indexer);
+        // Push a filter on the filter stack
+        $scope.eventSessionFilters.push(
+        {
+          name: item.name,
+          indexer: indexer,
+          serverTerm: '$eventSession:' + itemID,
+          clientFunction: utilityService.filterByPropertyValue('eventSessionID', itemID)
+        });
       });
     });
-  });
-
-
+  }
 
 
 
