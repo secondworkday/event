@@ -154,7 +154,7 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
 
   $scope.searchViewOptions = {
     sort: $scope.sortOptions[0],
-    filter: $scope.filterOptions[2],
+    selectFilter: $scope.filterOptions[2],
     participantGroupSearch: null
   };
 
@@ -181,7 +181,7 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
 
   $scope.searchParticipantViewOptions = {
     sort: $scope.sortOptions[0],
-    filter: $scope.filterOptions[2],
+    selectFilter: $scope.filterOptions[2],
     participantSearch: null
   };
 

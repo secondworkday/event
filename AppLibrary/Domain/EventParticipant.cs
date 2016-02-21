@@ -192,6 +192,13 @@ namespace App.Library
 
       //!! TODO remove any Tags that have their last reference with this Pipeline
       //!! Should we have an ExtendedObject call to remove all extended properties?
+
+      string activityDescription = "Deleted 1 EventParticipant";
+      var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+      var activityType = ActivityType.Deleted;
+      ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), itemID);
+
+
       dc.SubmitChanges();
 
       var notifyExpression = new NotifyExpression();
@@ -200,6 +207,56 @@ namespace App.Library
 
       return HubResult.Success;
     }
+
+    public static HubResult Delete(AppDC dc, int[] itemIDs)
+    {
+        Debug.Assert(itemIDs != null);
+        if (itemIDs == null)
+        {
+            return HubResult.Error;
+        }
+        if (!itemIDs.Any())
+        {
+            return HubResult.NotFound;
+        }
+
+        dc.SubmitLock(() =>
+        {
+            var deleteItems = dc.EventParticipants
+                .Where(item => itemIDs.Contains(item.ID));
+
+            //!! TODO remove any Tags that have their last reference with this Pipeline
+            //!! Should we have an ExtendedObject call to remove all extended properties?
+
+
+            //!! We won't delete Participant
+            dc.EventParticipants.DeleteAllOnSubmit(deleteItems);
+
+            //!! create a bulk delete TAG
+            int bulkTagIDThingy = 0;
+
+            string activityDescription = string.Format("Bulk Delete {0} EventParticipant(s)",
+                /*0*/ itemIDs.Length);
+            var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+            var activityType = ActivityType.BulkDeleted;
+            ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
+        });
+
+        var notifyExpression = new NotifyExpression();
+        itemIDs.ForEach(itemID =>
+        {
+            notifyExpression.AddDeletedID(itemID);
+        });
+        NotifyClients(dc, notifyExpression);
+
+        return HubResult.Success;
+    }
+
+
+
+
+
+
 
     public static HubResult Upload(AppDC dc, int eventID, JToken uploadData, dynamic reportProjectScope)
     {

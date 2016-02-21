@@ -34,14 +34,14 @@
 </div>
 
 <div layout
-  ng-show="showMultiSelectActions">
+  ng-show="$selectedIndex && $selectedIndex.length > 0">
   <div flex="15"></div>
   <div flex layout layout-align="end center">
-    <span class="tag">99 Selected <i ng-click="unselectAll()" class="fa fa-times u-clickable"></i></span>
+    <span class="tag">{{$selectedIndex.length}} Selected <i ng-click="unselectAll()" class="fa fa-times u-clickable"></i></span>
     <md-button ng-click="DO_SOMETHING()"><i class="fa fa-pencil"></i> Bulk Edit</md-button>
     <md-button ng-click="DO_SOMETHING()"><i class="fa fa-check"></i> Check-In</md-button>
     <md-button ng-click="DO_SOMETHING()"><i class="fa fa-undo"></i> Set Not Checked-In</md-button>
-    <md-button ng-click="DO_SOMETHING()" class="md-warn"><i class="fa fa-remove"></i> Delete</md-button>
+    <md-button ng-click="deleteEventParticipants()" class="md-warn"><i class="fa fa-remove"></i> Delete</md-button>
   </div>
 </div>
 
@@ -108,7 +108,12 @@
               ng-init="eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID); watchEventParticipantEventSession(this, 'eventParticipant.eventSessionID');
               eventParticipantParticipantGroup = demandParticipantGroup(eventParticipant.participantGroupID);">
             <td flex="5" class="table-data text-center">
-              <md-checkbox style="margin:0;" ng-model="eventParticipant.isSelected" ng-click="multiSelectOn()" aria-label="select {{eventParticipant.firstName}} {{eventParticipant.lastName}}"></md-checkbox>
+              <md-checkbox style="margin:0;" 
+                ng-checked="selectedIndexContains(eventParticipant)"
+                ng-click="toggleSelectedIndex(eventParticipant)"
+                aria-label="select {{eventParticipant.firstName}} {{eventParticipant.lastName}}">
+
+              </md-checkbox>
             </td>
             <td flex="10" class="table-data text-left">{{ eventParticipant.lastName }}</td>
             <td flex="10" class="table-data text-left">{{ eventParticipant.firstName }}</td>

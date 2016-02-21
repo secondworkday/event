@@ -5,7 +5,7 @@
 <div layout layout-align="start start">
   <div flex class="u-sm-margin-right">
     <md-input-container class="md-block" flex style="margin:0;padding:0;">
-      <label><i class="fa fa-search"></i> Search history</label>
+      <label><i class="fa fa-search"></i> Search</label>
       <input ng-model="searchViewOptions.userSearch">
     </md-input-container>
   </div>
@@ -15,14 +15,22 @@
 
 </div>
 <div ms-debug-only><pre>sampleActivities: {{sampleActivities | json}}</pre></div>
-<div> <!-- //!! TODO add ms-search-view here -->
+
+<ms-search-view change-event="updateActivityLog" search="searchActivityLog" options="searchViewOptions">
+
   <div class="md-body-1 text-support"
-    ng-repeat="activity in sampleActivities | orderBy:'-timeStamp'"
-    ng-switch on="activity.type">
+    ng-repeat="activity in $displayedIndex | objectLookup:$hashMap track by activity.id"
+    ng-switch on="activity.activityType + activity.targetTable"
+    ng-init="user = demandUser(activity.createdByUserID)"
+    >
+
     <div ng-show="!$first" style="height:.25rem;"></div>
-    <span ng-switch-when="bulkAddParticipants">
+
+    <div ms-debug-only><pre>activity: {{activity | json}}</pre></div>
+
+    <span ng-switch-when="BulkCreatedEventParticipant">
       <a href="#" class="no-style text-support text-bold">
-        {{activity.actor}}
+        {{user.displayName}}
       </a>
       <span> added </span>
       <a href="#" class="no-style text-support text-bold">{{activity.amount}} {{'PARTICIPANTS' | translate | lowercase}}</a>
@@ -43,7 +51,7 @@
         <i class="fa fa-undo"></i> undo
       </a>
       <span class="u-sm-margin-left">
-         <span class="md-caption" am-time-ago="activity.timeStamp"></span>
+         <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
       </span>
       <div class="activity-log-details"
         ng-show="activity.showDetails">
@@ -56,6 +64,7 @@
         mollit anim id est laborum.
       </div>
     </span>
+
     <span ng-switch-when="singleAddParticipant">
       <a href="#" class="no-style text-support text-bold">{{activity.actor}}</a>
       <span> added a {{'PARTICIPANT' | translate | lowercase}} named </span>
@@ -67,8 +76,9 @@
         <span class="md-caption" am-time-ago="activity.timeStamp"></span>
       </span>
     </span>
-    <span ng-switch-when="bulkDeleteParticipants">
-      <a href="#" class="no-style text-support text-bold">{{activity.actor}}</a>
+
+    <span ng-switch-when="BulkDeletedEventParticipant">
+      <a href="#" class="no-style text-support text-bold">{{user.displayName}}</a>
       <span> deleted </span>
       <a href="#" class="no-style text-support text-bold">{{activity.amount}} {{'PARTICIPANTS' | translate | lowercase}}</a>
       <span> from this {{activity.target}}. </span>
@@ -83,7 +93,7 @@
         hide details
       </a>
       <span class="u-sm-margin-left">
-       <span class="md-caption" am-time-ago="activity.timeStamp"></span>
+       <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
       </span>
       <div class="activity-log-details"
         ng-show="activity.showDetails">
@@ -98,4 +108,4 @@
     </span>
     <div style="height:.25rem;"></div>
   </div>
-</div>
+</ms-search-view>

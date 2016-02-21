@@ -1,9 +1,55 @@
-app.controller('EventParticipantsController', function ($scope, $mdDialog, $log, $msUI, utilityService, siteService, event, eventSession) {
+app.controller('EventParticipantsController', function ($scope, $translate, $mdDialog, $log, $msUI, utilityService, siteService, event, eventSession) {
   $log.debug('Loading EventParticipantsController...');
 
   $scope.searchHandler = siteService.model.eventParticipants.search;
   $scope.demandParticipantGroup = siteService.demandParticipantGroup;
   $scope.demandEventSession = siteService.demandEventSession;
+
+
+  //!! multi-select stuff
+  //!! I think we'll want to move this insde ms-search-view
+
+  //!! We need a separate Index because we'll need the ability to "select" items that aren't yet loaded into the view ...
+  $scope.$selectedIndex = [];
+
+  $scope.toggleList = function (list, item) {
+    var idx = list.indexOf(item);
+    if (idx > -1) {
+      // toggle off...
+      list.splice(idx, 1);
+    }
+    else {
+      // toggle on...
+      list.push(item);
+    }
+  };
+  $scope.listContains = function (list, item) {
+    return list.indexOf(item) > -1;
+  };
+
+  $scope.toggleSelectedIndex = function (item) {
+    $scope.toggleList($scope.$selectedIndex, item.id);
+  };
+  $scope.selectedIndexContains = function (item) {
+    return $scope.listContains($scope.$selectedIndex, item.id);
+  };
+
+  $scope.unselectAll = function () {
+    $scope.$selectedIndex = [];
+  };
+
+  $scope.toggleSelectAll = function () {
+    if ($scope.$selectedIndex && $scope.$selectedIndex.length > 0) {
+      $scope.$selectedIndex = [];
+    } else {
+      //!! fetch 'em and select all
+    }
+  };
+
+
+
+
+
 
 
   $scope.event = event;
@@ -17,21 +63,13 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
   // Establish our Base filtering (evaluatuating in order of most restrictive to least restrictive)
   if ($scope.eventSession) {
     // filter to one EventSession
-    $scope.searchViewOptions.baseFilters = { serverTerm: '$eventSession:' + $scope.eventSession.id, clientFunction: utilityService.filterByPropertyValue('eventSessionID', $scope.eventSession.id) };
+    $scope.searchViewOptions.baseFilter = { serverTerm: '$eventSession:' + $scope.eventSession.id, clientFunction: utilityService.filterByPropertyValue('eventSessionID', $scope.eventSession.id) };
   } else if ($scope.event) {
     // filter to one Event
-    $scope.searchViewOptions.baseFilters = { serverTerm: '$event:' + $scope.event.id, clientFunction: utilityService.filterByPropertyValue('eventID', $scope.event.id) };
+    $scope.searchViewOptions.baseFilter = { serverTerm: '$event:' + $scope.event.id, clientFunction: utilityService.filterByPropertyValue('eventID', $scope.event.id) };
   } else {
     // no filtering
   }
-
-  $scope.showMultiSelectActions = false;
-  //!! TODO make show the showMultiSelectActions only when items are selected
-  // instead of using this little hack
-  $scope.multiSelectOn = function(){
-    $scope.showMultiSelectActions = true;
-  };
-
 
 
   $scope.sortOptions = [
@@ -124,7 +162,7 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
   $scope.eventSessionFilters = [];
 
   //
-  siteService.model.eventSessions.search($scope.searchViewOptions.baseFilters.serverTerm, "", 0, 999999)
+  siteService.model.eventSessions.search($scope.searchViewOptions.baseFilter.serverTerm, "", 0, 999999)
   .then(function (itemsData) {
     console.log("setting up eventSessionFilters", itemsData);
 
@@ -185,7 +223,7 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 
   $scope.participantGroupFilters = [];
 
-  siteService.model.participantGroups.search($scope.searchViewOptions.baseFilters.serverTerm, "", 0, 999999)
+  siteService.model.participantGroups.search($scope.searchViewOptions.baseFilter.serverTerm, "", 0, 999999)
   .then(function (itemsData) {
     console.log("setting up participantGroupsFilters", itemsData);
 
@@ -428,15 +466,38 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
     });
   };
 
+
+  $scope.deleteEventParticipants = function () {
+
+    var itemIDs = $scope.$selectedIndex;
+
+    siteService.deleteEventParticipants(itemIDs)
+    .then(function (successData) {
+      // success
+      //!! fix the pluralization here - or perhaps improve upon the Toast
+
+      var PARTICIPANT = $translate.instant('PARTICIPANT');
+      $msUI.showToast(itemIDs.length + " " + PARTICIPANT + "(s) Deleted");
+      $log.debug(itemIDs.length + " Event Participant(s) Deleted.");
+      return successData;
+    }, function (failureData) {
+      // failure
+      $msUI.showToast(failureData.errorMessage);
+      $log.debug(failureData.errorMessage);
+      return failureData;
+    });
+  };
+
+
   $scope.download = function () {
 
     var searchExpression = utilityService.buildSearchExpression(
-      $scope.searchViewOptions.baseFilters,
+      $scope.searchViewOptions.baseFilter,
       $scope.searchViewOptions.stackFilters,
 
       $scope.searchViewOptions.filter,
       $scope.searchViewOptions.selectFilter,
-      $scope.searchViewOptions.userFilter,
+      $scope.searchViewOptions.objectFilter,
       $scope.searchViewOptions.userSearch);
 
     var query = {
@@ -455,7 +516,7 @@ app.controller('EventParticipantsController', function ($scope, $mdDialog, $log,
 
   // pre-load all our baseFilters participants - which loads up our Indexers
   var searchExpression = utilityService.buildSearchExpression(
-    $scope.searchViewOptions.baseFilters);
+    $scope.searchViewOptions.baseFilter);
   $scope.searchHandler(searchExpression, "", 0, 99999);
 
 });
