@@ -10,20 +10,20 @@
   self.showToast = function (content, context) {
     if (activeToastContent === content || (activeToastContext && activeToastContext === context)) {
       // freshen our existing toast - no need to flicker to show a new one
-      $mdToast.updateContent(content);
+      $mdToast.updateTextContent(content);
     }
     else {
       activeToast = $mdToast.show(
         $mdToast.simple()
           .content(content)
-          .hideDelay(0))
-      .finally(function () {
-        // this toast dismissed - we can't resuse it anymore
-        $timeout.cancel(activeToastTimeout);
-        activeToastContent = undefined;
-        activeToastContext = undefined;
-        activeToastTimeout = undefined;
-      });
+          .hideDelay(0));
+      //.finally(function () {
+      //  // this toast dismissed - we can't resuse it anymore
+      //  $timeout.cancel(activeToastTimeout);
+      //  activeToastContent = undefined;
+      //  activeToastContext = undefined;
+      //  activeToastTimeout = undefined;
+      //});
     }
 
     activeToastContent = content;
@@ -33,6 +33,9 @@
     $timeout.cancel(activeToastTimeout);
     activeToastTimeout = $timeout(function () {
       $mdToast.cancel();
+        activeToastContent = undefined;
+        activeToastContext = undefined;
+        activeToastTimeout = undefined;
     }, 3000);
 
     return activeToast;

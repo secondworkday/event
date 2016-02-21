@@ -668,7 +668,7 @@ namespace WebApp
         {
             return accountsOnlyHeader((siteContext, dc) =>
             {
-                var result = EventParticipant.Upload(dc, eventID, data);
+                var result = EventParticipant.Upload(dc, eventID, data, Clients.Caller);
                 return HubResult.CreateSuccessData(result);
             });
         }

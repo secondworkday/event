@@ -90,7 +90,7 @@ app.controller('UploadParticipantsDialogController', function ($scope, $mdDialog
         { firstName: 'barney', lastName: 'rubble', participantGroupName: "Stella Schola" },
         { firstName: 'fred', lastName: 'flintstone', participantGroupID: 3 }]
     };
-
+    $msUI.showToast("Uploading " + $scope.uploadData.itemsData.length + " students", "bulkEventParticipantUpload");
     siteService.uploadEventParticipants(event, $scope.uploadData);
     $mdDialog.hide();
   };

@@ -1,4 +1,5 @@
-app.controller('ReportController', function ($scope, $log, $mdDialog, utilityService, siteService) {
+
+app.controller('ReportController', function ($scope, $log, $mdDialog, $msUI, utilityService, siteService) {
   var participants = siteService.model.participants;
   var participantGroups = siteService.model.participantGroups;
 
@@ -28,6 +29,7 @@ app.controller('ReportController', function ($scope, $log, $mdDialog, utilitySer
       // $scope.status = 'You cancelled the dialog.';
     });
   }
+
   function GenerateRemindersDialogController($scope, $mdDialog, $filter, utilityService, participantGroupsIndex, eventSessionsIndex, eventParticipantsIndex) {
     $scope.participantGroups = siteService.model.participantGroups;
     $scope.eventSessions = siteService.model.eventSessions;
@@ -62,13 +64,13 @@ app.controller('ReportController', function ($scope, $log, $mdDialog, utilitySer
       $mdDialog.cancel();
     };
 
-    $scope.downloadReport = function (participantGroupID) {
-      var query = {
-        type: 'reminderFormForSchool',
-        participantGroupID: participantGroupID
-      };
-      utilityService.download(query);
-    }
+    //$scope.downloadReport = function (participantGroupID) {
+    //  var query = {
+    //    type: 'reminderFormForSchool',
+    //    participantGroupID: participantGroupID
+    //  };
+    //  utilityService.download(query);
+    //}
 
     $scope.downloadReminderForm = function (eventSessionID, participantGroupID) {
       var query = {
@@ -94,6 +96,10 @@ app.controller('EventController', function ($scope, $log, $state, $mdDialog, $ms
       return pgID == participantGroupID;
     }).length;
   };
+
+  $scope.$on("updateProgress", function (event, data) {
+    $msUI.showToast(data.message, data.updateProgressType);
+  });
 });
 
 app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msUI, utilityService, siteService) {
@@ -330,7 +336,7 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
       fullscreen: false,
       locals: {
         newOrEdit: "New",
-        participantGroup : null
+        participantGroup: null
       }
     })
     .then(function () {

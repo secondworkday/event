@@ -1301,8 +1301,7 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
   this.updateParticipants = function (itemsData) {
     $rootScope.$apply(utilityService.updateItemsModel(model.participants, itemsData));
-  }
-
+  };
 
 
 
@@ -1356,11 +1355,11 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
   }).on('updateClients', function (itemsData) {
     $rootScope.$apply($rootScope.$broadcast('updateClients', utilityService.updateItemsModel(model.clients, itemsData)));
+  }).on('updateProgress', function (progressData) {
+    $rootScope.$apply($rootScope.$broadcast('updateProgress', progressData));
   }).on('touchInit', function (touchData) {
     $rootScope.$apply(onTouchData(touchData));
   });
-
-
 
   function onSetAuthenticatedEventSession(itemsData) {
     // usersData is expected to contain just one user - the authenticated user
