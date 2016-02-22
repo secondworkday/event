@@ -1,49 +1,16 @@
-<div layout>
+<div layout layout-align="start center">
   <div flex>
-    <md-input-container class="md-block" flex-gt-sm>
-      <label><i class="fa fa-search"></i> Search for {{'PARTICIPANT' | translate | lowercase}} name or {{'PARTICIPANT_GROUP' | translate | lowercase}}</label>
-      <input ng-model="searchViewOptions.userSearch">
-    </md-input-container>
+    <h2 class="md-title">
+      {{'PARTICIPANTS' | translate}}
+    </h2>
   </div>
-  <div>
-    <md-menu md-position-mode="target-right target">
-      <md-button aria-label="Open sort menu" class="md-icon-button" ng-click="$mdOpenMenu()">
-        <i md-menu-origin class="fa fa-sort"></i>
-      </md-button>
-      <md-menu-content width="4">
-        <md-menu-item ng-repeat="sortOption in sortOptions">
-          <md-button ng-click="searchViewOptions.sort = sortOption">
-            {{sortOption.name}}
-          </md-button>
-        </md-menu-item>
-      </md-menu-content>
-    </md-menu>
-    <!-- //!! TODO make sure the ms-hide directive is hiding these buttons     <span ms-hide="['EventPlanner', 'EventSessionVolunteer']">   -->
-    <span ms-hide="'EventSessionVolunteer'">
-      <md-button ng-click="download()" class="md-icon-button" aria-label="download">
-        <i class="fa fa-download"></i>
-      </md-button>
-      <md-button ng-click="showUploadParticipantsDialog($event, event)" class="md-icon-button" aria-label="upload">
-        <i class="fa fa-upload"></i>
-      </md-button>
-      <md-button ng-click="showAddParticipantsDialog($event, event)" class="md-fab md-primary" aria-label="new">
-        <i class="fa fa-plus fa-lg"></i>
-      </md-button>
-    </span>
-  </div>
+  <span ms-hide="'EventSessionVolunteer'">
+    <md-button ng-click="download()"><i class="fa fa-download"></i> Download {{'PARTICIPANTS' | translate}}</md-button>
+    <md-button ng-click="showUploadParticipantsDialog($event, event)"><i class="fa fa-upload"></i> Upload {{'PARTICIPANTS' | translate}}</md-button>
+    <md-button ng-click="showAddParticipantsDialog($event, event)" class="md-primary"><i class="fa fa-plus"></i> Add {{'PARTICIPANT' | translate}}</md-button>
+  </span>
 </div>
 
-<div layout
-  ng-if="$selectedIndex && $selectedIndex.length > 0">
-  <div flex="15"></div>
-  <div flex layout layout-align="end center">
-    <span class="tag">{{$selectedIndex.length}} Selected <i ng-click="unselectAll()" class="fa fa-times u-clickable"></i></span>
-    <md-button ng-click="showBulkEditParticipantsDialog($event)"><i class="fa fa-pencil"></i> Bulk Edit</md-button>
-    <md-button ng-click="checkInEventParticipants()"><i class="fa fa-check"></i> Check-In</md-button>
-    <md-button ng-click="undoCheckInEventParticipants()"><i class="fa fa-undo"></i> Set Not Checked-In</md-button>
-    <md-button ng-click="deleteEventParticipants()" class="md-warn"><i class="fa fa-remove"></i> Delete</md-button>
-  </div>
-</div>
 
 <section layout>
   <div class="u-sm-margin-right" flex="15">
@@ -85,6 +52,40 @@
 
   </div>
   <div flex>
+    <div layout layout-align="start center"
+      ng-hide="$selectedIndex && $selectedIndex.length > 0">
+      <div flex>
+        <md-input-container class="md-block" flex-gt-sm style="margin-top:0;margin-bottom:0;">
+          <label><i class="fa fa-search"></i> Search for {{'PARTICIPANT' | translate | lowercase}} name or {{'PARTICIPANT_GROUP' | translate | lowercase}}</label>
+          <input ng-model="searchViewOptions.userSearch">
+        </md-input-container>
+      </div>
+      <div style="margin-top:-6px;">
+        <md-menu md-position-mode="target-right target">
+          <md-button aria-label="Open sort menu" ng-click="$mdOpenMenu()" style="margin-top:0;margin-bottom:0;">
+            <i md-menu-origin class="fa fa-sort"></i> Sort
+          </md-button>
+          <md-menu-content width="4">
+            <md-menu-item ng-repeat="sortOption in sortOptions">
+              <md-button ng-click="searchViewOptions.sort = sortOption">
+                {{sortOption.name}}
+              </md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+      </div>
+    </div>
+    <div layout style="height:58px;"
+      ng-if="$selectedIndex && $selectedIndex.length > 0">
+      <div flex="15"></div>
+      <div flex layout layout-align="end center">
+        <span class="tag">{{$selectedIndex.length}} Selected <i ng-click="unselectAll()" class="fa fa-times u-clickable"></i></span>
+        <md-button ng-click="showBulkEditParticipantsDialog($event)"><i class="fa fa-pencil"></i> Bulk Edit</md-button>
+        <md-button ng-click="checkInEventParticipants()"><i class="fa fa-check"></i> Check-In</md-button>
+        <md-button ng-click="undoCheckInEventParticipants()"><i class="fa fa-undo"></i> Set Not Checked-In</md-button>
+        <md-button ng-click="deleteEventParticipants()" class="md-warn"><i class="fa fa-remove"></i> Delete</md-button>
+      </div>
+    </div>
     <ms-search-view change-event="updateEventParticipants" search="searchHandler" options="searchViewOptions" user-search="userSearch">
       <table class="u-full-width table" id="datagrid" style="padding:3px;">
         <thead fsm-sticky-header scroll-body="'#datagrid'" scroll-stop="64" class="sticky-header-style">
