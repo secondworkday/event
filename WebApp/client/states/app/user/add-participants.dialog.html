@@ -49,6 +49,12 @@
             </md-option>
           </md-select>
         </md-input-container>
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Notes</label>
+            <textarea ng-model="formData.notes"></textarea>
+          </md-input-container>
+        </div>
         <br />
         <!--<md-button ng-disabled="!formData.participantGroupID" ng-click="generateRandomParticipants(formData.participantGroupID, 25)"><i class="fa fa-magic"></i> Generate 25 {{'PARTICIPANTS' | translate}}</md-button>-->
       </div>

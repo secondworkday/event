@@ -731,7 +731,17 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
   };
 
 
+  self.checkInEventParticipants = function (itemIDs) {
+    return utilityService.callHub(function () {
+      return siteHub.server.checkInEventParticipants(itemIDs);
+    });
+  };
 
+  self.undoCheckInEventParticipants = function (itemIDs) {
+    return utilityService.callHub(function () {
+      return siteHub.server.undoCheckInEventParticipants(itemIDs);
+  });
+};
 
   self.checkInEventParticipant = function (item) {
     return utilityService.callHub(function () {

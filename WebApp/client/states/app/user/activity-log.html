@@ -19,14 +19,35 @@
 <ms-search-view change-event="updateActivityLog" search="searchActivityLog" options="searchViewOptions">
 
   <div class="md-body-1 text-support"
-    ng-repeat="activity in $displayedIndex | objectLookup:$hashMap track by activity.id"
-    ng-switch on="activity.activityType + activity.targetTable"
-    ng-init="user = demandUser(activity.createdByUserID)"
-    >
+       ng-repeat="activity in $displayedIndex | objectLookup:$hashMap track by activity.id"
+       ng-switch on="activity.activityType + activity.targetTable"
+       ng-init="user = demandUser(activity.createdByUserID)">
 
     <div ng-show="!$first" style="height:.25rem;"></div>
 
     <div ms-debug-only><pre>activity: {{activity | json}}</pre></div>
+
+    <span ng-switch-when="BulkCheckInEventParticipant">
+      <a href="#" class="no-style text-support text-bold">
+        {{user.displayName}}
+      </a>
+      <span> checked-in </span>
+      <a href="#" class="no-style text-support text-bold">{{activity.amount}} {{'PARTICIPANTS' | translate | lowercase}}</a>
+      <span class="u-sm-margin-left">
+        <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
+      </span>
+    </span>
+
+    <span ng-switch-when="BulkUndoCheckInEventParticipant">
+      <a href="#" class="no-style text-support text-bold">
+        {{user.displayName}}
+      </a>
+      <span> undid check-in for </span>
+      <a href="#" class="no-style text-support text-bold">{{activity.amount}} {{'PARTICIPANTS' | translate | lowercase}}</a>
+      <span class="u-sm-margin-left">
+        <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
+      </span>
+    </span>
 
     <span ng-switch-when="BulkCreatedEventParticipant">
       <a href="#" class="no-style text-support text-bold">
@@ -36,25 +57,25 @@
       <a href="#" class="no-style text-support text-bold">{{activity.amount}} {{'PARTICIPANTS' | translate | lowercase}}</a>
       <span> to this {{activity.target}}. </span>
       <a href="#" class="md-caption u-sm-margin-left"
-        ng-hide="activity.showDetails"
-        ng-click="activity.showDetails = !activity.showDetails">
+         ng-hide="activity.showDetails"
+         ng-click="activity.showDetails = !activity.showDetails">
         show details
       </a>
       <a href="#" class="md-caption u-sm-margin-left"
-        ng-show="activity.showDetails"
-        ng-click="activity.showDetails = !activity.showDetails">
+         ng-show="activity.showDetails"
+         ng-click="activity.showDetails = !activity.showDetails">
         hide details
       </a>
       <a href="#" class="md-caption text-red text-bold u-sm-margin-left"
-        ng-show="$first"
-        ng-click="undoActivity()">
+         ng-show="$first"
+         ng-click="undoActivity()">
         <i class="fa fa-undo"></i> undo
       </a>
       <span class="u-sm-margin-left">
-         <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
+        <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
       </span>
       <div class="activity-log-details"
-        ng-show="activity.showDetails">
+           ng-show="activity.showDetails">
         Details go here Lorem ipsum dolor sit amet, consectetur adipisicing elit,
         sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
         enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
@@ -83,20 +104,20 @@
       <a href="#" class="no-style text-support text-bold">{{activity.amount}} {{'PARTICIPANTS' | translate | lowercase}}</a>
       <span> from this {{activity.target}}. </span>
       <a href="#" class="md-caption u-sm-margin-left"
-        ng-hide="activity.showDetails"
-        ng-click="activity.showDetails = !activity.showDetails">
+         ng-hide="activity.showDetails"
+         ng-click="activity.showDetails = !activity.showDetails">
         show details
       </a>
       <a href="#" class="md-caption u-sm-margin-left"
-        ng-show="activity.showDetails"
-        ng-click="activity.showDetails = !activity.showDetails">
+         ng-show="activity.showDetails"
+         ng-click="activity.showDetails = !activity.showDetails">
         hide details
       </a>
       <span class="u-sm-margin-left">
-       <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
+        <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
       </span>
       <div class="activity-log-details"
-        ng-show="activity.showDetails">
+           ng-show="activity.showDetails">
         Details go here Lorem ipsum dolor sit amet, consectetur adipisicing elit,
         sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
         enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut

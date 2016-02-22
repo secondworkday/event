@@ -141,89 +141,91 @@ namespace App.Library
 
 
 
-    public static int? CreateParticipantAndEventParticipant(AppDC dc, int eventID, JToken data)
-    {
-      var defaultParticipantGroupID = data.Value<int?>("participantGroupID");
-      var defaultParticipantGroup = defaultParticipantGroupID.HasValue ? ParticipantGroup.FindByID(dc, defaultParticipantGroupID.Value) : null;
-
-      //return CreateParticipantAndEventParticipant(dc, eventID, data, defaultParticipantGroup, null);
-      return CreateParticipantAndEventParticipant(dc, eventID, data, null, null);
-    }
-
-    public static HubResult Edit(AppDC dc, int itemID, dynamic data)
-    {
-      return WriteLock(dc, itemID, (item, notifyExpression) =>
-      {
-        item.updateData(dc, data);
-
-        notifyExpression.AddModifiedID(item.ID);
-        return HubResult.Success;
-      });
-    }
-
-    private void updateData(AppDC dc, dynamic data)
-    {
-      
-      // Update Participant
-      Participant.Edit(dc, this.ParticipantID, data);
-
-      // Update EventParticipant
-      var eventSessionID = (int?)data.eventSessionID;
-      if (eventSessionID.HasValue)
-      {
-        this.EventSessionID = eventSessionID;
-      }
-      this.Grade = (uint)data.grade;
-    }
-
-    public static HubResult Delete(AppDC dc, int itemID)
-    {
-      var deleteItem = dc.EventParticipants
-          .FirstOrDefault(item => item.ID == itemID);
-      Debug.Assert(deleteItem != null);
-
-      if (deleteItem == null)
-      {
-        return HubResult.NotFound;
-      }
-
-      //!! We won't delete Participant
-      dc.EventParticipants.DeleteOnSubmit(deleteItem);
-
-      //!! TODO remove any Tags that have their last reference with this Pipeline
-      //!! Should we have an ExtendedObject call to remove all extended properties?
-
-      string activityDescription = "Deleted 1 EventParticipant";
-      var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
-      var activityType = ActivityType.Deleted;
-      ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), itemID);
-
-
-      dc.SubmitChanges();
-
-      var notifyExpression = new NotifyExpression();
-      notifyExpression.AddDeletedID(itemID);
-      NotifyClients(dc, notifyExpression);
-
-      return HubResult.Success;
-    }
-
-    public static HubResult Delete(AppDC dc, int[] itemIDs)
-    {
-        Debug.Assert(itemIDs != null);
-        if (itemIDs == null)
+        public static int? CreateParticipantAndEventParticipant(AppDC dc, int eventID, JToken data)
         {
-            return HubResult.Error;
-        }
-        if (!itemIDs.Any())
-        {
-            return HubResult.NotFound;
+            var defaultParticipantGroupID = data.Value<int?>("participantGroupID");
+            var defaultParticipantGroup = defaultParticipantGroupID.HasValue ? ParticipantGroup.FindByID(dc, defaultParticipantGroupID.Value) : null;
+
+            //return CreateParticipantAndEventParticipant(dc, eventID, data, defaultParticipantGroup, null);
+            return CreateParticipantAndEventParticipant(dc, eventID, data, null, null);
         }
 
-        dc.SubmitLock(() =>
+        public static HubResult Edit(AppDC dc, int itemID, dynamic data)
         {
-            var deleteItems = dc.EventParticipants
-                .Where(item => itemIDs.Contains(item.ID));
+            return WriteLock(dc, itemID, (item, notifyExpression) =>
+            {
+                item.updateData(dc, data);
+
+                notifyExpression.AddModifiedID(item.ID);
+                return HubResult.Success;
+            });
+        }
+
+        private void updateData(AppDC dc, dynamic data)
+        {
+
+            // Update Participant
+            Participant.Edit(dc, this.ParticipantID, data);
+
+            // Update EventParticipant
+            var eventSessionID = (int?)data.eventSessionID;
+            if (eventSessionID.HasValue)
+            {
+                this.EventSessionID = eventSessionID;
+            }
+
+            this.SetNotes(dc, (string)data.notes);
+            this.Grade = (uint)data.grade;
+        }
+
+        public static HubResult Delete(AppDC dc, int itemID)
+        {
+            var deleteItem = dc.EventParticipants
+                .FirstOrDefault(item => item.ID == itemID);
+            Debug.Assert(deleteItem != null);
+
+            if (deleteItem == null)
+            {
+                return HubResult.NotFound;
+            }
+
+            //!! We won't delete Participant
+            dc.EventParticipants.DeleteOnSubmit(deleteItem);
+
+            //!! TODO remove any Tags that have their last reference with this Pipeline
+            //!! Should we have an ExtendedObject call to remove all extended properties?
+
+            string activityDescription = "Deleted 1 EventParticipant";
+            var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+            var activityType = ActivityType.Deleted;
+            ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), itemID);
+
+
+            dc.SubmitChanges();
+
+            var notifyExpression = new NotifyExpression();
+            notifyExpression.AddDeletedID(itemID);
+            NotifyClients(dc, notifyExpression);
+
+            return HubResult.Success;
+        }
+
+        public static HubResult Delete(AppDC dc, int[] itemIDs)
+        {
+            Debug.Assert(itemIDs != null);
+            if (itemIDs == null)
+            {
+                return HubResult.Error;
+            }
+            if (!itemIDs.Any())
+            {
+                return HubResult.NotFound;
+            }
+
+            dc.SubmitLock(() =>
+            {
+                var deleteItems = dc.EventParticipants
+                    .Where(item => itemIDs.Contains(item.ID));
 
             //!! TODO remove any Tags that have their last reference with this Pipeline
             //!! Should we have an ExtendedObject call to remove all extended properties?
@@ -235,162 +237,230 @@ namespace App.Library
             //!! create a bulk delete TAG
             int bulkTagIDThingy = 0;
 
-            string activityDescription = string.Format("Bulk Delete {0} EventParticipant(s)",
-                /*0*/ itemIDs.Length);
-            var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
-            var activityType = ActivityType.BulkDeleted;
-            ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
-        });
+                string activityDescription = string.Format("Bulk Delete {0} EventParticipant(s)",
+                    /*0*/ itemIDs.Length);
+                var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+                var activityType = ActivityType.BulkDeleted;
+                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
+            });
 
-        var notifyExpression = new NotifyExpression();
-        itemIDs.ForEach(itemID =>
+            var notifyExpression = new NotifyExpression();
+            itemIDs.ForEach(itemID =>
+            {
+                notifyExpression.AddDeletedID(itemID);
+            });
+            NotifyClients(dc, notifyExpression);
+
+            return HubResult.Success;
+        }
+
+
+
+
+
+
+
+        public static HubResult Upload(AppDC dc, int eventID, JToken uploadData, dynamic reportProjectScope)
         {
-            notifyExpression.AddDeletedID(itemID);
-        });
-        NotifyClients(dc, notifyExpression);
+            // take a submit lock
+            // go through each EventParticipant
+            // add them to the table
+            // return CRUD results
+            dynamic updateContent = new System.Dynamic.ExpandoObject();
+            updateContent.message = "Uploading participants...";
+            updateContent.updateProgressType = "bulkEventParticipantUpload";
+            reportProjectScope.updateProgress(updateContent);
+            var hubResult = dc.SubmitLock<HubResult>(() =>
+            {
 
-        return HubResult.Success;
-    }
+                var defaultParticipantGroupID = uploadData.Value<int?>("participantGroupID");
+                var defaultParticipantGroup = defaultParticipantGroupID.HasValue ? ParticipantGroup.FindByID(dc, defaultParticipantGroupID.Value) : null;
 
-
-
-
-
-
-
-    public static HubResult Upload(AppDC dc, int eventID, JToken uploadData, dynamic reportProjectScope)
-    {
-        // take a submit lock
-        // go through each EventParticipant
-        // add them to the table
-        // return CRUD results
-        dynamic updateContent = new System.Dynamic.ExpandoObject();
-        updateContent.message = "Uploading participants...";
-        updateContent.updateProgressType = "bulkEventParticipantUpload";
-        reportProjectScope.updateProgress(updateContent);
-        var hubResult = dc.SubmitLock<HubResult>(() =>
-        {
-            
-            var defaultParticipantGroupID = uploadData.Value<int?>("participantGroupID");
-            var defaultParticipantGroup = defaultParticipantGroupID.HasValue ? ParticipantGroup.FindByID(dc, defaultParticipantGroupID.Value) : null;
-
-            var defaultEventSessionID = uploadData.Value<int?>("eventSessionID");
+                var defaultEventSessionID = uploadData.Value<int?>("eventSessionID");
 
             //var eventParticipantsCount = uploadData["itemsData"].Count;
             var eventParticipantsCount = uploadData["itemsData"].Count();
-            var i = 1;
-            var eventParticipants = uploadData["itemsData"]
-                .Select(itemData =>
-                {
-                    updateContent.message = String.Format("Creating {0} of {1} students: {2} {3}", i++.ToString(), eventParticipantsCount, itemData["firstName"], itemData["lastName"]);
-                    reportProjectScope.updateProgress(updateContent);
-                    return CreateParticipantAndEventParticipant(dc, eventID, itemData, defaultParticipantGroup, defaultEventSessionID);
-                })
-                .ToArray();
+                var i = 1;
+                var eventParticipants = uploadData["itemsData"]
+                    .Select(itemData =>
+                    {
+                        updateContent.message = String.Format("Creating {0} of {1} students: {2} {3}", i++.ToString(), eventParticipantsCount, itemData["firstName"], itemData["lastName"]);
+                        reportProjectScope.updateProgress(updateContent);
+                        return CreateParticipantAndEventParticipant(dc, eventID, itemData, defaultParticipantGroup, defaultEventSessionID);
+                    })
+                    .ToArray();
 
-            updateContent.message = "Successfully created " + (i-1).ToString() + " students";
-            reportProjectScope.updateProgress(updateContent);
+                updateContent.message = "Successfully created " + (i - 1).ToString() + " students";
+                reportProjectScope.updateProgress(updateContent);
 
 
 
             //!! create a bulk activity TAG
             int bulkTagIDThingy = 0;
 
-            string activityDescription = string.Format("Bulk Create {0} EventParticipant(s)",
-                /*0*/ eventParticipants.Length);
-            var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
-            var activityType = ActivityType.BulkCreated;
-            ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
+                string activityDescription = string.Format("Bulk Create {0} EventParticipant(s)",
+                    /*0*/ eventParticipants.Length);
+                var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+                var activityType = ActivityType.BulkCreated;
+                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
 
 
 
 
 
-            return HubResult.CreateSuccessData(eventParticipants);
-        });
+                return HubResult.CreateSuccessData(eventParticipants);
+            });
 
-        return hubResult;
-    }
-
-    private static int? CreateParticipantAndEventParticipant(AppDC dc, int eventID, JToken itemData, ParticipantGroup defaultParticipantGroup, int? defaultEventSessionID)
-    {
-        var participantGroupID = itemData.Value<int?>("participantGroupID");
-        var participantGroupName = itemData.Value<string>("participantGroupName");
-
-        var participantGroup =
-            (participantGroupID.HasValue ? ParticipantGroup.FindByID(dc, participantGroupID.Value) : null) ??
-            (!string.IsNullOrEmpty(participantGroupName) ? ParticipantGroup.FindByName(dc, participantGroupName) : null) ??
-            defaultParticipantGroup;
-
-        Debug.Assert(participantGroup != null);
-        if (participantGroup == null)
-        {
-            //!! should return a reason code here ...
-            return (int?)null;
+            return hubResult;
         }
 
-        itemData["participantGroupID"] = participantGroup.ID;
-        var participant = Participant.Create(dc, itemData);
-        Debug.Assert(participant != null);
-        if (participant == null)
+        private static int? CreateParticipantAndEventParticipant(AppDC dc, int eventID, JToken itemData, ParticipantGroup defaultParticipantGroup, int? defaultEventSessionID)
         {
-            //!! should return a reason code here ...
-            return (int?)null;
+            var participantGroupID = itemData.Value<int?>("participantGroupID");
+            var participantGroupName = itemData.Value<string>("participantGroupName");
+
+            var participantGroup =
+                (participantGroupID.HasValue ? ParticipantGroup.FindByID(dc, participantGroupID.Value) : null) ??
+                (!string.IsNullOrEmpty(participantGroupName) ? ParticipantGroup.FindByName(dc, participantGroupName) : null) ??
+                defaultParticipantGroup;
+
+            Debug.Assert(participantGroup != null);
+            if (participantGroup == null)
+            {
+                //!! should return a reason code here ...
+                return (int?)null;
+            }
+
+            itemData["participantGroupID"] = participantGroup.ID;
+            var participant = Participant.Create(dc, itemData);
+            Debug.Assert(participant != null);
+            if (participant == null)
+            {
+                //!! should return a reason code here ...
+                return (int?)null;
+            }
+
+            itemData["eventID"] = eventID;
+            itemData["participantID"] = participant.ID;
+            if (defaultEventSessionID.HasValue)
+            {
+                itemData["eventSessionID"] = defaultEventSessionID.Value;
+            }
+            var eventParticipant = EventParticipant.Create(dc, itemData);
+            if (eventParticipant != null)
+            {
+                return (int?)eventParticipant.ID;
+            }
+            else
+            {
+                return (int?)null;
+            }
         }
 
-        itemData["eventID"] = eventID;
-        itemData["participantID"] = participant.ID;
-        if (defaultEventSessionID.HasValue)
+        public static HubResult CheckIn(AppDC dc, int[] itemIDs)
         {
-            itemData["eventSessionID"] = defaultEventSessionID.Value;
-        }
-        var eventParticipant = EventParticipant.Create(dc, itemData);
-        if (eventParticipant != null)
-        {
-            return (int?)eventParticipant.ID;
-        }
-        else
-        {
-            return (int?)null;
-        }
-    }
+            Debug.Assert(itemIDs != null);
+            if (itemIDs == null)
+            {
+                return HubResult.Error;
+            }
+            if (!itemIDs.Any())
+            {
+                return HubResult.NotFound;
+            }
 
-    public static HubResult CheckIn(AppDC dc, int itemID)
-    {
-        return WriteLock(dc, itemID, (item, notifyExpression) =>
-        {
-            Debug.Assert(!item.CheckInTimestamp.HasValue);
-            item.CheckInTimestamp = dc.TransactionTimestamp;
+            dc.SubmitLock(() =>
+            {
+                var checkInItems = dc.EventParticipants
+                    .Where(item => itemIDs.Contains(item.ID));
 
-            notifyExpression.AddModifiedID(item.ID);
+                foreach (var item in checkInItems)
+                {
+                    CheckIn(dc, item.ID);
+                }
+
+                int bulkTagIDThingy = 0;
+
+                string activityDescription = string.Format("Bulk CheckIn {0} EventParticipant(s)",
+                    /*0*/ itemIDs.Length);
+                var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+                var activityType = ActivityType.BulkCheckIn;
+                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
+            });
+
             return HubResult.Success;
-        });
-    }
+        }
 
-    public static HubResult UndoCheckIn(AppDC dc, int itemID)
-    {
-        return WriteLock(dc, itemID, (item, notifyExpression) =>
+        public static HubResult UndoCheckIn(AppDC dc, int[] itemIDs)
         {
-            Debug.Assert(item.CheckInTimestamp.HasValue);
-            item.CheckInTimestamp = null;
+            Debug.Assert(itemIDs != null);
+            if (itemIDs == null)
+            {
+                return HubResult.Error;
+            }
+            if (!itemIDs.Any())
+            {
+                return HubResult.NotFound;
+            }
 
-            notifyExpression.AddModifiedID(item.ID);
+            dc.SubmitLock(() =>
+            {
+                var undoCheckInItems = dc.EventParticipants
+                    .Where(item => itemIDs.Contains(item.ID));
+
+                foreach (var item in undoCheckInItems)
+                {
+                    UndoCheckIn(dc, item.ID);
+                }
+
+                int bulkTagIDThingy = 0;
+
+                string activityDescription = string.Format("Bulk Undo-CheckIn {0} EventParticipant(s)",
+                    /*0*/ itemIDs.Length);
+                var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+                var activityType = ActivityType.BulkUndoCheckIn;
+                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
+            });
+
             return HubResult.Success;
-        });
-    }
+        }
 
-    public static HubResult CheckOut(AppDC dc, int itemID)
-    {
-        return WriteLock(dc, itemID, (item, notifyExpression) =>
+        public static HubResult CheckIn(AppDC dc, int itemID)
         {
-            Debug.Assert(item.CheckInTimestamp.HasValue);
-            Debug.Assert(!item.CheckOutTimestamp.HasValue);
-            item.CheckOutTimestamp = dc.TransactionTimestamp;
+            return WriteLock(dc, itemID, (item, notifyExpression) =>
+            {
+                Debug.Assert(!item.CheckInTimestamp.HasValue);
+                item.CheckInTimestamp = dc.TransactionTimestamp;
 
-            notifyExpression.AddModifiedID(item.ID);
-            return HubResult.Success;
-        });
-    }
+                notifyExpression.AddModifiedID(item.ID);
+                return HubResult.Success;
+            });
+        }
+
+        public static HubResult UndoCheckIn(AppDC dc, int itemID)
+        {
+            return WriteLock(dc, itemID, (item, notifyExpression) =>
+            {
+                Debug.Assert(item.CheckInTimestamp.HasValue);
+                item.CheckInTimestamp = null;
+
+                notifyExpression.AddModifiedID(item.ID);
+                return HubResult.Success;
+            });
+        }
+
+        public static HubResult CheckOut(AppDC dc, int itemID)
+        {
+            return WriteLock(dc, itemID, (item, notifyExpression) =>
+            {
+                Debug.Assert(item.CheckInTimestamp.HasValue);
+                Debug.Assert(!item.CheckOutTimestamp.HasValue);
+                item.CheckOutTimestamp = dc.TransactionTimestamp;
+
+                notifyExpression.AddModifiedID(item.ID);
+                return HubResult.Success;
+            });
+        }
 
 
 
@@ -425,7 +495,7 @@ namespace App.Library
 
             // support filtering to a specific EventSession. eg. eventSession:{eventSessionID}
             query = searchExpression.FilterByAnyNamedStateTerm2(query, "eventSession",
-                searchTerm => item => item.EventSessionID.ToString() == searchTerm || 
+                searchTerm => item => item.EventSessionID.ToString() == searchTerm ||
                     (!item.EventSessionID.HasValue && string.IsNullOrEmpty(searchTerm)));
 
 
@@ -455,15 +525,15 @@ namespace App.Library
 
             // EventParticipants involve Partipants, ParticipantGroups & EventSessions, all of which can be involved with searches
             // So we widen the query here so we can filter on all those things
-            var searchTermQuery = 
+            var searchTermQuery =
                 from eventParticipant in query
-                // inner join - required
+                    // inner join - required
                 join participant in Participant.Query(dc) on eventParticipant.ParticipantID equals participant.ID
                 join participantGroup in ParticipantGroup.Query(dc) on participant.ParticipantGroupID equals participantGroup.ID
                 // outer join - optional
                 join session in EventSession.Query(dc) on eventParticipant.EventSessionID equals session.ID into eventParticipantSessionGroup
                 from session in eventParticipantSessionGroup.DefaultIfEmpty()
-                select new {eventParticipant, participant, participantGroup, session };
+                select new { eventParticipant, participant, participantGroup, session };
 
             searchTermQuery = searchExpression.FilterByTextTerms(searchTermQuery, (termQuery, searchTermLower) =>
             {
@@ -581,7 +651,7 @@ namespace App.Library
                 // outer join - optional
                 join session in EventSession.Query(dc) on eventParticipant.EventSessionID equals session.ID into eventParticipantSessionGroup
                 from session in eventParticipantSessionGroup.DefaultIfEmpty()
-                select new {eventParticipant, participant, participantGroup, myEvent, session };
+                select new { eventParticipant, participant, participantGroup, myEvent, session };
 
             var headerMap = new[]
             {
@@ -647,6 +717,9 @@ namespace App.Library
             [JsonProperty("donationAmount")]
             public Decimal? DonationAmount { get; internal set; }
 
+            [JsonProperty("notes")]
+            public string Notes { get; internal set; }
+
             public SearchItem(ExtendedEventParticipantItem exItem, SearchItemContext context)
                 : base(exItem, context)
             {
@@ -674,6 +747,9 @@ namespace App.Library
 
                 this.DonationLimit = exItem.item.DonationLimit;
                 this.DonationAmount = exItem.item.DonationAmount;
+
+                //!! Grabbing Notes field from ExEventParticipant - do we need to do this for other EPs like owned by?
+                this.Notes = exItem.ExEventParticipant.notes;
             }
 
             public static SearchItem Create(ExtendedEventParticipantItem item, params SearchItemContext[] searchItemContext)
@@ -717,10 +793,10 @@ namespace App.Library
 
             //clientQuery = searchExpression.FilterByTextTerms(clientQuery, (query, searchTermLower) => 
             //{
-                //return query.Where(item => item.Participant.FirstName.Contains(searchTermLower)
-                    //|| item.Participant.LastName.Contains(searchTermLower)
-                    //|| (item.ExEventParticipant.item.Grade.HasValue && item.ExEventParticipant.item.Grade.Value.ToString().Contains(searchTermLower))
-                    //); 
+            //return query.Where(item => item.Participant.FirstName.Contains(searchTermLower)
+            //|| item.Participant.LastName.Contains(searchTermLower)
+            //|| (item.ExEventParticipant.item.Grade.HasValue && item.ExEventParticipant.item.Grade.Value.ToString().Contains(searchTermLower))
+            //); 
             //});
 
             // Simple case - a trivial selector that retrieves the object as an ExtendedItem<T>
@@ -1178,7 +1254,7 @@ namespace App.Library
                 DateTimeProviderTag.Create("EventDate", exResult.epSession.StartDate, TimeZones.Pacific),
                 DateTimeProviderTag.Create("EventTime", exResult.epSession.StartDate, TimeZones.Pacific),
                 StringProviderTag.Create("EventLocation", exResult.epSession.Location),
-                
+
                 StringProviderTag.Create("Address", "16722 NE 116th Street, Redmond WA 98052"),
 
                 StringProviderTag.Create("SchoolCounselorName", exResult.epParticipantGroup.ContactName),
