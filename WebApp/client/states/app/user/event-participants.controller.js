@@ -505,6 +505,39 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     utilityService.download(query);
   };
 
+  $scope.showBulkEditParticipantsDialog = function ($event) {
+    var parentEl = angular.element(document.body);
+    $mdDialog.show({
+      parent: parentEl,
+      targetEvent: $event,
+      templateUrl: '/client/states/app/user/bulk-edit-participants.dialog.html',
+      locals: {
+        event: event,
+        eventSessionsIndex: $scope.eventSessionsIndex
+      },
+      controller: BulkEditParticipantsDialog
+    });
+    function BulkEditParticipantsDialog($scope, $mdDialog, $translate, event, eventSessionsIndex) {
+      $scope.eventSessions = siteService.model.eventSessions;
+      $scope.participantGroups = siteService.model.participantGroups;
+
+      $scope.event = event;
+      $scope.eventSessionsIndex = eventSessionsIndex;
+
+      $scope.cancel = function () {
+        $log.debug("You canceled the dialog.");
+        $mdDialog.hide();
+      };
+      $scope.apply = function () {
+        $log.debug("You applied the bulk edit.");
+        //!! TODO add function to actually apply the bulk edit to all the records
+        $mdDialog.hide();
+      };
+    }
+  };
+
+
+
 
   // init
 
