@@ -104,6 +104,16 @@
     background-color:rgba(0,0,0,.30);
   }
 
+  .user {
+    border-bottom: 1px solid #d6dadc;
+    min-height: 82px;
+    padding: 9px 0;
+  }
+
+  .user:hover {
+    background-color: #eeeeee;
+  }
+
   md-content {
     background-color: #FAFAFA;
   }
