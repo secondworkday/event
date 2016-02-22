@@ -1,21 +1,30 @@
-<ms-search-view change-event="updateEventSessions" search="searchHandler" options="searchViewOptions" user-search="userSearch">
-  <div ms-admin-only>
-      <md-button ng-click="showAddSessionDialog($event)" class="md-fab md-primary" aria-label="new" style="float:right;">
-        <i class="fa fa-plus fa-lg"></i>
-      </md-button>
+<div layout layout-align="start center">
+  <div>
+    <h2 class="md-title">{{'EVENT_SESSIONS' | translate}}</h2>
   </div>
+  <div ms-admin-only>
+    <md-button class="md-primary" aria-label="new"
+      ng-click="showAddSessionDialog($event)">
+      <i class="fa fa-plus"></i> Add {{'EVENT_SESSION' | translate}}
+    </md-button>
+  </div>
+</div>
+
+
+<ms-search-view change-event="updateEventSessions" search="searchHandler" options="searchViewOptions" user-search="userSearch">
   <div layout layout-wrap>
-    <md-card
+    <md-card style="width:300px;"
       ng-repeat="eventSession in $displayedIndex | objectLookup:$hashMap track by eventSession.id">
       <md-card-content>
         <p>
           <span class="md-headline">{{ eventSession.name }}</span><br/>
-          <span class="md-body-1">  {{ eventSession.startDate | amCalendar}}</span>
+          <span class="md-body-1">  {{ eventSession.startDate | amCalendar}}</span><br/>
+          <span class="md-body-1">Location: {{eventSession.location}}</span><br/>
+          <span class="md-caption tag"
+            ng-class="{live: state == 'Live'}">
+            <strong ng-repeat="state in setEventSessionState(eventSession)">{{ state }}</strong>
+          </span>
         </p>
-        <span class="md-caption tag"
-          ng-class="{live: state == 'Live'}">
-          <strong ng-repeat="state in setEventSessionState(eventSession)">{{ state }}</strong>
-        </span>
         <div>
           <md-switch ng-change="setEventSessionCheckInOpen(eventSession)" ng-model="eventSession.checkInOpen" aria-label="check in">
             Check In
@@ -23,10 +32,7 @@
             <span ng-show="!eventSession.checkInOpen">(closed)</span>
           </md-switch>
         </div>
-        <p class="md-body-1">
-          Location: {{eventSession.location}}
-        </p>
-        <p class="md-body-1">
+        <!-- <p class="md-body-1">
           Store Leader(s): Sam Adams, Sarah Adams
         </p>
         <p class="md-body-1">
@@ -34,10 +40,13 @@
         </p>
         <p class="md-body-1">
           Slots: 999
-        </p>
+        </p> -->
       </md-card-content>
       <md-card-actions layout="row" layout-align="end center">
-        <md-button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditEventSessionDialog($event, eventSession)" aria-label="edit event session"><i class="fa fa-pencil ng-scope"></i></md-button>
+        <md-button aria-label="edit event session"
+          ng-click="showEditEventSessionDialog($event, eventSession)">
+          <i class="fa fa-pencil ng-scope"></i> Edit
+        </md-button>
         <md-button class="md-primary"
           ui-sref="^.^.session.participants({eventSessionID:eventSession.id})">
           View
