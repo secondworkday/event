@@ -124,12 +124,7 @@ namespace App.Library
             this.Name = (string)data.name;
             this.ContactName = (string)data.contactName;
             this.Overview = (string)data.overview;
-            var notes = (string)data.notes;
-            //if (!String.IsNullOrEmpty(notes))
-            //{
-                this.SetNotes(dc, notes);
-            //}
-            
+            this.SetNotes(dc, (string)data.notes);
         }
 
         public static HubResult Edit(AppDC dc, int itemID, dynamic data)

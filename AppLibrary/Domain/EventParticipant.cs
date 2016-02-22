@@ -174,11 +174,7 @@ namespace App.Library
         this.EventSessionID = eventSessionID;
       }
 
-      var notes = (string)data.notes;
-      if (!String.IsNullOrEmpty(notes))
-      {
-          this.SetNotes(dc, notes);
-      }
+      this.SetNotes(dc, (string)data.notes);
       this.Grade = (uint)data.grade;
     }
 
@@ -653,6 +649,9 @@ namespace App.Library
             [JsonProperty("donationAmount")]
             public Decimal? DonationAmount { get; internal set; }
 
+            [JsonProperty("notes")]
+            public string Notes { get; internal set; }
+
             public SearchItem(ExtendedEventParticipantItem exItem, SearchItemContext context)
                 : base(exItem, context)
             {
@@ -680,6 +679,9 @@ namespace App.Library
 
                 this.DonationLimit = exItem.item.DonationLimit;
                 this.DonationAmount = exItem.item.DonationAmount;
+
+                //!! Grabbing Notes field from ExEventParticipant - do we need to do this for other EPs like owned by?
+                this.Notes = exItem.ExEventParticipant.notes;
             }
 
             public static SearchItem Create(ExtendedEventParticipantItem item, params SearchItemContext[] searchItemContext)
