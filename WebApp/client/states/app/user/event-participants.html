@@ -38,7 +38,7 @@
   <div flex="15"></div>
   <div flex layout layout-align="end center">
     <span class="tag">{{$selectedIndex.length}} Selected <i ng-click="unselectAll()" class="fa fa-times u-clickable"></i></span>
-    <md-button ng-click="DO_SOMETHING()"><i class="fa fa-pencil"></i> Bulk Edit</md-button>
+    <md-button ng-click="showBulkEditParticipantsDialog($event)"><i class="fa fa-pencil"></i> Bulk Edit</md-button>
     <md-button ng-click="checkInEventParticipants()"><i class="fa fa-check"></i> Check-In</md-button>
     <md-button ng-click="undoCheckInEventParticipants()"><i class="fa fa-undo"></i> Set Not Checked-In</md-button>
     <md-button ng-click="deleteEventParticipants()" class="md-warn"><i class="fa fa-remove"></i> Delete</md-button>
@@ -59,15 +59,17 @@
       </md-checkbox>
     </div>
 
-    <p class="md-body-2 text-support" ng-if="eventSessionFilters.length">
-      {{'EVENT_SESSIONS' | translate | uppercase}}
-    </p>
-    <div layout="column" class="md-caption" ng-if="eventSessionFilters.length">
-      <md-checkbox ng-repeat="filter in eventSessionFilters"
-                   ng-show="filter.indexer.index.length"
-                   ng-checked="exists(filter, searchViewOptions.stackFilters)" ng-click="toggle(filter, searchViewOptions.stackFilters)" aria-label="filter event session">
-        {{filter.name}} ({{filter.indexer.index.length}})
-      </md-checkbox>
+    <div ng-if="eventSessionFilters.length">
+      <p class="md-body-2 text-support">
+        {{'EVENT_SESSIONS' | translate | uppercase}}
+      </p>
+      <div layout="column" class="md-caption">
+        <md-checkbox ng-repeat="filter in eventSessionFilters"
+                     ng-show="filter.indexer.index.length"
+                     ng-checked="exists(filter, searchViewOptions.stackFilters)" ng-click="toggle(filter, searchViewOptions.stackFilters)" aria-label="filter event session">
+          {{filter.name}} ({{filter.indexer.index.length}})
+        </md-checkbox>
+      </div>
     </div>
 
     <p class="md-body-2 text-support">
@@ -106,7 +108,7 @@
               ng-init="eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID); watchEventParticipantEventSession(this, 'eventParticipant.eventSessionID');
               eventParticipantParticipantGroup = demandParticipantGroup(eventParticipant.participantGroupID);">
             <td flex="5" class="table-data text-center">
-              <md-checkbox style="margin:0;" 
+              <md-checkbox style="margin:0;"
                 ng-checked="selectedIndexContains(eventParticipant)"
                 ng-click="toggleSelectedIndex(eventParticipant)"
                 aria-label="select {{eventParticipant.firstName}} {{eventParticipant.lastName}}">
