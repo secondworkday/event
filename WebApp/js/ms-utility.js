@@ -1109,14 +1109,6 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     };
 
 
-    self.searchTenants = function (searchExpression, sortExpression, startIndex, rowCount) {
-      var searchTenantGroupExpression = "^";
-      if (searchExpression) {
-        searchTenantGroupExpression += " " + searchExpression;
-      }
-      return model.tenantGroups.search(searchTenantGroupExpression, sortExpression, startIndex, rowCount);
-    };
-
     this.createTenant = function (tenantName, data) {
         return callHub(function () {
             return utilityHub.server.createTenant(tenantName, data);

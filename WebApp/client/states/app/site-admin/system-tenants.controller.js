@@ -1,7 +1,7 @@
 app.controller('SystemTenantsController', function ($scope, $mdDialog, $log, $msUI, utilityService, siteService) {
   $log.debug('Loading SystemTenantsController...');
 
-  $scope.searchTenants = utilityService.searchTenants;
+  $scope.searchTenants = utilityService.model.tenantGroups.search;
 
 
   $scope.sortOptions = [
@@ -17,8 +17,8 @@ app.controller('SystemTenantsController', function ($scope, $mdDialog, $log, $ms
   };
 
   $scope.filterOptions = [
-    // We're calling utilityService.searchTenants, so that serves the function of the serverTerm parameter to fetch only top-level TenantGroups
-    { name: 'Tenants', clientFunction: utilityService.filterByPropertyHasValue("!parentID") }
+    // '^' means items with null parents, aka topmost items
+    { name: 'Tenants', serverTerm: '^', clientFunction: utilityService.filterByPropertyHasValue("!parentID") }
 
     //{ name: 'Active', serverTerm: '$Active', clientFunction: filterByStateFactory("Active") },
     //{ name: 'Disabled', serverTerm: '$Disabled', clientFunction: filterByStateFactory("Disabled") },

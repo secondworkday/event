@@ -22,7 +22,7 @@ app.controller('ActivityLogController', function ($scope, $log, utilityService, 
 
 
   $scope.sortOptions = [
-    { name: 'All', clientFunction: utilityService.compareByProperties('id') }
+    { name: 'All', serverTerm: '', clientFunction: utilityService.compareByProperties('id') }
 
     //{ name: 'First Name', serverTerm: 'Participant.FirstName', clientFunction: utilityService.compareByProperties('firstName', 'id') },
     //{ name: 'Last Name', serverTerm: 'Participant.LastName', clientFunction: utilityService.compareByProperties('lastName', 'id') },

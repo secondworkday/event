@@ -211,7 +211,7 @@
     <Content Include="client\states\app\site-admin\system-user.dialog.html" />
     <Content Include="client\states\app\site-admin\system-users.controller.js" />
     <Content Include="client\states\app\site-admin\system-users.html" />
-    <Content Include="client\states\app\user\event-history.controller.js" />
+    <Content Include="client\states\app\user\event-activity-log.controller.js" />
     <Content Include="client\states\app\user\events.controller.js" />
     <Content Include="client\states\app\user\events.html" />
     <Content Include="client\states\app\user\activity-log.html" />
