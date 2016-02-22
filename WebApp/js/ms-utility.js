@@ -3129,7 +3129,7 @@ app.directive('msFacadeOnly', function ($stateParams, ngIfDirective) {
 
 
 
-app.directive('msShow', function (msAuthenticated, ngIfDirective) {
+app.directive('msShow', function ($parse, msAuthenticated, ngIfDirective) {
   var ngIf = ngIfDirective[0];
   return {
     transclude: ngIf.transclude,
