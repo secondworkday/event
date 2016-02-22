@@ -707,6 +707,22 @@ namespace WebApp
         });
     }
 
+        public HubResult CheckInEventParticipants(int[] itemIDs)
+        {
+            return accountsOnlyHeader((utilityContext, dc) =>
+            {
+                return EventParticipant.CheckIn(dc, itemIDs);
+            });
+        }
+
+        public HubResult UndoCheckInEventParticipants(int[] itemIDs)
+        {
+            return accountsOnlyHeader((utilityContext, dc) =>
+            {
+                return EventParticipant.UndoCheckIn(dc, itemIDs);
+            });
+        }
+
 
 
         public HubResult CheckInEventParticipant(int itemID)

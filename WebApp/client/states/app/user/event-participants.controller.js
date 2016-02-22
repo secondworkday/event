@@ -486,6 +486,38 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     });
   };
 
+  $scope.checkInEventParticipants = function () {
+    var itemIDs = $scope.$selectedIndex;
+
+    siteService.checkInEventParticipants(itemIDs)
+    .then(function (successData) {
+      var PARTICIPANT = $translate.instant('PARTICIPANT');
+      $msUI.showToast(itemIDs.length + " " + PARTICIPANT + "(s) Checked in");
+      $log.debug(itemIDs.length + " Event Participant(s) Checked in.");
+      return successData;
+    }, function (failureData) {
+      $msUI.showToast(failureData.errorMessage);
+      $log.debug(failureData.errorMessage);
+      return failureData;
+    });
+  };
+
+  $scope.undoCheckInEventParticipants = function () {
+    var itemIDs = $scope.$selectedIndex;
+
+    siteService.undoCheckInEventParticipants(itemIDs)
+    .then(function (successData) {
+      var PARTICIPANT = $translate.instant('PARTICIPANT');
+      $msUI.showToast(itemIDs.length + " " + PARTICIPANT + "(s) Check-in Undone");
+      $log.debug(itemIDs.length + " Event Participant(s) Check-in Undone.");
+      return successData;
+    }, function (failureData) {
+      $msUI.showToast(failureData.errorMessage);
+      $log.debug(failureData.errorMessage);
+      return failureData;
+    });
+  };
+
 
   $scope.download = function () {
 
