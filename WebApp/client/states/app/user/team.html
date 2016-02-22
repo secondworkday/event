@@ -31,45 +31,38 @@
     </div>
 </div>
 <ms-search-view change-event="updateUsers" search="searchUsers" options="searchViewOptions" user-search="userSearch">
-    <table class="md-data-table u-full-width">
-        <thead>
-            <tr>
-                <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
-                <th class="md-data-table__cell--non-numeric">User</th>
-                <th></th>
-                <!--<th>UserID</th>
-                <th>TenantID</th>
-                <th>30-day Logins</th>
-                <th>Lifetime Logins</th>-->
-                <th>Role</th>
-                <th>Status</th>
-                <th class="md-data-table__cell--non-numeric">Online</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="user in $displayedIndex | objectLookup:$hashMap track by user.id" ui-sref="app.site-admin.system.user.account({userID:user.id})" style="cursor:pointer;">
-                <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ user | json }}</pre></td>
-                <td class="md-data-table__cell--non-numeric">
-                    <img ng-src="{{user.profilePhotoUrl || '/images/user-img-placeholder.png'}}" class="mini-user-img" style="margin-bottom:1rem;" />
-                </td>
-                <td class="md-data-table__cell--non-numeric">
-                    <strong>{{ user.displayName }}</strong><br />
-                    <span class="md-caption">{{ user.email }}</span>
-                </td>
-                <!--<td>{{ user.id }}</td>
-                <td>{{ user.tenantID }}</td>
-                <td>
-                    9 <span><i class="fa fa-arrow-up text-green"></i></span>
-                </td>
-                <td>
-                    99
-                </td>-->
-                <td>
-                  <span style ="display:block" ng-repeat="appRole in user.appRoles">{{APP_ROLE_TRANSLATION[appRole] | translate}}</span>
-                </td>
-                <td>Active</td>
-                <td class="md-data-table__cell--non-numeric"><i ng-show="user.connectionState=='Online'" class="fa fa-circle text-green"></i></td>
-            </tr>
-        </tbody>
-    </table>
+  <div class="bg-white">
+    <div class="user u-hover-container" layout layout-align="start center"
+      ng-repeat="user in $displayedIndex | objectLookup:$hashMap track by user.id">
+      <div class="u-sm-margin-left u-sm-margin-right">
+        <img ng-src="{{user.profilePhotoUrl || '/images/user-img-placeholder.png'}}" class="mini-user-img" />
+      </div>
+      <div flex>
+        <span class="md-body-2">
+          {{ user.displayName }} <i ng-show="user.connectionState=='Online'" class="fa fa-circle text-green"></i>
+        </span>
+        <br/>
+        <span class="md-body-1">
+          {{ user.email }}
+        </span>
+        <br/>
+        <span class="md-caption">
+          <span class="tag u-sm-margin-right"
+            ng-repeat="appRole in user.appRoles">
+            {{APP_ROLE_TRANSLATION[appRole] | translate}}
+          </span>
+        </span>
+      </div>
+      <div layout class="u-display-hover">
+        <md-button
+          ng-click="showEditUserDialog($event, user)">
+          <i class="fa fa-pencil"></i> Edit
+        </md-button>
+        <md-button class="md-warn"
+          ng-click="deleteUser(user)">
+          <i class="fa fa-remove"></i> Delete
+        </md-button>
+      </div>
+    </div>
+  </div>
 </ms-search-view>

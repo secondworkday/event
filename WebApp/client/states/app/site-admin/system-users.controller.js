@@ -106,7 +106,7 @@ app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileU
 
       //!! if we're a SystemAdmin, we allow the selection of a tenantGroupID, unless one is specified.
 
-      //!! if we're a SystemAdmin or TenantAdmin, we allow 
+      //!! if we're a SystemAdmin or TenantAdmin, we allow
 
       $scope.formData = {
         appRoles: [],
@@ -202,6 +202,37 @@ app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileU
       };
       $scope.cancelDialog = function() {
         $log.debug( "You canceled the dialog." );
+        $mdDialog.hide();
+      };
+    }
+  };
+
+  $scope.showEditUserDialog = function ($event, user) {
+    var parentEl = angular.element(document.body);
+    $mdDialog.show({
+      parent: parentEl,
+      targetEvent: $event,
+      templateUrl: '/client/states/app/user/edit-user.dialog.html',
+      locals: {
+        user: user
+      },
+      controller: EditUserDialogController
+    });
+    function EditUserDialogController($scope, $translate, user) {
+      $scope.user = user;
+
+      $scope.cancel = function () {
+        $log.debug("You canceled the dialog.");
+        $mdDialog.hide();
+      };
+      $scope.deleteUser = function () {
+        $log.debug("You deleted the user.");
+        //!! TODO add function to actually delete the user
+        $mdDialog.hide();
+      };
+      $scope.apply = function () {
+        $log.debug("You applied the edit.");
+        //!! TODO add function to actually apply the bulk edit to all the records
         $mdDialog.hide();
       };
     }
