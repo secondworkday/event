@@ -104,13 +104,16 @@
     background-color:rgba(0,0,0,.30);
   }
 
-  .user {
+  .list {
+    background-color: #FFF;
+  }
+
+  .list .item {
     border-bottom: 1px solid #d6dadc;
-    min-height: 82px;
     padding: 9px 0;
   }
 
-  .user:hover {
+  .list .item:hover {
     background-color: #eeeeee;
   }
 
