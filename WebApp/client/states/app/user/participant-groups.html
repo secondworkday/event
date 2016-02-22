@@ -56,9 +56,9 @@
         </thead>
         <tbody>
           <tr ng-repeat="participantGroup in $displayedIndex | objectLookup:$hashMap track by participantGroup.id">
-            <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ participantGroup | json }}</pre></td>
+            <td ms-debug-only class="md-data-table__cell--non-numeric"><pre>{{ participantGroup | json }}</pre></td>
             <td ms-debug-only>{{ participantGroup.id }}</td>
-            <td class="md-data-table__cell--non-numeric">{{ participantGroup.name }}</td>
+            <td class="md-data-table__cell--non-numeric" style="max-width:200px;">{{ participantGroup.name }}<div ng-if="participantGroup.notes && participantGroup.notes != ''" class="table-cell-notes">{{participantGroup.notes}}</div></td>
             <td class="md-data-table__cell--non-numeric">{{participantGroup.contactName}}</td>
             <td hide-xs hide-sm class="md-data-table__cell--non-numeric">{{participantGroup.primaryEmail}}</td>
             <td hide-xs hide-sm class="md-data-table__cell--non-numeric">{{participantGroup.primaryPhoneNumber}}</td>
@@ -75,6 +75,7 @@
               </span>
             </td>
             <td><md-button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="showEditParticipantGroupDialog($event, participantGroup)" aria-label="edit participant group"><i class="fa fa-pencil ng-scope"></i></md-button></td>
+          </tr>
         </tbody>
       </table>
     </ms-search-view>

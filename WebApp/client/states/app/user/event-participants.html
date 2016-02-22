@@ -90,7 +90,7 @@
             <th flex="5" class="text-center">
               <md-checkbox style="margin:0;"  ng-model="selectAll" ng-click="multiSelectOn()" aria-label="select all"></md-checkbox>
             </th>
-            <th flex="10" class="text-left">Last Name</th>
+            <th flex="10" class="text-left" style="max-width:120px;">Last Name</th>
             <th flex="10" class="text-left">First Name</th>
             <th flex="15" class="text-left">{{'PARTICIPANT_GROUP' | translate}}</th>
             <th flex="10" class="text-center">Grade</th>
@@ -101,7 +101,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr layout layout-align="start center" class="u-hover-container table-row" ng-class="{'is-selected': eventParticipant.isSelected}"
+          <tr layout layout-align="start center" class="u-hover-container table-row" ng-class="{'is-selected': eventParticipant.isSelected, 'table-data-with-note': eventParticipant.notes}"
               ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id"
               ng-init="eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID); watchEventParticipantEventSession(this, 'eventParticipant.eventSessionID');
               eventParticipantParticipantGroup = demandParticipantGroup(eventParticipant.participantGroupID);">
@@ -113,7 +113,8 @@
 
               </md-checkbox>
             </td>
-            <td flex="10" class="table-data text-left">{{ eventParticipant.lastName }}</td>
+            <td ms-debug-only class="table-table"><pre>{{ eventParticipant }}</pre></td>
+            <td flex="10" class="table-data text-left" ng-class="{'table-data-with-note': eventParticipant.notes}" style="max-width:120px;"><div ng-class="{'table-cell-with-note': eventParticipant.notes}">{{ eventParticipant.lastName }}</div><div ng-if="eventParticipant.notes" class="table-cell-notes">{{eventParticipant.notes}}</div></td>
             <td flex="10" class="table-data text-left">{{ eventParticipant.firstName }}</td>
             <td flex="15" class="table-data text-left">{{ eventParticipantParticipantGroup.name }}</td>
             <td flex="10" class="table-data text-center">{{ eventParticipant.grade }}</td>

@@ -173,6 +173,12 @@ namespace App.Library
       {
         this.EventSessionID = eventSessionID;
       }
+
+      var notes = (string)data.notes;
+      if (!String.IsNullOrEmpty(notes))
+      {
+          this.SetNotes(dc, notes);
+      }
       this.Grade = (uint)data.grade;
     }
 

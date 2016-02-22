@@ -441,6 +441,10 @@
     padding: 6px;
   }
 
+  .table-row-with-note {
+    height: 68px;
+  }
+
   .table-row:hover {
     background-color: #eeeeee;
   }
@@ -455,6 +459,16 @@
     text-overflow: ellipsis;
   }
 
+  .table-data-with-note {
+    padding-right: 2px;
+    overflow:visible;
+    text-overflow: unset;
+    height: 68px;
+  }
+
+  .table-cell-with-note {
+    margin-top:19px;
+  }
 
 
   /* =========================================================================== */
@@ -571,4 +585,11 @@
 .sticky-header-style {
   background-color: white;
   border: 1px solid #dadada;
+}
+
+.table-cell-notes {
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: #bbb;
+  font-style: italic;
 }

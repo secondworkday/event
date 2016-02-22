@@ -22,191 +22,196 @@ using MS.WebUtility;
 namespace App.Library
 {
 
-  public partial class ParticipantGroup
-  {
-    partial void OnLoaded()
+    public partial class ParticipantGroup
     {
-      // (ensure DB timestamps are correctly marked as UTC.)
-      this._CreatedTimestamp = DateTime.SpecifyKind(this.CreatedTimestamp, DateTimeKind.Utc);
-      this._LastModifiedTimestamp = DateTime.SpecifyKind(this.LastModifiedTimestamp, DateTimeKind.Utc);
-    }
-  }
-  public partial class ParticipantGroup : ExtendedObject<ParticipantGroup>, IEPScopeObject
-  {
-    protected override int objectID { get { return this.ID; } }
-    protected override ExtendedPropertyScopeType objectScopeType { get { return this.ScopeType; } }
-    protected override int? objectScopeID { get { return this.ScopeID; } }
-
-
-    // Global Scope shows
-    protected ParticipantGroup(DateTime createdTimestamp, string name)
-        : this()
-    {
-      Debug.Assert(!string.IsNullOrEmpty(name));
-
-      this.ScopeType = ExtendedPropertyScopeType.Global;
-      this.ScopeID = null;
-
-      this.CreatedTimestamp = createdTimestamp;
-      this.LastModifiedTimestamp = createdTimestamp;
-
-      this.Name = name;
-    }
-
-    protected ParticipantGroup(DateTime createdTimestamp, EPScope epScope, string name)
-        : this()
-    {
-      this.CreatedTimestamp = createdTimestamp;
-      this.ScopeType = epScope.ScopeType;
-      this.ScopeID = epScope.ID;
-
-      this.Name = name;
-    }
-
-    public static ParticipantGroup GenerateRandom(AppDC dc)
-    {
-      JToken data = new
-      {
-        name = "Eastside Elementary"
-      }
-      .ToJson().FromJson() as JToken;
-
-      var result = ParticipantGroup.createLock(dc, () =>
-      {
-        var newParticipantGroup = ParticipantGroup.Create(dc, data);
-        return newParticipantGroup;
-      });
-
-      return result;
-    }
-
-    public static ParticipantGroup Create(AppDC dc, JToken data)
-    {
-      return ParticipantGroup.exCreateLock(dc, data, () =>
-      {
-        var createdTimestamp = dc.TransactionTimestamp;
-        var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
-
-        var name = data.Value<string>("name");
-
-        var newItem = new ParticipantGroup(createdTimestamp, teamEPScope, name);
-
-              // optional
-              var badgeName = data.Value<string>("badgeName");
-        newItem.BadgeName = badgeName;
-
-        var contactName = data.Value<string>("contactName");
-        newItem.ContactName = contactName;
-        var overview = data.Value<string>("overview");
-        newItem.Overview = overview;
-
-        dc.Save(newItem);
-        Debug.Assert(newItem.ID > 0);
-
-        var primaryPhoneNumber = data.Value<string>("primaryPhoneNumber");
-        if (!string.IsNullOrEmpty(primaryPhoneNumber))
+        partial void OnLoaded()
         {
-            newItem.SetContactPhoneNumber(dc, primaryPhoneNumber);
+            // (ensure DB timestamps are correctly marked as UTC.)
+            this._CreatedTimestamp = DateTime.SpecifyKind(this.CreatedTimestamp, DateTimeKind.Utc);
+            this._LastModifiedTimestamp = DateTime.SpecifyKind(this.LastModifiedTimestamp, DateTimeKind.Utc);
+        }
+    }
+    public partial class ParticipantGroup : ExtendedObject<ParticipantGroup>, IEPScopeObject
+    {
+        protected override int objectID { get { return this.ID; } }
+        protected override ExtendedPropertyScopeType objectScopeType { get { return this.ScopeType; } }
+        protected override int? objectScopeID { get { return this.ScopeID; } }
+
+
+        // Global Scope shows
+        protected ParticipantGroup(DateTime createdTimestamp, string name)
+            : this()
+        {
+            Debug.Assert(!string.IsNullOrEmpty(name));
+
+            this.ScopeType = ExtendedPropertyScopeType.Global;
+            this.ScopeID = null;
+
+            this.CreatedTimestamp = createdTimestamp;
+            this.LastModifiedTimestamp = createdTimestamp;
+
+            this.Name = name;
         }
 
-        var primaryEmail = data.GetMailAddress("primaryEmail");
-        if (primaryEmail != null)
+        protected ParticipantGroup(DateTime createdTimestamp, EPScope epScope, string name)
+            : this()
         {
-            newItem.AssignMailAddress(dc, primaryEmail);
+            this.CreatedTimestamp = createdTimestamp;
+            this.ScopeType = epScope.ScopeType;
+            this.ScopeID = epScope.ID;
+
+            this.Name = name;
         }
 
-        return newItem;
-      });
-    }
+        public static ParticipantGroup GenerateRandom(AppDC dc)
+        {
+            JToken data = new
+            {
+                name = "Eastside Elementary"
+            }
+            .ToJson().FromJson() as JToken;
 
-    private void updateData(AppDC dc, dynamic data)
-    {
-      this.Name = (string)data.name;
-      this.ContactName = (string)data.contactName;
-      this.Overview = (string)data.overview;
-    }
+            var result = ParticipantGroup.createLock(dc, () =>
+            {
+                var newParticipantGroup = ParticipantGroup.Create(dc, data);
+                return newParticipantGroup;
+            });
 
-    public static HubResult Edit(AppDC dc, int itemID, dynamic data)
-    {
-      return WriteLock(dc, itemID, (item, notifyExpression) =>
-      {
-        item.updateData(dc, data);
+            return result;
+        }
 
-        notifyExpression.AddModifiedID(item.ID);
-        return HubResult.Success;
-      });
-    }
+        public static ParticipantGroup Create(AppDC dc, JToken data)
+        {
+            return ParticipantGroup.exCreateLock(dc, data, () =>
+            {
+                var createdTimestamp = dc.TransactionTimestamp;
+                var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
 
-    public static HubResult Delete(AppDC dc, int itemID)
-    {
-      var deleteItem = dc.ParticipantGroups
-                .FirstOrDefault(item => item.ID == itemID);
+                var name = data.Value<string>("name");
 
-      if (deleteItem == null)
-      {
-        return HubResult.CreateError("Not found");
-      }
+                var newItem = new ParticipantGroup(createdTimestamp, teamEPScope, name);
 
-      dc.Participants.DeleteAllOnSubmit(deleteItem.Participants);
-      dc.ParticipantGroups.DeleteOnSubmit(deleteItem);
+          // optional
+          var badgeName = data.Value<string>("badgeName");
+                newItem.BadgeName = badgeName;
 
-      //!! TODO remove any Tags that have their last reference with this Pipeline
-      //!! Should we have an ExtendedObject call to remove all extended properties?
-      dc.SubmitChanges();
+                var contactName = data.Value<string>("contactName");
+                newItem.ContactName = contactName;
+                var overview = data.Value<string>("overview");
+                newItem.Overview = overview;
 
-      var notifyExpression = new NotifyExpression();
-      notifyExpression.AddDeletedID(itemID);
-      NotifyClients(dc, notifyExpression);
+                dc.Save(newItem);
+                Debug.Assert(newItem.ID > 0);
 
-      return HubResult.Success;
-    }
+                var primaryPhoneNumber = data.Value<string>("primaryPhoneNumber");
+                if (!string.IsNullOrEmpty(primaryPhoneNumber))
+                {
+                    newItem.SetContactPhoneNumber(dc, primaryPhoneNumber);
+                }
+
+                var primaryEmail = data.GetMailAddress("primaryEmail");
+                if (primaryEmail != null)
+                {
+                    newItem.AssignMailAddress(dc, primaryEmail);
+                }
+
+                return newItem;
+            });
+        }
+
+        private void updateData(AppDC dc, dynamic data)
+        {
+            this.Name = (string)data.name;
+            this.ContactName = (string)data.contactName;
+            this.Overview = (string)data.overview;
+            var notes = (string)data.notes;
+            //if (!String.IsNullOrEmpty(notes))
+            //{
+                this.SetNotes(dc, notes);
+            //}
+            
+        }
+
+        public static HubResult Edit(AppDC dc, int itemID, dynamic data)
+        {
+            return WriteLock(dc, itemID, (item, notifyExpression) =>
+            {
+                item.updateData(dc, data);
+
+                notifyExpression.AddModifiedID(item.ID);
+                return HubResult.Success;
+            });
+        }
+
+        public static HubResult Delete(AppDC dc, int itemID)
+        {
+            var deleteItem = dc.ParticipantGroups
+                      .FirstOrDefault(item => item.ID == itemID);
+
+            if (deleteItem == null)
+            {
+                return HubResult.CreateError("Not found");
+            }
+
+            dc.Participants.DeleteAllOnSubmit(deleteItem.Participants);
+            dc.ParticipantGroups.DeleteOnSubmit(deleteItem);
+
+            //!! TODO remove any Tags that have their last reference with this Pipeline
+            //!! Should we have an ExtendedObject call to remove all extended properties?
+            dc.SubmitChanges();
+
+            var notifyExpression = new NotifyExpression();
+            notifyExpression.AddDeletedID(itemID);
+            NotifyClients(dc, notifyExpression);
+
+            return HubResult.Success;
+        }
 
 
 
 
 
 
-    public static HubResult Parse(AppDC dc, int eventID, string parseData)
-    {
-      BulkUpload.ColumnHandler[] availableColumnHandlers = new[]
-      {
+        public static HubResult Parse(AppDC dc, int eventID, string parseData)
+        {
+            BulkUpload.ColumnHandler[] availableColumnHandlers = new[]
+            {
                 new BulkUpload.ColumnHandler("name", BulkUpload.ColumnOptions.Required, "school"),
                 new BulkUpload.ColumnHandler("contactName", BulkUpload.ColumnOptions.Optional, "counselor", "contact name"),
                 new BulkUpload.ColumnHandler("primaryPhoneNumber", BulkUpload.ColumnOptions.Optional, "phone"),
                 new BulkUpload.ColumnHandler("primaryEmail", BulkUpload.ColumnOptions.Optional, "email"),
             };
 
-      return BulkUpload.Parse(parseData, availableColumnHandlers);
-    }
+            return BulkUpload.Parse(parseData, availableColumnHandlers);
+        }
 
 
 
-    public static HubResult Upload(AppDC dc, int eventID, JToken uploadData)
-    {
-      // take a submit lock
-      // go through each EventParticipant
-      // add them to the table
-      // return CRUD results
-
-        var hubResult = dc.SubmitLock<HubResult>(() =>
+        public static HubResult Upload(AppDC dc, int eventID, JToken uploadData)
         {
-            return Upload<ParticipantGroup>(dc, uploadData, itemData =>
+            // take a submit lock
+            // go through each EventParticipant
+            // add them to the table
+            // return CRUD results
+
+            var hubResult = dc.SubmitLock<HubResult>(() =>
             {
-                var eventParticipant = ParticipantGroup.Create(dc, itemData);
-                if (eventParticipant != null)
+                return Upload<ParticipantGroup>(dc, uploadData, itemData =>
                 {
-                    return (int?)eventParticipant.ID;
-                }
-                else
-                {
-                    return (int?)null;
-                }
+                    var eventParticipant = ParticipantGroup.Create(dc, itemData);
+                    if (eventParticipant != null)
+                    {
+                        return (int?)eventParticipant.ID;
+                    }
+                    else
+                    {
+                        return (int?)null;
+                    }
+                });
             });
-        });
 
-        return hubResult;
-    }
-
+            return hubResult;
+        }
 
 
 
@@ -217,74 +222,75 @@ namespace App.Library
 
 
 
-    public static List<int> GetParticipantsYYY(AppDC dc, int ParticipantGroupID)
-    {
-      var myQuery = from epParticipantGroup in ExtendedQuery(dc)
-                    join epParticipant in Participant.Query(dc) on epParticipantGroup.item.ID equals ParticipantGroupID
-                    select new { epParticipant };
 
-      var exResult = myQuery
-          .Where(exItem => exItem.epParticipant.ParticipantGroupID == ParticipantGroupID);
+        public static List<int> GetParticipantsYYY(AppDC dc, int ParticipantGroupID)
+        {
+            var myQuery = from epParticipantGroup in ExtendedQuery(dc)
+                          join epParticipant in Participant.Query(dc) on epParticipantGroup.item.ID equals ParticipantGroupID
+                          select new { epParticipant };
 
-      List<int> participantIDs = new List<int>();
+            var exResult = myQuery
+                .Where(exItem => exItem.epParticipant.ParticipantGroupID == ParticipantGroupID);
 
-      foreach (var p in exResult)
-      {
-        participantIDs.Add(p.epParticipant.ID);
-      }
+            List<int> participantIDs = new List<int>();
 
-      return participantIDs;
-    }
+            foreach (var p in exResult)
+            {
+                participantIDs.Add(p.epParticipant.ID);
+            }
 
-    private static Func<IQueryable<ParticipantGroup>, string, IQueryable<ParticipantGroup>> termFilter = (query, searchTermLower) =>
-    {
-      return query.Where(item =>
-              item.Name.Contains(searchTermLower) ||
-              item.ContactName.Contains(searchTermLower));
-    };
+            return participantIDs;
+        }
+
+        private static Func<IQueryable<ParticipantGroup>, string, IQueryable<ParticipantGroup>> termFilter = (query, searchTermLower) =>
+        {
+            return query.Where(item =>
+                item.Name.Contains(searchTermLower) ||
+                item.ContactName.Contains(searchTermLower));
+        };
 
 
-    private static IQueryable<ParticipantGroup> query(AppDC dc)
-    {
-      var result = dc.ParticipantGroups
-          .Select(item => item);
-      return result;
-    }
+        private static IQueryable<ParticipantGroup> query(AppDC dc)
+        {
+            var result = dc.ParticipantGroups
+                .Select(item => item);
+            return result;
+        }
 
-    public static IQueryable<ParticipantGroup> Query(AppDC dc)
-    {
-      Debug.Assert(dc.TransactionAuthorizedBy != null);
+        public static IQueryable<ParticipantGroup> Query(AppDC dc)
+        {
+            Debug.Assert(dc.TransactionAuthorizedBy != null);
 
-      var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrInvalid;
+            var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrInvalid;
 
-      var result = query(dc)
-          // http://stackoverflow.com/questions/586097/compare-nullable-types-in-linq-to-sql
-          .Where(show => show.ScopeType == ExtendedPropertyScopeType.Global ||
-              show.ScopeType == teamEPScope.ScopeType && object.Equals(show.ScopeID, teamEPScope.ID));
+            var result = query(dc)
+                // http://stackoverflow.com/questions/586097/compare-nullable-types-in-linq-to-sql
+                .Where(show => show.ScopeType == ExtendedPropertyScopeType.Global ||
+                    show.ScopeType == teamEPScope.ScopeType && object.Equals(show.ScopeID, teamEPScope.ID));
 
-      return result;
-    }
+            return result;
+        }
 
-    public static IQueryable<ParticipantGroup> Query(AppDC dc, SearchExpression searchExpression)
-    {
-      var query = Query(dc);
-      query = FilterBy(dc, query, searchExpression, termFilter);
+        public static IQueryable<ParticipantGroup> Query(AppDC dc, SearchExpression searchExpression)
+        {
+            var query = Query(dc);
+            query = FilterBy(dc, query, searchExpression, termFilter);
 
-      return query;
-    }
+            return query;
+        }
 
-    public static IQueryable<ParticipantGroup> Query(AppDC dc, SearchExpression searchExpression, string sortExpression, int startRowIndex, int maximumRows)
-    {
-      var query = Query(dc, searchExpression);
-      query = query.SortBy(sortExpression, startRowIndex, maximumRows);
-      return query;
-    }
+        public static IQueryable<ParticipantGroup> Query(AppDC dc, SearchExpression searchExpression, string sortExpression, int startRowIndex, int maximumRows)
+        {
+            var query = Query(dc, searchExpression);
+            query = query.SortBy(sortExpression, startRowIndex, maximumRows);
+            return query;
+        }
 
-    public static int QueryCount(AppDC dc, SearchExpression searchExpression)
-    {
-      var query = Query(dc, searchExpression);
-      return query.Count();
-    }
+        public static int QueryCount(AppDC dc, SearchExpression searchExpression)
+        {
+            var query = Query(dc, searchExpression);
+            return query.Count();
+        }
 
 #if false
         public static IQueryable<Show> QueryUpcomingShowsAvailable(AppDC dc)
@@ -299,36 +305,36 @@ namespace App.Library
 #endif
 
 
-    protected static IQueryable<ExtendedItem<ParticipantGroup>> ExtendedQuery(AppDC dc)
-    {
-      return ExtendedQuery(dc, Query(dc));
-    }
+        protected static IQueryable<ExtendedItem<ParticipantGroup>> ExtendedQuery(AppDC dc)
+        {
+            return ExtendedQuery(dc, Query(dc));
+        }
 
-    public static IQueryable<ExtendedItem<ParticipantGroup>> ExtendedQuery(AppDC dc, SearchExpression searchExpression)
-    {
-      var query = Query(dc, searchExpression);
-      var exQuery = ExtendedQuery(dc, query);
-      return exQuery;
-    }
+        public static IQueryable<ExtendedItem<ParticipantGroup>> ExtendedQuery(AppDC dc, SearchExpression searchExpression)
+        {
+            var query = Query(dc, searchExpression);
+            var exQuery = ExtendedQuery(dc, query);
+            return exQuery;
+        }
 
-    public static IQueryable<ExtendedItem<ParticipantGroup>> ExtendedQuery(AppDC dc, SearchExpression searchExpression, string sortExpression, int startRowIndex, int maximumRows)
-    {
-      var epQuery = ExtendedQuery(dc, searchExpression);
-      epQuery = epQuery.SortBy(sortExpression, startRowIndex, maximumRows);
-      return epQuery;
-    }
+        public static IQueryable<ExtendedItem<ParticipantGroup>> ExtendedQuery(AppDC dc, SearchExpression searchExpression, string sortExpression, int startRowIndex, int maximumRows)
+        {
+            var epQuery = ExtendedQuery(dc, searchExpression);
+            epQuery = epQuery.SortBy(sortExpression, startRowIndex, maximumRows);
+            return epQuery;
+        }
 
 
 
-    public static void GetExportRows(HttpResponse response, AppDC dc, SearchExpression searchExpression)
-    {
-        var epQuery =
-            from exParticipantGroup in ParticipantGroup.ExtendedQuery(dc, searchExpression)
+        public static void GetExportRows(HttpResponse response, AppDC dc, SearchExpression searchExpression)
+        {
+            var epQuery =
+                from exParticipantGroup in ParticipantGroup.ExtendedQuery(dc, searchExpression)
 
-            // Join with our 1:many 
+                    // Join with our 1:many 
             join tags in QueryGlobalEPTags2(dc, EPCategory.UserAssigned) on exParticipantGroup.itemID equals tags.TargetID into tagsGroup
 
-            join eventParticipant in EventParticipant.Query(dc) on exParticipantGroup.itemID equals eventParticipant.ParticipantID into eventParticipantsGroup
+                join eventParticipant in EventParticipant.Query(dc) on exParticipantGroup.itemID equals eventParticipant.ParticipantID into eventParticipantsGroup
 
             //join epGlobalSystemRoleTags in User.QueryGlobalEPTags2(dc, EPCategory.SystemRoleCategory) on exParticipantGroup.itemID equals epGlobalSystemRoleTags.TargetID into epGlobalSystemRoleTagsGroup
             //join epTeamSystemRoleTags in User.QueryItemEPTags2(dc, EPCategory.SystemRoleCategory, teamEPScope) on user.ID equals epTeamSystemRoleTags.TargetID into epTeamSystemRoleTagsGroup
@@ -337,26 +343,26 @@ namespace App.Library
             //join epOptionTags in User.QueryGlobalEPTags2(dc, EPCategory.OptionCategory) on user.ID equals epOptionTags.TargetID into epOptionTagsGroup
 
             select new
-            {
-                exParticipantGroup,
-                participantGroup = exParticipantGroup.item,
+                {
+                    exParticipantGroup,
+                    participantGroup = exParticipantGroup.item,
 
-                exParticipantGroup.item.Name,
+                    exParticipantGroup.item.Name,
                 //user.DisplayName,
                 //user.TimeZoneIndex,
                 Email = exParticipantGroup.PrimaryMailAddress.Address,
-                PhoneNumber = exParticipantGroup.PrimaryPhoneNumber.Proffered_CaseSensitive,
+                    PhoneNumber = exParticipantGroup.PrimaryPhoneNumber.Proffered_CaseSensitive,
 
 
-                tags = tagsGroup
-                    .Select(mm => mm.Item.Name)
-                    .Join(", "),
+                    tags = tagsGroup
+                        .Select(mm => mm.Item.Name)
+                        .Join(", "),
 
-                totalParticipants = eventParticipantsGroup.Count(),
-            };
+                    totalParticipants = eventParticipantsGroup.Count(),
+                };
 
-        var headerMap = new[]
-            {
+            var headerMap = new[]
+                {
                 new { key = "Name", value = "participantGroup.Name" },
                 //!! need to translate term
                 new { key = "Total Students", value = "totalParticipants" },
@@ -382,66 +388,66 @@ namespace App.Library
                 new { key = "Session Name", value = "session.Name" },
 */
             }
-        .ToDictionary(item => item.key, item => item.value);
+            .ToDictionary(item => item.key, item => item.value);
 
-        response.SendCsvFileToBrowser("ParticipantGroups.csv", epQuery, headerMap);
-    }
-
-
-
-    public class SearchItem : ExtendedSearchItem
-    {
-      [JsonProperty("name")]
-      public string Name { get; internal set; }
-      [JsonProperty("contactName")]
-      public string ContactName { get; internal set; }
-      [JsonProperty("badgeName")]
-      public string BadgeName { get; internal set; }
-      [JsonProperty("overview")]
-      public string Overview { get; internal set; }
-
-      [JsonProperty("createdTimestamp")]
-      public DateTime CreatedTimestamp { get; internal set; }
-      [JsonProperty("lastModifiedTimestamp")]
-      public DateTime LastModifiedTimestamp { get; internal set; }
-
-      public SearchItem(ExtendedItem<ParticipantGroup> exItem, SearchItemContext context)
-          : base(exItem, context)
-      {
-        //this.type = exItem.item.Ty
-        this.Name = exItem.item.Name;
-        this.ContactName = exItem.item.ContactName;
-        this.BadgeName = exItem.item.BadgeName;
-        this.Overview = exItem.item.Overview;
-
-        this.CreatedTimestamp = exItem.item.CreatedTimestamp;
-        this.LastModifiedTimestamp = exItem.item.LastModifiedTimestamp;
-      }
-
-      public static SearchItem Create(ExtendedItem<ParticipantGroup> item, SearchItemContext context)
-      {
-        var optionTags = context.TeamEPScopeItemTagCategoryGroups
-            .Where(group => group.Key == EPCategory.OptionCategory)
-            .SelectMany(groupElement => groupElement
-                .Select(epTagsItem => epTagsItem.Tag.Name))
-            .ToArray();
-
-        return new SearchItem(item, context);
-      }
-    }
+            response.SendCsvFileToBrowser("ParticipantGroups.csv", epQuery, headerMap);
+        }
 
 
 
+        public class SearchItem : ExtendedSearchItem
+        {
+            [JsonProperty("name")]
+            public string Name { get; internal set; }
+            [JsonProperty("contactName")]
+            public string ContactName { get; internal set; }
+            [JsonProperty("badgeName")]
+            public string BadgeName { get; internal set; }
+            [JsonProperty("overview")]
+            public string Overview { get; internal set; }
 
-    public static SearchResult<SearchItem> Search(AppDC dc, SearchExpression searchExpression, string sortExpression, int startRowIndex, int maximumRows)
-    {
-      // basic query that determines the objects that pass the search expression.
-      // (if the search expression contains Tags or other 1:many items, we'll need to do more work to filter down to those
-      var resultSetQuery = ExtendedQuery(dc, searchExpression);
+            [JsonProperty("createdTimestamp")]
+            public DateTime CreatedTimestamp { get; internal set; }
+            [JsonProperty("lastModifiedTimestamp")]
+            public DateTime LastModifiedTimestamp { get; internal set; }
 
-      var results = Search(dc, searchExpression, sortExpression, startRowIndex, maximumRows, resultSetQuery, SearchItem.Create);
-      return results;
-    }
+            public SearchItem(ExtendedItem<ParticipantGroup> exItem, SearchItemContext context)
+                : base(exItem, context)
+            {
+                //this.type = exItem.item.Ty
+                this.Name = exItem.item.Name;
+                this.ContactName = exItem.item.ContactName;
+                this.BadgeName = exItem.item.BadgeName;
+                this.Overview = exItem.item.Overview;
+
+                this.CreatedTimestamp = exItem.item.CreatedTimestamp;
+                this.LastModifiedTimestamp = exItem.item.LastModifiedTimestamp;
+            }
+
+            public static SearchItem Create(ExtendedItem<ParticipantGroup> item, SearchItemContext context)
+            {
+                var optionTags = context.TeamEPScopeItemTagCategoryGroups
+                    .Where(group => group.Key == EPCategory.OptionCategory)
+                    .SelectMany(groupElement => groupElement
+                        .Select(epTagsItem => epTagsItem.Tag.Name))
+                    .ToArray();
+
+                return new SearchItem(item, context);
+            }
+        }
+
+
+
+
+        public static SearchResult<SearchItem> Search(AppDC dc, SearchExpression searchExpression, string sortExpression, int startRowIndex, int maximumRows)
+        {
+            // basic query that determines the objects that pass the search expression.
+            // (if the search expression contains Tags or other 1:many items, we'll need to do more work to filter down to those
+            var resultSetQuery = ExtendedQuery(dc, searchExpression);
+
+            var results = Search(dc, searchExpression, sortExpression, startRowIndex, maximumRows, resultSetQuery, SearchItem.Create);
+            return results;
+        }
 
 
 
@@ -813,77 +819,77 @@ namespace App.Library
 #endif
 
 
-    public static ParticipantGroup FindByID(AppDC dc, int showID)
-    {
-      var result = ParticipantGroup.Query(dc)
-          .FirstOrDefault<ParticipantGroup>(show => show.ID == showID);
-      return result;
-    }
-
-    // probably need to use ShowNameAlias.FindShowOrCreateUnmatched() instead
-    internal static ParticipantGroup FindByName(AppDC dc, string name)
-    {
-      var existingItem = ParticipantGroup.Query(dc)
-          .Where(item => item.Name == name)
-          .FirstOrDefault();
-
-      return existingItem;
-    }
-
-
-
-
-
-    private static HubResult CreateLock(AppDC dc, Func<ParticipantGroup> createHandler)
-    {
-        var newCase = createLock(dc, createHandler);
-        if (newCase != null)
+        public static ParticipantGroup FindByID(AppDC dc, int showID)
         {
-            return HubResult.CreateSuccessData(new { id = newCase.ID });
+            var result = ParticipantGroup.Query(dc)
+                .FirstOrDefault<ParticipantGroup>(show => show.ID == showID);
+            return result;
         }
 
-        return HubResult.Error;
+        // probably need to use ShowNameAlias.FindShowOrCreateUnmatched() instead
+        internal static ParticipantGroup FindByName(AppDC dc, string name)
+        {
+            var existingItem = ParticipantGroup.Query(dc)
+                .Where(item => item.Name == name)
+                .FirstOrDefault();
+
+            return existingItem;
+        }
+
+
+
+
+
+        private static HubResult CreateLock(AppDC dc, Func<ParticipantGroup> createHandler)
+        {
+            var newCase = createLock(dc, createHandler);
+            if (newCase != null)
+            {
+                return HubResult.CreateSuccessData(new { id = newCase.ID });
+            }
+
+            return HubResult.Error;
+        }
+
+        private static ParticipantGroup createLock(AppDC dc, Func<ParticipantGroup> createHandler)
+        {
+            return createLock(dc, NotifyClients, createHandler);
+        }
+
+        private static ParticipantGroup exCreateLock(AppDC dc, JToken data, Func<ParticipantGroup> createHandler)
+        {
+            return exCreateLock(dc, data, NotifyClients, createHandler);
+        }
+
+        internal static T ReadLock<T>(AppDC dc, int itemID, Func<ParticipantGroup, T> readHandler)
+        {
+            return ReadLock(dc, itemID, FindByID, readHandler);
+        }
+
+        internal static HubResult ReadLock(AppDC dc, int itemID, Func<ParticipantGroup, HubResult> readHandler)
+        {
+            return ReadLock(dc, itemID, FindByID, readHandler);
+        }
+
+        internal static HubResult WriteLock(AppDC dc, int itemID, Func<ParticipantGroup, NotifyExpression, HubResult> writeHandler)
+        {
+            return WriteLock(dc, itemID, FindByID, NotifyClients, writeHandler);
+        }
+
+
+
+
+
+
+        internal static void NotifyClients(AppDC dc, NotifyExpression notifyExpression)
+        {
+            var notification = ParticipantGroup.Search(dc, notifyExpression, null, 0, int.MaxValue);
+            NotifyClients("siteHub", notifyExpression, notification, (hubClients, notificationItem) => hubClients.All.updateParticipantGroups(notificationItem));
+        }
+
+        public override string ToString()
+        {
+            return this.Name;
+        }
     }
-
-    private static ParticipantGroup createLock(AppDC dc, Func<ParticipantGroup> createHandler)
-    {
-        return createLock(dc, NotifyClients, createHandler);
-    }
-
-    private static ParticipantGroup exCreateLock(AppDC dc, JToken data, Func<ParticipantGroup> createHandler)
-    {
-        return exCreateLock(dc, data, NotifyClients, createHandler);
-    }
-
-    internal static T ReadLock<T>(AppDC dc, int itemID, Func<ParticipantGroup, T> readHandler)
-    {
-        return ReadLock(dc, itemID, FindByID, readHandler);
-    }
-
-    internal static HubResult ReadLock(AppDC dc, int itemID, Func<ParticipantGroup, HubResult> readHandler)
-    {
-        return ReadLock(dc, itemID, FindByID, readHandler);
-    }
-
-    internal static HubResult WriteLock(AppDC dc, int itemID, Func<ParticipantGroup, NotifyExpression, HubResult> writeHandler)
-    {
-        return WriteLock(dc, itemID, FindByID, NotifyClients, writeHandler);
-    }
-
-
-
-
-
-
-    internal static void NotifyClients(AppDC dc, NotifyExpression notifyExpression)
-    {
-        var notification = ParticipantGroup.Search(dc, notifyExpression, null, 0, int.MaxValue);
-        NotifyClients("siteHub", notifyExpression, notification, (hubClients, notificationItem) => hubClients.All.updateParticipantGroups(notificationItem));
-    }
-
-    public override string ToString()
-    {
-        return this.Name;
-    }
-  }
 }
