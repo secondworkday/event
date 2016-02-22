@@ -31,8 +31,8 @@
     </div>
 </div>
 <ms-search-view change-event="updateUsers" search="searchUsers" options="searchViewOptions" user-search="userSearch">
-  <div class="bg-white">
-    <div class="user u-hover-container" layout layout-align="start center"
+  <div class="list">
+    <div class="item u-hover-container" layout layout-align="start center" style="min-heigh:82px;"
       ng-repeat="user in $displayedIndex | objectLookup:$hashMap track by user.id">
       <div class="u-sm-margin-left u-sm-margin-right">
         <img ng-src="{{user.profilePhotoUrl || '/images/user-img-placeholder.png'}}" class="mini-user-img" />
