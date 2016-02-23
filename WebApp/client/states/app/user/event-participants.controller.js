@@ -42,7 +42,21 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     if ($scope.$selectedIndex && $scope.$selectedIndex.length > 0) {
       $scope.$selectedIndex = [];
     } else {
-      //!! fetch 'em and select all
+
+      // Fetch a list of all the currently selected IDs
+      var searchExpression = utilityService.buildSearchExpression(
+        $scope.searchViewOptions.baseFilter,
+        $scope.searchViewOptions.stackFilters,
+
+        $scope.searchViewOptions.filter,
+        $scope.searchViewOptions.selectFilter,
+        $scope.searchViewOptions.objectFilter,
+        $scope.searchViewOptions.userSearch);
+
+      siteService.model.eventParticipants.getSet(searchExpression)
+      .then(function (itemIDs) {
+        $scope.$selectedIndex = itemIDs;
+      });
     }
   };
 

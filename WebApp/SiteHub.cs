@@ -654,6 +654,17 @@ namespace WebApp
             });
         }
 
+        public HubResult GetEventParticipantSet(string searchExpressionString)
+        {
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var searchExpression = SearchExpression.Create(searchExpressionString);
+                var result = EventParticipant.GetSet(dc, searchExpression);
+                return HubResult.CreateSuccessData(result);
+            });
+        }
+
+
 
         public HubResult ParseEventParticipants(int eventID, string parseData)
         {

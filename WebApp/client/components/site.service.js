@@ -653,6 +653,12 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
       }).then(function (itemsData) {
         return utilityService.updateItemsModel(model.eventParticipants, itemsData);
       });
+    },
+
+    getSet: function (searchExpression) {
+      return utilityService.callHub(function () {
+        return siteHub.server.getEventParticipantSet(searchExpression);
+      });
     }
   };
 

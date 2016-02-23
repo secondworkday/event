@@ -91,7 +91,7 @@
         <thead fsm-sticky-header scroll-body="'#datagrid'" scroll-stop="64" class="sticky-header-style">
           <tr layout layout-align="start center" class="table-header md-body-2 text-support">
             <th flex="5" class="text-center">
-              <md-checkbox style="margin:0;"  ng-model="selectAll" ng-click="multiSelectOn()" aria-label="select all"></md-checkbox>
+              <md-checkbox style="margin:0;" ng-checked="$selectedIndex.length" ng-click="toggleSelectAll()" aria-label="select all"></md-checkbox>
             </th>
             <th flex="10" class="text-left" style="max-width:120px;">Last Name</th>
             <th flex="10" class="text-left">First Name</th>

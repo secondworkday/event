@@ -849,6 +849,18 @@ namespace App.Library
 
 
 
+        public static int[] GetSet(AppDC dc, SearchExpression searchExpression)
+        {
+            var query = EventParticipant.Query(dc, searchExpression);
+
+            var result = query
+                .Select(eventParticipant => eventParticipant.ID)
+                .ToArray();
+
+            return result;
+        }
+
+
 #if false
         public static SearchResults<SearchItem> Search(AppDC dc, SearchExpression searchExpression, string sortExpression, uint startRowIndex, uint maximumRows)
         {
