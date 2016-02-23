@@ -498,6 +498,24 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
   }
 
 
+  self.toggleList = function (list, item) {
+    var idx = list.indexOf(item);
+    if (idx > -1) {
+      // toggle off...
+      list.splice(idx, 1);
+    }
+    else {
+      // toggle on...
+      list.push(item);
+    }
+  };
+
+  self.listContains = function (list, item) {
+    return list.indexOf(item) > -1;
+  };
+
+
+
 
 
   // Some handy compare functions
@@ -2868,7 +2886,7 @@ app.directive('msSearchView', function ($parse, utilityService) {
         if ($scope.totalCount) {
           $scope.totalCount += eventData.ids.length;
         }
-      }
+      };
 
 
       $scope.loadPage = function (searchExpression) {
@@ -2909,7 +2927,7 @@ app.directive('msSearchView', function ($parse, utilityService) {
               //!!   return;
             }
           }
-        }
+        };
 
 
 

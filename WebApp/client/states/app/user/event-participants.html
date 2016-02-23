@@ -53,7 +53,7 @@
   </div>
   <div flex>
     <div layout layout-align="start center"
-      ng-hide="$selectedIndex && $selectedIndex.length > 0">
+      ng-hide="selectedIndex.length">
       <div flex>
         <md-input-container class="md-block" flex-gt-sm style="margin-top:0;margin-bottom:0;">
           <label><i class="fa fa-search"></i> Search for {{'PARTICIPANT' | translate | lowercase}} name or {{'PARTICIPANT_GROUP' | translate | lowercase}}</label>
@@ -76,10 +76,10 @@
       </div>
     </div>
     <div layout style="height:58px;"
-      ng-if="$selectedIndex && $selectedIndex.length > 0">
+      ng-if="selectedIndex.length">
       <div flex="15"></div>
       <div flex layout layout-align="end center">
-        <span class="tag">{{$selectedIndex.length}} Selected <i ng-click="unselectAll()" class="fa fa-times u-clickable"></i></span>
+        <span class="tag">{{selectedIndex.length}} Selected <i ng-click="unselectAll()" class="fa fa-times u-clickable"></i></span>
         <md-button ng-click="showBulkEditParticipantsDialog($event)"><i class="fa fa-pencil"></i> Bulk Edit</md-button>
         <md-button ng-click="checkInEventParticipants()"><i class="fa fa-check"></i> Check-In</md-button>
         <md-button ng-click="undoCheckInEventParticipants()"><i class="fa fa-undo"></i> Set Not Checked-In</md-button>
@@ -91,7 +91,7 @@
         <thead fsm-sticky-header scroll-body="'#datagrid'" scroll-stop="64" class="sticky-header-style">
           <tr layout layout-align="start center" class="table-header md-body-2 text-support">
             <th flex="5" class="text-center">
-              <md-checkbox style="margin:0;" ng-checked="$selectedIndex.length" ng-click="toggleSelectAll()" aria-label="select all"></md-checkbox>
+              <md-checkbox style="margin:0;" ng-checked="selectedIndex.length" ng-click="toggleSelectAll()" aria-label="select all"></md-checkbox>
             </th>
             <th flex="10" class="text-left" style="max-width:120px;">Last Name</th>
             <th flex="10" class="text-left">First Name</th>
