@@ -726,6 +726,14 @@ namespace WebApp
             });
         }
 
+        public HubResult BulkEditEventParticipants(int[] itemIDs, int eventSessionID)
+        {
+            return accountsOnlyHeader((utilityContext, dc) =>
+            {
+                return EventParticipant.SetEventSession(dc, itemIDs, eventSessionID);
+            });
+        }
+
         public HubResult UndoCheckInEventParticipants(int[] itemIDs)
         {
             return accountsOnlyHeader((utilityContext, dc) =>

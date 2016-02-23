@@ -559,13 +559,16 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
       templateUrl: '/client/states/app/user/bulk-edit-participants.dialog.html',
       locals: {
         event: event,
-        eventSessionsIndex: $scope.eventSessionsIndex
+        eventSessionsIndex: $scope.eventSessionsIndex,
+        selectedIndex: $scope.$selectedIndex
       },
       controller: BulkEditParticipantsDialog
     });
-    function BulkEditParticipantsDialog($scope, $mdDialog, $translate, event, eventSessionsIndex) {
+    function BulkEditParticipantsDialog($scope, $mdDialog, $translate, event, eventSessionsIndex, selectedIndex) {
       $scope.eventSessions = siteService.model.eventSessions;
       $scope.participantGroups = siteService.model.participantGroups;
+      
+      $scope.totalSelectedParticipants = selectedIndex.length;
 
       $scope.event = event;
       $scope.eventSessionsIndex = eventSessionsIndex;
@@ -574,9 +577,22 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
         $log.debug("You canceled the dialog.");
         $mdDialog.hide();
       };
-      $scope.apply = function () {
+
+      $scope.apply = function (formData) {
+        var itemIDs = selectedIndex;
+
         $log.debug("You applied the bulk edit.");
-        //!! TODO add function to actually apply the bulk edit to all the records
+        siteService.bulkEditEventParticipants(itemIDs, formData.eventSessionID)
+        .then(function (successData) {
+          var PARTICIPANT = $translate.instant('PARTICIPANT');
+          $msUI.showToast(itemIDs.length + " " + PARTICIPANT + "s Edited");
+          $log.debug(itemIDs.length + " Event Participants Edited.");
+          return successData;
+        }, function (failureData) {
+          $msUI.showToast(failureData.errorMessage);
+          $log.debug(failureData.errorMessage);
+          return failureData;
+        });
         $mdDialog.hide();
       };
     }

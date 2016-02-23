@@ -24,5 +24,6 @@ namespace App.Library
 
         public static readonly ActivityType BulkCheckIn = create(0);
         public static readonly ActivityType BulkUndoCheckIn = create(1);
+        public static readonly ActivityType BulkEdit = create(2);
     }
 }

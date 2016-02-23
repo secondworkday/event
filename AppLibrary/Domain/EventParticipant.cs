@@ -357,6 +357,56 @@ namespace App.Library
             }
         }
 
+        private void updateEventSession(AppDC dc, int eventSessionID)
+        {
+            this.EventSessionID = eventSessionID;
+        }
+
+        public static HubResult SetEventSession(AppDC dc, int itemID, int eventSessionID)
+        {
+            return WriteLock(dc, itemID, (item, notifyExpression) =>
+            {
+                item.updateEventSession(dc, eventSessionID);
+
+                notifyExpression.AddModifiedID(item.ID);
+                return HubResult.Success;
+            });
+        }
+
+        public static HubResult SetEventSession(AppDC dc, int[] itemIDs, int eventSessionID)
+        {
+            Debug.Assert(itemIDs != null);
+            if (itemIDs == null)
+            {
+                return HubResult.Error;
+            }
+            if (!itemIDs.Any())
+            {
+                return HubResult.NotFound;
+            }
+
+            dc.SubmitLock(() =>
+            {
+                var editItems = dc.EventParticipants
+                    .Where(item => itemIDs.Contains(item.ID));
+
+                foreach (var item in editItems)
+                {
+                    SetEventSession(dc, item.ID, eventSessionID);
+                }
+
+                int bulkTagIDThingy = 0;
+
+                string activityDescription = string.Format("Bulk CheckIn {0} EventParticipant(s)",
+                    /*0*/ itemIDs.Length);
+                var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+                var activityType = ActivityType.BulkEdit;
+                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
+            });
+
+            return HubResult.Success;
+        }
+
         public static HubResult CheckIn(AppDC dc, int[] itemIDs)
         {
             Debug.Assert(itemIDs != null);

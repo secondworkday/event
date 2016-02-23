@@ -746,8 +746,14 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
   self.undoCheckInEventParticipants = function (itemIDs) {
     return utilityService.callHub(function () {
       return siteHub.server.undoCheckInEventParticipants(itemIDs);
-  });
-};
+    });
+  };
+
+  self.bulkEditEventParticipants = function (itemIDs, eventSessionID) {
+    return utilityService.callHub(function () {
+      return siteHub.server.bulkEditEventParticipants(itemIDs, eventSessionID);
+    });
+  };
 
   self.checkInEventParticipant = function (item) {
     return utilityService.callHub(function () {
