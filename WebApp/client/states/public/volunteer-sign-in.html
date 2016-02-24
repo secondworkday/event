@@ -1,0 +1,40 @@
+<div layout layout-align="center center" style="margin-top:4rem;">
+  <md-card flex-xs flex-gt-xs="50">
+    <form name="signInForm">
+      <md-card-content>
+        <div>
+          <h2 class="md-title">Enter your event information</h2>
+        </div>
+        <div layout="column">
+          <div layout>
+            <md-input-container flex>
+              <label>First Name</label>
+              <input ng-model="formData.firstName" type="text" required>
+            </md-input-container>
+            <md-input-container flex>
+              <label>Last Name</label>
+              <input ng-model="formData.lastName" type="text" required>
+            </md-input-container>
+          </div>
+          <md-input-container flex>
+            <label>Access Code</label>
+            <input ng-model="formData.eventSessionCode" type="text" required>
+          </md-input-container>
+        </div>
+        <span class="md-caption u-sm-margin-right">
+          <a href="#">Need Help?</a>
+        </span>
+        <span class="md-caption">
+          <a href="#">Demo Volunteers</a>
+        </span>
+      </md-card-content>
+      <md-card-actions layout="row" layout-align="end center">
+        <md-button class="md-primary" type="submit"
+          ng-disabled="signInForm.$invalid"
+          ng-click="signIn(formData)">
+          Go
+        </md-button>
+      </md-card-actions>
+    </form>
+  </md-card>
+</div>

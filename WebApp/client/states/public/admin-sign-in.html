@@ -1,0 +1,34 @@
+<div layout layout-align="center center" style="margin-top:4rem;">
+  <md-card flex-xs flex-gt-xs="50">
+    <form name="signInForm">
+      <md-card-content>
+        <div>
+          <h2 class="md-title">Sign in to your account</h2>
+        </div>
+        <div layout="column">
+          <md-input-container flex>
+            <label>Email</label>
+            <input ng-model="formData.email" type="email" required>
+          </md-input-container>
+          <md-input-container flex>
+            <label>Password</label>
+            <input ng-model="formData.password" type="password" required>
+          </md-input-container>
+        </div>
+        <span class="md-caption u-sm-margin-right">
+          <a ng-click="showForgotPasswordDialog($event)">Forgot password?</a>
+        </span>
+        <span class="md-caption">
+          <a ng-click="showDemoAccountDialog()">Demo Users</a>
+        </span>
+      </md-card-content>
+      <md-card-actions layout="row" layout-align="end center">
+        <md-button class="md-primary" type="submit"
+          ng-disabled="signInForm.$invalid"
+          ng-click="signIn(formData)">
+          Sign In
+        </md-button>
+      </md-card-actions>
+    </form>
+  </md-card>
+</div>
