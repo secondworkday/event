@@ -43,6 +43,14 @@ namespace WebApp
             return IdentityHeader(BaseHub.AccountsOnlyDataContextFactory<AppDC>, dc => accountsOnlyHandler(SiteContext.Current, dc));
         }
 
+        protected HubResult accountsOnlyHeader(Func<SiteContext, AppDC, HubResult> accountsOnlyHandler, string callingMethod)
+        {
+            MsEventSourceActivities.MsEventSource.Log.RequestStart(callingMethod);
+            var header = IdentityHeader(BaseHub.AccountsOnlyDataContextFactory<AppDC>, dc => accountsOnlyHandler(SiteContext.Current, dc));
+            MsEventSourceActivities.MsEventSource.Log.RequestStop(true);
+            return header;
+        }
+
 #if false
         /// <summary>
         /// Authenticates as a TenantAdmin for our Demo Tenant - for creating tenant stuff
@@ -681,7 +689,7 @@ namespace WebApp
             {
                 var result = EventParticipant.Upload(dc, eventID, data, Clients.Caller);
                 return HubResult.CreateSuccessData(result);
-            });
+            }, "/SiteHub/UploadEventParticipants");
         }
 
 
@@ -715,7 +723,7 @@ namespace WebApp
         return accountsOnlyHeader((utilityContext, dc) =>
         {
             return EventParticipant.Delete(dc, itemIDs);
-        });
+        }, "/SiteHub/DeleteEventParticipants");
     }
 
         public HubResult CheckInEventParticipants(int[] itemIDs)
@@ -723,7 +731,7 @@ namespace WebApp
             return accountsOnlyHeader((utilityContext, dc) =>
             {
                 return EventParticipant.CheckIn(dc, itemIDs);
-            });
+            }, "/SiteHub/CheckInEventParticipants");
         }
 
         public HubResult BulkEditEventParticipants(int[] itemIDs, int eventSessionID)
@@ -731,7 +739,7 @@ namespace WebApp
             return accountsOnlyHeader((utilityContext, dc) =>
             {
                 return EventParticipant.SetEventSession(dc, itemIDs, eventSessionID);
-            });
+            }, "/SiteHub/BulkEditEventParticipants");
         }
 
         public HubResult UndoCheckInEventParticipants(int[] itemIDs)
@@ -739,7 +747,7 @@ namespace WebApp
             return accountsOnlyHeader((utilityContext, dc) =>
             {
                 return EventParticipant.UndoCheckIn(dc, itemIDs);
-            });
+            }, "/SiteHub/UndoCheckInEventParticipants");
         }
 
 
