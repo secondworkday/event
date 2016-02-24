@@ -243,6 +243,7 @@
     <Content Include="client\states\app\user\user-container.html" />
     <Content Include="client\states\app\user\user.config.js" />
     <Content Include="client\states\app\user\user.controller.js" />
+    <Content Include="client\states\public\admin-sign-in.html" />
     <Content Include="client\states\public\connection\disconnected.controller.js" />
     <Content Include="client\states\public\connection\disconnected.html" />
     <Content Include="client\states\public\connection\reconnecting.controller.js" />
@@ -258,7 +259,7 @@
     <Content Include="client\states\public\reset-password.html" />
     <Content Include="client\states\public\sign-in-demo-account.dialog.html" />
     <Content Include="client\states\public\sign-in.controller.js" />
-    <Content Include="client\states\public\sign-in.html" />
+    <Content Include="client\states\public\volunteer-sign-in.html" />
     <Content Include="client\states\public\wait.html" />
     <Content Include="Content\angular-material\angular-material.css" />
     <Content Include="Content\angular-material\angular-material.min.css" />
@@ -267,6 +268,7 @@
     <Content Include="default.html" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />
+    <Content Include="images\boy-guitar-laith-abuabdu-unsplash.jpg" />
     <Content Include="images\logo-eastside.png" />
     <Content Include="images\user-img-placeholder.png" />
     <Content Include="js\mk-editable-span.js" />
