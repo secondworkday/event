@@ -251,6 +251,7 @@ namespace App.Library
             });
             NotifyClients(dc, notifyExpression);
 
+            //!! This is an undoable action! need a way to return info about that!
             return HubResult.Success;
         }
 

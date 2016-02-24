@@ -5,44 +5,37 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
   $scope.demandParticipantGroup = siteService.demandParticipantGroup;
   $scope.demandEventSession = siteService.demandEventSession;
 
+  $scope.event = event;
+  // (optional - provided when we're looking at just one session, null when we're not)
+  $scope.eventSession = eventSession;
 
-  //!! multi-select stuff
-  //!! I think we'll want to move this insde ms-search-view
 
-  //!! We need a separate Index because we'll need the ability to "select" items that aren't yet loaded into the view ...
-  $scope.$selectedIndex = [];
+  // ** Selection related stuff
 
-  $scope.toggleList = function (list, item) {
-    var idx = list.indexOf(item);
-    if (idx > -1) {
-      // toggle off...
-      list.splice(idx, 1);
-    }
-    else {
-      // toggle on...
-      list.push(item);
-    }
-  };
-  $scope.listContains = function (list, item) {
-    return list.indexOf(item) > -1;
-  };
+  // Our selection. Note might be a superset of items displayed as we can "select" items that aren't yet loaded into the view ...
+  $scope.selectedIndex = [];
+
+
+  $scope.$on('updateEventParticipants', function (event, eventData) {
+    // Remove from our selection any items that are deleted
+    utilityService.arrayRemove($scope.selectedIndex, eventData.deletedIDs);
+  });
 
   $scope.toggleSelectedIndex = function (item) {
-    $scope.toggleList($scope.$selectedIndex, item.id);
+    utilityService.toggleList($scope.selectedIndex, item.id);
   };
   $scope.selectedIndexContains = function (item) {
-    return $scope.listContains($scope.$selectedIndex, item.id);
+    return utilityService.listContains($scope.selectedIndex, item.id);
   };
 
   $scope.unselectAll = function () {
-    $scope.$selectedIndex = [];
+    $scope.selectedIndex = [];
   };
 
   $scope.toggleSelectAll = function () {
-    if ($scope.$selectedIndex && $scope.$selectedIndex.length > 0) {
-      $scope.$selectedIndex = [];
+    if ($scope.selectedIndex.length) {
+      $scope.selectedIndex = [];
     } else {
-
       // Fetch a list of all the currently selected IDs
       var searchExpression = utilityService.buildSearchExpression(
         $scope.searchViewOptions.baseFilter,
@@ -55,7 +48,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
 
       siteService.model.eventParticipants.getSet(searchExpression)
       .then(function (itemIDs) {
-        $scope.$selectedIndex = itemIDs;
+        $scope.selectedIndex = itemIDs;
       });
     }
   };
@@ -65,10 +58,6 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
 
 
 
-
-  $scope.event = event;
-  // (optional - provided when we're looking at just one session, null when we're not)
-  $scope.eventSession = eventSession;
 
 
   $scope.searchViewOptions = { };
@@ -481,7 +470,8 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
 
   $scope.deleteEventParticipants = function () {
 
-    var itemIDs = $scope.$selectedIndex;
+    var itemIDs = $scope.selectedIndex;
+    var itemIDsLength = itemIDs.length;
 
     siteService.deleteEventParticipants(itemIDs)
     .then(function (successData) {
@@ -489,8 +479,8 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
       //!! fix the pluralization here - or perhaps improve upon the Toast
 
       var PARTICIPANT = $translate.instant('PARTICIPANT');
-      $msUI.showToast(itemIDs.length + " " + PARTICIPANT + "(s) Deleted");
-      $log.debug(itemIDs.length + " Event Participant(s) Deleted.");
+      $msUI.showToast(itemIDsLength + " " + PARTICIPANT + "(s) Deleted");
+      $log.debug(itemIDsLength + " Event Participant(s) Deleted.");
       return successData;
     }, function (failureData) {
       // failure
@@ -501,13 +491,15 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
   };
 
   $scope.checkInEventParticipants = function () {
-    var itemIDs = $scope.$selectedIndex;
+
+    var itemIDs = $scope.selectedIndex;
+    var itemIDsLength = itemIDs.length;
 
     siteService.checkInEventParticipants(itemIDs)
     .then(function (successData) {
       var PARTICIPANT = $translate.instant('PARTICIPANT');
-      $msUI.showToast(itemIDs.length + " " + PARTICIPANT + "(s) Checked in");
-      $log.debug(itemIDs.length + " Event Participant(s) Checked in.");
+      $msUI.showToast(itemIDsLength + " " + PARTICIPANT + "(s) Checked in");
+      $log.debug(itemIDsLength + " Event Participant(s) Checked in.");
       return successData;
     }, function (failureData) {
       $msUI.showToast(failureData.errorMessage);
@@ -517,13 +509,15 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
   };
 
   $scope.undoCheckInEventParticipants = function () {
-    var itemIDs = $scope.$selectedIndex;
+
+    var itemIDs = $scope.selectedIndex;
+    var itemIDsLength = itemIDs.length;
 
     siteService.undoCheckInEventParticipants(itemIDs)
     .then(function (successData) {
       var PARTICIPANT = $translate.instant('PARTICIPANT');
-      $msUI.showToast(itemIDs.length + " " + PARTICIPANT + "(s) Check-in Undone");
-      $log.debug(itemIDs.length + " Event Participant(s) Check-in Undone.");
+      $msUI.showToast(itemIDsLength + " " + PARTICIPANT + "(s) Check-in Undone");
+      $log.debug(itemIDsLength + " Event Participant(s) Check-in Undone.");
       return successData;
     }, function (failureData) {
       $msUI.showToast(failureData.errorMessage);
@@ -560,7 +554,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
       locals: {
         event: event,
         eventSessionsIndex: $scope.eventSessionsIndex,
-        selectedIndex: $scope.$selectedIndex
+        selectedIndex: $scope.selectedIndex
       },
       controller: BulkEditParticipantsDialog
     });
