@@ -200,7 +200,6 @@ namespace App.Library
             var activityType = ActivityType.Deleted;
             ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), itemID);
 
-
             dc.SubmitChanges();
 
             var notifyExpression = new NotifyExpression();
@@ -222,26 +221,44 @@ namespace App.Library
                 return HubResult.NotFound;
             }
 
+
             dc.SubmitLock(() =>
             {
                 var deleteItems = dc.EventParticipants
                     .Where(item => itemIDs.Contains(item.ID));
 
-            //!! TODO remove any Tags that have their last reference with this Pipeline
-            //!! Should we have an ExtendedObject call to remove all extended properties?
+                //!! TODO remove any Tags that have their last reference with this Pipeline
+                //!! Should we have an ExtendedObject call to remove all extended properties?
 
+                int eventID;
+                if (!deleteItems
+                    .Select(eventParticipant => eventParticipant.EventID)
+                    .AsEnumerable()
+                    .AllEqual(out eventID))
+                {
+                    throw new HubResultException(HubResult.Error);
+                }
 
-            //!! We won't delete Participant
-            dc.EventParticipants.DeleteAllOnSubmit(deleteItems);
-
-            //!! create a bulk delete TAG
-            int bulkTagIDThingy = 0;
+                //!! We won't delete Participant
+                dc.EventParticipants.DeleteAllOnSubmit(deleteItems);
 
                 string activityDescription = string.Format("Bulk Delete {0} EventParticipant(s)",
                     /*0*/ itemIDs.Length);
                 var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
                 var activityType = ActivityType.BulkDeleted;
-                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
+
+                // Note we're tucking the number of items deleted as the EventParticipant ID. 
+                var activityItem = ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), itemIDs.Length, typeof(Event), eventID);
+                Debug.Assert(activityItem != null);
+
+                // Stash away Length here? Or should we stick it as JSON in activityItem.ActivityContext?
+
+                Debug.Assert(activityItem.ID == 0);
+                dc.Save(activityItem);
+                Debug.Assert(activityItem.ID > 0);
+
+                var epCategory = EPCategory.DefaultSetCategory;
+                activityItem.AddSet(dc, epCategory, itemIDs);
             });
 
             var notifyExpression = new NotifyExpression();
@@ -254,9 +271,6 @@ namespace App.Library
             //!! This is an undoable action! need a way to return info about that!
             return HubResult.Success;
         }
-
-
-
 
 
 
@@ -279,8 +293,8 @@ namespace App.Library
 
                 var defaultEventSessionID = uploadData.Value<int?>("eventSessionID");
 
-            //var eventParticipantsCount = uploadData["itemsData"].Count;
-            var eventParticipantsCount = uploadData["itemsData"].Count();
+                //var eventParticipantsCount = uploadData["itemsData"].Count;
+                var eventParticipantsCount = uploadData["itemsData"].Count();
                 var i = 1;
                 var eventParticipants = uploadData["itemsData"]
                     .Select(itemData =>
@@ -296,18 +310,26 @@ namespace App.Library
 
 
 
-            //!! create a bulk activity TAG
-            int bulkTagIDThingy = 0;
 
                 string activityDescription = string.Format("Bulk Create {0} EventParticipant(s)",
                     /*0*/ eventParticipants.Length);
                 var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
                 var activityType = ActivityType.BulkCreated;
-                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
 
+                // Note we're tucking the number of items deleted as the EventParticipant ID. 
+                var activityItem = ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), eventParticipants.Length, typeof(Event), eventID);
+                Debug.Assert(activityItem != null);
 
+                // Stash away Length here? Or should we stick it as JSON in activityItem.ActivityContext?
 
+                Debug.Assert(activityItem.ID == 0);
+                dc.Save(activityItem);
+                Debug.Assert(activityItem.ID > 0);
 
+                var epCategory = EPCategory.DefaultSetCategory;
+                activityItem.AddSet(dc, epCategory, eventParticipants
+                    .Where(eventParticipant => eventParticipant.HasValue)
+                    .Select(eventParticipant => eventParticipant.Value));
 
                 return HubResult.CreateSuccessData(eventParticipants);
             });
