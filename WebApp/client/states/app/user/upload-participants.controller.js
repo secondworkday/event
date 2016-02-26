@@ -91,7 +91,24 @@ app.controller('UploadParticipantsDialogController', function ($scope, $mdDialog
         { firstName: 'fred', lastName: 'flintstone', participantGroupID: 3 }]
     };
     $msUI.showToast("Uploading " + $scope.uploadData.itemsData.length + " students", "bulkEventParticipantUpload");
-    siteService.uploadEventParticipants(event, $scope.uploadData);
+
+    siteService.uploadEventParticipants(event, $scope.uploadData)
+    .then(function (successData) {
+      // success
+      $msUI.showToast("All done");
+      return successData;
+    }, function (failureData) {
+      // failure
+      $log.debug(failureData.errorMessage);
+      $msUI.showToast(failureData.errorMessage);
+      return failureData;
+    }, function (progressData) {
+      // progress
+      $log.debug(progressData);
+      $msUI.showToast(progressData, "uploadEventParticipants");
+      return progressData;
+    });
+
     $mdDialog.hide();
   };
 
