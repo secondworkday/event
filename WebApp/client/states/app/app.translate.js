@@ -9,6 +9,7 @@ app.config(['$translateProvider', function ($translateProvider) {
     'EVENT_SESSIONS': 'Sessions',
     'PARTICIPANT': 'Participant',
     'PARTICIPANTS': 'Participants',
+    'PARTICIPANT_LEVEL': 'Level',
     'PARTICIPANT_GROUP': 'Participant Group',
     'PARTICIPANT_GROUPS': 'Participant Groups',
     'LOCATION': 'Location',
@@ -36,6 +37,7 @@ app.config(['$translateProvider', function ($translateProvider) {
     'EVENT_SESSIONS': 'Skills Clinics',
     'PARTICIPANT': 'Player',
     'PARTICIPANTS': 'Players',
+    'PARTICIPANT_LEVEL': 'Age Group',
     'PARTICIPANT_GROUP': 'Club',
     'PARTICIPANT_GROUPS': 'Clubs',
     'LOCATION': 'Field',
@@ -64,6 +66,7 @@ app.config(['$translateProvider', function ($translateProvider) {
     'EVENT_SESSIONS': 'Shopping Events',
     'PARTICIPANT': 'Student',
     'PARTICIPANTS': 'Students',
+    'PARTICIPANT_LEVEL': 'Grade',
     'PARTICIPANT_GROUP': 'School',
     'PARTICIPANT_GROUPS': 'Schools', // issue: concepts are now a mismatch, name changed per Bob's request
     'LOCATION': 'Store',
