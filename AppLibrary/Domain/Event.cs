@@ -338,7 +338,7 @@ namespace App.Library
                     eventID = randomEvent.ID,
                     participantID = participantInfo.Participant.ID,
 
-                    grade = random.Next(1, 12),
+                    level = random.Next(1, 12).ToString(),
 
                 }.ToJson().FromJson())
                 .Select(eventParticipantData => new {
@@ -386,7 +386,7 @@ namespace App.Library
                             eventID = randomEvent.ID,
                             participantID = participantInfo.Participant.ID,
 
-                            grade = random.Next(1, 12),
+                            level = random.Next(1, 12).ToString(),
 
                             eventSessionID = eventSession.ID,
                         }.ToJson().FromJson())

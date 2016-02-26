@@ -120,7 +120,7 @@
             <td flex="10" class="table-data text-left" ng-class="{'table-data-with-note': eventParticipant.notes}" style="max-width:120px;"><div ng-class="{'table-cell-with-note': eventParticipant.notes}">{{ eventParticipant.lastName }}</div><div ng-if="eventParticipant.notes" class="table-cell-notes">{{eventParticipant.notes}}</div></td>
             <td flex="10" class="table-data text-left">{{ eventParticipant.firstName }}</td>
             <td flex="15" class="table-data text-left">{{ eventParticipantParticipantGroup.name }}</td>
-            <td flex="10" class="table-data text-center">{{ eventParticipant.grade }}</td>
+            <td flex="10" class="table-data text-center">{{ eventParticipant.level }}</td>
             <td flex="10" class="table-data text-left" hide-xs hide-sm>{{ eventParticipant.gender }}</td>
             <td flex="10" class="table-data text-left" hide-xs hide-sm ng-if="!eventSession">{{ eventParticipantEventSession.location }}</td>
             <td flex="10" class="table-data text-left" ng-if="!eventSession">{{ eventParticipantEventSession.startDate | amCalendar}}</td>

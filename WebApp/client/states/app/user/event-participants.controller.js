@@ -80,7 +80,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     { name: 'Last Name', serverTerm: 'Participant.LastName', clientFunction: utilityService.compareByProperties('lastName', 'id') },
     //!! this is currently broken - as we don't really want to sort by the ParticipantGroup ID
     { name: 'School', serverTerm: 'Participant.ParticipantGroup.Name', clientFunction: utilityService.compareByProperties('participantGroupName', 'id') },
-    { name: 'Grade', serverTerm: 'ExEventParticipant.item.Grade', clientFunction: utilityService.compareByProperties('grade', 'id') }
+    { name: 'Level', serverTerm: 'ExEventParticipant.item.Level', clientFunction: utilityService.compareByProperties('level', 'id') }
   ];
 
   $scope.searchViewOptions.sort = $scope.sortOptions[0];

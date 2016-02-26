@@ -44,7 +44,7 @@ namespace App.Library
         protected override ExtendedPropertyScopeType objectScopeType { get { return this.ScopeType; } }
         protected override int? objectScopeID { get { return this.ScopeID; } }
 
-        protected EventParticipant(DateTime createdTimestamp, EPScope epScope, int eventID, int participantID, uint? grade)
+        protected EventParticipant(DateTime createdTimestamp, EPScope epScope, int eventID, int participantID, string level)
             : this()
         {
             this.CreatedTimestamp = createdTimestamp;
@@ -54,7 +54,7 @@ namespace App.Library
             this.EventID = eventID;
             this.ParticipantID = participantID;
 
-            this.Grade = grade;
+            this.Level = level;
         }
 
         public static EventParticipant Create(AppDC dc, JToken data)
@@ -67,10 +67,9 @@ namespace App.Library
                 var eventID = data.Value<int>("eventID");
                 var participantID = data.Value<int>("participantID");
 
-                var grade = data.Value<uint?>("grade");
+                var level = data.Value<string>("level");
 
-
-                var newItem = new EventParticipant(createdTimestamp, teamEPScope, eventID, participantID, grade);
+                var newItem = new EventParticipant(createdTimestamp, teamEPScope, eventID, participantID, level);
 
                 // optional parameters
                 var dataJToken = data as JToken;
@@ -130,7 +129,7 @@ namespace App.Library
                 new BulkUpload.ColumnHandler("firstName", BulkUpload.ColumnOptions.Required, "first name", "first"),
                 new BulkUpload.ColumnHandler("lastName", BulkUpload.ColumnOptions.Required, "last name", "last"),
                 new BulkUpload.ColumnHandler("gender", BulkUpload.ColumnOptions.Required, genderNormalizationValues, "sex"),
-                new BulkUpload.ColumnHandler("grade", BulkUpload.ColumnOptions.Optional),
+                new BulkUpload.ColumnHandler("level", BulkUpload.ColumnOptions.Optional, "grade"),
                 new BulkUpload.ColumnHandler("participantGroupName", BulkUpload.ColumnOptions.Optional, "school"),
             };
 
@@ -175,7 +174,7 @@ namespace App.Library
             }
 
             this.SetNotes(dc, (string)data.notes);
-            this.Grade = (uint)data.grade;
+            this.Level = (string)data.level;
         }
 
         public static HubResult Delete(AppDC dc, int itemID)
@@ -611,7 +610,7 @@ namespace App.Library
             searchTermQuery = searchExpression.FilterByTextTerms(searchTermQuery, (termQuery, searchTermLower) =>
             {
                 return termQuery.Where(item =>
-                    (item.eventParticipant.Grade.HasValue && item.eventParticipant.Grade.Value.ToString().Contains(searchTermLower)) ||
+                    item.eventParticipant.Level.Contains(searchTermLower) ||
                     item.participant.FirstName.Contains(searchTermLower) ||
                     item.participant.LastName.Contains(searchTermLower) ||
                     item.participantGroup.Name.Contains(searchTermLower) ||
@@ -734,7 +733,7 @@ namespace App.Library
 
                 new { key = "School", value = "participantGroup.Name" },
 
-                new { key = "Grade", value = "eventParticipant.Grade" },
+                new { key = "Grade", value = "eventParticipant.Level" },
                 new { key = "CheckInTimestamp", value = "eventParticipant.CheckInTimestamp" },
                 new { key = "CheckOutTimestamp", value = "eventParticipant.CheckOutTimestamp" },
                 new { key = "DonationLimit", value = "eventParticipant.DonationLimit" },
@@ -777,8 +776,8 @@ namespace App.Library
             [JsonProperty("gender"), JsonConverter(typeof(StringEnumConverter))]
             public UserGender? Gender { get; internal set; }
 
-            [JsonProperty("grade")]
-            public uint? Grade { get; internal set; }
+            [JsonProperty("level")]
+            public string Level { get; internal set; }
 
             [JsonProperty("checkInTimestamp")]
             public DateTime? CheckInTimestamp { get; internal set; }
@@ -813,7 +812,7 @@ namespace App.Library
 
                 this.Gender = exItem.Participant.Gender;
 
-                this.Grade = exItem.ExEventParticipant.item.Grade;
+                this.Level = exItem.ExEventParticipant.item.Level;
 
                 this.CheckInTimestamp = exItem.item.CheckInTimestamp;
                 this.CheckOutTimestamp = exItem.item.CheckOutTimestamp;

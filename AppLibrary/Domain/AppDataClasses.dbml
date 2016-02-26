@@ -149,8 +149,7 @@
       <Column Name="CreatedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
       <Column Name="LastModifiedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
 
-      <Column Name="Grade" Type="System.UInt32" DbType="Int" CanBeNull="true" />
-
+      <Column Name="Level" Type="System.String" DbType="nvarchar(32)" CanBeNull="true"/>
 
       <Column Name="CheckInTimestamp" Type="System.DateTime" DbType="DATETIME2" CanBeNull="true" />
       <Column Name="CheckOutTimestamp" Type="System.DateTime" DbType="DATETIME2" CanBeNull="true" />
