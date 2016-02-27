@@ -372,9 +372,9 @@ namespace App.Library
             {
                 // This verifies the Event Session really exists and we have access
 
-                var authToken = LoginAuthTemplate.ExtendOrCreateNew(dc, item, null, null);
+                var authToken = ItemPinAuthTemplate.ExtendOrCreateNew(dc, item, null, null);
 
-                var url = LoginAuthTemplate.Instance.GetUrl(authToken, UtilityContext.Current.RequireSslLogin);
+                var url = ItemPinAuthTemplate.Instance.GetUrl(authToken, UtilityContext.Current.RequireSslLogin);
 
                 var result = new
                 {

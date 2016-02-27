@@ -55,6 +55,10 @@ namespace App.Library
 
             var webAuthTemplates = new WebAuthTemplate[] 
             {
+                ItemPinAuthTemplate.Instance,
+
+                //!! depricated below, right?
+
                 //!! nextgen - add in the compelte list here
                 LoginAuthTemplate.Instance,
                 //CreateSsoUserAuthTemplate.Instance,
