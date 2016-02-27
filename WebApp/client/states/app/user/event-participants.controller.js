@@ -1,4 +1,4 @@
-app.controller('EventParticipantsController', function ($scope, $translate, $mdDialog, $log, $msUI, utilityService, siteService, event, eventSession, initialSelection) {
+app.controller('EventParticipantsController', function ($scope, $translate, $mdDialog, $log, $msUI, $filter, utilityService, siteService, event, eventSession, initialSelection) {
   $log.debug('Loading EventParticipantsController...');
 
   $scope.searchHandler = siteService.model.eventParticipants.search;
@@ -467,6 +467,19 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     });
   };
 
+  $scope.showDeleteConfirmationDialog = function (ev, numberOfStudents) {
+    var confirm = $mdDialog.confirm()
+      .title("Delete " + numberOfStudents + " " + $translate.instant('PARTICIPANTS'))
+      .textContent("Would you like to delete the selected " + $filter('lowercase')($translate.instant('PARTICIPANTS')) + "?")
+      .ariaLabel("Delete user")
+      .targetEvent(ev)
+      .ok("yes")
+      .cancel("no");
+
+    $mdDialog.show(confirm).then(function () {
+      $scope.deleteEventParticipants();
+    });
+  };
 
   $scope.deleteEventParticipants = function () {
 

@@ -83,7 +83,7 @@
         <md-button ng-click="showBulkEditParticipantsDialog($event)"><i class="fa fa-pencil"></i> Bulk Edit</md-button>
         <md-button ng-click="checkInEventParticipants()"><i class="fa fa-check"></i> Check-In</md-button>
         <md-button ng-click="undoCheckInEventParticipants()"><i class="fa fa-undo"></i> Set Not Checked-In</md-button>
-        <md-button ng-click="deleteEventParticipants()" class="md-warn"><i class="fa fa-remove"></i> Delete</md-button>
+        <md-button ng-click="showDeleteConfirmationDialog($event, selectedIndex.length)" class="md-warn"><i class="fa fa-remove"></i> Delete</md-button>
       </div>
     </div>
     <ms-search-view change-event="updateEventParticipants" search="searchHandler" options="searchViewOptions" user-search="userSearch">
