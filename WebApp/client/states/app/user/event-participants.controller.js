@@ -1,4 +1,4 @@
-app.controller('EventParticipantsController', function ($scope, $translate, $mdDialog, $log, $msUI, utilityService, siteService, event, eventSession) {
+app.controller('EventParticipantsController', function ($scope, $translate, $mdDialog, $log, $msUI, utilityService, siteService, event, eventSession, initialSelection) {
   $log.debug('Loading EventParticipantsController...');
 
   $scope.searchHandler = siteService.model.eventParticipants.search;
@@ -13,7 +13,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
   // ** Selection related stuff
 
   // Our selection. Note might be a superset of items displayed as we can "select" items that aren't yet loaded into the view ...
-  $scope.selectedIndex = [];
+  $scope.selectedIndex = initialSelection || [];
 
 
   $scope.$on('updateEventParticipants', function (event, eventData) {
@@ -80,7 +80,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     { name: 'Last Name', serverTerm: 'Participant.LastName', clientFunction: utilityService.compareByProperties('lastName', 'id') },
     //!! this is currently broken - as we don't really want to sort by the ParticipantGroup ID
     { name: 'School', serverTerm: 'Participant.ParticipantGroup.Name', clientFunction: utilityService.compareByProperties('participantGroupName', 'id') },
-    { name: 'Grade', serverTerm: 'ExEventParticipant.item.Grade', clientFunction: utilityService.compareByProperties('grade', 'id') }
+    { name: 'Level', serverTerm: 'ExEventParticipant.item.Level', clientFunction: utilityService.compareByProperties('level', 'id') }
   ];
 
   $scope.searchViewOptions.sort = $scope.sortOptions[0];

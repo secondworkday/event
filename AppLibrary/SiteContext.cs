@@ -30,6 +30,8 @@ namespace App.Library
         protected SiteContext(UtilityContextSerializer contextDataSerializer, AppInfo appInfo, string siteRootPath, string appDataPath, IConnectionManager connectionManager, IEnumerable<DataContextFactory> dataContextFactories, IEnumerable<WebAuthTemplate> webAuthTemplates)
             : base(contextDataSerializer, appInfo, siteRootPath, appDataPath, connectionManager, dataContextFactories, webAuthTemplates)
         {
+            // reference this to force all our custom ActivityTypes to load
+            var ensureLoaded = ActivityType.BulkCheckIn;
         }
 
         public static SiteContext Create(AppInfo appInfo, string rootPath, string appDataPath, params DataContextFactory[] dataContextFactories)

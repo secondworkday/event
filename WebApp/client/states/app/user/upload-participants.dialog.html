@@ -37,7 +37,7 @@
 
           <div>
             <b>Tip:</b> Copy a table in Excel and paste it directly in this dialog. <b>Bold</b> header columns must be included:<br /><br />
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>First Name</b>&nbsp;&nbsp;&nbsp;&nbsp;<b>Last Name</b>&nbsp;&nbsp;&nbsp;&nbsp;<b>Gender</b>&nbsp;&nbsp;&nbsp;&nbsp;<b>Grade</b>&nbsp;&nbsp;&nbsp;&nbsp;School<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>First Name</b>&nbsp;&nbsp;&nbsp;&nbsp;<b>Last Name</b>&nbsp;&nbsp;&nbsp;&nbsp;<b>Gender</b>&nbsp;&nbsp;&nbsp;&nbsp;<b>{{'PARTICIPANT_LEVEL' | translate}}</b>&nbsp;&nbsp;&nbsp;&nbsp;{{'PARTICIPANT_GROUP' | translate}}<br />
           </div>
         </div>
 
@@ -55,8 +55,8 @@
                 <th class="md-data-table__cell--non-numeric">First Name</th>
                 <th class="md-data-table__cell--non-numeric">Last Name</th>
                 <th>Gender</th>
-                <th>Grade</th>
-                <th>School</th>
+                <th>{{'PARTICIPANT_LEVEL' | translate}}</th>
+                <th>{{'PARTICIPANT_GROUP' | translate}}</th>
                 <th></th>
               </tr>
             </thead>
@@ -67,7 +67,7 @@
                 <td class="md-data-table__cell--non-numeric">{{row.firstName}}</td>
                 <td class="md-data-table__cell--non-numeric">{{row.lastName}}</td>
                 <td class="md-data-table__cell--non-numeric">{{row.gender}}</td>
-                <td class="md-data-table__cell--non-numeric">{{row.grade}}</td>
+                <td class="md-data-table__cell--non-numeric">{{row.level}}</td>
                 <td class="md-data-table__cell--non-numeric" ng-if="row.participantGroupName">{{row.participantGroupName}}</td>
                 <td class="md-data-table__cell--non-numeric" ng-if="!row.participantGroupName">{{participantGroups.hashMap[uploadData.participantGroupID].name}}<span ng-if="participantGroups.hashMap[uploadData.participantGroupID].contactName"> ({{participantGroups.hashMap[uploadData.participantGroupID].contactName}})</span></td>
                 <td><span ng-if="row.errors">{{row.errors}}</span></td>
@@ -76,28 +76,6 @@
           </table>
         </div>
         <div ms-debug-only><pre>{{uploadData | json}}</pre></div>
-
-
-
-        <!--<md-input-container class="md-block" flex-gt-sm>
-          <label>Name</label>
-          <input ng-model="formData.name">
-        </md-input-container>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>Grade</label>
-          <input type="number" ng-model="formData.grade">
-        </md-input-container>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>School</label>
-          <md-select ng-model="formData.participantGroupID">
-            <md-option ng-repeat="school in participantGroups.index | objectLookup:participantGroups.hashMap track by school.id" value="{{school.id}}">
-              {{school.name}}
-            </md-option>
-          </md-select>
-        </md-input-container>
-        <br/>-->
-        <!--<md-button ng-disabled="true" ng-click="parseEventParticipants()" class="md-primary"><i class="fa fa-upload"></i> Bulk parse</md-button>-->
-        <!--<md-button ng-disabled="!formData.participantGroupID" ng-click="generateRandomParticipants(formData.participantGroupID, 25)"><i class="fa fa-magic"></i> Generate 25 participants</md-button>-->
       </div>
     </md-dialog-content>
     <md-dialog-actions layout="row" layout-align="end center">

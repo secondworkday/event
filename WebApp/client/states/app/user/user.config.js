@@ -138,10 +138,26 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       data: {
         'selectedTab': 2
       },
+      params: {
+        activityID: undefined
+      },
       views: {
         'participants': {
           templateUrl: '/client/states/app/user/event-participants.html',
           controller: "EventParticipantsController"
+        }
+      },
+      resolve: {
+        initialSelection: function ($stateParams, utilityService) {
+          // careful - might be an invalid or unauthorized ID
+          var itemID = $stateParams.activityID;
+          if (itemID) {
+            return utilityService.model.activityLog.getSet(itemID)
+            .then(function (itemIDs) {
+              return itemIDs;
+            });
+          }
+          return null; 
         }
       }
     })

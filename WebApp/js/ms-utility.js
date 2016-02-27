@@ -1884,7 +1884,14 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         }).then(function (itemsData) {
           return onActivityLogUpdated(model.activityLog, itemsData);
         });
+      },
+
+      getSet: function (itemID) {
+        return callHub(function () {
+          return utilityHub.server.getActivityLogSet(itemID);
+        });
       }
+
     };
 
     function onActivityLogUpdated(itemsModel, itemsData) {
@@ -1926,11 +1933,19 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
+  // returns a promise (not an Item - see demandXyz() for the delayed load Item variant)
+    self.ensureActivityLog = function (itemKey) {
+      var modelItems = model.activityLog;
+      var item = modelItems.hashMap[itemKey];
+      if (!item) {
+        return modelItems.search("%" + itemKey, "", 0, 1)
+        .then(function (ignoredNotificationData) {
+          return modelItems.hashMap[itemKey];
+        });
+      }
 
-
-
-
-
+      return $q.when(item);
+    };
 
 
 

@@ -1,4 +1,4 @@
-app.controller('ActivityLogController', function ($scope, $log, utilityService, siteService) {
+app.controller('ActivityLogController', function ($scope, $state, $log, utilityService, siteService) {
   $log.debug('Loading ActivityLogController...');
 
   $scope.searchActivityLog = utilityService.model.activityLog.search;
@@ -40,7 +40,9 @@ app.controller('ActivityLogController', function ($scope, $log, utilityService, 
   ];
 
 
-
+  $scope.showActivityLogSelection = function (activity) {
+    $state.go('app.user.event.participants', { eventID: activity.contextID, activityID: activity.id });
+  };
 
 
 

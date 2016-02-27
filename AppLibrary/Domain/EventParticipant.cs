@@ -44,7 +44,7 @@ namespace App.Library
         protected override ExtendedPropertyScopeType objectScopeType { get { return this.ScopeType; } }
         protected override int? objectScopeID { get { return this.ScopeID; } }
 
-        protected EventParticipant(DateTime createdTimestamp, EPScope epScope, int eventID, int participantID, uint? grade)
+        protected EventParticipant(DateTime createdTimestamp, EPScope epScope, int eventID, int participantID, string level)
             : this()
         {
             this.CreatedTimestamp = createdTimestamp;
@@ -54,7 +54,7 @@ namespace App.Library
             this.EventID = eventID;
             this.ParticipantID = participantID;
 
-            this.Grade = grade;
+            this.Level = level;
         }
 
         public static EventParticipant Create(AppDC dc, JToken data)
@@ -67,10 +67,9 @@ namespace App.Library
                 var eventID = data.Value<int>("eventID");
                 var participantID = data.Value<int>("participantID");
 
-                var grade = data.Value<uint?>("grade");
+                var level = data.Value<string>("level");
 
-
-                var newItem = new EventParticipant(createdTimestamp, teamEPScope, eventID, participantID, grade);
+                var newItem = new EventParticipant(createdTimestamp, teamEPScope, eventID, participantID, level);
 
                 // optional parameters
                 var dataJToken = data as JToken;
@@ -130,7 +129,7 @@ namespace App.Library
                 new BulkUpload.ColumnHandler("firstName", BulkUpload.ColumnOptions.Required, "first name", "first"),
                 new BulkUpload.ColumnHandler("lastName", BulkUpload.ColumnOptions.Required, "last name", "last"),
                 new BulkUpload.ColumnHandler("gender", BulkUpload.ColumnOptions.Required, genderNormalizationValues, "sex"),
-                new BulkUpload.ColumnHandler("grade", BulkUpload.ColumnOptions.Optional),
+                new BulkUpload.ColumnHandler("level", BulkUpload.ColumnOptions.Optional, "grade"),
                 new BulkUpload.ColumnHandler("participantGroupName", BulkUpload.ColumnOptions.Optional, "school"),
             };
 
@@ -175,7 +174,7 @@ namespace App.Library
             }
 
             this.SetNotes(dc, (string)data.notes);
-            this.Grade = (uint)data.grade;
+            this.Level = (string)data.level;
         }
 
         public static HubResult Delete(AppDC dc, int itemID)
@@ -200,7 +199,6 @@ namespace App.Library
             var activityType = ActivityType.Deleted;
             ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), itemID);
 
-
             dc.SubmitChanges();
 
             var notifyExpression = new NotifyExpression();
@@ -222,26 +220,44 @@ namespace App.Library
                 return HubResult.NotFound;
             }
 
+
             dc.SubmitLock(() =>
             {
                 var deleteItems = dc.EventParticipants
                     .Where(item => itemIDs.Contains(item.ID));
 
-            //!! TODO remove any Tags that have their last reference with this Pipeline
-            //!! Should we have an ExtendedObject call to remove all extended properties?
+                //!! TODO remove any Tags that have their last reference with this Pipeline
+                //!! Should we have an ExtendedObject call to remove all extended properties?
 
+                int eventID;
+                if (!deleteItems
+                    .Select(eventParticipant => eventParticipant.EventID)
+                    .AsEnumerable()
+                    .AllEqual(out eventID))
+                {
+                    throw new HubResultException(HubResult.Error);
+                }
 
-            //!! We won't delete Participant
-            dc.EventParticipants.DeleteAllOnSubmit(deleteItems);
-
-            //!! create a bulk delete TAG
-            int bulkTagIDThingy = 0;
+                //!! We won't delete Participant
+                dc.EventParticipants.DeleteAllOnSubmit(deleteItems);
 
                 string activityDescription = string.Format("Bulk Delete {0} EventParticipant(s)",
                     /*0*/ itemIDs.Length);
                 var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
                 var activityType = ActivityType.BulkDeleted;
-                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
+
+                // Note we're tucking the number of items deleted as the EventParticipant ID. 
+                var activityItem = ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), itemIDs.Length, typeof(Event), eventID);
+                Debug.Assert(activityItem != null);
+
+                // Stash away Length here? Or should we stick it as JSON in activityItem.ActivityContext?
+
+                Debug.Assert(activityItem.ID == 0);
+                dc.Save(activityItem);
+                Debug.Assert(activityItem.ID > 0);
+
+                var epCategory = EPCategory.DefaultSetCategory;
+                activityItem.AddSet(dc, epCategory, itemIDs);
             });
 
             var notifyExpression = new NotifyExpression();
@@ -254,9 +270,6 @@ namespace App.Library
             //!! This is an undoable action! need a way to return info about that!
             return HubResult.Success;
         }
-
-
-
 
 
 
@@ -279,8 +292,8 @@ namespace App.Library
 
                 var defaultEventSessionID = uploadData.Value<int?>("eventSessionID");
 
-            //var eventParticipantsCount = uploadData["itemsData"].Count;
-            var eventParticipantsCount = uploadData["itemsData"].Count();
+                //var eventParticipantsCount = uploadData["itemsData"].Count;
+                var eventParticipantsCount = uploadData["itemsData"].Count();
                 var i = 1;
                 var eventParticipants = uploadData["itemsData"]
                     .Select(itemData =>
@@ -296,18 +309,26 @@ namespace App.Library
 
 
 
-            //!! create a bulk activity TAG
-            int bulkTagIDThingy = 0;
 
                 string activityDescription = string.Format("Bulk Create {0} EventParticipant(s)",
                     /*0*/ eventParticipants.Length);
                 var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
                 var activityType = ActivityType.BulkCreated;
-                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
 
+                // Note we're tucking the number of items deleted as the EventParticipant ID. 
+                var activityItem = ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), eventParticipants.Length, typeof(Event), eventID);
+                Debug.Assert(activityItem != null);
 
+                // Stash away Length here? Or should we stick it as JSON in activityItem.ActivityContext?
 
+                Debug.Assert(activityItem.ID == 0);
+                dc.Save(activityItem);
+                Debug.Assert(activityItem.ID > 0);
 
+                var epCategory = EPCategory.DefaultSetCategory;
+                activityItem.AddSet(dc, epCategory, eventParticipants
+                    .Where(eventParticipant => eventParticipant.HasValue)
+                    .Select(eventParticipant => eventParticipant.Value));
 
                 return HubResult.CreateSuccessData(eventParticipants);
             });
@@ -589,7 +610,7 @@ namespace App.Library
             searchTermQuery = searchExpression.FilterByTextTerms(searchTermQuery, (termQuery, searchTermLower) =>
             {
                 return termQuery.Where(item =>
-                    (item.eventParticipant.Grade.HasValue && item.eventParticipant.Grade.Value.ToString().Contains(searchTermLower)) ||
+                    item.eventParticipant.Level.Contains(searchTermLower) ||
                     item.participant.FirstName.Contains(searchTermLower) ||
                     item.participant.LastName.Contains(searchTermLower) ||
                     item.participantGroup.Name.Contains(searchTermLower) ||
@@ -712,7 +733,7 @@ namespace App.Library
 
                 new { key = "School", value = "participantGroup.Name" },
 
-                new { key = "Grade", value = "eventParticipant.Grade" },
+                new { key = "Grade", value = "eventParticipant.Level" },
                 new { key = "CheckInTimestamp", value = "eventParticipant.CheckInTimestamp" },
                 new { key = "CheckOutTimestamp", value = "eventParticipant.CheckOutTimestamp" },
                 new { key = "DonationLimit", value = "eventParticipant.DonationLimit" },
@@ -755,8 +776,8 @@ namespace App.Library
             [JsonProperty("gender"), JsonConverter(typeof(StringEnumConverter))]
             public UserGender? Gender { get; internal set; }
 
-            [JsonProperty("grade")]
-            public uint? Grade { get; internal set; }
+            [JsonProperty("level")]
+            public string Level { get; internal set; }
 
             [JsonProperty("checkInTimestamp")]
             public DateTime? CheckInTimestamp { get; internal set; }
@@ -791,7 +812,7 @@ namespace App.Library
 
                 this.Gender = exItem.Participant.Gender;
 
-                this.Grade = exItem.ExEventParticipant.item.Grade;
+                this.Level = exItem.ExEventParticipant.item.Level;
 
                 this.CheckInTimestamp = exItem.item.CheckInTimestamp;
                 this.CheckOutTimestamp = exItem.item.CheckOutTimestamp;
