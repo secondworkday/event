@@ -138,7 +138,7 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
 
         if (!authenticatedIdenity) {
           // log on / sign in...
-          $state.go("public.sign-in", null, { location: 'replace' });
+          $state.go("public.landing", null, { location: 'replace' });
         }
         if (authenticate(stateAllowedRoles, authenticatedIdenity)) {
           // location: 'replace' prevents the browser back button from returning a logged in user to the login page.
@@ -182,7 +182,7 @@ app.controller('SpaController', function ($scope, $http, $window, $state, SYSTEM
   $scope.signOut = function () {
     utilityService.signOut()
       .then(function () {
-        $state.go('public.sign-in', {}, { reload: true });
+        $state.go('public.landing', {}, { reload: true });
         // $state.go('app.system.users', {}, { reload: true });
       });
   };
@@ -2155,7 +2155,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         }
         else {
           // shouldn't happen
-          $state.go('public.sign-in');
+          $state.go('public.landing');
         }
       }).fail(function (reason) {
         //!! show the button or change states
@@ -2173,7 +2173,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         }
         else {
           // shouldn't happen
-          $state.go('public.sign-in');
+          $state.go('public.landing');
         }
       });
     });
