@@ -66,6 +66,11 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
     .state('app.event-session.check-in', {
       url: '/check-in',
       controller: 'EventParticipantsController',
+      resolve: {
+        initialSelection: function () {
+          return null;
+        }
+      },
       templateUrl: '/client/states/app/event-session-volunteer/check-in.html'
     })
 
