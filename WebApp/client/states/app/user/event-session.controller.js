@@ -95,24 +95,4 @@ app.controller('EventSessionController', function ($scope, $translate, $log, $st
   $scope.searchEventParticipants("$eventSession:" + eventSessionID, "", 0, 99999);
 
 
-
-  /*
-  activeUsersIndexer: {
-      index: [],
-      sort: self.localeCompareByPropertyThenByID('displayName'),
-      filter: function (item) {
-        return item.state === USER_STATE.active;
-      }
-  },
-  disabledUsersIndexer: {
-    index: [],
-    sort: self.localeCompareByPropertyThenByID('displayName'),
-    filter: function (item) {
-      return item.state === USER_STATE.disabled;
-    }
-*/
-
-
-
-
 });

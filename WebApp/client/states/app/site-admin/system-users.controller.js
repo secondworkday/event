@@ -1,4 +1,4 @@
-app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileUploader, $msUI, utilityService, siteService, tenant) {
+app.controller('SystemUsersController', function ($scope, $state, $mdDialog, $log, FileUploader, $msUI, utilityService, siteService, tenant) {
   $log.debug('Loading SystemUsersController...');
 
   $scope.tenant = tenant;
@@ -6,11 +6,11 @@ app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileU
   $scope.searchUsers = utilityService.model.users.search;
 
   $scope.sortOptions = [
-    { name: 'First Name', serverTerm: 'item.firstName', clientFunction: utilityService.localeCompareByPropertyThenByID('firstName') },
-    { name: 'First Name Descending', serverTerm: 'item.firstName DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('firstName') },
-    { name: 'Last Name', serverTerm: 'item.lastName', clientFunction: utilityService.localeCompareByPropertyThenByID('lastName') },
-    { name: 'Last Name Descending', serverTerm: 'item.lastName DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('lastName') },
-    { name: 'Email', serverTerm: 'item.email', clientFunction: utilityService.localeCompareByPropertyThenByID('email') }
+    { name: 'First Name', serverTerm: 'item.firstName', clientFunction: utilityService.compareByProperties('firstName', 'id') },
+    { name: 'First Name Descending', serverTerm: 'item.firstName DESC', clientFunction: utilityService.compareByProperties('firstName', '-id') },
+    { name: 'Last Name', serverTerm: 'item.lastName', clientFunction: utilityService.compareByProperties('lastName', 'id') },
+    { name: 'Last Name Descending', serverTerm: 'item.lastName DESC', clientFunction: utilityService.compareByProperties('lastName', '-id') },
+    { name: 'Email', serverTerm: 'item.email', clientFunction: utilityService.compareByProperties('email', 'id') }
   ];
 
 
@@ -64,6 +64,25 @@ app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileU
     //!! I'm not understanding something here - clear our homeID value so we remember the next one correctly
     $scope.uploader.profilePhotoID = undefined;
   };
+
+
+  $scope.impersonateUser = function (user) {
+    return utilityService.impersonateUser(user)
+        .then(function (successData) {
+          // !! $state.go('master.admin.settings');
+
+          $state.go('app.user.events', {}, { reload: true });
+
+
+          return true;
+        }, function (failureData) {
+          return failureData.StatusCodeDescription;
+        });
+  };
+
+
+
+
 
   $scope.deleteUser = function (user) {
     //$log.debug("Deleted user " + user.email);

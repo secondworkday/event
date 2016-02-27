@@ -42,7 +42,7 @@ namespace WebApp
                 WebAuthentication.AccessCheckOrRedirectToLoginPage(authorizedBy, SystemRole.SystemAdmin.ToEnumerable());
                 Debug.Assert(context.User.IsInRole("SystemAdmin"));
 
-                User impersonatedUser = context.Request.GetUserOrTransfer(dc, "uid", "/default.aspx");
+                User impersonatedUser = context.Request.GetUserOrTransfer(dc, "uid", "/Spas/UserSpa.aspx");
                 WebIdentityAuthentication.ImpersonateUser(dc, authorizedBy, impersonatedUser);
                 return HubResult.Success;
             }

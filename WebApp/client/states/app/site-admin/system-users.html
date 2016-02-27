@@ -51,7 +51,14 @@
         </td>
         <td class="md-data-table__cell--non-numeric">
           <strong>{{ user.displayName }}</strong><br/>
-          <span class="md-caption">{{ user.email }}</span>
+          <span class="md-caption">{{ user.email }}</span><br />
+
+          <md-button ng-click="impersonateUser(user)">
+            <i class="fa fa-sign-out"></i> Impersonate
+          </md-button>
+
+
+
         </td>
         <td>{{ user.id }}</td>
         <td>{{ user.tenantID }}</td>
