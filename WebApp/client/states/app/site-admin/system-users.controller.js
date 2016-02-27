@@ -65,8 +65,35 @@ app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileU
     $scope.uploader.profilePhotoID = undefined;
   };
 
+  $scope.deleteUser = function (user) {
+    //$log.debug("Deleted user " + user.email);
+    utilityService.deleteUser(user)
+        .then(function (successData) {
+          // success
+          $msUI.showToast("User Deleted");
+          $log.debug("User Deleted.");
+          return successData;
+        }, function (failureData) {
+          // failure
+          $msUI.showToast(failureData.errorMessage);
+          $log.debug(failureData.errorMessage);
+          return failureData;
+        });
+  };
 
+  $scope.showDeleteConfirmationDialog = function (ev, user) {
+    var confirm = $mdDialog.confirm()
+      .title("Delete User")
+      .textContent("Would you like to delete user '" + user.firstName + " " + user.lastName + "'?")
+      .ariaLabel("Delete user")
+      .targetEvent(ev)
+      .ok("yes")
+      .cancel("no");
 
+    $mdDialog.show(confirm).then(function () {
+      $scope.deleteUser(user);
+    });
+  };
 
 
 
@@ -214,25 +241,101 @@ app.controller('SystemUsersController', function ($scope, $mdDialog, $log, FileU
       targetEvent: $event,
       templateUrl: '/client/states/app/user/edit-user.dialog.html',
       locals: {
-        user: user
+        user: user,
+        newOrEdit: "Edit"
       },
       controller: EditUserDialogController
     });
-    function EditUserDialogController($scope, $translate, user) {
-      $scope.user = user;
+    function EditUserDialogController($scope, $filter, $translate, utilityService, APP_ROLE_ITEMS, APP_ROLE_TRANSLATION, user, newOrEdit) {
+      if (newOrEdit == "Edit") {
+        $scope.user = user;
+      }
+      
+      $scope.APP_ROLE_TRANSLATION = APP_ROLE_TRANSLATION;
+
+      var model = utilityService.model;
+      var authenticatedIdentity = model.authenticatedIdentity;
+      $scope.authenticatedUser = model.authenticatedUser;
+      $scope.authenticatedIdentity = authenticatedIdentity;
+
+      $scope.tenantGroups = utilityService.model.tenantGroups;
+
+
+      // AppRoles and SystemRoles
+
+      $scope.appRoleItems = APP_ROLE_ITEMS;
+      $.each($scope.appRoleItems, function (index, roleItem) {
+        $scope.appRoleItems[index].checked = userHasRole($scope.user.appRoles, roleItem.value);
+      });
+
+      var systemRoleSourceItems = [
+          { name: 'Security Admin', value: 'SecurityAdmin', visible: ["SecurityAdmin", "OperationsAdmin", "SystemAdmin"], enabled: ["SecurityAdmin"] },
+          { name: 'Operations Admin', value: 'OperationsAdmin', visible: ["SecurityAdmin", "OperationsAdmin", "DatabaseAdmin", "SystemAdmin"], enabled: ["SecurityAdmin"] },
+          { name: 'Database Admin', value: 'DatabaseAdmin', visible: ["SecurityAdmin", "OperationsAdmin", "DatabaseAdmin", "SystemAdmin"], enabled: ["OperationsAdmin"] },
+          { name: 'System Admin', value: 'SystemAdmin', visible: ["SecurityAdmin", "OperationsAdmin", "SystemAdmin"], enabled: ["SecurityAdmin"] },
+          // Known by SystemAdmins as a 'Tenant Admin', known by TenantAdmins as 'Admin' handled elsewhere
+          { name: 'Tenant Admin', value: 'TenantAdmin', visible: ["SystemAdmin"], enabled: ["SystemAdmin"] },
+      ];
+
+      $scope.systemRoleItems = [];
+      $.each(systemRoleSourceItems, function (index, systemRoleSourceItem) {
+        var isVisible = $filter('intersect')(authenticatedIdentity.roles, systemRoleSourceItem.visible).length > 0;
+        if (isVisible) {
+          var isEnabled = $filter('intersect')(authenticatedIdentity.roles, systemRoleSourceItem.enabled).length > 0;
+          $scope.systemRoleItems.push({
+            name: systemRoleSourceItem.name, value: systemRoleSourceItem.value, enabled: isEnabled, checked: userHasRole($scope.user.systemRoles, systemRoleSourceItem.value)
+          });
+        }
+      });
+
+      $scope.updateUserRole = function (userRoles, role) {
+        // add
+        if (role.checked) {
+          if (userRoles.indexOf(role.value) == -1) {
+            userRoles.push(role.value);
+          }
+        }
+          // remove from array
+        else {
+          var index = userRoles.indexOf(role.value);
+          if (index >= 0) {
+            userRoles.splice(index, 1);
+          }
+        }
+      };
+
+      function userHasRole(roleScope, roleName) {
+        for (i = 0; i < roleScope.length; i++) {
+          if (roleScope[i] == roleName) {
+            return true;
+          }
+        }
+        return false;
+      };
 
       $scope.cancel = function () {
         $log.debug("You canceled the dialog.");
         $mdDialog.hide();
       };
-      $scope.deleteUser = function () {
-        $log.debug("You deleted the user.");
-        //!! TODO add function to actually delete the user
-        $mdDialog.hide();
-      };
+      //$scope.deleteUser = function () {
+      //  $log.debug("You deleted the user.");
+      //  //!! TODO add function to actually delete the user
+      //  $mdDialog.hide();
+      //};
       $scope.apply = function () {
-        $log.debug("You applied the edit.");
-        //!! TODO add function to actually apply the bulk edit to all the records
+        utilityService.editUser(user.id, user)
+        .then(function (successData) {
+          // success
+          $msUI.showToast("User Updated");
+          $log.debug("User Updated.");
+          return successData;
+        }, function (failureData) {
+          // failure
+          $msUI.showToast(failureData.errorMessage);
+          $log.debug(failureData.errorMessage);
+          return failureData;
+        });
+
         $mdDialog.hide();
       };
     }
