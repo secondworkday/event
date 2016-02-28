@@ -790,8 +790,11 @@ namespace App.Library
 #endif
 
 
+        private static readonly IEnumerable<string> volunteerRoles = new string[] { AppRole.EventSessionVolunteer.ToString() };
+
+#if false
         // Used to create a "EventSession Identity" - for a Volunteer 
-        public static IdentityData CreateIdentityData(AppDC dc, int itemID)
+        public static IdentityData CreateIdentityDataXXX(AppDC dc, int itemID)
         {
             var eventSession = EventSession.FindByID(dc, itemID);
 
@@ -800,16 +803,16 @@ namespace App.Library
                 return null;
             }
 
+            // ** Create our identity ... A EventSessionVolunteer role able to access one EventSession!
+
             var itemEPScope = eventSession.ItemEPScope;
             Debug.Assert(itemEPScope.ScopeType == ExtendedPropertyScopeType.TenantGroupID);
-
             var tenantGroupID = itemEPScope.ID;
             var timeZoneInfo = TenantGroup.GetCachedTimeZoneInfo(tenantGroupID);
-
-            IdentityData identityData = IdentityData.Create(itemEPScope, tenantGroupID, eventSession.Name, null, null, null, timeZoneInfo);
+            IdentityData identityData = IdentityData.Create(itemEPScope, tenantGroupID, eventSession.Name, null, volunteerRoles, null, timeZoneInfo);
             return identityData;
         }
-
+#endif
 
 
 

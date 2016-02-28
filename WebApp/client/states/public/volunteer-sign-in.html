@@ -3,7 +3,7 @@
     <form name="signInForm">
       <md-card-content>
         <div>
-          <h2 class="md-title">Enter your event information</h2>
+          <h2 class="md-title">Enter your {{'EVENT_SESSION' | translate}} information</h2>
         </div>
         <div layout="column">
           <div layout>
@@ -18,20 +18,17 @@
           </div>
           <md-input-container flex>
             <label>Access Code</label>
-            <input ng-model="formData.eventSessionCode" type="text" required>
+            <input ng-model="formData.authCode" type="text" required>
           </md-input-container>
         </div>
         <span class="md-caption u-sm-margin-right">
           <a href="#">Need Help?</a>
         </span>
-        <span class="md-caption">
-          <a href="#">Demo Volunteers</a>
-        </span>
       </md-card-content>
       <md-card-actions layout="row" layout-align="end center">
-        <md-button class="md-primary" type="submit"
+        <md-button class="md-primary"
           ng-disabled="signInForm.$invalid"
-          ng-click="signIn(formData)">
+          ng-click="signIn()">
           Go
         </md-button>
       </md-card-actions>

@@ -30,7 +30,7 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
   .state('public.volunteer-sign-in', {
       url: '/volunteer',
       templateUrl: '/client/states/public/volunteer-sign-in.html',
-      controller: 'SignInController'
+      controller: 'VolunteerSignInController'
   })
   .state('public.reset-password', {
       url: '/reset-password/:authCode',

@@ -1338,6 +1338,14 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
 
 
+  }).on('setAuthenticatedItemUserSession', function (itemsData) {
+
+
+    // please hit me...
+    $rootScope.$apply(onSetAuthenticatedItemUserSession(itemsData));
+
+
+
   }).on('updateProjects', function (projectsData) {
     //var notification = onProjectsUpdated(projectsData);
     $rootScope.$apply($rootScope.$broadcast('updateProjects', onProjectsUpdated(projectsData)));
@@ -1404,6 +1412,37 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
       $rootScope.$broadcast('authenticated:', model.authenticatedIdentity);
     }
   };
+
+  function onSetAuthenticatedItemUserSession(itemUserData) {
+    if (itemUserData) {
+
+      var appRoles = itemUserData.appRoles;
+      var systemRoles = itemUserData.systemRoles;
+      var displayName = itemUserData.displayName;
+      var profilePhotoUrl = itemUserData.profilePhotoUrl;
+
+      var userID = itemUserData.userID;
+
+      var itemType = itemUserData.itemType;
+      var itemID = itemUserData.itemID;
+
+      // If we're authenticated, we have an authenticatedIdentity
+      model.authenticatedIdentity = msIdentity.createItemUser(appRoles, systemRoles, displayName, profilePhotoUrl, userID, itemType, itemID);
+      if (userID) {
+        // But only users have authenticatedUser
+        model.authenticatedUser = model.authenticatedIdentity;
+      }
+
+      msAuthenticated.setAuthenticatedIdentity(model.authenticatedIdentity);
+
+
+      // head to Kiosk home page
+      $state.go('app.spa-landing', {}, { reload: true });
+
+      $rootScope.$broadcast('authenticated:', model.authenticatedIdentity);
+    }
+  };
+
 
 
 

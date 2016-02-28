@@ -52,6 +52,15 @@ namespace WebApp
 
                 try
                 {
+                    string authCodeValue = body.authCode;
+                    if (!string.IsNullOrEmpty(authCodeValue))
+                    {
+                        var authCode = AuthCode.FromValue(authCodeValue);
+                        var hubResult = AuthTemplate.Redeem(authCode, body);
+                        return hubResult;
+                    }
+
+
                     string userName = body.email;
                     string password = body.password;
                     bool rememberMe = ((bool?)body.rememberMe) ?? false;

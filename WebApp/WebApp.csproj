@@ -248,6 +248,7 @@
     <Content Include="client\states\public\connection\disconnected.html" />
     <Content Include="client\states\public\connection\reconnecting.controller.js" />
     <Content Include="client\states\public\connection\reconnecting.html" />
+    <Content Include="client\states\public\volunteer-sign-in.controller.js" />
     <Content Include="client\states\public\create-account.controller.js" />
     <Content Include="client\states\public\create-account.html" />
     <Content Include="client\states\public\forgot-password.dialog.html" />

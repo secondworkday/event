@@ -313,6 +313,42 @@ app.service('msIdentity', function () {
 
     return this;
   };
+
+//  model.authenticatedIdentity = msIdentity.createItemUser(type, appRoles, systemRoles, userID, userDisplayName, profilePhotoUrl, itemID);
+
+
+  this.createItemUser = function (appRoles, systemRoles, displayName, profilePhotoUrl, userID, itemType, itemID) {
+    if (!appRoles) {
+      appRoles = [];
+    } else if (!angular.isArray(appRoles)) {
+      appRoles = [appRoles];
+    }
+    if (!systemRoles) {
+      systemRoles = [];
+    } else if (!angular.isArray(systemRoles)) {
+      systemRoles = [systemRoles];
+    }
+    this.appRoles = appRoles;
+    this.systemRoles = systemRoles;
+    this.displayName = displayName;
+    this.profilePhotoUrl = profilePhotoUrl;
+
+    this.userID = userID;
+
+    this.itemType = itemType;
+    this.itemID = itemID;
+
+    //!! what about this???
+    // this.id = id;
+
+    // (used for permission checks)
+    //!! though not really required - could be refactored out
+    this.roles = systemRoles.concat(appRoles);
+
+    return this;
+  };
+
+
   this.destroy = function () {
     this.type = null;
     this.id = null;

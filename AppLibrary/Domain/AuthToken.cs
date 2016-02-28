@@ -301,6 +301,72 @@ namespace App.Library
 */
 
 
+        protected override HubResult OnRedeemed(UtilityDC utilityDC, AuthToken authToken, dynamic data)
+        {
+            if (authToken.Redeem(utilityDC))
+            {
+                var authTokenEPScope = authToken.ItemEPScope;
+                Debug.Assert(authTokenEPScope.ScopeType == ExtendedPropertyScopeType.TenantGroupID);
+                Debug.Assert(authToken.TargetID.HasValue);
+
+
+                // Our item's tenant is our tenant
+                var tenantGroupID = authTokenEPScope.ID.Value;
+                var tenantGroupInfo = TenantGroup.GetCachedTenantGroupInfo(tenantGroupID);
+
+                Debug.Assert(authToken.ContextUserID.HasValue);
+                var authTokenContextUserID = authToken.ContextUserID.Value;
+
+                var authorizedBy = utilityDC.TransactionAuthorizedBy;
+                var authTokenAuthorizingIdentity = authorizedBy.GetImpersonatedIdentity(utilityDC, authTokenContextUserID);
+
+                var appRoles = new string[] { "EventSessionVolunteer" };
+
+                // If we're given a firstName/lastName, we'll have a User Volunteer. Otherwise an Anonymous Volunteer
+                string firstName = data.firstName;
+                string lastName = data.lastName;
+
+                //!! do we need a non-null display name?
+                string identityDisplayName = null;
+                int? identityUserID = null;
+                TimeZoneInfo identityTimeZoneInfo = tenantGroupInfo.TimeZoneInfo;
+
+                User volunteerUser = null;
+                if (!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName))
+                {
+                    var trimFirstName = firstName.Trim();
+                    var trimLastName = lastName.Trim();
+
+                    volunteerUser = User.FindOrCreateVisitor(utilityDC, authTokenAuthorizingIdentity, trimFirstName, trimLastName, appRoles);
+                    Debug.Assert(volunteerUser != null);
+                    Debug.Assert(volunteerUser.ID > 0);
+
+                    identityDisplayName = volunteerUser.DisplayName;
+                    identityUserID = volunteerUser.ID;
+                    identityTimeZoneInfo = volunteerUser.EffectiveTimeZoneInfo;
+                }
+
+                // If they authenticate this way, we only allow these roles. (Log in normally if your User account has greater permissions)
+                var systemRoles = Enumerable.Empty<SystemRole>();
+
+                IdentityData identityData = IdentityData.Create(authTokenEPScope, tenantGroupID, identityUserID, identityDisplayName, systemRoles, appRoles, null, identityTimeZoneInfo);
+
+                //var systemIdentity = authorizedBy.GetSystemIdentity(dc, tenantGroupInfo);
+                //Debug.Assert(systemIdentity != null);
+
+                utilityDC.UsingIdentity<AppDC>(authTokenAuthorizingIdentity, authTokenIdentityDC =>
+                {
+                    if (authToken.TargetID.HasValue)
+                    {
+                        WebIdentityAuthentication.StartObjectSession(authTokenIdentityDC, identityData, TimeZones.Pacific, tenantGroupID, identityUserID, typeof(EventSession), authToken.TargetID.Value, authToken.Type, authToken.ID);
+                    }
+                });
+                return HubResult.Success;
+            }
+            return HubResult.Forbidden;
+        }
+
+
 
         protected override AuthTokenState OnTokenClicked(HttpContext context, WebUtilityDC dc, AuthToken authToken)
         {
@@ -318,39 +384,18 @@ namespace App.Library
             var authTokenState = base.OnTokenClicked(context, dc, authToken);
 
 
-            var authorizedBy = dc.TransactionAuthorizedBy;
 
             if (authTokenState == AuthTokenState.Valid)
             {
-                var itemEPScope = authToken.ItemEPScope;
-                Debug.Assert(itemEPScope.ScopeType == ExtendedPropertyScopeType.TenantGroupID);
-                Debug.Assert(authToken.TargetID.HasValue);
+                //!! how do we pass firstName/lastName? Is the intent to show UI? Or specify the volunteer Name in the authToken? Guess if we have it, we should pass a userID. 
+                var result = OnRedeemed(dc, authToken, new {});
 
-
-                // Impersonate the TenantGroup "System" - so we're contrained to the correct EPScope
-                var tenantGroupID = itemEPScope.ID.Value;
-                var tenantGroupInfo = TenantGroup.GetCachedTenantGroupInfo(tenantGroupID);
-
-
-                Debug.Assert(authToken.ContextUserID.HasValue);
-                var contextUserID = authToken.ContextUserID.Value;
-
-                var authTokenAuthorizingIdentity = authorizedBy.GetImpersonatedIdentity(dc, contextUserID);
-
-
-                //var systemIdentity = authorizedBy.GetSystemIdentity(dc, tenantGroupInfo);
-                //Debug.Assert(systemIdentity != null);
-
-                dc.UsingIdentity<AppDC>(authTokenAuthorizingIdentity, tenantDC =>
+                if (result == HubResult.Success)
                 {
-                    if (authToken.TargetID.HasValue)
-                    {
-                        WebIdentityAuthentication.StartObjectSession(dc, context, TimeZones.Pacific, tenantGroupID, null, typeof(EventSession), authToken.TargetID.Value, null, null);
-                        context.Response.Redirect("/Spas/VolunteerSpa.aspx");
-                        Debug.Fail("Shouldn't get here...");
-                    }
-                });
-
+                    //!! hmm should we always jump to the SPA, success or no on redeeming?
+                    context.Response.Redirect("/Spas/VolunteerSpa.aspx");
+                    Debug.Fail("Shouldn't get here...");
+                }
             }
 
             // (this page handles both valid and invalid clicks)
@@ -360,11 +405,8 @@ namespace App.Library
 
             context.RewritePath("/ResetPassword.aspx", string.Empty, queryString);
 
-
             return authTokenState;
         }
-
-
 
 
         /*
@@ -762,13 +804,13 @@ namespace App.Library
 
             if (authTokenState == AuthTokenState.Valid)
             {
-                var itemEPScope = authToken.ItemEPScope;
-                Debug.Assert(itemEPScope.ScopeType == ExtendedPropertyScopeType.TenantGroupID);
+                var authTokenEPScope = authToken.ItemEPScope;
+                Debug.Assert(authTokenEPScope.ScopeType == ExtendedPropertyScopeType.TenantGroupID);
                 Debug.Assert(authToken.TargetID.HasValue);
 
 
                 // Impersonate the TenantGroup "System" - so we're contrained to the correct EPScope
-                var tenantGroupID = itemEPScope.ID.Value;
+                var tenantGroupID = authTokenEPScope.ID.Value;
                 var tenantGroupInfo = TenantGroup.GetCachedTenantGroupInfo(tenantGroupID);
 
 
@@ -785,7 +827,15 @@ namespace App.Library
                     {
                         if (authToken.TargetID.HasValue)
                         {
-                            WebIdentityAuthentication.StartObjectSession(dc, context, TimeZones.Pacific, tenantGroupID, null, typeof(EventSession), authToken.TargetID.Value, null, null);
+                            int? nullUserID = null;
+                            var displayName = "login auth token display name";
+                            var systemRoles = Enumerable.Empty<SystemRole>();
+                            var appRoles = Enumerable.Empty<string>();
+                            var tenantGroupTimeZoneInfo = tenantGroupInfo.TimeZoneInfo;
+
+                            IdentityData identityData = IdentityData.Create(authTokenEPScope, tenantGroupID, nullUserID, displayName, systemRoles, appRoles, null, tenantGroupTimeZoneInfo);
+
+                            WebIdentityAuthentication.StartObjectSession(dc, identityData, TimeZones.Pacific, tenantGroupID, null, typeof(EventSession), authToken.TargetID.Value, null, null);
                             context.Response.Redirect("/Spas/VolunteerSpa.aspx");
                             Debug.Fail("Shouldn't get here...");
                         }

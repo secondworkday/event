@@ -84,7 +84,7 @@ namespace WebApp
 
 
 
-            appInfo.RefreshIdentityDataHandler = (dc, authenticatedTableHashCode, authenticatedID) =>
+            appInfo.RefreshIdentityDataHandler = (dc, ticketData, authenticatedTableHashCode, authenticatedID) =>
             {
                 var appDC = dc as AppDC;
                 Debug.Assert(appDC != null);
@@ -94,10 +94,14 @@ namespace WebApp
                 //{
                 //return MS.Utility.User.CreateIdentityData(dc, authenticatedID);
                 //}
-
                 Debug.Assert(authenticatedTableHashCode == EventSession.TableHashCode);
-                var identityData =  EventSession.CreateIdentityData(appDC, authenticatedID);
-                return identityData;
+
+                return ticketData;
+
+
+                //IdentityData identityData = IdentityData.Create(ticketData.TeamEPScope, tenantGroupID, eventSession.Name, null, volunteerRoles, null, timeZoneInfo);
+                //var identityData =  EventSession.CreateIdentityData(appDC, authenticatedID);
+                //return identityData;
             };
 
 

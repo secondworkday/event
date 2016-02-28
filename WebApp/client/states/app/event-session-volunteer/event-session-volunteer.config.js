@@ -49,11 +49,11 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
 
           var authenticatedIdentity = utilityService.model.authenticatedIdentity;
 
-          if (authenticatedIdentity.type != 'eventSession') {
+          if (authenticatedIdentity.itemType != 'eventSession') {
             return null;
           }
 
-          var eventSessionID = authenticatedIdentity.id;
+          var eventSessionID = authenticatedIdentity.itemID;
           return siteService.ensureEventSession(eventSessionID);
         },
         event: function (siteService, eventSession) {

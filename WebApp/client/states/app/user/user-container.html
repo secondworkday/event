@@ -17,11 +17,11 @@
           <span layout layout-align="start center">
             <img alt="user img" class="mini-user-img"
               ng-show="model.authenticatedUser.profilePhotoUrl"
-              ng-src="{{model.authenticatedUser.profilePhotoUrl}}" />
+              ng-src="{{model.authenticatedIdentity.profilePhotoUrl}}" />
             <img alt="user img" class="mini-user-img"
               ng-hide="model.authenticatedUser.profilePhotoUrl"
               ng-src="/images/user-img-placeholder.png" />
-            <span hide-xs>{{model.authenticatedUser.displayName}} &nbsp;</span> <i class="fa fa-caret-down"></i>
+            <span hide-xs>{{model.authenticatedIdentity.displayName}} &nbsp;</span> <i class="fa fa-caret-down"></i>
           </span>
         </md-button>
         <md-menu-content width="4">

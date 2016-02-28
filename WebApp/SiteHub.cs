@@ -116,10 +116,26 @@ namespace WebApp
                     // Generate a notification which lets the client know their authenticated identity.
                     if (authorizedBy.AuthorizedTableHashCode == EventSession.TableHashCode)
                     {
+#if false
                         var authenticatedSearchExpression = SearchExpression.Create(authorizedBy.AuthorizedIDs.FirstOrDefault());
                         var authenticatedNotification = EventSession.Search(appDC, authenticatedSearchExpression, string.Empty, 0, int.MaxValue);
 
-                        Clients.Caller.setAuthenticatedEventSession(authenticatedNotification);
+
+                        //       model.authenticatedIdentity = msIdentity.create('eventSession', authenticatedItem.id, authenticatedItem.name, appRoles, systemRoles, authenticatedItem.profilePhotoUrl);
+
+                        Debug.Assert(authorizedBy.UserIDOrNull != null);
+
+                        var eventSessionNotification = new
+                        {
+                            type = "eventSessionUser",
+                            userID = authorizedBy.UserIDOrNull,
+                            eventSessionID = authorizedBy.AuthorizedIDs.FirstOrDefault(),
+                        };
+#endif
+
+                        var authenticatedNotification = authorizedBy.GetClientNotification(dc, "eventSession");
+
+                        Clients.Caller.setAuthenticatedItemUserSession(authenticatedNotification);
                     }
 
                     // Send user stats
