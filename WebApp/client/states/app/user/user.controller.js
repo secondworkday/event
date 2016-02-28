@@ -64,10 +64,20 @@ app.controller('ReportController', function ($scope, $log, $mdDialog, $msUI, uti
     };
 
     $scope.downloadReminderForm = function (eventSessionID, participantGroupID) {
+
+      var ev = $scope.eventSessions.hashMap[eventSessionID];
+      var pg = $scope.participantGroups.hashMap[participantGroupID];
+
+      var filename = "OSB Reminder Form - "
+              + ev.name + " " + $filter('date')(ev.startDate,'MM-dd-yyyy')
+              + " - " + pg.name + " (" + pg.contactName + ")"
+      ;
+
       var query = {
         type: 'reminderFormForEventParticipant',
         participantGroupID: participantGroupID,
-        eventSessionID: eventSessionID
+        eventSessionID: eventSessionID,
+        pdfFilename: filename
       };
 
       if ($scope.formData.sendEmail) {

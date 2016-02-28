@@ -82,9 +82,10 @@ namespace WebApp
                     case "reminderFormForEventParticipant":
                         participantGroupID = request.QueryString.GetNullableInt32("participantGroupID");
                         var eventSessionID = request.QueryString.GetNullableInt32("eventSessionID");
+                        var filename = request.QueryString.Get("pdfFilename");
                         if (participantGroupID.HasValue && eventSessionID.HasValue)
                         {
-                            downloadReminderFormForEventParticipants(response, appDC, siteContext, participantGroupID.Value, eventSessionID.Value);
+                            downloadReminderFormForEventParticipants(response, appDC, siteContext, participantGroupID.Value, eventSessionID.Value, filename);
                             return;
                         }
                         return;
@@ -164,7 +165,7 @@ namespace WebApp
             response.DownloadToBrowser("ReminderForm" + DateTime.Now.ToString() + reportFileExtension, reportContentType, multipagePdfStream);
         }
 
-        private void downloadReminderFormForEventParticipants(HttpResponse response, AppDC appDC, SiteContext siteContext, int participantGroupID, int eventSessionID)
+        private void downloadReminderFormForEventParticipants(HttpResponse response, AppDC appDC, SiteContext siteContext, int participantGroupID, int eventSessionID, string filename)
         {
             var searchExpressionString = string.Format("$participantGroup:{0} $eventSession:{1}",
                 /*0*/ participantGroupID,
@@ -192,7 +193,13 @@ namespace WebApp
 
             var multipagePdfStream = PdfPlayground.MergePdfDocuments(individualPdfReportStreams);
             multipagePdfStream.Position = 0;
-            response.DownloadToBrowser("ReminderForm" + DateTime.Now.ToString() + reportFileExtension, reportContentType, multipagePdfStream);
+
+            string reminderFormFilename = "ReminderForm" + DateTime.Now.ToString() + reportFileExtension;
+            if (!String.IsNullOrEmpty(filename))
+            {
+                reminderFormFilename = filename + reportFileExtension;
+            }
+            response.DownloadToBrowser(reminderFormFilename, reportContentType, multipagePdfStream);
         }
 
         private void downloadReminderForm(HttpResponse response, AppDC appDC, SiteContext siteContext, int itemID)
