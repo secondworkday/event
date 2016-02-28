@@ -167,6 +167,16 @@ namespace WebApp
         // This routine extends the MS.Utility provided "Permission" check infrastructure to include Application layer permissions
         private bool permissionCheckHandler(Identity authorizedBy, MS.Utility.Permission permission, params object[] parameters)
         {
+            if (permission == Permission.ResetPassword)
+            {
+                if (authorizedBy.IsInExclusiveAppRole(AppRole.EventSessionVolunteer.ToString()))
+                {
+                    return false;
+                }
+                return true;
+            }
+
+
             // better safe than sorry...
             return false;
         }
