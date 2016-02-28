@@ -1189,6 +1189,14 @@ namespace App.Library
 		
 		private string _Location;
 		
+		private string _LocationStreetAddress;
+		
+		private string _LocationCity;
+		
+		private string _LocationState;
+		
+		private string _LocationZipCode;
+		
 		private System.DateTime _StartDate;
 		
 		private System.DateTime _EndDate;
@@ -1225,6 +1233,14 @@ namespace App.Library
     partial void OnOverviewChanged();
     partial void OnLocationChanging(string value);
     partial void OnLocationChanged();
+    partial void OnLocationStreetAddressChanging(string value);
+    partial void OnLocationStreetAddressChanged();
+    partial void OnLocationCityChanging(string value);
+    partial void OnLocationCityChanged();
+    partial void OnLocationStateChanging(string value);
+    partial void OnLocationStateChanged();
+    partial void OnLocationZipCodeChanging(string value);
+    partial void OnLocationZipCodeChanged();
     partial void OnStartDateChanging(System.DateTime value);
     partial void OnStartDateChanged();
     partial void OnEndDateChanging(System.DateTime value);
@@ -1402,6 +1418,86 @@ namespace App.Library
 					this._Location = value;
 					this.SendPropertyChanged("Location");
 					this.OnLocationChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LocationStreetAddress", DbType="nvarchar(128)")]
+		public string LocationStreetAddress
+		{
+			get
+			{
+				return this._LocationStreetAddress;
+			}
+			set
+			{
+				if ((this._LocationStreetAddress != value))
+				{
+					this.OnLocationStreetAddressChanging(value);
+					this.SendPropertyChanging();
+					this._LocationStreetAddress = value;
+					this.SendPropertyChanged("LocationStreetAddress");
+					this.OnLocationStreetAddressChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LocationCity", DbType="nvarchar(128)")]
+		public string LocationCity
+		{
+			get
+			{
+				return this._LocationCity;
+			}
+			set
+			{
+				if ((this._LocationCity != value))
+				{
+					this.OnLocationCityChanging(value);
+					this.SendPropertyChanging();
+					this._LocationCity = value;
+					this.SendPropertyChanged("LocationCity");
+					this.OnLocationCityChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LocationState", DbType="nvarchar(128)")]
+		public string LocationState
+		{
+			get
+			{
+				return this._LocationState;
+			}
+			set
+			{
+				if ((this._LocationState != value))
+				{
+					this.OnLocationStateChanging(value);
+					this.SendPropertyChanging();
+					this._LocationState = value;
+					this.SendPropertyChanged("LocationState");
+					this.OnLocationStateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LocationZipCode", DbType="nvarchar(128)")]
+		public string LocationZipCode
+		{
+			get
+			{
+				return this._LocationZipCode;
+			}
+			set
+			{
+				if ((this._LocationZipCode != value))
+				{
+					this.OnLocationZipCodeChanging(value);
+					this.SendPropertyChanging();
+					this._LocationZipCode = value;
+					this.SendPropertyChanged("LocationZipCode");
+					this.OnLocationZipCodeChanged();
 				}
 			}
 		}

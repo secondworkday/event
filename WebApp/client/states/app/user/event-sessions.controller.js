@@ -39,7 +39,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
   //!! TODO improve this so that it automatically checks every 10 seconds or so
   // it's a cheap fix to set the eventSession state to Upcoming, Live, or Past
   // but we need to make this more robust with a timer or something
-  $scope.setEventSessionState = function(eventSession) {
+  $scope.setEventSessionState = function (eventSession) {
     var currentDate = new Date();
     var eventStart = new Date(eventSession.startDate);
     var eventEnd = new Date(eventSession.endDate);
@@ -106,10 +106,10 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
     // these should be replaced with any of the users (aka "Team" members) who are eligible
     // to be Session Managers (aka Store Leaders)
     $scope.sampleUsers = [
-      {firstName: "Sam", lastName: "Adams", isSessionManager: false},
-      {firstName: "Jack", lastName: "Daniels", isSessionManager: false},
-      {firstName: "Johnny", lastName: "Walker", isSessionManager: false},
-      {firstName: "Lindsy", lastName: "Jones", isSessionManager: false}
+      { firstName: "Sam", lastName: "Adams", isSessionManager: false },
+      { firstName: "Jack", lastName: "Daniels", isSessionManager: false },
+      { firstName: "Johnny", lastName: "Walker", isSessionManager: false },
+      { firstName: "Lindsy", lastName: "Jones", isSessionManager: false }
     ];
 
     $scope.newOrEdit = newOrEdit;
@@ -259,6 +259,11 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
       updateTimeDisplay();
     }
 
+    $scope.states = ('AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS '
+      + 'MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY')
+      .split(' ').map(function (state) {
+        return { abbrev: state };
+      });
 
 
     $scope.hide = function () {
@@ -321,7 +326,7 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
       });
     };
 
-    function deleteEventSession (item) {
+    function deleteEventSession(item) {
       siteService.deleteEventSession(item)
       .then(function (successData) {
         // success

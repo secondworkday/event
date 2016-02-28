@@ -79,6 +79,13 @@
 
       <Column Name="Location" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
 
+      <Column Name="LocationStreetAddress" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />
+      <Column Name="LocationCity" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />
+      <Column Name="LocationState" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />
+      <Column Name="LocationZipCode" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />
+      
+      
+
       <Column Name="StartDate" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
       <Column Name="EndDate" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
 

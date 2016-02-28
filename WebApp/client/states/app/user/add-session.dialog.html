@@ -1,5 +1,5 @@
 <md-dialog aria-label="add {{'EVENT_SESSION' | translate}}" ng-cloak>
-  <form name="addEditSessionForm" novalidate>
+  <form name="addEditSessionForm">
     <md-toolbar>
       <div class="md-toolbar-tools">
         <h2>{{newOrEdit}} {{'EVENT_SESSION' | translate}}</h2>
@@ -90,7 +90,7 @@
               </md-select>
             </div>
           </div>
-          <div layout-gt-sm="row" layout-align="start center">
+          <!--<div layout-gt-sm="row" layout-align="start center">
             <div flex>
               <p class="md-body-2">
                 Total Slots
@@ -102,8 +102,8 @@
                   ng-model="formData.slots">
               </md-input-container>
             </div>
-          </div>
-          <div layout-gt-sm="row" layout-align="start center">
+          </div>-->
+          <!--<div layout-gt-sm="row" layout-align="start center">
             <div flex>
               <p class="md-body-2">
                 Check In Code
@@ -115,18 +115,7 @@
                   ng-model="formData.checkInCode">
               </md-input-container>
             </div>
-          </div>
-        </div>
-
-        <div layout="column">
-          <p class="md-subhead">
-            Select {{'SESSION_MANAGER' | translate}}(s)
-          </p>
-          <md-checkbox aria-label="{{user}} session manager checkbox"
-            ng-repeat="user in sampleUsers"
-            ng-model="user.isSessionManager">
-            {{user.firstName}} {{user.lastName}}
-          </md-checkbox>
+          </div>-->
         </div>
 
         <div layout-gt-sm="row">
@@ -138,22 +127,32 @@
         <div layout-gt-sm="row">
           <md-input-container class="md-block" flex-gt-sm>
             <label>Street address</label>
-            <input ng-model="formData.streetAddress">
+            <input ng-model="formData.locationStreetAddress" required>
           </md-input-container>
         </div>
         <div layout-gt-sm="row">
           <md-input-container class="md-block" flex-gt-sm>
             <label>City</label>
-            <input ng-model="formData.city">
+            <input ng-model="formData.locationCity" required>
           </md-input-container>
           <md-input-container class="md-block" flex-gt-sm>
             <label>State</label>
-            <input ng-model="formData.state">
+            <input ng-model="formData.locationState" required>
           </md-input-container>
           <md-input-container class="md-block" flex-gt-sm>
             <label>Zip code</label>
-            <input ng-model="formData.zipCode">
+            <input ng-model="formData.locationZipCode" required>
           </md-input-container>
+        </div>
+        <div layout="column">
+          <p class="md-subhead">
+            Select {{'SESSION_MANAGER' | translate}}(s)
+          </p>
+          <md-checkbox aria-label="{{user}} session manager checkbox"
+                       ng-repeat="user in sampleUsers"
+                       ng-model="user.isSessionManager">
+            {{user.firstName}} {{user.lastName}}
+          </md-checkbox>
         </div>
       </div>
     </md-dialog-content>
@@ -167,13 +166,13 @@
         ng-click="cancel()">
         Cancel
       </md-button>
-      <md-button class="md-primary"
+      <md-button class="md-primary" type="submit"
         ng-click="createEventSession(formData)"
         ng-if="newOrEdit == 'New'"
         ng-disabled="addEditSessionForm.$invalid">
         Add
       </md-button>
-      <md-button class="md-primary"
+      <md-button class="md-primary" type="submit"
         ng-click="editEventSession()"
         ng-if="newOrEdit == 'Edit'"
         ng-disabled="addEditSessionForm.$invalid">

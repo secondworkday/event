@@ -1,4 +1,4 @@
-<md-dialog aria-label="generate reminders" ng-cloak style="min-width:400px;">
+<md-dialog aria-label="generate reminders" ng-cloak style="min-width:650px;">
   <form>
     <md-toolbar>
       <div class="md-toolbar-tools">
@@ -12,7 +12,7 @@
     <md-dialog-content>
       <div class="md-dialog-content">
           <md-input-container class="md-block" flex-gt-sm>
-              <label>Session</label>
+            <label>{{'EVENT_SESSION' | translate}}</label>
               <md-select ng-model="formData.eventSessionID" ng-change="eventSessionIDChanged()">
                   <md-option ng-repeat="eventSession in eventSessionsIndex | objectLookup:eventSessions.hashMap track by eventSession.id" value="{{eventSession.id}}">
                       {{eventSession.name}} - {{eventSession.startDate | date:'MM/dd/yyyy'}}
@@ -20,12 +20,18 @@
               </md-select>
           </md-input-container>
         <md-input-container class="md-block" flex-gt-sm ng-if="formData.eventSessionID">
-          <label>School</label>
+          <label>{{'PARTICIPANT_GROUP' | translate}}</label>
           <md-select ng-model="formData.participantGroupID">
             <md-option ng-repeat="participantGroup in sessionParticipantGroupsIndex | objectLookup:participantGroups.hashMap track by participantGroup.id" value="{{participantGroup.id}}">
               {{participantGroup.name}}<span ng-if="participantGroup.contactName"> ({{participantGroup.contactName}})</span>
             </md-option>
           </md-select>
+        </md-input-container>
+        <md-input-container>
+          <md-checkbox ng-model="formData.sendEmail">
+            Send email to {{'PARTICIPANT_GROUP' | translate | lowercase}} contact
+          </md-checkbox>
+          <span ng-show="formData.sendEmail" style="font-size:smaller;"><br/>Your email app will launch, after which you'll need to manually attach the pdf document to the email.</span>
         </md-input-container>
       </div>
     </md-dialog-content>
@@ -33,7 +39,7 @@
       <md-button ng-click="cancel()">
        Cancel
       </md-button>
-      <md-button ng-disabled="!(formData.participantGroupID && formData.eventSessionID)" ng-click="downloadReminderForm(formData.eventSessionID, formData.participantGroupID); hide()">OK</md-button>
+      <md-button ng-disabled="!(formData.participantGroupID && formData.eventSessionID)" ng-click="downloadReminderForm(formData.eventSessionID, formData.participantGroupID)">OK</md-button>
     </md-dialog-actions>
     <div ms-debug-only>
       <h1>Debug</h1>

@@ -23,12 +23,14 @@ app.controller('ReportController', function ($scope, $log, $mdDialog, $msUI, uti
         eventParticipantsIndex: $scope.eventParticipantsIndex
       }
     })
-    .then(function () {
-      // $scope.status = 'You said the information was "' + answer + '".';
+    .then(function (selectedData) {
+      //if (selectedData.sendEmail) {
+      //  sendMail(selectedData.participantGroupID);
+      //}
     }, function () {
       // $scope.status = 'You cancelled the dialog.';
     });
-  }
+  };
 
   function GenerateRemindersDialogController($scope, $mdDialog, $filter, utilityService, participantGroupsIndex, eventSessionsIndex, eventParticipantsIndex) {
     $scope.participantGroups = siteService.model.participantGroups;
@@ -57,20 +59,9 @@ app.controller('ReportController', function ($scope, $log, $mdDialog, $msUI, uti
       });
     }
 
-    $scope.hide = function () {
-      $mdDialog.hide();
-    };
     $scope.cancel = function () {
       $mdDialog.cancel();
     };
-
-    //$scope.downloadReport = function (participantGroupID) {
-    //  var query = {
-    //    type: 'reminderFormForSchool',
-    //    participantGroupID: participantGroupID
-    //  };
-    //  utilityService.download(query);
-    //}
 
     $scope.downloadReminderForm = function (eventSessionID, participantGroupID) {
       var query = {
@@ -78,8 +69,32 @@ app.controller('ReportController', function ($scope, $log, $mdDialog, $msUI, uti
         participantGroupID: participantGroupID,
         eventSessionID: eventSessionID
       };
-      utilityService.download(query);
-    }
+
+      if ($scope.formData.sendEmail) {
+        var participantGroup = siteService.model.participantGroups.hashMap[participantGroupID];
+
+        var link = "mailto:" + participantGroup.primaryEmail
+                 + "?subject=" + escape("Reminder Notices for ALE OSB Event -- Please Print -- ")
+                 + "&body=" + escape("Here's a pdf file with pre-filled check-in information for each of your students.  Please make sure to print these out and distribute before your event.\n\n\n")
+        ;
+
+        var wi = window.open(link);
+
+        setTimeout(function () {
+          wi.location.href = "/Download.ashx?" + $.param(query);
+        }, 500);
+      }
+      else {
+        utilityService.download(query);
+      }
+      
+      var selectedData = {
+        participantGroupID: participantGroupID,
+        sendEmail: $scope.formData.sendEmail
+      }
+      
+      $mdDialog.hide(selectedData);
+    };
   }
 });
 
