@@ -207,6 +207,15 @@ namespace App.Library
             [JsonProperty("location")]
             public string Location { get; internal set; }
 
+            [JsonProperty("locationStreetAddress")]
+            public string LocationStreetAddress { get; internal set; }
+            [JsonProperty("locationCity")]
+            public string LocationCity { get; internal set; }
+            [JsonProperty("locationState")]
+            public string LocationState { get; internal set; }
+            [JsonProperty("locationZipCode")]
+            public string LocationZipCode { get; internal set; }
+
 
             public SearchItem(ExtendedItem<EventSession> exItem, SearchItemContext context)
                 : base(exItem, context)
@@ -226,6 +235,11 @@ namespace App.Library
 
                 this.EventID = exItem.item.EventID;
                 this.Location = exItem.item.Location;
+
+                this.LocationStreetAddress = exItem.item.LocationStreetAddress;
+                this.LocationCity = exItem.item.LocationCity;
+                this.LocationState = exItem.item.LocationState;
+                this.LocationZipCode = exItem.item.LocationZipCode;
             }
 
             public static SearchItem Create(ExtendedItem<EventSession> item, SearchItemContext context)
@@ -294,6 +308,10 @@ namespace App.Library
             this.Location = (string)data.location;
             this.StartDate = (DateTime)data.startDate;
             this.EndDate = (DateTime)data.endDate;
+            this.LocationStreetAddress = (string)data.locationStreetAddress;
+            this.LocationCity = (string)data.locationCity;
+            this.LocationState = (string)data.locationState;
+            this.LocationZipCode = (string)data.locationZipCode;
         }
 
         public static HubResult Edit(AppDC dc, int itemID, dynamic data)

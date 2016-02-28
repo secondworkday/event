@@ -1339,7 +1339,8 @@ namespace App.Library
                 DateTimeProviderTag.Create("EventTime", exResult.epSession.StartDate, TimeZones.Pacific),
                 StringProviderTag.Create("EventLocation", exResult.epSession.Location),
 
-                StringProviderTag.Create("Address", "16722 NE 116th Street, Redmond WA 98052"),
+                //StringProviderTag.Create("Address", "16722 NE 116th Street, Redmond WA 98052"),
+                StringProviderTag.Create("Address", String.Format("{0}, {1} {2} {3}", exResult.epSession.LocationStreetAddress, exResult.epSession.LocationCity, exResult.epSession.LocationState, exResult.epSession.LocationZipCode)),
 
                 StringProviderTag.Create("SchoolCounselorName", exResult.epParticipantGroup.ContactName),
 
