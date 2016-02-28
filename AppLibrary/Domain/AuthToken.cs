@@ -320,7 +320,8 @@ namespace App.Library
                 var authorizedBy = utilityDC.TransactionAuthorizedBy;
                 var authTokenAuthorizingIdentity = authorizedBy.GetImpersonatedIdentity(utilityDC, authTokenContextUserID);
 
-                var appRoles = new string[] { "EventSessionVolunteer" };
+                var appRoles = new AppRole[] { AppRole.EventSessionVolunteer }
+                    .Select(appRole => appRole.ToString());
 
                 // If we're given a firstName/lastName, we'll have a User Volunteer. Otherwise an Anonymous Volunteer
                 string firstName = data.firstName;
