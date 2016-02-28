@@ -95,6 +95,11 @@ app.controller('ReportController', function ($scope, $log, $mdDialog, $msUI, uti
       
       $mdDialog.hide(selectedData);
     };
+
+    // init
+    $scope.formData = {
+      sendEmail: true
+    };
   }
 });
 
