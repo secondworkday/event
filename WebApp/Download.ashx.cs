@@ -179,7 +179,7 @@ namespace WebApp
 
             foreach (int epID in eventParticipantIDsQuery)
             {
-                var reportGenerator = EventParticipant.GetReportGenerator(appDC, "OSB-Reminder-Form-2.docx", ReportFormat.Pdf, epID);
+                var reportGenerator = EventParticipant.GetReportGenerator(appDC, "OSB-Reminder-Form-EN-ES.docx", ReportFormat.Pdf, epID);
                 reportFileExtension = reportGenerator.ReportFileExtension;
                 reportContentType = reportGenerator.ReportContentType;
 

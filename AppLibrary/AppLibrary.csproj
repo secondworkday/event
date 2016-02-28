@@ -114,6 +114,7 @@
       <SubType>Designer</SubType>
     </None>
     <EmbeddedResource Include="Reports\OSB-Reminder-Form-2.docx" />
+    <EmbeddedResource Include="Reports\OSB-Reminder-Form-EN-ES.docx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Domain\AppDataClasses.dbml.layout">

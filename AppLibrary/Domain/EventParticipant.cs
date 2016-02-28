@@ -1331,7 +1331,7 @@ namespace App.Library
             {
                 StringProviderTag.Create("FirstName", exResult.epParticipant.FirstName),
                 StringProviderTag.Create("LastName", exResult.epParticipant.LastName),
-                StringProviderTag.Create("FullName", exResult.epParticipant.FullName),
+                StringProviderTag.Create("StudentName", exResult.epParticipant.FullName),
 
                 StringProviderTag.Create("SchoolName", exResult.epParticipantGroup.Name),
 
