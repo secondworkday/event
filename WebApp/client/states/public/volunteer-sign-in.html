@@ -19,11 +19,12 @@
           <md-input-container flex>
             <label>Access Code</label>
             <input ng-model="formData.authCode" type="text" required>
+            <div ng-show="invalidPIN" style="color:red;">Invalid Access Code, please try again.</div>
           </md-input-container>
         </div>
-        <span class="md-caption u-sm-margin-right">
+        <!--<span class="md-caption u-sm-margin-right">
           <a href="#">Need Help?</a>
-        </span>
+        </span>-->
       </md-card-content>
       <md-card-actions layout="row" layout-align="end center">
         <md-button class="md-primary"

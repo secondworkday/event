@@ -4,7 +4,7 @@ app.controller('VolunteerSignInController', function ($scope, $state, $window, $
   $scope.stateData = $state.current.data;
 
   $scope.signIn = function () {
-
+    $scope.invalidPIN = false;
     utilityService.signIn($scope.formData)
       .then(function () {
         // success
@@ -13,7 +13,8 @@ app.controller('VolunteerSignInController', function ($scope, $state, $window, $
         // $state.go('app.system.users', {}, { reload: true });
       }, function (failureData) {
         // failure
-        alert(failureData);
+        //alert(failureData);
+        $scope.invalidPIN = true;
       });
   };
 
