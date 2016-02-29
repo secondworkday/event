@@ -10,8 +10,8 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       controller: function ($scope, $state, utilityService, identity) {
         var model = utilityService.model;
 
-        if (identity.type == 'eventSession') {
-          $state.go('app.event-session.check-in', { eventSessionID: identity.id });
+        if (identity.itemType == 'eventSession') {
+          $state.go('app.event-session.check-in');
         }
         else {
           $state.go('public.welcome');
@@ -22,7 +22,7 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
     // authenticated volunteer - but not bound to a specific session - need to choose one
     .state('public.welcome', {
       url: '/welcome',
-      template: 'Hi there and welcome'
+      template: 'Hi there and welcome.'
     })
 
 
