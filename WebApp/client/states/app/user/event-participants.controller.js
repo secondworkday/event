@@ -296,7 +296,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
       templateUrl: '/client/states/app/user/upload-participants.dialog.html',
       locals: {
         event: event,
-        eventSessionsIndex: $scope.eventSessionsIndex
+        eventSessionsIndex: $scope.eventSessionsIndexer.index
       },
       parent: angular.element(document.body),
       targetEvent: ev,
