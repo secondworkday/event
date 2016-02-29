@@ -2,7 +2,7 @@
   <form name="participantGroupForm">
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <h2>{{newOrEdit}} {{'PARTICIPANT_GROUP' | translate}}</h2>
+        <h2>{{newOrEdit}} {{'PARTICIPANT_GROUP' | translate}} Contact</h2>
         <span flex></span>
         <md-button class="md-icon-button" ng-click="cancel()">
           <i class="fa fa-times"></i>
@@ -40,12 +40,6 @@
         </div>
         <div layout-gt-sm="row">
           <md-input-container class="md-block" flex-gt-sm>
-            <label>Total {{'PARTICIPANTS' | translate}}</label>
-            <input type="number" ng-model="formData.totalParticipants">
-          </md-input-container>
-        </div>
-        <div layout-gt-sm="row">
-          <md-input-container class="md-block" flex-gt-sm>
             <label>Notes</label>
             <textarea ng-model="formData.notes"></textarea>
           </md-input-container>
@@ -53,7 +47,7 @@
       </div>
     </md-dialog-content>
     <md-dialog-actions layout="row" layout-align="end center">
-      <md-button ng-click="showDeleteConfirmationDialog($event, formData)" ng-if="newOrEdit == 'Edit'">
+      <md-button ng-click="showDeleteConfirmationDialog($event, formData)" ng-if="newOrEdit == 'Edit'" class="md-warn">
         Delete {{'PARTICIPANT_GROUP' | translate}}
       </md-button>
       <md-button ng-click="cancel()">

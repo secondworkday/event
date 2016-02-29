@@ -115,6 +115,8 @@ namespace App.Library
                     newItem.AssignMailAddress(dc, primaryEmail);
                 }
 
+                newItem.SetNotes(dc, data.Value<string>("notes"));
+
                 return newItem;
             });
         }

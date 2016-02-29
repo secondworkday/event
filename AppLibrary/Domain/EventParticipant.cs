@@ -100,6 +100,7 @@ namespace App.Library
                     newItem.AddComment(dc, EPCategory.UserAssigned, comment);
                 }
 
+                newItem.SetNotes(dc, data.Value<string>("notes"));
 
                 return newItem;
             });
