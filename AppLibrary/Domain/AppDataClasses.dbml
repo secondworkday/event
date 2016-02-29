@@ -161,6 +161,9 @@
       <Column Name="CheckInTimestamp" Type="System.DateTime" DbType="DATETIME2" CanBeNull="true" />
       <Column Name="CheckOutTimestamp" Type="System.DateTime" DbType="DATETIME2" CanBeNull="true" />
 
+      <Column Name="CheckedInUserID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="CheckedOutUserID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      
       <Column Name="DonationLimit" Type="System.Decimal" DbType="Money" CanBeNull="true" />
       <Column Name="DonationAmount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
 

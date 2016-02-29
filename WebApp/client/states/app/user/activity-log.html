@@ -27,6 +27,39 @@
 
     <div ms-debug-only><pre>activity: {{activity | json}}</pre></div>
 
+    <span ng-switch-when="CheckInEventParticipant">
+      <a href="#" class="no-style text-support text-bold">
+        {{user.displayName}}
+      </a>
+      <span> checked-in a </span>
+      <a href="#" class="no-style text-support text-bold">{{'PARTICIPANT' | translate | lowercase}}</a>
+      <span class="u-sm-margin-left">
+        <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
+      </span>
+    </span>
+
+    <span ng-switch-when="UndoCheckInEventParticipant">
+      <a href="#" class="no-style text-support text-bold">
+        {{user.displayName}}
+      </a>
+      <span> undid check-in for a </span>
+      <a href="#" class="no-style text-support text-bold">{{'PARTICIPANT' | translate | lowercase}}</a>
+      <span class="u-sm-margin-left">
+        <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
+      </span>
+    </span>
+
+    <span ng-switch-when="CheckOutEventParticipant">
+      <a href="#" class="no-style text-support text-bold">
+        {{user.displayName}}
+      </a>
+      <span> checked out a </span>
+      <a href="#" class="no-style text-support text-bold">{{'PARTICIPANT' | translate | lowercase}}</a>
+      <span class="u-sm-margin-left">
+        <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
+      </span>
+    </span>
+
     <span ng-switch-when="BulkCheckInEventParticipant">
       <a href="#" class="no-style text-support text-bold">
         {{user.displayName}}

@@ -503,8 +503,16 @@ namespace App.Library
             {
                 Debug.Assert(!item.CheckInTimestamp.HasValue);
                 item.CheckInTimestamp = dc.TransactionTimestamp;
+                item.CheckedInUserID = dc.TransactionAuthorizedBy.UserIDOrNull;
 
                 notifyExpression.AddModifiedID(item.ID);
+
+                int bulkTagIDThingy = 0;
+                string activityDescription = "CheckIn EventParticipant";
+                var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+                var activityType = ActivityType.CheckIn;
+                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
+
                 return HubResult.Success;
             });
         }
@@ -515,6 +523,13 @@ namespace App.Library
             {
                 Debug.Assert(item.CheckInTimestamp.HasValue);
                 item.CheckInTimestamp = null;
+                item.CheckedInUserID = dc.TransactionAuthorizedBy.UserIDOrNull;
+
+                int bulkTagIDThingy = 0;
+                string activityDescription = "UndoCheckIn EventParticipant";
+                var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+                var activityType = ActivityType.UndoCheckIn;
+                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
 
                 notifyExpression.AddModifiedID(item.ID);
                 return HubResult.Success;
@@ -528,6 +543,13 @@ namespace App.Library
                 Debug.Assert(item.CheckInTimestamp.HasValue);
                 Debug.Assert(!item.CheckOutTimestamp.HasValue);
                 item.CheckOutTimestamp = dc.TransactionTimestamp;
+                item.CheckedOutUserID = dc.TransactionAuthorizedBy.UserIDOrNull;
+
+                int bulkTagIDThingy = 0;
+                string activityDescription = "CheckOut EventParticipant";
+                var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+                var activityType = ActivityType.CheckOut;
+                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
 
                 notifyExpression.AddModifiedID(item.ID);
                 return HubResult.Success;

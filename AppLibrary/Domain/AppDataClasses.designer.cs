@@ -2307,6 +2307,10 @@ namespace App.Library
 		
 		private System.Nullable<System.DateTime> _CheckOutTimestamp;
 		
+		private System.Nullable<int> _CheckedInUserID;
+		
+		private System.Nullable<int> _CheckedOutUserID;
+		
 		private System.Nullable<decimal> _DonationLimit;
 		
 		private System.Nullable<decimal> _DonationAmount;
@@ -2341,6 +2345,10 @@ namespace App.Library
     partial void OnCheckInTimestampChanged();
     partial void OnCheckOutTimestampChanging(System.Nullable<System.DateTime> value);
     partial void OnCheckOutTimestampChanged();
+    partial void OnCheckedInUserIDChanging(System.Nullable<int> value);
+    partial void OnCheckedInUserIDChanged();
+    partial void OnCheckedOutUserIDChanging(System.Nullable<int> value);
+    partial void OnCheckedOutUserIDChanged();
     partial void OnDonationLimitChanging(System.Nullable<decimal> value);
     partial void OnDonationLimitChanged();
     partial void OnDonationAmountChanging(System.Nullable<decimal> value);
@@ -2534,6 +2542,46 @@ namespace App.Library
 					this._CheckOutTimestamp = value;
 					this.SendPropertyChanged("CheckOutTimestamp");
 					this.OnCheckOutTimestampChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CheckedInUserID", DbType="Int")]
+		public System.Nullable<int> CheckedInUserID
+		{
+			get
+			{
+				return this._CheckedInUserID;
+			}
+			set
+			{
+				if ((this._CheckedInUserID != value))
+				{
+					this.OnCheckedInUserIDChanging(value);
+					this.SendPropertyChanging();
+					this._CheckedInUserID = value;
+					this.SendPropertyChanged("CheckedInUserID");
+					this.OnCheckedInUserIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CheckedOutUserID", DbType="Int")]
+		public System.Nullable<int> CheckedOutUserID
+		{
+			get
+			{
+				return this._CheckedOutUserID;
+			}
+			set
+			{
+				if ((this._CheckedOutUserID != value))
+				{
+					this.OnCheckedOutUserIDChanging(value);
+					this.SendPropertyChanging();
+					this._CheckedOutUserID = value;
+					this.SendPropertyChanged("CheckedOutUserID");
+					this.OnCheckedOutUserIDChanged();
 				}
 			}
 		}
