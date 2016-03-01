@@ -27,6 +27,9 @@ namespace WebApp.Spas
             }
 
             var master = this.Master as AngularJS_SignalR;
+
+            master.spaName = "User";
+
             //master.includeAngularUI = true;
             //master.includeAngularStrap = true;
             //master.includeAngularStrapTypeahead = true;

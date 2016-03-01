@@ -3283,6 +3283,56 @@ app.directive('msHide', function (ngIfDirective, msAuthenticated) {
 });
 
 
+
+// ms-show ms-not-got-it ms-spa
+
+// ms-production
+// ms-development
+// ms-spa="user"
+// ms-spa="volunteer"
+// ms-spa="!volunteer"
+
+app.directive('msDevelopment', function (ngIfDirective, SYSTEM_INFO) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    return function () {
+      return SYSTEM_INFO.isDevelopmentSite;
+    };
+  });
+});
+
+app.directive('msProduction', function (ngIfDirective, SYSTEM_INFO) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    return function () {
+      return SYSTEM_INFO.isProductionSite;
+    };
+  });
+});
+
+
+app.directive('msSpa', function (ngIfDirective, SYSTEM_INFO) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    var myAttribute = scope.$eval(attributes.msSpa);
+    if (myAttribute.charAt(0) === '!') {
+      myAttribute = myAttribute.substr(1);
+      return function () {
+        return SYSTEM_INFO.spaName !== myAttribute;
+      };
+    }
+    return function () {
+      return SYSTEM_INFO.spaName === myAttribute;
+    };
+  });
+});
+
+
+
+
+
+
+
+
+
+
 app.directive('msNotGotIt', function (ngIfDirective, utilityService, msAuthenticated) {
   return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
 
