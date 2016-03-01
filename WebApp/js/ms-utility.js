@@ -314,9 +314,29 @@ app.service('msIdentity', function () {
     return this;
   };
 
+
+  //  model.authenticatedIdentity = msIdentity.createItemUser(type, appRoles, systemRoles, userID, userDisplayName, profilePhotoUrl, itemID);
+  this.createUser = function (user) {
+    this.appRoles = user.appRoles || [];
+    this.systemRoles = user.systemRoles || [];
+    this.displayName = user.displayName;
+    this.profilePhotoUrl = user.profilePhotoUrl;
+
+    this.userID = user.id;
+    this.notGotItSet = user.notGotItSet;
+
+    // (used for permission checks)
+    //!! though not really required - could be refactored out
+    this.roles = this.systemRoles.concat(this.appRoles);
+
+    return this;
+  };
+
+
+
+
+
 //  model.authenticatedIdentity = msIdentity.createItemUser(type, appRoles, systemRoles, userID, userDisplayName, profilePhotoUrl, itemID);
-
-
   this.createItemUser = function (appRoles, systemRoles, displayName, profilePhotoUrl, userID, itemType, itemID) {
     if (!appRoles) {
       appRoles = [];
@@ -373,10 +393,30 @@ app.service('msAuthenticated', function (AUTHORIZATION_ROLES) {
   };
 
 
+  self.isNotGotIt = function (gotItLabel) {
+    if (self.identity && self.identity.notGotItSet) {
+      return self.identity.notGotItSet.indexOf(gotItLabel) > -1;
+    }
+    return false;
+  }
+
+  self.setGotIt = function (gotItLabel) {
+    if (self.identity && self.identity.notGotItSet) {
+      var idx = self.identity.notGotItSet.indexOf(gotItLabel);
+      if (idx > -1) {
+        // toggle off...
+        self.identity.notGotItSet.splice(idx, 1);
+      }
+    }
+  };
+
   self.authorizeRole = function (allowedRoles) {
+
+    allowedRoles = angular.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+
     // anyone can enter a state which allows AUTHORIZATION_ROLES.anonymous
     if (allowedRoles.indexOf(AUTHORIZATION_ROLES.anonymous) > -1) {
-      return true;
+        return true;
     }
 
     if (!self.identity) {
@@ -1325,6 +1365,15 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     };
 
 
+    self.setUserGotIt = function (identity, gotItLabel) {
+      return callHub(function () {
+        return utilityHub.server.setUserGotIt(identity.userID, gotItLabel);
+      });
+    };
+
+
+
+
 
 
 
@@ -2042,7 +2091,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
         //!! TODO - this users' data might change - need to track that in onUsersUpdated() - but do that after we change the server notification
         var authenticatedUser = usersData.items[0];
-        model.authenticatedIdentity = msIdentity.create('user', authenticatedUser.id, authenticatedUser.displayName, authenticatedUser.appRoles, authenticatedUser.systemRoles, authenticatedUser.profilePhotoUrl);
+        model.authenticatedIdentity = msIdentity.createUser(authenticatedUser);
         //!! retire this guy...
         model.authenticatedUser = authenticatedUser;
 
@@ -3168,77 +3217,91 @@ app.directive('passwordMatch', [function () {
     }
   };
 }]);
+
 // http://stackoverflow.com/questions/20325480/angularjs-whats-the-best-practice-to-add-ngif-to-a-directive-programmatically
-app.directive('msDebugOnly', function ($stateParams, ngIfDirective) {
+function ngIfVariation(ngIfDirective, customLink) {
   var ngIf = ngIfDirective[0];
   return {
     transclude: ngIf.transclude,
-    priority: ngIf.priority,
+    priority: ngIf.priority - 1,
     terminal: ngIf.terminal,
     restrict: ngIf.restrict,
-    link: function ($scope, $element, $attr) {
-      $attr.ngIf = function () {
-        return $stateParams.debug;
-      };
+    link: function (scope, element, attributes) {
+      // grab our custom ng-if function
+      var customNgIf = customLink(scope, element, attributes);
+      // grab the initial ng-if attribute (if any)
+      var initialNgIf = attributes.ngIf, ifEvaluator;
+      if (initialNgIf) {
+        ifEvaluator = function () {
+          // ng-if exists! evaluate both
+          return scope.$eval(initialNgIf) && customNgIf();
+        }
+      } else { 
+        ifEvaluator = function () {
+          // ng-if doesn't exist, just use our custom one
+          return customNgIf();
+        }
+      }
+      attributes.ngIf = ifEvaluator;
       ngIf.link.apply(ngIf, arguments);
     }
   };
-});
-app.directive('msFacadeOnly', function ($stateParams, ngIfDirective) {
-  var ngIf = ngIfDirective[0];
-  return {
-    transclude: ngIf.transclude,
-    priority: ngIf.priority,
-    terminal: ngIf.terminal,
-    restrict: ngIf.restrict,
-    link: function ($scope, $element, $attr) {
-      $attr.ngIf = function () {
-        return $stateParams.facade;
-      };
-      ngIf.link.apply(ngIf, arguments);
-    }
-  };
+}
+
+app.directive('msDebugOnly', function (ngIfDirective, $stateParams) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    return function () {
+      return $stateParams.debug;
+    };
+  });
 });
 
-
-
-app.directive('msShow', function ($parse, msAuthenticated, ngIfDirective) {
-  var ngIf = ngIfDirective[0];
-  return {
-    transclude: ngIf.transclude,
-    priority: ngIf.priority,
-    terminal: ngIf.terminal,
-    restrict: ngIf.restrict,
-    link: function (scope, element, attrs, ngModel) {
-      var parse = $parse(attrs.msShow);
-      var expression = parse(scope);
-      var allowedRoles = angular.isObject(expression) && angular.isArray(expression) ? expression : [expression];
-      attrs.ngIf = function () {
-        return msAuthenticated.authorizeRole(allowedRoles);
-      };
-      ngIf.link.apply(ngIf, arguments);
-    }
-  };
+app.directive('msFacadeOnly', function (ngIfDirective, $stateParams) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    return function () {
+      return $stateParams.facade;
+    };
+  });
 });
 
-app.directive('msHide', function ($parse, msAuthenticated, ngIfDirective) {
-  var ngIf = ngIfDirective[0];
-  return {
-    transclude: ngIf.transclude,
-    priority: ngIf.priority,
-    terminal: ngIf.terminal,
-    restrict: ngIf.restrict,
-    link: function (scope, element, attrs, ngModel) {
-      var parse = $parse(attrs.msHide);
-      var expression = parse(scope);
-      var allowedRoles = angular.isObject(expression) && angular.isArray(expression) ? expression : [expression];
-      attrs.ngIf = function () {
-        return !msAuthenticated.authorizeRole(allowedRoles);
-      };
-      ngIf.link.apply(ngIf, arguments);
-    }
-  };
+app.directive('msShow', function (ngIfDirective, msAuthenticated) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    var myAttribute = scope.$eval(attributes.msShow);
+    return function () {
+      return msAuthenticated.authorizeRole(myAttribute);
+    };
+  });
 });
+
+app.directive('msHide', function (ngIfDirective, msAuthenticated) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    var myAttribute = scope.$eval(attributes.msHide);
+    return function () {
+      return !msAuthenticated.authorizeRole(myAttribute);
+    };
+  });
+});
+
+
+app.directive('msNotGotIt', function (ngIfDirective, utilityService, msAuthenticated) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+
+    scope.setGotIt = function (gotItLabel) {
+      // optimistic clear it first
+      msAuthenticated.setGotIt(gotItLabel);
+
+      if (msAuthenticated.identity && msAuthenticated.identity.userID) {
+        utilityService.setUserGotIt(msAuthenticated.identity, gotItLabel);
+      }
+    };
+
+    var myAttribute = scope.$eval(attributes.msNotGotIt);
+    return function () {
+      return msAuthenticated.isNotGotIt(myAttribute);
+    };
+  });
+});
+
 
 
 
