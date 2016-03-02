@@ -6,9 +6,11 @@
         ALE
       </span>-->
       <span hide-xs style="margin-top:4px;">
-        <md-button ui-sref="app.user.events">{{'EVENTS' | translate}}</md-button>
-        <md-button ui-sref="app.user.team"
-          ms-hide="'EventSessionManager'">
+        <!-- ms-hide can't be applied on a button, so encapsulate within a <span> -->
+        <span ms-hide="'EventSessionManager'">
+          <md-button ui-sref="app.user.events">{{'EVENTS' | translate}}</md-button>
+        </span>
+        <md-button ui-sref="app.user.team">
           {{'USERS' | translate}}
         </md-button>
         <!-- <md-button ui-sref="app.user.participant-groups">{{'PARTICIPANT_GROUPS' | translate}}</md-button> -->
