@@ -13,21 +13,32 @@
 
 <ms-search-view change-event="updateEventSessions" search="searchHandler" options="searchViewOptions" user-search="userSearch">
   <div layout layout-wrap>
-    <md-card style="width:300px;"
+    <md-card style="width:385px;"
       ng-repeat="eventSession in $displayedIndex | objectLookup:$hashMap track by eventSession.id">
       <md-card-content>
-        <p>
-          <span class="md-headline">{{ eventSession.name }}</span><br/>
-          <span class="md-body-1">  {{ eventSession.startDate | amCalendar}}</span><br/>
-          <span class="md-body-1">Location: {{eventSession.location}}</span><br/>
-          <span class="md-caption tag"
-            ng-class="{live: state == 'Live'}">
-            <strong ng-repeat="state in setEventSessionState(eventSession)">{{ state }}</strong>
+        <div layout layout-align="start center">
+          <span flex class="md-headline">
+            {{ eventSession.name }}
           </span>
-        </p>
+          <span>
+            <span class="md-caption tag"
+              ng-class="{live: state == 'Live'}">
+              <strong ng-repeat="state in setEventSessionState(eventSession)">{{ state }}</strong>
+            </span>
+          </span>
+        </div>
+        <div class="u-sm-space"></div>
+        <md-divider></md-divider>
+        <div class="u-sm-space"></div>
+        <div>
+          <span class="md-subhead">When: {{ eventSession.startDate | amCalendar}}</span><br/>
+          <span class="md-subhead">Where: {{eventSession.location}}</span><br/>
+          <span class="md-subhead">Volunteer PIN: <strong>{{eventSession.authInfo.authCode}}</strong></span><br/>
+
+        </div>
         <div>
           <md-switch ng-change="setEventSessionCheckInOpen(eventSession)" ng-model="eventSession.checkInOpen" aria-label="check in">
-            Check In
+            Check-In
             <span ng-show="eventSession.checkInOpen">(open)</span>
             <span ng-show="!eventSession.checkInOpen">(closed)</span>
           </md-switch>
