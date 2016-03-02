@@ -7,7 +7,10 @@
       </span>-->
       <span hide-xs style="margin-top:4px;">
         <md-button ui-sref="app.user.events">{{'EVENTS' | translate}}</md-button>
-        <md-button ui-sref="app.user.team">{{'USERS' | translate}}</md-button>
+        <md-button ui-sref="app.user.team"
+          ms-hide="'EventSessionManager'">
+          {{'USERS' | translate}}
+        </md-button>
         <!-- <md-button ui-sref="app.user.participant-groups">{{'PARTICIPANT_GROUPS' | translate}}</md-button> -->
         <!-- <md-button ui-sref="app.user.locations">{{'LOCATIONS' | translate}}</md-button> -->
       </span>

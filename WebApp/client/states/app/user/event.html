@@ -14,16 +14,17 @@
       md-dynamic-height
       md-border-bottom>
     <md-tab ui-sref=".sessions">
-        <md-tab-label>{{'EVENT_SESSIONS' | translate}}</md-tab-label>
-        <md-tab-body>
-          <div ui-view="sessions"></div>
-        </md-tab-body>
+      <md-tab-label>{{'EVENT_SESSIONS' | translate}}</md-tab-label>
+      <md-tab-body>
+        <div ui-view="sessions"></div>
+      </md-tab-body>
     </md-tab>
-    <md-tab ui-sref=".schools">
-        <md-tab-label>{{'PARTICIPANT_GROUP_CONTACTS_ROLE' | translate}}</md-tab-label>
-        <md-tab-body>
-          <div ui-view="schools"></div>
-        </md-tab-body>
+    <md-tab ui-sref=".schools"
+      ms-hide="'EventSessionManager'">
+      <md-tab-label>{{'PARTICIPANT_GROUP_CONTACTS_ROLE' | translate}}</md-tab-label>
+      <md-tab-body>
+        <div ui-view="schools"></div>
+      </md-tab-body>
     </md-tab>
     <md-tab ui-sref=".participants">
       <md-tab-label>{{'PARTICIPANTS' | translate}}</md-tab-label>
@@ -31,7 +32,8 @@
         <div ui-view="participants"></div>
       </md-tab-body>
     </md-tab>
-    <md-tab ui-sref=".documents">
+    <md-tab ui-sref=".documents"
+      ms-hide="'EventSessionManager'">
       <md-tab-label>Documents</md-tab-label>
       <md-tab-body>
         <div ui-view="documents"></div>

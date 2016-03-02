@@ -5,8 +5,16 @@
     </h2>
   </div>
   <span ms-hide="'EventSessionVolunteer'">
-    <md-button ng-click="download()"><i class="fa fa-download"></i> Download {{'PARTICIPANTS' | translate}}</md-button>
-    <md-button ng-click="showUploadParticipantsDialog($event, event)"><i class="fa fa-upload"></i> Upload {{'PARTICIPANTS' | translate}}</md-button>
+    <md-button
+      ng-click="download()"
+      ms-hide="'EventSessionManager'">
+      <i class="fa fa-download"></i> Download {{'PARTICIPANTS' | translate}}
+    </md-button>
+    <md-button
+      ng-click="showUploadParticipantsDialog($event, event)"
+      ms-hide="'EventSessionManager'">
+      <i class="fa fa-upload"></i> Upload {{'PARTICIPANTS' | translate}}
+    </md-button>
     <md-button ng-click="showAddParticipantsDialog($event, event)" class="md-primary"><i class="fa fa-plus"></i> Add {{'PARTICIPANT' | translate}}</md-button>
   </span>
 </div>
@@ -76,7 +84,8 @@
       </div>
     </div>
     <div layout style="height:58px;"
-      ng-if="selectedIndex.length">
+      ng-if="selectedIndex.length"
+      ms-hide="'EventSessionManager'">
       <div flex="15"></div>
       <div flex layout layout-align="end center">
         <span class="tag">{{selectedIndex.length}} Selected <i ng-click="unselectAll()" class="fa fa-times u-clickable"></i></span>
@@ -90,7 +99,8 @@
       <table class="u-full-width table" id="datagrid" style="padding:3px;">
         <thead fsm-sticky-header scroll-body="'#datagrid'" scroll-stop="64" class="sticky-header-style">
           <tr layout layout-align="start center" class="table-header md-body-2 text-support">
-            <th flex="5" class="text-center">
+            <th flex="5" class="text-center"
+              ms-hide="'EventSessionManager'">
               <md-checkbox style="margin:0;" ng-checked="selectedIndex.length" ng-click="toggleSelectAll()" aria-label="select all"></md-checkbox>
             </th>
             <th flex="10" class="text-left" style="max-width:120px;">Last Name</th>
@@ -108,7 +118,8 @@
               ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id"
               ng-init="eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID); watchEventParticipantEventSession(this, 'eventParticipant.eventSessionID');
               eventParticipantParticipantGroup = demandParticipantGroup(eventParticipant.participantGroupID);">
-            <td flex="5" class="table-data text-center">
+            <td flex="5" class="table-data text-center"
+              ms-hide="'EventSessionManager'">
               <md-checkbox style="margin:0;"
                 ng-checked="selectedIndexContains(eventParticipant)"
                 ng-click="toggleSelectedIndex(eventParticipant)"
