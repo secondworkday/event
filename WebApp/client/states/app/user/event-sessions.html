@@ -43,11 +43,12 @@
         </p> -->
       </md-card-content>
       <md-card-actions layout="row" layout-align="end center">
-        <md-button aria-label="edit event session"
-          ng-click="showEditEventSessionDialog($event, eventSession)"
-          ms-hide="'EventSessionManager'">
-          <i class="fa fa-pencil ng-scope"></i> Edit
-        </md-button>
+        <span ms-hide="'EventSessionManager'">
+          <md-button aria-label="edit event session"
+            ng-click="showEditEventSessionDialog($event, eventSession)">
+            <i class="fa fa-pencil ng-scope"></i> Edit
+          </md-button>
+        </span>
         <md-button class="md-primary"
           ui-sref="^.^.session.participants({eventSessionID:eventSession.id})">
           View
