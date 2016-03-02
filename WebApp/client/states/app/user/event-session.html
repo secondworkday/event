@@ -1,11 +1,25 @@
 <div layout layout-align="start center">
-  <div>
-    <md-button ui-sref="app.user.event.sessions({eventID:event.id})"><i class="fa fa-chevron-left"></i> Back</md-button>
+  <div flex>
+    <md-button style="margin-left:0;" ui-sref="app.user.event.sessions({eventID:event.id})"><i class="fa fa-chevron-left"></i> Back</md-button><br/>
+    <span class="md-display-1">{{'EVENT_SESSION' | translate}}: {{eventSession.name}}</span>
+    <div class="u-sm-space"></div>
+    <span class="md-body-1">
+      Check In URL: <a href="{{authInfo.url}}">{{authInfo.url}}</a><br/>
+      Volunteer Code:  <strong>{{authInfo.authCode}}</strong>
+    </span>
   </div>
-  <div>
-    <h2>{{'EVENT_SESSION' | translate}}: {{eventSession.name}}</h2>
+  <div class="text-center">
+    <h2 class="md-display-1">{{eventSession.checkedInParticipants.index.length}} of {{eventSession.allParticipants.index.length}}</h2>
+    <md-progress-linear style="margin-left:auto;margin-right:auto;max-width:300px;" md-mode="determinate" value="{{eventSession.checkedInParticipants.index.length / eventSession.allParticipants.index.length * 100}}"></md-progress-linear><br/>
+    <span class="md-body-1 text-support">
+      Checked-In
+    </span>
   </div>
 </div>
+
+<div class="u-sm-space"></div>
+<md-divider></md-divider>
+<div class="u-sm-space"></div>
 
 <div ms-debug-only><pre>eventSession: {{eventSession | json}}</pre></div>
 
@@ -18,10 +32,7 @@ checked-out Participants Indexer: {{eventSession.checkedOutParticipants}}<br />
 
 AuthInfo: {{authInfo}} -->
 
-<p class="md-body-1">
-  Check In URL: <a href="{{authInfo.url}}">{{authInfo.url}}</a><br/>
-  Volunteer Code:  <strong>{{authInfo.authCode}}</strong>
-</p>
+
 
 
 <div ui-view></div>
