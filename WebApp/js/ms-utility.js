@@ -67,7 +67,7 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
 
     if (toState.redirectTo) {
       event.preventDefault();
-      $state.go(toState.redirectTo, toParams)
+      $state.go(toState.redirectTo, toParams);
     }
 
     //set variables to false
@@ -108,7 +108,7 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
 
       // See if identity has any roles in common with stateAllowedRoles
       var intersection = stateAllowedRoles.filter(function (n) {
-        return identityRoles.indexOf(n) != -1
+        return identityRoles.indexOf(n) != -1;
       });
       if (intersection.length > 0) {
         return true;
@@ -116,7 +116,7 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
 
       // If we can't find a reason to allow - we've got to deny
       return false;
-    }
+    };
 
     if (authenticate(stateAllowedRoles, authenticatedIdenity)) {
       return;
@@ -283,7 +283,7 @@ app.service('bootstrapService', ['$rootScope', '$q', 'utilityService', function 
 app.constant('CONNECTION_EVENT', {
   connectionStarting: 'connection-starting',
   connectionStarted: 'connection-started',
-  connectionStopped: 'connection-stopped',
+  connectionStopped: 'connection-stopped'
 })
 .constant('CONNECTION_STATUS', {
   online: 'online',
@@ -398,7 +398,7 @@ app.service('msAuthenticated', function (AUTHORIZATION_ROLES) {
       return self.identity.notGotItSet.indexOf(gotItLabel) > -1;
     }
     return false;
-  }
+  };
 
   self.setGotIt = function (gotItLabel) {
     if (self.identity && self.identity.notGotItSet) {
@@ -416,7 +416,7 @@ app.service('msAuthenticated', function (AUTHORIZATION_ROLES) {
 
     // anyone can enter a state which allows AUTHORIZATION_ROLES.anonymous
     if (allowedRoles.indexOf(AUTHORIZATION_ROLES.anonymous) > -1) {
-        return true;
+      return true;
     }
 
     if (!self.identity) {
@@ -465,7 +465,7 @@ app.service('msAuthenticated', function (AUTHORIZATION_ROLES) {
 
     // If we can't find a reason to allow - we've got to deny
     return false;
-  }
+  };
 
   return this;
 });
@@ -603,7 +603,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
     function compareByIDDescending(left, right) {
       return compareByID(right, left);
-    };
+    }
     this.compareByIDDescending = compareByIDDescending;
 
 
@@ -639,7 +639,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
             i++;
           }
           return result;
-        }
+        };
       }
       var sortOrder = 1;
       if (propertyName[0] === "-") {
@@ -658,7 +658,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         var result = (left[propertyName] < right[propertyName]) ? -1 : (left[propertyName] > right[propertyName]) ? 1 : 0;
         return result * sortOrder;
       }
-    }
+    };
 
     self.filterByPropertyValue = function (propertyName, value) {
       var value = value;
@@ -3184,7 +3184,7 @@ app.directive('msSearchView', function ($parse, utilityService) {
       var templateHtml =
         '<div>' +
           // 'Search: <input type="text" class="form-control" placeholder="Search for any text, &commat;name, or even &num;tag" ng-model="userSearch">' +
-          '<div class="ms-search-view"' + container + ' data-infinite-scroll="loadPage()" data-infinite-scroll-disabled="loadPageDone" data-infinite-scroll-distance="0" data-infinite-scroll-immediate-check="true">' +
+          '<div class="ms-search-view"' + container + ' data-infinite-scroll="loadPage()" data-infinite-scroll-disabled="loadPageDone" data-infinite-scroll-distance="2" data-infinite-scroll-immediate-check="true">' +
           '</div>' +
         '</div>';
 
@@ -3235,12 +3235,12 @@ function ngIfVariation(ngIfDirective, customLink) {
         ifEvaluator = function () {
           // ng-if exists! evaluate both
           return scope.$eval(initialNgIf) && customNgIf();
-        }
-      } else { 
+        };
+      } else {
         ifEvaluator = function () {
           // ng-if doesn't exist, just use our custom one
           return customNgIf();
-        }
+        };
       }
       attributes.ngIf = ifEvaluator;
       ngIf.link.apply(ngIf, arguments);
