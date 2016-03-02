@@ -27,13 +27,15 @@
 
       app.constant('APP_ROLE_ITEMS', [
         // note 'Admin' is the same as TenantAdmin, handled as a SystemRole so not listed here
-        { name: 'Manager', value: 'EventPlanner' },
+        { name: 'Planner', value: 'EventPlanner' },
+        { name: 'Manager', value: 'EventSessionManager' },
         { name: 'Volunteer', value: 'EventSessionVolunteer' }
       ]);
 
       app.constant('APP_ROLE_TRANSLATION', {
         Admin: 'TENANT_ADMIN_ROLE',
         EventPlanner: 'EVENT_PLANNER_ROLE',
+        EventSessionManager: 'SESSION_MANAGER_ROLE',
         EventSessionVolunteer: 'SESSION_VOLUNTEER_ROLE'
       });
 
@@ -51,6 +53,7 @@
 
         admin: "Admin",
         eventPlanner: "EventPlanner",
+        eventSessionManager: "EventSessionManager",
         eventSessionVolunteer: "EventSessionVolunteer"
       });
 

@@ -28,6 +28,7 @@
       app.constant('APP_ROLE_TRANSLATION', {
         Admin: 'TENANT_ADMIN_ROLE',
         EventPlanner: 'EVENT_PLANNER_ROLE',
+        EventSessionManager: 'SESSION_MANAGER_ROLE',
         EventSessionVolunteer: 'SESSION_VOLUNTEER_ROLE'
       });
 
@@ -46,6 +47,7 @@
 
         admin: "Admin",
         eventPlanner: "EventPlanner",
+        eventSessionManager: "EventSessionManager",
         eventSessionVolunteer: "EventSessionVolunteer"
       });
 
