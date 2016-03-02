@@ -55,10 +55,14 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
 
 
 
+  $scope.filtersAreOn = function () {
+    return $scope.searchViewOptions.stackFilters.length > 0 || $scope.searchViewOptions.userSearch;
+  }
 
-
-
-
+  $scope.clearAllFilters = function () {
+    $scope.searchViewOptions.stackFilters = [];
+    $scope.searchViewOptions.userSearch = null;
+  }
 
   $scope.searchViewOptions = { };
 

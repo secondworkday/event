@@ -19,6 +19,9 @@
 
 <section layout>
   <div class="u-sm-margin-right" flex="15">
+    <a ng-show="filtersAreOn()" ng-click="clearAllFilters()" style="font-size:smaller; position:relative;">Clear all filters</a>
+    <a ng-hide="filtersAreOn()" style="font-size:smaller; position:relative;">&nbsp;</a>
+
     <p class="md-body-2 text-support">
       STATE
     </p>
@@ -65,6 +68,7 @@
           <input ng-model="searchViewOptions.userSearch">
         </md-input-container>
       </div>
+      <div ng-if="searchViewOptions.userSearch" ng-click="searchViewOptions.userSearch = null" style="cursor:pointer; margin-bottom:17px;"><i class="fa fa-times"></i></div>
       <div style="margin-top:-6px;">
         <md-menu md-position-mode="target-right target">
           <md-button aria-label="Open sort menu" ng-click="$mdOpenMenu()" style="margin-top:0;margin-bottom:0;">

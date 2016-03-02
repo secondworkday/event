@@ -9,6 +9,7 @@
       <input ng-model="searchViewOptions.userSearch">
     </md-input-container>
   </div>
+  <div ng-if="searchViewOptions.userSearch" ng-click="searchViewOptions.userSearch = null" style="cursor:pointer; margin-top:22px;"><i class="fa fa-times"></i></div>
   <div hide-xs>
     <md-menu md-position-mode="target-right target">
       <md-button aria-label="Open sort menu" class="md-icon-button" ng-click="$mdOpenMenu()">
