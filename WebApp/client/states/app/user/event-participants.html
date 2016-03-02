@@ -129,7 +129,7 @@
             <td flex="10" class="table-data text-left" hide-xs hide-sm ng-if="!eventSession">{{ eventParticipantEventSession.location }}</td>
             <td flex="10" class="table-data text-left" ng-if="!eventSession">{{ eventParticipantEventSession.startDate | amCalendar}}</td>
             <td flex class="table-data text-center">
-              <span class="u-display-hover" ms-hide="'EventSessionVolunteer'">
+              <span class="u-display-hover" ms-show="['Admin', 'EventPlanner']">
                 <md-button class="md-icon-button" style="margin-top:-6px;margin-bottom:0;"
                            ng-click="showEditParticipantsDialog($event, event, eventParticipant)">
                   <md-tooltip>Edit {{'PARTICIPANT' | translate | lowercase}}</md-tooltip>

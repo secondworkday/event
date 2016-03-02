@@ -269,6 +269,7 @@
     <Content Include="default.html" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />
+    <Content Include="images\ale-photo-blurred.png" />
     <Content Include="images\boy-guitar-laith-abuabdu-unsplash.jpg" />
     <Content Include="images\logo-eastside.png" />
     <Content Include="images\user-img-placeholder.png" />
