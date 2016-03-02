@@ -17,8 +17,8 @@
       <div flex class="u-sm-margin-left u-clickable"
         ui-sref="app.user.event.sessions({eventID:event.id})">
         <span class="md-title">{{event.name}}</span><br/>
-        <span class="md-body-1">{{getEventDatesString(event.id) || "no date set"}}</span><br/>
-        <span class="md-caption">{{getNumberOfEventParticipants(event.id) || "0"}}/{{totalEventParticipants}} {{ 'PARTICIPANTS' | translate | lowercase}}</span>
+        <span class="md-body-1">{{getEventDatesString(event.id) || "no date set"}}</span>
+        <!-- <span class="md-caption">{{getNumberOfEventParticipants(event.id) || "0"}}/{{totalEventParticipants}} {{ 'PARTICIPANTS' | translate | lowercase}}</span> -->
       </div>
       <md-button class="md-warn u-display-hover"
         ng-click="showDeleteConfirmationDialog($event, event)">
