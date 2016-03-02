@@ -216,8 +216,11 @@ namespace App.Library
             [JsonProperty("locationZipCode")]
             public string LocationZipCode { get; internal set; }
 
+            [JsonProperty("authInfo")]
+            public object AuthInfo { get; internal set; }
 
-            public SearchItem(ExtendedItem<EventSession> exItem, SearchItemContext context)
+
+            public SearchItem(ExtendedItem<EventSession> exItem, SearchItemContext context, object authInfo)
                 : base(exItem, context)
             {
                 this.CreatedTimestamp = exItem.item.CreatedTimestamp;
@@ -240,6 +243,8 @@ namespace App.Library
                 this.LocationCity = exItem.item.LocationCity;
                 this.LocationState = exItem.item.LocationState;
                 this.LocationZipCode = exItem.item.LocationZipCode;
+
+                this.AuthInfo = authInfo;
             }
 
             public static SearchItem Create(ExtendedItem<EventSession> item, SearchItemContext context)
@@ -250,7 +255,12 @@ namespace App.Library
                         .Select(epTagsItem => epTagsItem.Tag.Name))
                     .ToArray();
 
-                return new SearchItem(item, context);
+                AppDC appDC = context.UtilityDC as AppDC;
+                Debug.Assert(appDC != null);
+
+                var volunteerAuthInfo = getVolunteerAuthInfo(appDC, item.itemID);
+
+                return new SearchItem(item, context, volunteerAuthInfo);
             }
         }
 
@@ -382,7 +392,14 @@ namespace App.Library
 #endif
 
 
+
         public static HubResult GetVolunteerAuthInfo(AppDC dc, int itemID)
+        {
+            var volunteerAuthInfo = getVolunteerAuthInfo(dc, itemID);
+            return HubResult.CreateSuccessData(volunteerAuthInfo);
+        }
+
+        public static object getVolunteerAuthInfo(AppDC dc, int itemID)
         {
             Debug.Assert(dc != null);
 
@@ -400,11 +417,9 @@ namespace App.Library
                     url = url.ToString()
                 };
 
-                return HubResult.CreateSuccessData(result);
+                return result;
             });
         }
-
-
 
 
 
