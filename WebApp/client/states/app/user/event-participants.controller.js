@@ -83,7 +83,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     { name: 'Level', serverTerm: 'ExEventParticipant.item.Level', clientFunction: utilityService.compareByProperties('level', 'id') }
   ];
 
-  $scope.searchViewOptions.sort = $scope.sortOptions[0];
+  $scope.searchViewOptions.sort = $scope.sortOptions[1];
 
   $scope.filterOptions = [
     //{ name: 'Active', serverTerm: '$Active', clientFunction: filterByStateFactory("Active") },
@@ -574,7 +574,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     function BulkEditParticipantsDialog($scope, $mdDialog, $translate, event, eventSessionsIndex, selectedIndex) {
       $scope.eventSessions = siteService.model.eventSessions;
       $scope.participantGroups = siteService.model.participantGroups;
-      
+
       $scope.totalSelectedParticipants = selectedIndex.length;
 
       $scope.event = event;
