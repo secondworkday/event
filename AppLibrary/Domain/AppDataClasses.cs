@@ -24,9 +24,10 @@ namespace App.Library
 
         // Ability to assist with the planning of an Event
         EventPlanner,
+        // Ability to manage the running of an EventSession
+        EventSessionManager,
         // Ability to check-in and check-out at an Event Session
         EventSessionVolunteer,
-
 
         //EventManager,
         //EventVolunteer,
