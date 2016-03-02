@@ -83,9 +83,22 @@ app.controller('ReportController', function ($scope, $log, $mdDialog, $msUI, uti
       if ($scope.formData.sendEmail) {
         var participantGroup = siteService.model.participantGroups.hashMap[participantGroupID];
 
+        var emailSubject = "Reminder Form - Assistance League of the Eastside ~ Operation School Bell";
+        var emailBody = "Thank you very much for sending in your student list for the Operation School Bell shopping events."
+          + "\n\n"
+          + "Attached is a PDF file with a pre-filled check-in form which includes date, time and location for each of your students. Please make sure to print these out and distribute to the student a few days before the scheduled shopping event."
+          + "\n\n"
+          + "Please ask your student/family to bring this form to the check in table at the shopping event."
+          + "\n\n"
+          + "If you have any questions, please contact me."
+          + "\n\n"
+          + "Thank you again for all that you do for Assistance League of the Eastside and the students in our community."
+          + "\n\n"
+          ;
+
         var link = "mailto:" + participantGroup.primaryEmail
-                 + "?subject=" + escape("Reminder Notices for ALE OSB Event -- Please Print -- ")
-                 + "&body=" + escape("Here's a pdf file with pre-filled check-in information for each of your students.  Please make sure to print these out and distribute before your event.\n\n\n")
+                 + "?subject=" + escape(emailSubject)
+                 + "&body=" + escape(emailBody)
         ;
 
         var wi = window.open(link);
