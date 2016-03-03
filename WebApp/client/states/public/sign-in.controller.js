@@ -11,7 +11,7 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
         // $state.go('app.system.users', {}, { reload: true });
       }, function (failureData) {
         // failure
-        alert(failureData.errorMessage);
+        $scope.errorMessage = failureData.errorMessage;
       });
   };
 
