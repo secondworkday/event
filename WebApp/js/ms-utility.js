@@ -995,7 +995,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     // tracks in memory the presumably few myTasks that are active
     activeIndexer: {
       index: [],
-      sort: self.localeCompareByPropertyThenByID('name'),
+      sort: self.compareByProperties('name', 'id'),
       filter: function (item) {
         return item.state == 'Active';
       }
@@ -1625,68 +1625,6 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
-    self.delayLoad2 = function (modelItems, itemKey) {
-
-      if (!modelItems.delayLoad) {
-        modelItems.delayLoad = {
-          busy: false,
-          deferred: $q.defer(),
-          itemKeys: [],
-          search: function (searchTerm) {
-            return modelItems.search(searchTerm, "", 0, 999999);
-          }
-        };
-      }
-
-      var delayLoadData = modelItems.delayLoad;
-
-
-
-      if (itemKey) {
-
-        //!! could add a check here to see if we're already featching this itemID - and if so, return that promise.
-
-        if (delayLoadData.itemKeys.indexOf(itemKey) < 0) {
-          // this is a new itemID - add it to our work Q ...
-          delayLoadData.itemKeys.push(itemKey);
-          // ... and mark the target with an object - so Angular can reference the final object that will eventually be hydrated.
-          if (!modelItems.hashMap[itemKey]) {
-            modelItems.hashMap[itemKey] = {};
-          }
-        }
-      }
-
-      if (delayLoadData.busy) {
-        //!! huh?
-        return delayLoadData.deferred.promise;
-      }
-
-      if (delayLoadData.itemKeys.length > 0) {
-        // we're going to issue a new request!
-
-        delayLoadData.busy = true;
-
-        var activeDeferred = delayLoadData.deferred;
-        var searchTerm = '%' + delayLoadData.itemKeys.join(" %");
-
-        // create a new promise and array for our next batch of work
-        delayLoadData.deferred = $q.defer();
-        delayLoadData.itemKeys = [];
-
-        delayLoadData.search(searchTerm)
-        .then(function () {
-          activeDeferred.resolve();
-
-          delayLoadData.busy = false;
-
-          if (delayLoadData.itemKeys.length > 0) {
-            self.delayLoad2(modelItems);
-          }
-        });
-
-        return activeDeferred.promise;
-      }
-    }
 
 
     this.createUser = function (user) {
@@ -2375,6 +2313,126 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       });
     };
     this.arrayAddRemove = arrayAddRemove;
+
+
+
+    self.createModelItems = function (searchHandler) {
+      var modelItems = {
+        hashMap: {},
+        index: [],
+      };
+
+      // Add a 'search' handler, which fetches items server-side, and caches the results
+      modelItems.search = function (searchExpression, sortExpression, startIndex, rowCount) {
+        return self.callHub(function () {
+          return searchHandler(searchExpression, sortExpression, startIndex, rowCount);
+        }).then(function (itemsData) {
+          return self.updateItemsModel(modelItems, itemsData);
+        });
+      };
+
+      // returns an object, whereas ensure() returns a promise.
+      modelItems.demand = function (itemKey) {
+        if (!itemKey) {
+          return null;
+        }
+        return modelItems.hashMap[itemKey] ||
+          (
+            modelItems.hashMap[itemKey] = { id: itemKey, code: itemKey, displayTitle: 'loading...' },
+            // fetches requested objects that aren't already cached asynchronously
+            self.delayLoad2(modelItems, itemKey),
+            modelItems.hashMap[itemKey]
+          );
+      };
+
+      // returns a promise, whereas demand() returns a object.
+      modelItems.ensure = function (itemKey) {
+        if (!itemKey) {
+          return $q.when();
+        }
+        var item = modelItems.hashMap[itemKey];
+        if (!item) {
+          return modelItems.search("%" + itemKey, "", 0, 1)
+          .then(function (notificationData) {
+            // (search should have already cached any results)
+            return modelItems.hashMap[itemKey];
+          });
+        }
+        return $q.when(item);
+      };
+
+      return modelItems;
+    };
+
+
+    self.delayLoad2 = function (modelItems, itemKey) {
+
+      if (!modelItems.delayLoad) {
+        modelItems.delayLoad = {
+          busy: false,
+          deferred: $q.defer(),
+          itemKeys: [],
+          search: function (searchTerm) {
+            return modelItems.search(searchTerm, "", 0, 999999);
+          }
+        };
+      }
+
+      var delayLoadData = modelItems.delayLoad;
+
+      if (itemKey) {
+
+        //!! could add a check here to see if we're already featching this itemID - and if so, return that promise.
+
+        if (delayLoadData.itemKeys.indexOf(itemKey) < 0) {
+          // this is a new itemID - add it to our work Q ...
+          delayLoadData.itemKeys.push(itemKey);
+          // ... and mark the target with an object - so Angular can reference the final object that will eventually be hydrated.
+          if (!modelItems.hashMap[itemKey]) {
+            modelItems.hashMap[itemKey] = {};
+          }
+        }
+      }
+
+      if (delayLoadData.busy) {
+        //!! huh?
+        return delayLoadData.deferred.promise;
+      }
+
+      if (delayLoadData.itemKeys.length > 0) {
+        // we're going to issue a new request!
+
+        delayLoadData.busy = true;
+
+        var activeDeferred = delayLoadData.deferred;
+        var searchTerm = '%' + delayLoadData.itemKeys.join(" %");
+
+        // create a new promise and array for our next batch of work
+        delayLoadData.deferred = $q.defer();
+        delayLoadData.itemKeys = [];
+
+        delayLoadData.search(searchTerm)
+        .then(function () {
+          activeDeferred.resolve();
+
+          delayLoadData.busy = false;
+
+          if (delayLoadData.itemKeys.length > 0) {
+            self.delayLoad2(modelItems);
+          }
+        });
+
+        return activeDeferred.promise;
+      }
+    };
+
+
+
+
+
+
+
+
 
 
 
