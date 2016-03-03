@@ -1,6 +1,7 @@
 <div layout>
   <h3>Documents</h3>
 </div>
-<div>
-  <md-button ng-controller="ReportController" ng-click="showGenerateRemindersDialog($event)" class="md-raised md-primary"><i class="fa fa-file-text-o"></i> Generate Reminders</md-button>
+<div ng-controller="ReportController">
+  <md-button ng-click="showGenerateRemindersDialog($event)" class="md-raised md-primary"><i class="fa fa-file-text-o"></i> Generate Reminders</md-button>
+  <md-button ng-click="showNoShowDialog($event)" class="md-raised md-primary"><i class="fa fa-file-text-o"></i> Generate No Show Report</md-button>
 </div>
