@@ -735,39 +735,70 @@ namespace App.Library
         }
 
 
-        public static void GetExportRows(HttpResponse response, AppDC dc, SearchExpression searchExpression)
+        public static void GetExportRows(HttpResponse response, AppDC appDC, SearchExpression searchExpression)
         {
-            var query =
-                from eventParticipant in EventParticipant.Query(dc, searchExpression)
-                join participant in Participant.Query(dc) on eventParticipant.ParticipantID equals participant.ID
-                join participantGroup in ParticipantGroup.Query(dc) on participant.ParticipantGroupID equals participantGroup.ID
-                join myEvent in Event.Query(dc) on eventParticipant.EventID equals myEvent.ID
+            var authorizedBy = appDC.TransactionAuthorizedBy;
+            var teamEPScope = authorizedBy.TeamEPScopeOrInvalid;
+            var timeZoneInfo = authorizedBy.TimeZoneInfo;
+
+            var rowQuery =
+                from eventParticipant in EventParticipant.Query(appDC, searchExpression)
+                join participant in Participant.Query(appDC) on eventParticipant.ParticipantID equals participant.ID
+
+                join participantGroup in ParticipantGroup.Query(appDC) on participant.ParticipantGroupID equals participantGroup.ID
+                // (Need to call ExtendedProperty.QueryAssignedTags() since we're after ParticipantGroup, not our type EventParticipants
+                join tags in ExtendedProperty.QueryAssignedTags2(appDC, typeof(ParticipantGroup), EPCategory.UserAssigned, EPScope.Global) on participant.ParticipantGroupID equals tags.TargetID into participantGroupTagsGroup
+
+                join myEvent in Event.Query(appDC) on eventParticipant.EventID equals myEvent.ID
 
                 // outer join - optional
-                join session in EventSession.Query(dc) on eventParticipant.EventSessionID equals session.ID into eventParticipantSessionGroup
+                join session in EventSession.Query(appDC) on eventParticipant.EventSessionID equals session.ID into eventParticipantSessionGroup
                 from session in eventParticipantSessionGroup.DefaultIfEmpty()
-                select new { eventParticipant, participant, participantGroup, myEvent, session };
+                select new { eventParticipant, participant, participantGroup, participantGroupTagsGroup, myEvent, session };
+
+            var rowData = rowQuery
+                .Select(exItem => new
+                {
+                    exItem.participant.FirstName,
+                    exItem.participant.LastName,
+                    exItem.participant.Gender,
+
+                    ParticipantGroupName = exItem.participantGroup.Name,
+                    ParticipantGroupTags = exItem.participantGroupTagsGroup
+                        .Select(mm => mm.Item.Name)
+                        .Join(", "),
+
+                    exItem.eventParticipant.Level,
+                    CheckInTimestamp = exItem.eventParticipant.CheckInTimestamp.DatabaseToLocalTime(timeZoneInfo),
+                    CheckOutTimestamp = exItem.eventParticipant.CheckOutTimestamp.DatabaseToLocalTime(timeZoneInfo),
+                    exItem.eventParticipant.DonationLimit,
+                    exItem.eventParticipant.DonationAmount,
+
+                    EventName = exItem.myEvent.Name,
+                    EventSessionName = exItem.session.Name,
+                });
 
             var headerMap = new[]
             {
-                new { key = "First Name", value = "participant.FirstName" },
-                new { key = "Last Name", value = "participant.LastName" },
-                new { key = "Gender", value = "participant.Gender" },
+                new { key = "First Name", value = "FirstName" },
+                new { key = "Last Name", value = "LastName" },
+                new { key = "Gender", value = "Gender" },
 
-                new { key = "School", value = "participantGroup.Name" },
+                new { key = "School", value = "ParticipantGroupName" },
+                new { key = "School Tags", value = "ParticipantGroupTags" },
 
-                new { key = "Grade", value = "eventParticipant.Level" },
-                new { key = "CheckInTimestamp", value = "eventParticipant.CheckInTimestamp" },
-                new { key = "CheckOutTimestamp", value = "eventParticipant.CheckOutTimestamp" },
-                new { key = "DonationLimit", value = "eventParticipant.DonationLimit" },
-                new { key = "DonationAmount", value = "eventParticipant.DonationAmount" },
+                new { key = "Grade", value = "Level" },
+                new { key = "Check-In Timestamp", value = "CheckInTimestamp" },
+                new { key = "Check-Out Timestamp", value = "CheckOutTimestamp" },
+                new { key = "Donation Limit", value = "DonationLimit" },
+                new { key = "Donation Amount", value = "DonationAmount" },
 
-                new { key = "Event Name", value = "myEvent.Name" },
-                new { key = "Session Name", value = "session.Name" },
+                new { key = "Event Name", value = "EventName" },
+                new { key = "Session Name", value = "EventSessionName" },
             }
             .ToDictionary(item => item.key, item => item.value);
 
-            response.SendCsvFileToBrowser("EventParticipants.csv", query, headerMap);
+            response.SendCsvFileToBrowser("EventParticipants.csv", rowData, headerMap);
         }
 
 

@@ -328,35 +328,35 @@ namespace App.Library
             var epQuery =
                 from exParticipantGroup in ParticipantGroup.ExtendedQuery(dc, searchExpression)
 
-                    // Join with our 1:many 
-            join tags in QueryGlobalEPTags2(dc, EPCategory.UserAssigned) on exParticipantGroup.itemID equals tags.TargetID into tagsGroup
+                // Join with our 1:many 
+                join tags in QueryGlobalEPTags2(dc, EPCategory.UserAssigned) on exParticipantGroup.itemID equals tags.TargetID into tagsGroup
 
                 join eventParticipant in EventParticipant.Query(dc) on exParticipantGroup.itemID equals eventParticipant.ParticipantID into eventParticipantsGroup
 
-            //join epGlobalSystemRoleTags in User.QueryGlobalEPTags2(dc, EPCategory.SystemRoleCategory) on exParticipantGroup.itemID equals epGlobalSystemRoleTags.TargetID into epGlobalSystemRoleTagsGroup
-            //join epTeamSystemRoleTags in User.QueryItemEPTags2(dc, EPCategory.SystemRoleCategory, teamEPScope) on user.ID equals epTeamSystemRoleTags.TargetID into epTeamSystemRoleTagsGroup
-            //join epAppRoleTags in User.QueryItemEPTags2(dc, EPCategory.AppRoleCategory, teamEPScope) on user.ID equals epAppRoleTags.TargetID into epAppRoleTagsGroup
+                //join epGlobalSystemRoleTags in User.QueryGlobalEPTags2(dc, EPCategory.SystemRoleCategory) on exParticipantGroup.itemID equals epGlobalSystemRoleTags.TargetID into epGlobalSystemRoleTagsGroup
+                //join epTeamSystemRoleTags in User.QueryItemEPTags2(dc, EPCategory.SystemRoleCategory, teamEPScope) on user.ID equals epTeamSystemRoleTags.TargetID into epTeamSystemRoleTagsGroup
+                //join epAppRoleTags in User.QueryItemEPTags2(dc, EPCategory.AppRoleCategory, teamEPScope) on user.ID equals epAppRoleTags.TargetID into epAppRoleTagsGroup
 
-            //join epOptionTags in User.QueryGlobalEPTags2(dc, EPCategory.OptionCategory) on user.ID equals epOptionTags.TargetID into epOptionTagsGroup
+                //join epOptionTags in User.QueryGlobalEPTags2(dc, EPCategory.OptionCategory) on user.ID equals epOptionTags.TargetID into epOptionTagsGroup
 
-            select new
-                {
-                    exParticipantGroup,
-                    participantGroup = exParticipantGroup.item,
+                select new
+                    {
+                        exParticipantGroup,
+                        participantGroup = exParticipantGroup.item,
 
-                    exParticipantGroup.item.Name,
-                //user.DisplayName,
-                //user.TimeZoneIndex,
-                Email = exParticipantGroup.PrimaryMailAddress.Address,
-                    PhoneNumber = exParticipantGroup.PrimaryPhoneNumber.Proffered_CaseSensitive,
+                        exParticipantGroup.item.Name,
+                        //user.DisplayName,
+                        //user.TimeZoneIndex,
+                        Email = exParticipantGroup.PrimaryMailAddress.Address,
+                        PhoneNumber = exParticipantGroup.PrimaryPhoneNumber.Proffered_CaseSensitive,
 
 
-                    tags = tagsGroup
-                        .Select(mm => mm.Item.Name)
-                        .Join(", "),
+                        tags = tagsGroup
+                            .Select(mm => mm.Item.Name)
+                            .Join(", "),
 
-                    totalParticipants = eventParticipantsGroup.Count(),
-                };
+                        totalParticipants = eventParticipantsGroup.Count(),
+                    };
 
             var headerMap = new[]
                 {
