@@ -42,6 +42,11 @@ namespace App.Library
             // (ensure DB timestamps are correctly marked as UTC.)
             this._CreatedTimestamp = DateTime.SpecifyKind(this.CreatedTimestamp, DateTimeKind.Utc);
             this._LastModifiedTimestamp = DateTime.SpecifyKind(this.LastModifiedTimestamp, DateTimeKind.Utc);
+
+            Debug.Assert(this._StartDate.Kind == DateTimeKind.Unspecified);
+
+            this._StartDate = DateTime.SpecifyKind(this.StartDate, DateTimeKind.Utc);
+            this._EndDate = DateTime.SpecifyKind(this.EndDate, DateTimeKind.Utc);
         }
     }
     public partial class EventSession : ExtendedObject<EventSession>, IEPScopeObject
@@ -226,7 +231,8 @@ namespace App.Library
                 this.CreatedTimestamp = exItem.item.CreatedTimestamp;
                 this.LastModifiedTimestamp = exItem.item.LastModifiedTimestamp;
 
-                //!! this.State = exItem.item.State;
+                Debug.Assert(this.CreatedTimestamp.Kind == DateTimeKind.Utc);
+                Debug.Assert(this.LastModifiedTimestamp.Kind == DateTimeKind.Utc);
 
                 this.CheckInOpen = exItem.item.CheckInOpen;
 
@@ -235,6 +241,9 @@ namespace App.Library
 
                 this.StartDate = exItem.item.StartDate;
                 this.EndDate = exItem.item.EndDate;
+
+                Debug.Assert(this.StartDate.Kind == DateTimeKind.Utc);
+                Debug.Assert(this.EndDate.Kind == DateTimeKind.Utc);
 
                 this.EventID = exItem.item.EventID;
                 this.Location = exItem.item.Location;
