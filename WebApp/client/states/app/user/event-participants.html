@@ -12,6 +12,8 @@
       ng-click="showUploadParticipantsDialog($event, event)">
       <i class="fa fa-upload"></i> Upload {{'PARTICIPANTS' | translate}}
     </md-button>
+  </span>
+  <span ms-show="['Admin', 'EventPlanner', 'EventSessionManager']">
     <md-button ng-click="showAddParticipantsDialog($event, event)" class="md-primary"><i class="fa fa-plus"></i> Add {{'PARTICIPANT' | translate}}</md-button>
   </span>
 </div>
@@ -133,7 +135,7 @@
             <td flex="10" class="table-data text-left" hide-xs hide-sm ng-if="!eventSession">{{ eventParticipantEventSession.location }}</td>
             <td flex="10" class="table-data text-left" ng-if="!eventSession">{{ eventParticipantEventSession.startDate | amCalendar}}</td>
             <td flex class="table-data text-center">
-              <span class="u-display-hover" ms-show="['Admin', 'EventPlanner']">
+              <span class="u-display-hover">
                 <md-button class="md-icon-button" style="margin-top:-6px;margin-bottom:0;"
                            ng-click="showEditParticipantsDialog($event, event, eventParticipant)">
                   <md-tooltip>Edit {{'PARTICIPANT' | translate | lowercase}}</md-tooltip>
@@ -142,8 +144,15 @@
               </span>
               <span osb-event-session-live="eventParticipantEventSession">
                 <span ng-hide="eventParticipant.checkInTimestamp" class="u-hide-hover text-hint">Not checked in</span>
-                <span osb-can-check-in="eventParticipantEventSession">
-                  <span ng-if="!eventParticipant.checkInTimestamp" class="u-display-hover">
+                <span ng-hide="eventParticipant.checkInTimestamp">
+                  <span ms-show="['Volunteer']" ng-if="eventSession.checkInOpen" class="u-display-hover">
+                    <md-button class="md-icon-button md-accent" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
+                               ng-click="checkIn(eventParticipant)">
+                      <md-tooltip>Check in {{'PARTICIPANT' | translate | lowercase}}</md-tooltip>
+                      <i class="fa fa-check"></i>
+                    </md-button>
+                  </span>
+                  <span ms-show="['Admin', 'EventPlanner', 'EventSessionManager']" class="u-display-hover">
                     <md-button class="md-icon-button md-accent" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
                                ng-click="checkIn(eventParticipant)">
                       <md-tooltip>Check in {{'PARTICIPANT' | translate | lowercase}}</md-tooltip>

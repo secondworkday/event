@@ -20,14 +20,16 @@
         <span class="md-body-1">{{getEventDatesString(event.id) || "no date set"}}</span>
         <!-- <span class="md-caption">{{getNumberOfEventParticipants(event.id) || "0"}}/{{totalEventParticipants}} {{ 'PARTICIPANTS' | translate | lowercase}}</span> -->
       </div>
-      <md-button class="md-warn u-display-hover"
-        ng-click="showDeleteConfirmationDialog($event, event)">
-        <i class="fa fa-remove"></i> Delete
-      </md-button>
-      <md-button class="u-display-hover"
-        ng-click="showEditEventDialog(event)">
-        <i class="fa fa-pencil"></i> Edit
-      </md-button>
+      <span ms-show="['Admin', 'EventPlanner']">
+        <md-button class="md-warn u-display-hover"
+          ng-click="showDeleteConfirmationDialog($event, event)">
+          <i class="fa fa-remove"></i> Delete
+        </md-button>
+        <md-button class="u-display-hover"
+          ng-click="showEditEventDialog(event)">
+          <i class="fa fa-pencil"></i> Edit
+        </md-button>
+      </span>
       <md-button class="md-primary u-display-hover"
         ui-sref="app.user.event.sessions({eventID:event.id})">
         View
