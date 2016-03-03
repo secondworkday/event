@@ -2,7 +2,7 @@
   <div>
     <h2 class="md-title">{{'EVENT_SESSIONS' | translate}}</h2>
   </div>
-  <div ms-admin-only>
+  <div ms-show="['Admin', 'EventPlanner']">
     <md-button class="md-primary" aria-label="new"
       ng-click="showAddSessionDialog($event)">
       <i class="fa fa-plus"></i> Add {{'EVENT_SESSION' | translate}}
