@@ -67,7 +67,7 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
 
     if (toState.redirectTo) {
       event.preventDefault();
-      $state.go(toState.redirectTo, toParams)
+      $state.go(toState.redirectTo, toParams);
     }
 
     //set variables to false
@@ -108,7 +108,7 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
 
       // See if identity has any roles in common with stateAllowedRoles
       var intersection = stateAllowedRoles.filter(function (n) {
-        return identityRoles.indexOf(n) != -1
+        return identityRoles.indexOf(n) != -1;
       });
       if (intersection.length > 0) {
         return true;
@@ -116,7 +116,7 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
 
       // If we can't find a reason to allow - we've got to deny
       return false;
-    }
+    };
 
     if (authenticate(stateAllowedRoles, authenticatedIdenity)) {
       return;
@@ -283,7 +283,7 @@ app.service('bootstrapService', ['$rootScope', '$q', 'utilityService', function 
 app.constant('CONNECTION_EVENT', {
   connectionStarting: 'connection-starting',
   connectionStarted: 'connection-started',
-  connectionStopped: 'connection-stopped',
+  connectionStopped: 'connection-stopped'
 })
 .constant('CONNECTION_STATUS', {
   online: 'online',
@@ -398,7 +398,7 @@ app.service('msAuthenticated', function (AUTHORIZATION_ROLES) {
       return self.identity.notGotItSet.indexOf(gotItLabel) > -1;
     }
     return false;
-  }
+  };
 
   self.setGotIt = function (gotItLabel) {
     if (self.identity && self.identity.notGotItSet) {
@@ -416,7 +416,7 @@ app.service('msAuthenticated', function (AUTHORIZATION_ROLES) {
 
     // anyone can enter a state which allows AUTHORIZATION_ROLES.anonymous
     if (allowedRoles.indexOf(AUTHORIZATION_ROLES.anonymous) > -1) {
-        return true;
+      return true;
     }
 
     if (!self.identity) {
@@ -465,7 +465,7 @@ app.service('msAuthenticated', function (AUTHORIZATION_ROLES) {
 
     // If we can't find a reason to allow - we've got to deny
     return false;
-  }
+  };
 
   return this;
 });
@@ -603,7 +603,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
     function compareByIDDescending(left, right) {
       return compareByID(right, left);
-    };
+    }
     this.compareByIDDescending = compareByIDDescending;
 
 
@@ -639,7 +639,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
             i++;
           }
           return result;
-        }
+        };
       }
       var sortOrder = 1;
       if (propertyName[0] === "-") {
@@ -658,7 +658,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         var result = (left[propertyName] < right[propertyName]) ? -1 : (left[propertyName] > right[propertyName]) ? 1 : 0;
         return result * sortOrder;
       }
-    }
+    };
 
     self.filterByPropertyValue = function (propertyName, value) {
       var value = value;
@@ -995,7 +995,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     // tracks in memory the presumably few myTasks that are active
     activeIndexer: {
       index: [],
-      sort: self.localeCompareByPropertyThenByID('name'),
+      sort: self.compareByProperties('name', 'id'),
       filter: function (item) {
         return item.state == 'Active';
       }
@@ -1625,68 +1625,6 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
-    self.delayLoad2 = function (modelItems, itemKey) {
-
-      if (!modelItems.delayLoad) {
-        modelItems.delayLoad = {
-          busy: false,
-          deferred: $q.defer(),
-          itemKeys: [],
-          search: function (searchTerm) {
-            return modelItems.search(searchTerm, "", 0, 999999);
-          }
-        };
-      }
-
-      var delayLoadData = modelItems.delayLoad;
-
-
-
-      if (itemKey) {
-
-        //!! could add a check here to see if we're already featching this itemID - and if so, return that promise.
-
-        if (delayLoadData.itemKeys.indexOf(itemKey) < 0) {
-          // this is a new itemID - add it to our work Q ...
-          delayLoadData.itemKeys.push(itemKey);
-          // ... and mark the target with an object - so Angular can reference the final object that will eventually be hydrated.
-          if (!modelItems.hashMap[itemKey]) {
-            modelItems.hashMap[itemKey] = {};
-          }
-        }
-      }
-
-      if (delayLoadData.busy) {
-        //!! huh?
-        return delayLoadData.deferred.promise;
-      }
-
-      if (delayLoadData.itemKeys.length > 0) {
-        // we're going to issue a new request!
-
-        delayLoadData.busy = true;
-
-        var activeDeferred = delayLoadData.deferred;
-        var searchTerm = '%' + delayLoadData.itemKeys.join(" %");
-
-        // create a new promise and array for our next batch of work
-        delayLoadData.deferred = $q.defer();
-        delayLoadData.itemKeys = [];
-
-        delayLoadData.search(searchTerm)
-        .then(function () {
-          activeDeferred.resolve();
-
-          delayLoadData.busy = false;
-
-          if (delayLoadData.itemKeys.length > 0) {
-            self.delayLoad2(modelItems);
-          }
-        });
-
-        return activeDeferred.promise;
-      }
-    }
 
 
     this.createUser = function (user) {
@@ -2375,6 +2313,126 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       });
     };
     this.arrayAddRemove = arrayAddRemove;
+
+
+
+    self.createModelItems = function (searchHandler) {
+      var modelItems = {
+        hashMap: {},
+        index: [],
+      };
+
+      // Add a 'search' handler, which fetches items server-side, and caches the results
+      modelItems.search = function (searchExpression, sortExpression, startIndex, rowCount) {
+        return self.callHub(function () {
+          return searchHandler(searchExpression, sortExpression, startIndex, rowCount);
+        }).then(function (itemsData) {
+          return self.updateItemsModel(modelItems, itemsData);
+        });
+      };
+
+      // returns an object, whereas ensure() returns a promise.
+      modelItems.demand = function (itemKey) {
+        if (!itemKey) {
+          return null;
+        }
+        return modelItems.hashMap[itemKey] ||
+          (
+            modelItems.hashMap[itemKey] = { id: itemKey, code: itemKey, displayTitle: 'loading...' },
+            // fetches requested objects that aren't already cached asynchronously
+            self.delayLoad2(modelItems, itemKey),
+            modelItems.hashMap[itemKey]
+          );
+      };
+
+      // returns a promise, whereas demand() returns a object.
+      modelItems.ensure = function (itemKey) {
+        if (!itemKey) {
+          return $q.when();
+        }
+        var item = modelItems.hashMap[itemKey];
+        if (!item) {
+          return modelItems.search("%" + itemKey, "", 0, 1)
+          .then(function (notificationData) {
+            // (search should have already cached any results)
+            return modelItems.hashMap[itemKey];
+          });
+        }
+        return $q.when(item);
+      };
+
+      return modelItems;
+    };
+
+
+    self.delayLoad2 = function (modelItems, itemKey) {
+
+      if (!modelItems.delayLoad) {
+        modelItems.delayLoad = {
+          busy: false,
+          deferred: $q.defer(),
+          itemKeys: [],
+          search: function (searchTerm) {
+            return modelItems.search(searchTerm, "", 0, 999999);
+          }
+        };
+      }
+
+      var delayLoadData = modelItems.delayLoad;
+
+      if (itemKey) {
+
+        //!! could add a check here to see if we're already featching this itemID - and if so, return that promise.
+
+        if (delayLoadData.itemKeys.indexOf(itemKey) < 0) {
+          // this is a new itemID - add it to our work Q ...
+          delayLoadData.itemKeys.push(itemKey);
+          // ... and mark the target with an object - so Angular can reference the final object that will eventually be hydrated.
+          if (!modelItems.hashMap[itemKey]) {
+            modelItems.hashMap[itemKey] = {};
+          }
+        }
+      }
+
+      if (delayLoadData.busy) {
+        //!! huh?
+        return delayLoadData.deferred.promise;
+      }
+
+      if (delayLoadData.itemKeys.length > 0) {
+        // we're going to issue a new request!
+
+        delayLoadData.busy = true;
+
+        var activeDeferred = delayLoadData.deferred;
+        var searchTerm = '%' + delayLoadData.itemKeys.join(" %");
+
+        // create a new promise and array for our next batch of work
+        delayLoadData.deferred = $q.defer();
+        delayLoadData.itemKeys = [];
+
+        delayLoadData.search(searchTerm)
+        .then(function () {
+          activeDeferred.resolve();
+
+          delayLoadData.busy = false;
+
+          if (delayLoadData.itemKeys.length > 0) {
+            self.delayLoad2(modelItems);
+          }
+        });
+
+        return activeDeferred.promise;
+      }
+    };
+
+
+
+
+
+
+
+
 
 
 
@@ -3184,7 +3242,7 @@ app.directive('msSearchView', function ($parse, utilityService) {
       var templateHtml =
         '<div>' +
           // 'Search: <input type="text" class="form-control" placeholder="Search for any text, &commat;name, or even &num;tag" ng-model="userSearch">' +
-          '<div class="ms-search-view"' + container + ' data-infinite-scroll="loadPage()" data-infinite-scroll-disabled="loadPageDone" data-infinite-scroll-distance="0" data-infinite-scroll-immediate-check="true">' +
+          '<div class="ms-search-view"' + container + ' data-infinite-scroll="loadPage()" data-infinite-scroll-disabled="loadPageDone" data-infinite-scroll-distance="2" data-infinite-scroll-immediate-check="true">' +
           '</div>' +
         '</div>';
 
@@ -3235,12 +3293,12 @@ function ngIfVariation(ngIfDirective, customLink) {
         ifEvaluator = function () {
           // ng-if exists! evaluate both
           return scope.$eval(initialNgIf) && customNgIf();
-        }
-      } else { 
+        };
+      } else {
         ifEvaluator = function () {
           // ng-if doesn't exist, just use our custom one
           return customNgIf();
-        }
+        };
       }
       attributes.ngIf = ifEvaluator;
       ngIf.link.apply(ngIf, arguments);

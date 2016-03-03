@@ -44,7 +44,9 @@
           </span>
         </md-button>
       </div>
-      <div ng-include="'/client/states/app/app-bar-menu.html'"></div>
+      <span ms-development>
+        <div ng-include="'/client/states/app/app-bar-menu.html'"></div>
+      </span>
     </div>
   </md-toolbar>
 </div>
@@ -64,7 +66,6 @@
   <nav>
     <ul>
       <li>&copy; 2016 Social Venture Software</li>
-      <li><a class="md-body-2" ng-click="showSiteInfoDialog($event)">Site Info</a></li>
     </ul>
   </nav>
 </div>

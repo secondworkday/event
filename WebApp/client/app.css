@@ -52,7 +52,7 @@
   }
 
   #public {
-    background: url('/images/ale-photo-blurred.png') no-repeat center center fixed;
+    background: url('/images/ale-two-people-at-table-bw-blurred.png') no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -439,52 +439,6 @@
 
   .md-icon-button img.mini-user-img {
     margin: 0;
-  }
-
-  .table {
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    border-collapse: collapse;
-    white-space: nowrap;
-    font-size: 13px;
-    background-color: rgb(255,255,255);
-  }
-
-  .table-header,
-  .table-row {
-    vertical-align: top;
-    height: 48px;
-    border-top: 1px solid rgba(0, 0, 0, 0.12);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-    padding: 6px;
-  }
-
-  .table-row-with-note {
-    height: 68px;
-  }
-
-  .table-row:hover {
-    background-color: #eeeeee;
-  }
-
-  .table-row.is-selected {
-    background-color: #e0e0e0;
-  }
-
-  .table-data {
-    overflow: hidden;
-    padding-right: 2px;
-    text-overflow: ellipsis;
-  }
-
-  .table-data-with-note {
-    padding-right: 2px;
-    overflow:visible;
-    text-overflow: unset;
-    height: 68px;
-  }
-
-  .table-cell-with-note {
-    margin-top:19px;
   }
 
 
