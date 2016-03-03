@@ -320,7 +320,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
       templateUrl: '/client/states/app/user/add-participants.dialog.html',
       locals: {
         event: event,
-        eventSessionsIndex: $scope.eventSessionsIndex,
+        eventSessionsIndex: $scope.eventSessionsIndexer.index,
         eventParticipant: null,
         newOrEdit: "New"
       },
@@ -342,7 +342,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
       templateUrl: '/client/states/app/user/add-participants.dialog.html',
       locals: {
         event: event,
-        eventSessionsIndex: $scope.eventSessionsIndex,
+        eventSessionsIndex: $scope.eventSessionsIndexer.index,
         eventParticipant: angular.copy(eventParticipant),
         newOrEdit: "Edit"
       },
