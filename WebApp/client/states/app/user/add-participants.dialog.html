@@ -11,44 +11,46 @@
     </md-toolbar>
     <md-dialog-content>
       <div class="md-dialog-content">
-        <div layout-gt-sm="row">
+        <div ms-show="['Admin', 'EventPlanner', 'EventSessionManager']">
+          <div layout-gt-sm="row">
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>First Name</label>
+              <input ng-model="formData.firstName">
+            </md-input-container>
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>Last Name</label>
+              <input ng-model="formData.lastName">
+            </md-input-container>
+          </div>
+
           <md-input-container class="md-block" flex-gt-sm>
-            <label>First Name</label>
-            <input ng-model="formData.firstName">
+            <label>{{'PARTICIPANT_GROUP' | translate}}</label>
+            <md-select ng-model="formData.participantGroupID">
+              <md-option ng-repeat="participantGroup in participantGroups.index | objectLookup:participantGroups.hashMap | orderBy: 'name' track by participantGroup.id" value="{{participantGroup.id}}">
+                {{participantGroup.name}}<span ng-if="participantGroup.contactName"> ({{participantGroup.contactName}})</span>
+              </md-option>
+            </md-select>
           </md-input-container>
           <md-input-container class="md-block" flex-gt-sm>
-            <label>Last Name</label>
-            <input ng-model="formData.lastName">
+            <label>{{'PARTICIPANT_LEVEL' | translate}}</label>
+            <input type="text" ng-model="formData.level">
+          </md-input-container>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Gender</label>
+            <!--<input type="number" ng-model="formData.gender">-->
+            <md-select ng-model="formData.gender">
+              <md-option ng-repeat="gender in formInput.genders" value="{{gender}}">{{gender}}</md-option>
+            </md-select>
+          </md-input-container>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>{{'EVENT_SESSION' | translate}}</label>
+            <md-select ng-model="formData.eventSessionID">
+              <md-option ng-repeat="eventSession in eventSessionsIndex | objectLookup:eventSessions.hashMap track by eventSession.id" value="{{eventSession.id}}">
+                {{eventSession.name}} - {{eventSession.startDate | date:'MM/dd/yyyy'}}
+              </md-option>
+            </md-select>
           </md-input-container>
         </div>
-
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>{{'PARTICIPANT_GROUP' | translate}}</label>
-          <md-select ng-model="formData.participantGroupID">
-            <md-option ng-repeat="participantGroup in participantGroups.index | objectLookup:participantGroups.hashMap | orderBy: 'name' track by participantGroup.id" value="{{participantGroup.id}}">
-              {{participantGroup.name}}<span ng-if="participantGroup.contactName"> ({{participantGroup.contactName}})</span>
-            </md-option>
-          </md-select>
-        </md-input-container>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>{{'PARTICIPANT_LEVEL' | translate}}</label>
-          <input type="text" ng-model="formData.level">
-        </md-input-container>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>Gender</label>
-          <!--<input type="number" ng-model="formData.gender">-->
-          <md-select ng-model="formData.gender">
-            <md-option ng-repeat="gender in formInput.genders" value="{{gender}}">{{gender}}</md-option>
-          </md-select>
-        </md-input-container>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>{{'EVENT_SESSION' | translate}}</label>
-          <md-select ng-model="formData.eventSessionID">
-            <md-option ng-repeat="eventSession in eventSessionsIndex | objectLookup:eventSessions.hashMap track by eventSession.id" value="{{eventSession.id}}">
-              {{eventSession.name}} - {{eventSession.startDate | date:'MM/dd/yyyy'}}
-            </md-option>
-          </md-select>
-        </md-input-container>
         <div layout-gt-sm="row">
           <md-input-container class="md-block" flex-gt-sm>
             <label>Notes</label>

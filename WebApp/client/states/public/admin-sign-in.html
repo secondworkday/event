@@ -18,11 +18,14 @@
         <span class="md-caption u-sm-margin-right">
           <a ng-click="showForgotPasswordDialog($event)">Forgot password?</a>
         </span>
-        <span class="md-caption">
+        <span class="md-caption" ms-development>
           <a ng-click="showDemoAccountDialog()">Demo Users</a>
         </span>
       </md-card-content>
       <md-card-actions layout="row" layout-align="end center">
+        <md-button ui-sref="public.landing">
+          Cancel
+        </md-button>
         <md-button class="md-primary" type="submit"
           ng-disabled="signInForm.$invalid"
           ng-click="signIn(formData)">

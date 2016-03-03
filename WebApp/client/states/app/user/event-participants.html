@@ -21,7 +21,7 @@
 
 <section layout>
   <div class="u-sm-margin-right" flex="15">
-    <a ng-show="filtersAreOn()" ng-click="clearAllFilters()" style="font-size:smaller; position:relative;">Clear all filters</a>
+    <a class="text-red" ng-show="filtersAreOn()" ng-click="clearAllFilters()" style="font-size:smaller; position:relative;">Clear all filters</a>
     <a ng-hide="filtersAreOn()" style="font-size:smaller; position:relative;">&nbsp;</a>
 
     <p class="md-body-2 text-support">
@@ -64,13 +64,18 @@
   <div flex>
     <div layout layout-align="start center"
       ng-hide="selectedIndex.length">
-      <div flex>
+      <div flex="50">
         <md-input-container class="md-block" flex-gt-sm style="margin-top:0;margin-bottom:0;">
           <label><i class="fa fa-search"></i> Search for {{'PARTICIPANT' | translate | lowercase}} name or {{'PARTICIPANT_GROUP' | translate | lowercase}}</label>
           <input ng-model="searchViewOptions.userSearch">
         </md-input-container>
       </div>
-      <div ng-if="searchViewOptions.userSearch" ng-click="searchViewOptions.userSearch = null" style="cursor:pointer; margin-bottom:17px;"><i class="fa fa-times"></i></div>
+        <md-button class="md-warn" style="margin-bottom:20px;margin-top:0;margin-left:0;margin-right:0;"
+          ng-click="searchViewOptions.userSearch = null"
+          ng-if="searchViewOptions.userSearch">
+          <i class="fa fa-times"></i> Clear
+        </md-button>
+      <span flex></span>
       <div style="margin-top:-6px;">
         <md-menu md-position-mode="target-right target">
           <md-button aria-label="Open sort menu" ng-click="$mdOpenMenu()" style="margin-top:0;margin-bottom:0;">

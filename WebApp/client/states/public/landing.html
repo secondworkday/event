@@ -1,9 +1,18 @@
-<div layout layout-align="center center" style="margin-top:6rem;color:#FFF;">
-
-  <div class="text-center">
-    <h1 style="text-shadow: 1px 1px 1px #000">Operation School Bell</h1>
-    <md-button ui-sref="public.volunteer-sign-in" class="md-raised md-primary">Volunteer Sign In</md-button>
-    <md-button ui-sref="public.admin-sign-in">Admin Sign In</md-button>
-  </div>
-
+<div class="text-center" layout layout-align="center center" style="margin-top:4rem;">
+  <md-card style="padding-left:4rem;padding-right:4rem;padding-bottom:2rem;">
+    <form name="signInForm">
+      <md-card-content>
+        <div>
+          <h2 class="md-display-1">Operation School Bell</h2>
+          <p class="md-subhead">
+            Please sign in below
+          </p>
+        </div>
+        <div layout layout-align="center center">
+          <md-button ui-sref="public.volunteer-sign-in" class="md-raised md-primary">Check-in Agent</md-button>
+          <md-button ui-sref="public.admin-sign-in">Manager</md-button>
+        </div>
+      </md-card-content>
+    </form>
+  </md-card>
 </div>
