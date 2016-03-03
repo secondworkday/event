@@ -375,6 +375,9 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     if ($scope.newOrEdit == 'Edit') {
       $scope.formData = eventParticipant;
     }
+    else {
+      $scope.formData = {};
+    }
 
     $scope.formInput = {
       genders: [ "Male", "Female" ]
