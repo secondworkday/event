@@ -23,6 +23,9 @@
         </span>
       </md-card-content>
       <md-card-actions layout="row" layout-align="end center">
+        <md-button ui-sref="public.landing">
+          Cancel
+        </md-button>
         <md-button class="md-primary" type="submit"
           ng-disabled="signInForm.$invalid"
           ng-click="signIn(formData)">
