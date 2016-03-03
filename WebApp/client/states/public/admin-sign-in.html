@@ -10,10 +10,11 @@
             <label>Email</label>
             <input ng-model="formData.email" type="email" required>
           </md-input-container>
-          <md-input-container flex>
+          <md-input-container flex style="margin-bottom:0;">
             <label>Password</label>
             <input ng-model="formData.password" type="password" required>
           </md-input-container>
+          <span style="margin-bottom:2rem;" class="text-red" ng-show="errorMessage">{{errorMessage}}</span>
         </div>
         <span class="md-caption u-sm-margin-right">
           <a ng-click="showForgotPasswordDialog($event)">Forgot password?</a>

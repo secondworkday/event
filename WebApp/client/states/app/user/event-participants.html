@@ -101,45 +101,86 @@
         <md-button ng-click="showDeleteConfirmationDialog($event, selectedIndex.length)" class="md-warn"><i class="fa fa-remove"></i> Delete</md-button>
       </div>
     </div>
+
     <ms-search-view change-event="updateEventParticipants" search="searchHandler" options="searchViewOptions" user-search="userSearch">
-      <table class="u-full-width table" id="datagrid" style="padding:3px;">
-        <thead fsm-sticky-header scroll-body="'#datagrid'" scroll-stop="64" class="sticky-header-style">
-          <tr layout layout-align="start center" class="table-header md-body-2 text-support">
-            <th flex="5" class="text-center" ms-show="['Admin', 'EventPlanner']">
+      <table class="md-data-table u-full-width" id="datagrid">
+        <thead fsm-sticky-header scroll-body="'#datagrid'" scroll-stop="64" style="background-color:#FFF;border-bottom:2px solid rgba(0, 0, 0, 0.12);">
+          <tr>
+            <th class="md-data-table__cell--non-numeric"
+              ms-show="['Admin', 'EventPlanner']">
               <md-checkbox style="margin:0;" ng-checked="selectedIndex.length" ng-click="toggleSelectAll()" aria-label="select all"></md-checkbox>
             </th>
-            <th flex="10" class="text-left" style="max-width:120px;">Last Name</th>
-            <th flex="10" class="text-left">First Name</th>
-            <th flex="15" class="text-left">{{'PARTICIPANT_GROUP' | translate}}</th>
-            <th flex="10" class="text-center">{{'PARTICIPANT_LEVEL' | translate}}</th>
-            <th flex="10" class="text-left" hide-xs hide-sm>Gender</th>
-            <th flex="10" class="text-left" hide-xs hide-sm ng-if="!eventSession">Location</th>
-            <th flex="10" class="text-left" ng-if="!eventSession">Date</th>
-            <th flex class="text-center">Status</th>
+            <th class="md-data-table__cell--non-numeric">
+              Last Name
+            </th>
+            <th class="md-data-table__cell--non-numeric">
+              First Name
+            </th>
+            <th class="md-data-table__cell--non-numeric">
+              {{'PARTICIPANT_GROUP' | translate}}
+            </th>
+            <th class="md-data-table__cell--non-numeric">
+              {{'PARTICIPANT_LEVEL' | translate}}
+            </th>
+            <th class="md-data-table__cell--non-numeric" hide-xs hide-sm>
+              Gender
+            </th>
+            <th class="md-data-table__cell--non-numeric" hide-xs hide-sm
+              ng-if="!eventSession">
+              Location
+            </th>
+            <th class="md-data-table__cell--non-numeric"
+              ng-if="!eventSession">
+              Date
+            </th>
+            <th class="md-data-table__cell--non-numeric">
+              Status
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr layout layout-align="start center" class="u-hover-container table-row" ng-class="{'is-selected': eventParticipant.isSelected, 'table-data-with-note': eventParticipant.notes}"
-              ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id"
-              ng-init="eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID); watchEventParticipantEventSession(this, 'eventParticipant.eventSessionID');
-              eventParticipantParticipantGroup = demandParticipantGroup(eventParticipant.participantGroupID);">
-            <td flex="5" class="table-data text-center" ms-show="['Admin', 'EventPlanner']">
+          <tr class="u-hover-container" ng-class="{'is-selected': eventParticipant.isSelected}"
+            ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id"
+            ng-init=" eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID);
+                      watchEventParticipantEventSession(this, 'eventParticipant.eventSessionID');
+                      eventParticipantParticipantGroup = demandParticipantGroup(eventParticipant.participantGroupID);">
+            <td class="md-data-table__cell--non-numeric"
+              ms-show="['Admin', 'EventPlanner']">
               <md-checkbox style="margin:0;"
                 ng-checked="selectedIndexContains(eventParticipant)"
                 ng-click="toggleSelectedIndex(eventParticipant)"
                 aria-label="select {{eventParticipant.firstName}} {{eventParticipant.lastName}}">
-
               </md-checkbox>
             </td>
-            <td ms-debug-only class="table-table"><pre>{{ eventParticipant }}</pre></td>
-            <td flex="10" class="table-data text-left" ng-class="{'table-data-with-note': eventParticipant.notes}" style="max-width:120px;"><div ng-class="{'table-cell-with-note': eventParticipant.notes}">{{ eventParticipant.lastName }}</div><div ng-if="eventParticipant.notes" class="table-cell-notes">{{eventParticipant.notes}}</div></td>
-            <td flex="10" class="table-data text-left">{{ eventParticipant.firstName }}</td>
-            <td flex="15" class="table-data text-left">{{ eventParticipantParticipantGroup.name }}</td>
-            <td flex="10" class="table-data text-center">{{ eventParticipant.level }}</td>
-            <td flex="10" class="table-data text-left" hide-xs hide-sm>{{ eventParticipant.gender }}</td>
-            <td flex="10" class="table-data text-left" hide-xs hide-sm ng-if="!eventSession">{{ eventParticipantEventSession.location }}</td>
-            <td flex="10" class="table-data text-left" ng-if="!eventSession">{{ eventParticipantEventSession.startDate | amCalendar}}</td>
-            <td flex class="table-data text-center">
+            <td class="md-data-table__cell--non-numeric">
+              {{ eventParticipant.lastName }}
+              <span class="md-caption text-support"
+                ng-if="eventParticipant.notes">
+                <br/>
+                {{eventParticipant.notes | limitTo:15}}<span ng-show="eventParticipant.notes.length > 15">&hellip;</span>
+              </span>
+            </td>
+            <td class="md-data-table__cell--non-numeric">
+              {{ eventParticipant.firstName }}
+            </td>
+            <td class="md-data-table__cell--non-numeric">
+              {{ eventParticipantParticipantGroup.name }}
+            </td>
+            <td class="md-data-table__cell--non-numeric">
+              {{ eventParticipant.level }}
+            </td>
+            <td class="md-data-table__cell--non-numeric" hide-xs hide-sm>
+              {{ eventParticipant.gender }}
+            </td>
+            <td class="md-data-table__cell--non-numeric" hide-xs hide-sm
+              ng-if="!eventSession">
+              {{ eventParticipantEventSession.location }}
+            </td>
+            <td class="md-data-table__cell--non-numeric"
+              ng-if="!eventSession">
+              {{ eventParticipantEventSession.startDate | date:"shortDate"}}
+            </td>
+            <td class="md-data-table__cell--non-numeric">
               <span class="u-display-hover">
                 <md-button class="md-icon-button" style="margin-top:-6px;margin-bottom:0;"
                            ng-click="showEditParticipantsDialog($event, event, eventParticipant)">
@@ -150,7 +191,7 @@
               <span osb-event-session-live="eventParticipantEventSession">
                 <span ng-hide="eventParticipant.checkInTimestamp" class="u-hide-hover text-hint">Not checked in</span>
                 <span ng-hide="eventParticipant.checkInTimestamp">
-                  <span ms-show="['Volunteer']" ng-if="eventSession.checkInOpen" class="u-display-hover">
+                  <span ms-show="['EventSessionVolunteer']" ng-if="eventSession.checkInOpen" class="u-display-hover">
                     <md-button class="md-icon-button md-accent" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
                                ng-click="checkIn(eventParticipant)">
                       <md-tooltip>Check in {{'PARTICIPANT' | translate | lowercase}}</md-tooltip>
