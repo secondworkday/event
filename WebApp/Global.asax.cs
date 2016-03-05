@@ -280,7 +280,7 @@ namespace WebApp
                 requestPathLower.StartsWith("/inbox")
                 )
             {
-                context.RewritePath("/Spas/UserSpa.aspx");
+                context.RewritePath("/Spas/DefaultSpa.aspx");
                 // context.RewritePath("/app/default.aspx");
                 return true;
             }

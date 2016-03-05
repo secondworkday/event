@@ -498,6 +498,9 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
   var connectionLostState;
 
 
+  // Helper routine, primarily in support of ms-search-view
+  // Takes filters and converts them into a string searchExpression that is compatible with the server SearchExpression class.
+  // Helpful for creating the searchExpression parameter passed to server XxxSearch() methods.
   self.buildSearchExpression = function (/*filters*/) {
     var filterHandler = function (searchTerms, filter) {
       if (typeof filter === 'string') {
@@ -890,7 +893,10 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
-
+  // ** handy Group helpers
+  // SignalR groups are used to track ad-hoc collections of clients, generally for notification purposes.
+  // For example, clients join the "eventlog" group if they want to receive server notifications when something changes in the eventlog.
+  // Clients then join that group when they enter the eventlog page/state, and leave it when they exit the eventlog page/state.
 
     function joinGroup(groupName) {
         return callHub(function () {
@@ -973,6 +979,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
     //** Authentication Related
 
+  //!! depricated - do we still need this?
     this.isInRole = function (role) {
         if (model.authenticatedIdentity) {
             // role == authenticatedIdentity.type == "hospital" --> kiosk mode
@@ -1032,15 +1039,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
   };
 
 
-/*
-    this.getActiveAndBlockedCases = function () {
-      this.searchCases('$Submitted $Rejected', '', 0, 999999);
-    };
 
-    this.getClosedCases = function (startIndex, rowCount) {
-      return this.searchClosedCases('', startIndex, rowCount);
-    };
-*/
 
   self.searchMyTasks = function (searchExpression, sortExpression, startIndex, rowCount) {
     return self.callHub(function () {
@@ -1105,64 +1104,140 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
-  //** Tenant Related
 
-  model.tenantGroups = {
-    hashMap: {},
-    index: [],
 
-    groupsIndexer: {
-      index: [],
-      sort: self.compareByProperties('name', 'id'),
-      filter: function (item) {
-        return item.parentID;
-      }
-    },
 
-    tenantsIndexer: {
-      index: [],
-      sort: self.compareByProperties('name', 'id'),
-      filter: function (item) {
-        return !item.parentID;
-      }
-    },
 
-    search: function (searchExpression, sortExpression, startIndex, rowCount) {
-      return callHub(function () {
-        return utilityHub.server.searchTenantGroups(searchExpression, sortExpression, startIndex, rowCount);
-      }).then(function (itemsData) {
-        return onTenantGroupsUpdated(model.tenantGroups, itemsData);
-      });
+
+
+
+
+
+
+
+
+
+
+  //!! INDEXER Helpers - so that controllers can keep things up-to-date based on the standard notifications we send from our services!! 
+
+  self.registerIndexer = function (modelItems, indexer) {
+
+    var modelItemsIndexers = modelItems.indexers;
+    if (!modelItemsIndexers) {
+      modelItems.indexers = modelItemsIndexers = [];
     }
+
+    //!! should check if we really need to add it!!!
+    modelItemsIndexers.push(indexer);
   };
 
-  // (actually supports both tenants (top level) and groups (children of tenants)
-  function onTenantGroupsUpdated(itemsModel, itemsData) {
-    // Update our main cache (model.xxx) and cacheIndex (model.xxxIndex)
+  self.unRegisterIndexer = function (modelItems, indexer) {
+    self.arrayRemove(modelItems.indexers, indexer);
+  };
 
-    self.purgeItems(itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index, itemsModel.groupsIndexer.index, itemsModel.tenantsIndexer.index);
-    var newItemIDs = cacheSortedItems(itemsData.items, itemsModel.hashMap, itemsModel.index, itemsModel.tenantsIndexer, itemsModel.groupsIndexer);
 
-    if (model.authenticatedGroup) {
-      // refresh our authenticated group (might be a no-op)
-      model.authenticatedGroup = itemsModel.hashMap[model.authenticatedGroup.id];
-    }
 
-    var notification = {
-      hashMap: itemsModel.hashMap,
-      ids: $.map(itemsData.items, function (item) {
-        return item.id;
-      }),
-      newIDs: newItemIDs,
-      deletedIDs: itemsData.deletedIDs,
-      totalCount: itemsData.totalCount,
-      resolvedIDs: []
+
+
+
+  self.createModelItems = function (searchHandler) {
+    var modelItems = {
+      hashMap: {},
+      index: [],
     };
 
-    return notification;
+    // Add a 'search' handler, which fetches items server-side, and caches the results
+    modelItems.search = function (searchExpression, sortExpression, startIndex, rowCount) {
+      return self.callHub(function () {
+        return searchHandler(searchExpression, sortExpression, startIndex, rowCount);
+      }).then(function (itemsData) {
+        return self.updateItemsModel(modelItems, itemsData);
+      });
+    };
+
+    // returns an object, whereas ensure() returns a promise.
+    modelItems.demand = function (itemKey) {
+      if (!itemKey) {
+        return null;
+      }
+      return modelItems.hashMap[itemKey] ||
+        (
+          modelItems.hashMap[itemKey] = { id: itemKey, code: itemKey, displayTitle: 'loading...' },
+          // fetches requested objects that aren't already cached asynchronously
+          self.delayLoad2(modelItems, itemKey),
+          modelItems.hashMap[itemKey]
+        );
+    };
+
+    // returns a promise, whereas demand() returns a object.
+    modelItems.ensure = function (itemKey) {
+      if (!itemKey) {
+        return $q.when();
+      }
+      var item = modelItems.hashMap[itemKey];
+      if (!item) {
+        return modelItems.search("%" + itemKey, "", 0, 1)
+        .then(function (notificationData) {
+          // (search should have already cached any results)
+          return modelItems.hashMap[itemKey];
+        });
+      }
+      return $q.when(item);
+    };
+
+    return modelItems;
   };
 
-  // returns a promise (not an Item - see demandXyz() for the delayed load Item variant)
+
+
+
+
+
+  //** Tenant Related
+  self.tenantGroups = self.createModelItems(utilityHub.server.searchTenantGroups);
+  model.tenantGroups = self.tenantGroups;
+
+
+  utilityHub.on('updateTenantGroups', function (itemsData) {
+    $rootScope.$apply(function () {
+      $rootScope.$broadcast('updateTenantGroups', self.updateItemsModel(self.tenantGroups, itemsData))
+      // After an update, freshen our authenticatedGroup
+      if (model.authenticatedGroup) {
+        // refresh our authenticated group (might be a no-op if nothing in our authenticatedGroup has changed)
+        model.authenticatedGroup = itemsModel.hashMap[model.authenticatedGroup.id];
+        msAuthenticated.setAuthenticatedGroup(model.authenticatedGroup);
+      }
+    });
+  }).on('setAuthenticatedTenantGroup', function (itemsData) {
+    $rootScope.$apply(function () {
+      self.updateItemsModel(self.tenantGroups, itemsData);
+      if (itemsData && itemsData.items) {
+        // Set our authenticatedGroup
+        model.authenticatedGroup = itemsData.items[0];
+        msAuthenticated.setAuthenticatedGroup(model.authenticatedGroup);
+      }
+    });
+  });
+
+  self.tenantGroups.tenantsIndexer = {
+    index: [],
+    sort: self.compareByProperties('name', 'id'),
+    filter: function (item) {
+      return !item.parentID;
+    }
+  };
+  self.registerIndexer(self.tenantGroups, self.tenantGroups.tenantsIndexer);
+
+  self.tenantGroups.groupsIndexer = {
+    index: [],
+    sort: self.compareByProperties('name', 'id'),
+    filter: function (item) {
+      return item.parentID;
+    }
+  };
+  self.registerIndexer(self.tenantGroups, self.tenantGroups.groupsIndexer);
+
+  // depricated - use standard one
   self.ensureTenantGroup = function (itemKey) {
     var modelItems = model.tenantGroups;
     var item = modelItems.hashMap[itemKey];
@@ -1982,16 +2057,12 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         return utilityHub.server.updateAuthUserAway(away);
     }
 
-    utilityHub.on('setAuthenticatedTenantGroup', function (tenantGroupsData) {
-      $rootScope.$apply(onSetAuthenticatedTenantGroup(tenantGroupsData));
-    }).on('setAuthenticatedUser', function (usersData) {
+    utilityHub.on('setAuthenticatedUser', function (usersData) {
       $rootScope.$apply(onSetAuthenticatedUser(usersData));
     }).on('setSystemAuthenticated', function (tenantID) {
       $rootScope.$apply(onSetSystemAuthenticated(tenantID));
     }).on('updateJobsData', function (jobsData) {
       $rootScope.$apply(onJobsDataUpdated(jobsData));
-    }).on('updateTenantGroups', function (itemsData) {
-      $rootScope.$apply($rootScope.$broadcast('updateTenantGroups', onTenantGroupsUpdated(model.tenantGroups, itemsData)));
     }).on('updateUsers', function (itemsData) {
       $rootScope.$apply($rootScope.$broadcast('updateUsers', onUsersUpdated(model.users, itemsData)));
     }).on('updateMyTasks', function (itemsData) {
@@ -2011,16 +2082,6 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       $rootScope.$apply(self.onServerRestart());
     });
 
-    function onSetAuthenticatedTenantGroup(tenantGroupsData) {
-      onTenantGroupsUpdated(model.tenantGroups, tenantGroupsData);
-      if (tenantGroupsData && tenantGroupsData.items) {
-        model.authenticatedGroup = tenantGroupsData.items[0];
-
-        msAuthenticated.setAuthenticatedGroup(model.authenticatedGroup);
-
-
-      }
-    };
 
     function onSetAuthenticatedUser(usersData) {
       // usersData is expected to contain just one user - the authenticated user
@@ -2314,55 +2375,6 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     };
     this.arrayAddRemove = arrayAddRemove;
 
-
-
-    self.createModelItems = function (searchHandler) {
-      var modelItems = {
-        hashMap: {},
-        index: [],
-      };
-
-      // Add a 'search' handler, which fetches items server-side, and caches the results
-      modelItems.search = function (searchExpression, sortExpression, startIndex, rowCount) {
-        return self.callHub(function () {
-          return searchHandler(searchExpression, sortExpression, startIndex, rowCount);
-        }).then(function (itemsData) {
-          return self.updateItemsModel(modelItems, itemsData);
-        });
-      };
-
-      // returns an object, whereas ensure() returns a promise.
-      modelItems.demand = function (itemKey) {
-        if (!itemKey) {
-          return null;
-        }
-        return modelItems.hashMap[itemKey] ||
-          (
-            modelItems.hashMap[itemKey] = { id: itemKey, code: itemKey, displayTitle: 'loading...' },
-            // fetches requested objects that aren't already cached asynchronously
-            self.delayLoad2(modelItems, itemKey),
-            modelItems.hashMap[itemKey]
-          );
-      };
-
-      // returns a promise, whereas demand() returns a object.
-      modelItems.ensure = function (itemKey) {
-        if (!itemKey) {
-          return $q.when();
-        }
-        var item = modelItems.hashMap[itemKey];
-        if (!item) {
-          return modelItems.search("%" + itemKey, "", 0, 1)
-          .then(function (notificationData) {
-            // (search should have already cached any results)
-            return modelItems.hashMap[itemKey];
-          });
-        }
-        return $q.when(item);
-      };
-
-      return modelItems;
-    };
 
 
     self.delayLoad2 = function (modelItems, itemKey) {
@@ -2738,30 +2750,6 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
-  //!! INDEXER Helpers - so that controllers can keep things up-to-date based on the standard notifications we send from our services!! 
-
-    self.registerIndexer = function (modelItems, indexer) {
-
-      var modelItemsIndexers = modelItems.indexers;
-      if (!modelItemsIndexers) {
-        modelItems.indexers = modelItemsIndexers = [];
-      }
-
-      //!! should check if we really need to add it!!!
-      modelItemsIndexers.push(indexer);
-    };
-
-    self.unRegisterIndexer = function (modelItems, indexer) {
-      self.arrayRemove(modelItems.indexers, indexer);
-    };
-
-
-
-
-
-
-
-
 
 
     function callHub(hubRequest) {
@@ -2823,8 +2811,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
   //!! I suck. I'm using the time as our ID - and don't want two with the same ID
     var tick = new Date().getTime();
-    while (new Date().getTime() == tick)
-    {
+  while (new Date().getTime() == tick) {
       var i;
       i = i + 2;
       // do nothing
@@ -3403,9 +3390,9 @@ app.directive('msNotGotIt', function (ngIfDirective, utilityService, msAuthentic
       }
     };
 
-    var myAttribute = scope.$eval(attributes.msNotGotIt);
+    var gotItLabel = scope.$eval(attributes.msNotGotIt);
     return function () {
-      return msAuthenticated.isNotGotIt(myAttribute);
+      return msAuthenticated.isNotGotIt(gotItLabel);
     };
   });
 });

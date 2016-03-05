@@ -58,7 +58,7 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         },
         event: function (siteService, eventSession) {
           var eventID = eventSession.eventID;
-          return siteService.ensureEvent(eventID);
+          return siteService.events.ensure(eventID);
         }
       }
     })

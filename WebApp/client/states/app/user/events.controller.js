@@ -1,15 +1,6 @@
-app.controller('EventsController', function ($scope, $log, moment, utilityService, siteService, eventSessions, eventParticipants, eventParticipantCounts) {
+app.controller('EventsController', function ($scope, $log, moment, utilityService, siteService, eventSessions) {
 
   $log.debug('Loading EventsController...');
-
-  $scope.totalEventParticipants = 0;
-  angular.forEach(eventParticipantCounts, function (value, key) {
-    $scope.totalEventParticipants += value;
-  });
-
-  $scope.getNumberOfEventParticipants = function (eventID) {
-    return eventParticipantCounts[eventID];
-  }
 
   // EventSessions for a specific Event by ID
   function getEventSessionsIndex(eventID) {

@@ -18,7 +18,6 @@
         ui-sref="app.user.event.sessions({eventID:event.id})">
         <span class="md-title">{{event.name}}</span><br/>
         <span class="md-body-1">{{getEventDatesString(event.id) || "no date set"}}</span>
-        <!-- <span class="md-caption">{{getNumberOfEventParticipants(event.id) || "0"}}/{{totalEventParticipants}} {{ 'PARTICIPANTS' | translate | lowercase}}</span> -->
       </div>
       <span ms-show="['Admin', 'EventPlanner']">
         <md-button class="md-warn u-display-hover"

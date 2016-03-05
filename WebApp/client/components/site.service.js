@@ -170,367 +170,68 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
 
 
-  //** Occupation Related
-
-  model.occupations = {
-    hashMap: {},
-    index: [],
-
-    search: function (searchExpression, sortExpression, startIndex, rowCount) {
-      return utilityService.callHub(function () {
-        return siteHub.server.searchOccupations(searchExpression, sortExpression, startIndex, rowCount);
-      }).then(function (itemsData) {
-        return utilityService.updateItemsModel(model.occupations, itemsData);
-      });
-    }
-  };
 
 
-  // returns a promise (not an Item - see demandXyz() for the delayed load Item variant)
-  self.ensureOccupation = function (itemID) {
-    var modelItems = model.occupations;
-    var item = modelItems.hashMap[itemID];
-    if (!item) {
-      return modelItems.search("%" + itemID, "", 0, 1)
-      .then(function (ignoredNotificationData) {
-        return modelItems.hashMap[itemID];
-      });
-    }
 
-    return $q.when(item);
-  };
+  //** Events Related
+  self.events = utilityService.createModelItems(siteHub.server.searchEvents);
+  model.events = self.events;
 
-  // returns an Item (not a promise - see ensureXyz() for the promise variant)
-  self.demandOccupation = function (itemKey) {
-    var modelItems = model.occupations;
-    return modelItems.hashMap[itemKey] ||
-      (
-        modelItems.hashMap[itemKey] = { key: itemKey, id: itemKey, code: itemKey, displayTitle: 'loading...' },
-        utilityService.delayLoad2(modelItems, itemKey),
-        modelItems.hashMap[itemKey]
-      );
-  };
+  siteHub.on('updateEventSessions', function (itemsData) {
+    $rootScope.$apply($rootScope.$broadcast('updateEventSessions', utilityService.updateItemsModel(self.eventSessions, itemsData)));
+  });
 
-  self.setOccupationTitle = function (occupation, title) {
+
+  this.generateRandomEvent = function () {
     return utilityService.callHub(function () {
-      return siteHub.server.setOccupationTitle(occupation.onetCode, title);
+      return siteHub.server.generateRandomEvent();
     });
   };
 
-  self.setOccupationDescription = function (occupation, description) {
+  this.createEvent = function (formData) {
     return utilityService.callHub(function () {
-      return siteHub.server.setOccupationDescription(occupation.onetCode, description);
+      return siteHub.server.createEvent(formData);
     });
   };
 
-  self.setOccupationReleaseState = function (occupation, releaseState) {
+  this.editEvent = function (eventID, eventData) {
     return utilityService.callHub(function () {
-      return siteHub.server.setOccupationReleaseState(occupation.onetCode, releaseState);
+      return siteHub.server.editEvent(eventID, eventData);
     });
   };
 
-  self.setOccupationHeroImageLicense = function (occupation, license) {
+  this.deleteEvent = function (event) {
     return utilityService.callHub(function () {
-      return siteHub.server.setOccupationHeroImageLicense(occupation.onetCode, license);
+      return siteHub.server.deleteEvent(event.id);
     });
   };
 
-  self.setOccupationHeroImageSource = function (occupation, source) {
+  this.modifyEventTag = function (item, newTag, isAssigned) {
     return utilityService.callHub(function () {
-      return siteHub.server.setOccupationHeroImageSource(occupation.onetCode, source);
+      return siteHub.server.modifyEventTag(item.id, newTag, isAssigned);
     });
   };
 
-  self.setOccupationHeroImageFocalPoint = function (occupation, x, y) {
+  this.modifyEventMyTag = function (item, newTag, isAssigned) {
     return utilityService.callHub(function () {
-      return siteHub.server.setOccupationHeroImageFocalPoint(occupation.onetCode, x, y);
+      return siteHub.server.modifyEventMyTag(item.id, newTag, isAssigned);
     });
   };
 
 
 
-
-  self.createOccupationBundle = function (name, options) {
-    return utilityService.callHub(function () {
-      return siteHub.server.createOccupationBundle(name, options);
-    });
-  };
-
-  self.deleteOccupationBundle = function (occupationBundle) {
-    return utilityService.callHub(function () {
-      return siteHub.server.deleteOccupationBundle(occupationBundle.id);
-    });
-  };
-
-  self.searchOccupationBundles = function (searchExpression, sortExpression, startIndex, rowCount) {
-    return utilityService.callHub(function () {
-      return siteHub.server.searchOccupationBundles(searchExpression, sortExpression, startIndex, rowCount);
-    });
-  };
-
-  self.modifyOccupationBundleMember = function (occupationBundle, occupation, isMember) {
-    return utilityService.callHub(function () {
-      return siteHub.server.modifyOccupationBundleMember(occupationBundle.id, occupation.onetCode, isMember);
-    });
-  };
-
-
-
-
-
-
-
-
-
-
-
-  //** Job Seeker Profile Related
-  model.jsProfiles = {};
-  model.jsProfilesIndex = [];
-
-  this.addProfileOccupation = function (profile, occupation) {
-
-    profile.nextOccupationIDs.push(occupation.id);
-
-    //return utilityService.callHub(function () {
-    //      return siteHub.server.modifyProjectTag(project.id, newTag, isAssigned);
-    //});
-  };
-
-
-
-
-
-
-
-
-
-
-  //** CareerProfiles (aka JobSeeker) Related
-  model.careerProfiles = {
-    hashMap: {},
-    index: [],
-
-    search: function (searchExpression, sortExpression, startIndex, rowCount) {
-      return utilityService.callHub(function () {
-        return siteHub.server.searchCareerProfiles(searchExpression, sortExpression, startIndex, rowCount);
-      }).then(function (itemsData) {
-        return utilityService.updateItemsModel(model.careerProfiles, itemsData);
-      });
-    }
-  };
-
-  self.getCareerProfile = function (careerProfileID) {
-    return utilityService.callHub(function () {
-      return siteHub.server.getCareerProfile(careerProfileID);
-    }).then(function (itemsData) {
-      utilityService.updateItemsModel(model.careerProfiles, itemsData);
-
-      var item = model.careerProfiles.hashMap[careerProfileID];
-      if (item) {
-        return item;
-      }
-      return $q.reject("career profile not found");
-    });
-  };
-
-
-  this.modifyCareerProfileTag = function (client, newTag, isAssigned) {
-    return utilityService.callHub(function () {
-      return siteHub.server.modifyCareerProfileTag(client.id, newTag, isAssigned);
-    });
-  };
-  this.modifyCareerProfileMyTag = function (client, newTag, isAssigned) {
-    return utilityService.callHub(function () {
-      return siteHub.server.modifyCareerProfileMyTag(client.id, newTag, isAssigned);
-    });
-  };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  //** Career Step Related
-
-  model.careerSteps = {
-    hashMap: {},
-    index: [],
-
-    search: function (searchExpression, sortExpression, startIndex, rowCount) {
-      return utilityService.callHub(function () {
-        return siteHub.server.searchCareerSteps(searchExpression, sortExpression, startIndex, rowCount);
-      }).then(function (itemsData) {
-        return utilityService.updateItemsModel(model.careerSteps, itemsData);
-      });
-    }
-  };
-
-
-  // returns a promise (not an Item - see demandXyz() for the delayed load Item variant)
-  self.ensureCareerStep = function (itemID) {
-    var modelItems = model.careerSteps;
-    var item = modelItems.hashMap[itemID];
-    if (!item) {
-      return modelItems.search("%" + itemID, "", 0, 1)
-      .then(function (ignoredNotificationData) {
-        return modelItems.hashMap[itemID];
-      });
-    }
-
-    return $q.when(item);
-  };
-
-  // returns an Item (not a promise - see ensureXyz() for the promise variant)
-  self.demandCareerStep = function (itemID) {
-    var modelItems = model.careerSteps;
-    return modelItems.hashMap[itemID] ||
-      (
-        modelItems.hashMap[itemID] = { id: itemID, code: itemID, displayTitle: 'loading...' },
-        utilityService.delayLoad2(modelItems, itemID),
-        modelItems.hashMap[itemID]
-      );
-  };
-
-  this.setCareerStepZipCode = function (careerStep, zipCode) {
-    //careerStep.zipCode = zipCode;
-    //!! tell the server what just happened here...
-    return utilityService.callHub(function () {
-      return siteHub.server.setCareerStepZipCode(careerStep.id, zipCode);
-    });
-  };
-
-  this.modifyCareerStepSettings = function (careerStep, settings) {
-    //careerStep.zipCode = zipCode;
-    //!! tell the server what just happened here...
-    return utilityService.callHub(function () {
-      return siteHub.server.modifyCareerStepSettings(careerStep.id, settings);
-    });
-  };
-
-
-
-  self.addCareerStepCareerHistoryWork = function (careerStep, workPeriod) {
-    return utilityService.callHub(function () {
-      return siteHub.server.addCareerStepCareerHistoryWork(careerStep.id, workPeriod);
-    });
-  };
-  self.removeCareerStepCareerHistoryWork = function (careerStep, workPeriodIndex) {
-    return utilityService.callHub(function () {
-      return siteHub.server.removeCareerStepCareerHistoryWork(careerStep.id, workPeriodIndex);
-    });
-  };
-  self.modifyCareerStepCareerHistoryWork = function (careerStep, workPeriodIndex, workPeriod) {
-    return utilityService.callHub(function () {
-      return siteHub.server.modifyCareerStepCareerHistoryWork(careerStep.id, workPeriodIndex, workPeriod);
-    });
-  };
-
-
-
-  self.addCareerStepOccupation = function (careerStep, occupation) {
-    return utilityService.callHub(function () {
-      return siteHub.server.addCareerStepOccupation(careerStep.id, occupation.onetCode);
-    });
-  };
-  self.removeCareerStepOccupation = function (careerStep, occupation) {
-    return utilityService.callHub(function () {
-      return siteHub.server.removeCareerStepOccupation(careerStep.id, occupation.onetCode);
-    });
-  };
-  self.skipCareerStepOccupation = function (careerStep, occupation) {
-    return utilityService.callHub(function () {
-      return siteHub.server.skipCareerStepOccupation(careerStep.id, occupation.onetCode);
-    });
-  };
-
-  self.getCareerStepJobOpenings2 = function (careerStep, occupation, zipCode, searchRadius) {
-    return utilityService.callHub(function () {
-      return siteHub.server.getCareerStepJobOpenings2(careerStep.id, occupation.onetCode, zipCode, searchRadius);
-    });
-  };
-  // note - we identify a "JobOpportunity" via a "JobPosting"
-  self.addCareerStepJobOpportunity = function (careerStep, occupation, jobPosting) {
-    return utilityService.callHub(function () {
-      return siteHub.server.addCareerStepJobOpportunity(careerStep.id, occupation.onetCode, jobPosting);
-    });
-  };
-  self.removeCareerStepJobOpportunity = function (careerStep, jobPosting) {
-    return utilityService.callHub(function () {
-      return siteHub.server.removeCareerStepJobOpportunity(careerStep.id, jobPosting);
-    });
-  };
-  self.skipCareerStepJobOpening = function (careerStep, jobOpening) {
-    return utilityService.callHub(function () {
-      // Note server expects JobPosting
-      return siteHub.server.skipCareerStepJobPosting(careerStep.id, jobOpening.jobPosting);
-    });
-  };
-
-
-
-
-  self.getCareerStepEducationOptions = function (careerStep, occupation, zipCode, searchRadius) {
-    return utilityService.callHub(function () {
-      return siteHub.server.getCareerStepEducationOptions(careerStep.id, occupation.onetCode, zipCode, searchRadius);
-    });
-  };
-  // note - we identify a "JobOpportunity" via a "JobPosting"
-  self.addCareerStepEducationOpportunity = function (careerStep, occupation, educationProgram) {
-    return utilityService.callHub(function () {
-      return siteHub.server.addCareerStepEducationOpportunity(careerStep.id, occupation.onetCode, educationProgram);
-    });
-  };
-  self.removeCareerStepEducationOpportunity = function (careerStep, educationProgram) {
-    return utilityService.callHub(function () {
-      return siteHub.server.removeCareerStepEducationOpportunity(careerStep.id, educationProgram);
-    });
-  };
-  self.skipCareerStepEducationOpportunity = function (careerStep, educationProgram) {
-    return utilityService.callHub(function () {
-      // Note server expects JobPosting
-      return siteHub.server.skipCareerStepEducationOpportunity(careerStep.id, educationProgram);
-    });
-  };
-
-
-
-
-
-
-
-  self.searchCareerStepTransitions = function (careerStep, searchExpression, sortExpression, startIndex, rowCount) {
-    return utilityService.callHub(function () {
-      return siteHub.server.searchCareerStepTransitions(careerStep.id, searchExpression, sortExpression, startIndex, rowCount);
-    });
-  };
 
 
 
   //** EventSessions Related
-  model.eventSessions = {
-    hashMap: {},
-    index: [],
+  self.eventSessions = utilityService.createModelItems(siteHub.server.searchEventSessions);
+  model.eventSessions = self.eventSessions;
 
-    search: function (searchExpression, sortExpression, startIndex, rowCount) {
-      return utilityService.callHub(function () {
-        return siteHub.server.searchEventSessions(searchExpression, sortExpression, startIndex, rowCount);
-      }).then(function (itemsData) {
-        return utilityService.updateItemsModel(model.eventSessions, itemsData);
-      });
-    }
-  };
+  siteHub.on('updateEventSessions', function (itemsData) {
+    $rootScope.$apply($rootScope.$broadcast('updateEventSessions', utilityService.updateItemsModel(self.eventSessions, itemsData)));
+  });
+
+
 
   this.ensureAllEventSessions = function () {
     return model.eventSessions.search("", "", 0, 999999)
@@ -777,79 +478,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
 
 
-
-
-
-
-
-
-
-
-
-
-  //** Events Related
-  model.events = {
-    hashMap: {},
-    index: [],
-
-    search: function (searchExpression, sortExpression, startIndex, rowCount) {
-      return utilityService.callHub(function () {
-        return siteHub.server.searchEvents(searchExpression, sortExpression, startIndex, rowCount);
-      }).then(function (itemsData) {
-        return utilityService.updateItemsModel(model.events, itemsData);
-      });
-    }
-  };
-
-  this.ensureEvent = function (eventID) {
-    var event = model.events.hashMap[eventID];
-    if (!event) {
-      return model.events.search("%" + eventID, "", 0, 999999)
-      .then(function (eventData) {
-        return model.events.hashMap[eventID];
-      });
-    }
-
-    return $q.when(event);
-  }
-
-  this.generateRandomEvent = function () {
-    return utilityService.callHub(function () {
-      return siteHub.server.generateRandomEvent();
-    });
-  };
-
-  this.createEvent = function (formData) {
-    return utilityService.callHub(function () {
-      return siteHub.server.createEvent(formData);
-    });
-  };
-
-  this.editEvent = function (eventID, eventData) {
-    return utilityService.callHub(function () {
-      return siteHub.server.editEvent(eventID, eventData);
-    });
-  };
-
-  this.deleteEvent = function (event) {
-    return utilityService.callHub(function () {
-      return siteHub.server.deleteEvent(event.id);
-    });
-  };
-
-
-
-
-  this.modifyEventTag = function (item, newTag, isAssigned) {
-    return utilityService.callHub(function () {
-      return siteHub.server.modifyEventTag(item.id, newTag, isAssigned);
-    });
-  };
-  this.modifyEventMyTag = function (item, newTag, isAssigned) {
-    return utilityService.callHub(function () {
-      return siteHub.server.modifyEventMyTag(item.id, newTag, isAssigned);
-    });
-  };
 
 
 
@@ -1356,10 +984,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
   }).on('updateEvents', function (itemsData) {
     $rootScope.$apply($rootScope.$broadcast('updateEvents', utilityService.updateItemsModel(model.events, itemsData)));
-  }).on('updateEventSessions', function (itemsData) {
-    $rootScope.$apply($rootScope.$broadcast('updateEventSessions', utilityService.updateItemsModel(model.eventSessions, itemsData)));
-
-
   }).on('updateParticipantGroups', function (itemsData) {
     $rootScope.$apply($rootScope.$broadcast('updateParticipantGroups', utilityService.updateItemsModel(model.participantGroups, itemsData)));
 
@@ -1468,14 +1092,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
   // init
 }]);
 
-
-app.filter('demandOccupations', ['demandObjectsFilter', 'siteService', function (demandObjectsFilter, siteService) {
-  return function (objects) {
-    return demandObjectsFilter(objects, function (object) {
-      return siteService.demandOccupation(object.id);
-    });
-  };
-}]);
 
 app.filter('demandObjects', function () {
   return function (objects, demandObject) {

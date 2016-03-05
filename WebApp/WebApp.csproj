@@ -212,6 +212,7 @@
     <Content Include="client\states\app\site-admin\system-users.controller.js" />
     <Content Include="client\states\app\site-admin\system-users.html" />
     <Content Include="client\states\app\user\bulk-edit-participants.dialog.html" />
+    <Content Include="client\states\app\user\event.controller.js" />
     <Content Include="client\states\app\user\edit-user.dialog.html" />
     <Content Include="client\states\app\user\event-activity-log.controller.js" />
     <Content Include="client\states\app\user\events.controller.js" />
@@ -267,6 +268,8 @@
     <Content Include="Content\angular-material\angular-material.min.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
+    <Content Include="Content\nv.d3.css" />
+    <Content Include="Content\nv.d3.min.css" />
     <Content Include="default.html" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />
@@ -283,6 +286,7 @@
     <Content Include="js\ng-infinite-scroll-1.2.0.min.js" />
     <Content Include="js\xml2json.js" />
     <Content Include="js\xml2json.min.js" />
+    <Content Include="node_modules\normalize.css\normalize.css" />
     <Content Include="Scripts\angular-animate.js" />
     <Content Include="Scripts\angular-animate.min.js" />
     <Content Include="Scripts\angular-aria.js" />
@@ -309,6 +313,9 @@
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\FontAwesome.otf" />
     <Content Include="instrumentation\Settings.Json" />
+    <Content Include="node_modules\normalize.css\LICENSE.md" />
+    <Content Include="node_modules\normalize.css\package.json" />
+    <Content Include="node_modules\normalize.css\README.md" />
     <None Include="Properties\PublishProfiles\demo.socialventuresoftware.org.pubxml" />
     <None Include="Properties\PublishProfiles\www.socialventuresoftware.org.pubxml" />
     <None Include="Scripts\jquery-2.1.4.intellisense.js" />
@@ -329,6 +336,7 @@
     <Content Include="SignIn\signin.html" />
     <Content Include="SignIn\signin.js" />
     <Content Include="SignIn\welcome.html" />
+    <Content Include="Spas\DefaultSpa.aspx" />
     <Content Include="Spas\VolunteerSpa.aspx" />
     <Content Include="Spas\UserSpa.aspx" />
     <Content Include="Web.config" />
@@ -382,6 +390,13 @@
       <DependentUpon>SiteLogin.ashx</DependentUpon>
     </Compile>
     <Compile Include="SiteHub.cs" />
+    <Compile Include="Spas\DefaultSpa.aspx.cs">
+      <DependentUpon>DefaultSpa.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Spas\DefaultSpa.aspx.designer.cs">
+      <DependentUpon>DefaultSpa.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Spas\VolunteerSpa.aspx.cs">
       <DependentUpon>VolunteerSpa.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

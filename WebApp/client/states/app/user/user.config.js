@@ -18,9 +18,8 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         templateUrl: '/client/states/app/user/events.html',
         controller: 'EventsController',
         resolve: {
-          eventSessions: function (siteService, $stateParams) { return siteService.ensureAllEventSessions() },
-          eventParticipants: function (siteService) { return siteService.ensureAllEventParticipants() },
-          eventParticipantCounts: function (siteService) { return siteService.countEventParticipantsPerEvent() }
+          //!! - We do this to get the date range associated with an Event - probably better to have the server do that.
+          eventSessions: function (siteService, $stateParams) { return siteService.ensureAllEventSessions() }
         }
     })
     .state('app.user.team', {
@@ -37,30 +36,6 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         url: '/locations',
         templateUrl: '/client/states/app/user/locations.html'
     })
-/*
-    .state('app.user.event', {
-      url: '/event/:eventID/',
-      templateUrl: '/client/states/app/user/event.html',
-      controller: "EventController",
-      resolve: {
-        event: function (siteService, $stateParams) {
-          var eventID = $stateParams.eventID;
-          return siteService.ensureEvent(eventID);
-        },
-        eventSessionsIndex: function (siteService, $stateParams) {
-          var eventID = $stateParams.eventID;
-          return siteService.ensureEventSessions(eventID);
-        },
-        eventParticipantsIndex: function (siteService, $stateParams) {
-          var eventID = $stateParams.eventID;
-          return siteService.ensureEventParticipantsIndex(eventID);
-        },
-        eventParticipantGroupsIndex: function (siteService, eventParticipantsIndex) {
-          return siteService.ensureEventParticipantGroups(siteService, eventParticipantsIndex);
-        }
-      }
-    })
-*/
     .state('app.user.event', {
       abstract: true,
       url: '/event/:eventID',
@@ -69,8 +44,9 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       resolve: {
         event: function ($stateParams, siteService) {
           var eventID = $stateParams.eventID;
-          return siteService.ensureEvent(eventID);
+          return siteService.events.ensure(eventID);
         },
+        //!! document why we need this
         eventSession: function () {
           return null;
         },
@@ -112,7 +88,7 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         },
         event: function ($stateParams, siteService, eventSession) {
           var eventID = eventSession.eventID;
-          return siteService.ensureEvent(eventID);
+          return siteService.events.ensure(eventID);
         }
       }
     })

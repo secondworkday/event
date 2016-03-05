@@ -1,5 +1,6 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AngularJS-SignalR.Master" AutoEventWireup="true" CodeBehind="UserSpa.aspx.cs" Inherits="WebApp.Spas.UserSpaPage" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AngularJS-SignalR.Master" AutoEventWireup="true" CodeBehind="DefaultSpa.aspx.cs" Inherits="WebApp.Spas.DefaultSpaPage" %>
 <%@ Register Namespace="MS.WebUtility" Assembly="MS.WebUtility" TagPrefix="util" %>
+
 
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
@@ -57,16 +58,13 @@
       });
 
 
-
-
       app.constant('US_STATES', <%=USStatesArrayJson%> );
 
 
-
-        app.config(['$locationProvider', '$stateProvider', '$urlRouterProvider', '$mdThemingProvider', 'AUTHORIZATION_ROLES', function ($locationProvider, $stateProvider, $urlRouterProvider, $mdThemingProvider, AUTHORIZATION_ROLES) {
+        app.config(['$locationProvider', '$urlRouterProvider', '$mdThemingProvider', 'AUTHORIZATION_ROLES', function ($locationProvider, $urlRouterProvider, $mdThemingProvider, AUTHORIZATION_ROLES) {
 
             $locationProvider.html5Mode(true);
-            $urlRouterProvider.otherwise("/events");
+            $urlRouterProvider.otherwise("/");
 
             //Now set up the theme
             $mdThemingProvider.theme('default')
@@ -82,17 +80,17 @@
     <% if (WebUtilityContext.Current.SiteBaseDomain.StartsWith("dev.") || WebUtilityContext.Current.SiteBaseDomain.StartsWith("rolling.")) { %>
 
       <%--On Dev (dev.*) or Rolling (rolling.*) sites, we don't want to emit anything when optimizations are off. That allows Charles to work --%>
-      <%: Scripts.Render("~/bundles/userSpaTemplates") %>
+      <%: Scripts.Render("~/bundles/defaultSpaTemplates") %>
 
     <% } else { %>
 
       <%--Everywhere else, we always want to bundle our templates even when BundleTable.EnableOptimizations is off --%>
-      <script src="<%: BundleTable.Bundles.ResolveBundleUrl("~/bundles/userSpaTemplates") %>" type="text/javascript"></script>
+      <script src="<%: BundleTable.Bundles.ResolveBundleUrl("~/bundles/defaultSpaTemplates") %>" type="text/javascript"></script>
 
     <% } %>
 
 
-    <%: Scripts.Render("~/bundles/userSpaJS") %>
+    <%: Scripts.Render("~/bundles/defaultSpaJS") %>
 
 
 
