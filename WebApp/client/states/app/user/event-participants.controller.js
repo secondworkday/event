@@ -128,7 +128,8 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
       indexer: {
         index: [],
         sort: utilityService.compareByProperties('id'),
-        filter: utilityService.filterByPropertyHasValue('!checkInTimestamp')
+        baseFilter: $scope.searchViewOptions.baseFilter,
+        selectFilter: utilityService.filterByPropertyHasValue('!checkInTimestamp')
       },
       serverTerm: '$notCheckedIn',
       clientFunction: utilityService.filterByPropertyHasValue('!checkInTimestamp')
@@ -138,7 +139,8 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
       indexer: {
         index: [],
         sort: utilityService.compareByProperties('id'),
-        filter: function (item) {
+        baseFilter: $scope.searchViewOptions.baseFilter,
+        selectFilter: function (item) {
           return item.checkInTimestamp && !item.checkOutTimestamp;
         }
       },
@@ -147,6 +149,8 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
         return item.checkInTimestamp && !item.checkOutTimestamp;
       }
     }
+
+    //!! Add this in when check-out is enabled as a per-tenant option
     // {
     //   name: 'Checked-Out',
     //   indexer: {
@@ -158,6 +162,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     //   clientFunction: utilityService.filterByPropertyHasValue('checkOutTimestamp')
     // }
   ];
+
   angular.forEach($scope.eventParticipantStateFilters, function (filter) {
     utilityService.registerIndexer($scope.model.eventParticipants, filter.indexer);
   });
@@ -177,7 +182,8 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
       var indexer = {
         index: [],
         sort: utilityService.compareByProperties('id'),
-        filter: utilityService.filterByPropertyHasValue('!eventSessionID')
+        baseFilter: $scope.searchViewOptions.baseFilter,
+        selectFilter: utilityService.filterByPropertyHasValue('!eventSessionID')
       };
       utilityService.registerIndexer($scope.model.eventParticipants, indexer);
       // Push a filter on the filter stack
@@ -197,7 +203,8 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
         var indexer = {
           index: [],
           sort: utilityService.compareByProperties('id'),
-          filter: utilityService.filterByPropertyValue('eventSessionID', itemID)
+          baseFilter: $scope.searchViewOptions.baseFilter,
+          selectFilter: utilityService.filterByPropertyValue('eventSessionID', itemID)
         };
         utilityService.registerIndexer($scope.model.eventParticipants, indexer);
         // Push a filter on the filter stack
@@ -239,7 +246,8 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
       var indexer = {
         index: [],
         sort: utilityService.compareByProperties('id'),
-        filter: utilityService.filterByPropertyValue('participantGroupID', itemID)
+        baseFilter: $scope.searchViewOptions.baseFilter,
+        selectFilter: utilityService.filterByPropertyValue('participantGroupID', itemID)
       };
       utilityService.registerIndexer($scope.model.eventParticipants, indexer);
       // Push a filter on the filter stack
