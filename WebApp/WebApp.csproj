@@ -433,7 +433,6 @@
     <Content Include="Scripts\jquery-2.1.4.min.map" />
     <Content Include="SignIn\Signout.ashx" />
     <Content Include="SignIn\SiteLogin.ashx" />
-    <Content Include="templates\OSB-Reminder-Form.docx" />
     <Content Include="SignIn\Reset-Password.ashx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

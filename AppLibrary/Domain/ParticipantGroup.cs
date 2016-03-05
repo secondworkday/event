@@ -127,6 +127,11 @@ namespace App.Library
             this.ContactName = (string)data.contactName;
             this.Overview = (string)data.overview;
             this.SetNotes(dc, (string)data.notes);
+            var primaryPhoneNumber = (string)data.primaryPhoneNumber;
+            if (!string.IsNullOrEmpty(primaryPhoneNumber))
+            {
+                this.SetContactPhoneNumber(dc, primaryPhoneNumber);
+            }
         }
 
         public static HubResult Edit(AppDC dc, int itemID, dynamic data)
