@@ -533,7 +533,14 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
   self.buildClientFilter = function (/*filters*/) {
     var clientFilterHandler = function (clientFilterTerms, filter) {
-      if (angular.isObject(filter)) {
+
+      if (angular.isUndefined(filter)) {
+        // nothing to do
+      }
+      else if (angular.isFunction(filter)) {
+        clientFilterTerms.push(filter);
+      }
+      else if (angular.isObject(filter)) {
         if (filter.clientFunction) {
           clientFilterTerms.push(filter.clientFunction);
         }
@@ -547,30 +554,15 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     return filterTerms;
   };
 
-
-
   function buildFilterTerms(hierarchy, filterHandler) {
-
-    var filterTermHandler = function (searchTerms, filter) {
-      if (typeof filter === 'undefined') {
-        // nothing to do
-      }
-      else if (typeof filter === 'string' || typeof filter === 'object') {
-        filterHandler(searchTerms, filter);
-      }
-      else {
-        $log.debug('type?', filter);
-      }
-    };
-
     var filterTerms = [];
     angular.forEach(hierarchy, function (filter) {
       if (angular.isArray(filter)) {
         angular.forEach(filter, function (filter) {
-          filterTermHandler(filterTerms, filter);
+          filterHandler(filterTerms, filter);
         });
       } else {
-        filterTermHandler(filterTerms, filter);
+        filterHandler(filterTerms, filter);
       }
     });
     return filterTerms;
@@ -1122,6 +1114,28 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
   self.registerIndexer = function (modelItems, indexer) {
 
+    var clientFilters = self.buildClientFilter(
+      //!! hmm - nonstandard name?
+      indexer.filter,
+
+      indexer.baseFilter,
+      indexer.stackFilters,
+      indexer.selectFilter,
+      indexer.objectFilter,
+      indexer.userSearch);
+
+    indexer.clientFilter = function (item) {
+      // If we fail any filter, return false
+      for (var i = 0; i < clientFilters.length; i++) {
+        if (!clientFilters[i](item)) {
+          return false;
+        }
+      }
+      // Otherwise return true
+      return true;
+    };
+
+
     var modelItemsIndexers = modelItems.indexers;
     if (!modelItemsIndexers) {
       modelItems.indexers = modelItemsIndexers = [];
@@ -1129,6 +1143,22 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
     //!! should check if we really need to add it!!!
     modelItemsIndexers.push(indexer);
+
+    // now 'catch up' the indexer with any items that are already in the cache
+    angular.forEach(modelItems.index, function (itemKey) {
+      var item = modelItems.hashMap[itemKey];
+      var indexerOffset = indexerBinarySearch(indexer, modelItems.hashMap, item);
+
+      // determine if we need to add a new index entry
+      if (indexerOffset != null) {
+        var insertOffset = indexerOffset >= 0 ? indexerOffset : ~indexerOffset;
+        indexer.index.splice(insertOffset, 0, itemKey);
+      }
+
+
+    });
+
+
   };
 
   self.unRegisterIndexer = function (modelItems, indexer) {
@@ -2533,7 +2563,15 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       if (!item) {
         return null;
       }
-      if (indexer.filter && !indexer.filter(item)) {
+      // Perform filtering - so our indexer only contains items we want included
+      if (indexer.clientFilter) {
+        // If we have a .clientFilter - use it exclusively. It should be a compliation of any sub-filters
+        if (!indexer.clientFilter(item)) {
+          return null;
+        }
+      }
+      else if (indexer.filter && !indexer.filter(item)) {
+        // old-school - think we should depricate this
         return null;
       }
       return hashMapBinarySearch(indexer.index, item, indexer.sort, hashMap);
@@ -2721,7 +2759,8 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       self.purgeItems.apply(self, purgeItemsArguments);
       //!!self.purgeItems(itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index);
 
-
+      // Dynamically build the argument list for a call to self.cacheSortedItems()
+      // self.cacheSortedItems(itemsData.items, itemsModel.hashMap, itemsModel.index, /* add in any indexers here */ );
       var cacheItemsArguments = [itemsData.items, itemsModel.hashMap, itemsModel.index];
       if (itemsModel.indexers) {
         cacheItemsArguments.push.apply(cacheItemsArguments, itemsModel.indexers);
@@ -2999,8 +3038,8 @@ app.directive('msSearchView', function ($parse, utilityService) {
 
           // Otherwise return true
           return true;
-        }
-      }
+        };
+      };
 
 
       $scope.onChangeEvent = function (eventData) {
@@ -3327,8 +3366,6 @@ app.directive('msHide', function (ngIfDirective, msAuthenticated) {
   });
 });
 
-
-
 // ms-show ms-not-got-it ms-spa
 
 // ms-production
@@ -3371,6 +3408,21 @@ app.directive('msSpa', function (ngIfDirective, SYSTEM_INFO) {
 
 
 
+
+app.directive('msOption', function (ngIfDirective, msAuthenticated) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    var myAttribute = scope.$eval(attributes.msOption);
+    if (myAttribute.charAt(0) === '!') {
+      myAttribute = myAttribute.substr(1);
+      return function () {
+        return !msAuthenticated.group.accountOptions[myAttribute];
+      };
+    }
+    return function () {
+      return msAuthenticated.group.accountOptions[myAttribute];
+    };
+  });
+});
 
 
 

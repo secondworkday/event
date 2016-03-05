@@ -13,29 +13,10 @@ app.controller('EventSessionController', function ($scope, $translate, $log, $st
   $scope.searchEventParticipants = siteService.model.eventParticipants.search;
   $scope.searchEvents = siteService.model.events.search;
 
-  $scope.checkedInCount = 0;
-  $scope.expectedCount = 99;
-  $scope.timeRemaining = "3h 45m";
 
-  $scope.sampleParticipants = [
-    { firstName: "Johnny", lastName: "Walker", school: "Eastside Elementary", grade: "3rd", status: "expected" },
-    { firstName: "Sam", lastName: "Adams", school: "Eastside Elementary", grade: "2nd", status: "expected" },
-    { firstName: "Alize", lastName: "Blue", school: "Westside Elementary", grade: "4th", status: "expected" }
-  ];
-
-  $scope.checkIn = function (participant) {
-    participant.status = "checkedIn";
-    $scope.checkedInCount++;
-    $scope.expectedCount--;
+  var baseParticipantFilter = function (item) {
+    return item.eventSessionID === $scope.eventSession.id;
   };
-
-  $scope.undoCheckIn = function (participant) {
-    participant.status = "expected";
-    $scope.checkedInCount--;
-    $scope.expectedCount++;
-  };
-
-
 
 
 
@@ -44,30 +25,31 @@ app.controller('EventSessionController', function ($scope, $translate, $log, $st
   eventSession.allParticipants = {
     index: [],
     sort: utilityService.compareByProperties('id'),
-    filter: function (item) {
-      return item.eventSessionID === $scope.eventSession.id;
-    }
+    baseFilter: baseParticipantFilter
   };
 
   eventSession.expectedParticipants = {
     index: [],
     sort: utilityService.compareByProperties('id'),
-    filter: function (item) {
-      return item.eventSessionID === $scope.eventSession.id && !item.checkInTimestamp;
+    baseFilter: baseParticipantFilter,
+    selectFilter: function (item) {
+      return !item.checkInTimestamp;
     }
   };
   eventSession.checkedInParticipants = {
     index: [],
     sort: utilityService.compareByProperties('id'),
-    filter: function (item) {
-      return item.eventSessionID === $scope.eventSession.id && item.checkInTimestamp && !item.checkOutTimestamp;
+    baseFilter: baseParticipantFilter,
+    selectFilter: function (item) {
+      return item.checkInTimestamp && !item.checkOutTimestamp;
     }
   };
   eventSession.checkedOutParticipants = {
     index: [],
     sort: utilityService.compareByProperties('id'),
-    filter: function (item) {
-      return item.eventSessionID === $scope.eventSession.id && item.checkInTimestamp && item.checkOutTimestamp;
+    baseFilter: baseParticipantFilter,
+    selectFilter: function (item) {
+      return item.checkInTimestamp && item.checkOutTimestamp;
     }
   };
 

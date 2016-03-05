@@ -34,7 +34,7 @@
       <md-button ng-click="cancel()">
        Cancel
       </md-button>
-      <md-button ng-if="model.authenticatedGroup.accountOptions.isDemo" ng-click="generateRandomEvent()"><i class="fa fa-magic"></i> Create Demo {{'EVENT' | translate}}</md-button>
+      <md-button ms-option="'isDemo'" ng-click="generateRandomEvent()"><i class="fa fa-magic"></i> Create Demo {{'EVENT' | translate}}</md-button>
       <md-button type="submit" class="md-primary" ng-click="createEvent()" ng-disabled="!formData.name" >
         Create {{'EVENT' | translate}}
       </md-button>
