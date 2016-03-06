@@ -12,12 +12,43 @@ app.controller('NoShowReportDialogController', function ($scope, $window, $trans
   //$scope.participantGroupsIndex = participantGroupsIndex;
   //$scope.eventParticipantsIndex = eventParticipantsIndex;
 
-  $scope.sessionParticipantGroupsIndex = [];
-
   // find unique participantGroups for selected eventSession
   $scope.eventSessionIDChanged = function () {
+
+    // Count our slacker no-shows EventParticipants for this EventSession, gathered by ParticipantGroup
+    var noShowSessionParticipantGroupsCounts = {};
+    var noShowSessionParticipantGroupsIndex = [];
+    angular.forEach(siteService.eventParticipants.index, function (eventParticipantID) {
+      var eventParticipant = siteService.eventParticipants.hashMap[eventParticipantID];
+      if ($scope.formData.eventSessionID == eventParticipant.eventSessionID && !eventParticipant.checkInTimestamp) {
+        if (!noShowSessionParticipantGroupsCounts[eventParticipant.participantGroupID]) {
+          noShowSessionParticipantGroupsCounts[eventParticipant.participantGroupID] = 1;
+          noShowSessionParticipantGroupsIndex.push(eventParticipant.participantGroupID);
+        } else {
+          noShowSessionParticipantGroupsCounts[eventParticipant.participantGroupID]++;
+        }
+      }
+    });
+    // Ensure we've loaded each of these ParticipantGroups into our model
+    siteService.participantGroups.ensure(noShowSessionParticipantGroupsIndex)
+    .then(function () {
+      // all done - flag the UI we can show 'em
+      $scope.noShowSessionParticipantGroupsCounts = noShowSessionParticipantGroupsCounts;
+      $scope.noShowSessionParticipantGroupsIndex = noShowSessionParticipantGroupsIndex;
+    });
+
+
+
+
+
+/*
     var flags = [];
-    $scope.sessionParticipantGroupsIndex = [];
+
+    return siteService.participantGroups.search("$eventSession:" + $scope.formData.eventSessionID, "", 0, 999999)
+    .then(function (itemsData) {
+      $scope.sessionParticipantGroupsIndex = itemsData.ids;
+    });
+
 
     $.each($scope.eventParticipantsIndex, function (index, value) {
       var participant = $scope.eventParticipants.hashMap[value];
@@ -28,6 +59,7 @@ app.controller('NoShowReportDialogController', function ($scope, $window, $trans
         }
       }
     });
+*/
   };
 
   function printEventParticipantInfo(eventParticipant) {

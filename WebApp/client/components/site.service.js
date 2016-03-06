@@ -177,8 +177,8 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
   self.events = utilityService.createModelItems(siteHub.server.searchEvents);
   model.events = self.events;
 
-  siteHub.on('updateEventSessions', function (itemsData) {
-    $rootScope.$apply($rootScope.$broadcast('updateEventSessions', utilityService.updateItemsModel(self.eventSessions, itemsData)));
+  siteHub.on('updateEvents', function (itemsData) {
+    $rootScope.$apply($rootScope.$broadcast('updateEvents', utilityService.updateItemsModel(self.events, itemsData)));
   });
 
 
@@ -793,21 +793,21 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
   };
 
 
+
+
+
+
+
+
+
+
   // ** Participant Group related
-  model.participantGroups = {
-    hashMap: {},
-    index: [],
+  self.participantGroups = utilityService.createModelItems(siteHub.server.searchParticipantGroups);
+  model.participantGroups = self.participantGroups;
 
-    search: function (searchExpression, sortExpression, startIndex, rowCount) {
-      return utilityService.callHub(function () {
-        return siteHub.server.searchParticipantGroups(searchExpression, sortExpression, startIndex, rowCount);
-      }).then(function (itemsData) {
-        return utilityService.updateItemsModel(model.participantGroups, itemsData);
-      });
-    }
-  };
-
-
+  siteHub.on('updateParticipantGroups', function (itemsData) {
+    $rootScope.$apply($rootScope.$broadcast('updateParticipantGroups', utilityService.updateItemsModel(self.participantGroups, itemsData)));
+  });
 
 
   self.parseParticipantGroups = function (event, data) {
@@ -821,12 +821,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
       return siteHub.server.uploadParticipantGroups(event.id, data);
     });
   };
-
-
-
-
-
-
 
 
 
@@ -956,30 +950,11 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
     //var notification = onProjectsUpdated(projectsData);
     $rootScope.$apply($rootScope.$broadcast('updateProjects', onProjectsUpdated(projectsData)));
 
-  }).on('updateCompanyLayTitles', function (itemsData) {
-    $rootScope.$apply($rootScope.$broadcast('updateCompanyLayTitles', itemsData, model.companyLayTitles));
-
-
-  }).on('updateEvents', function (itemsData) {
-    $rootScope.$apply($rootScope.$broadcast('updateEvents', utilityService.updateItemsModel(model.events, itemsData)));
-  }).on('updateParticipantGroups', function (itemsData) {
-    $rootScope.$apply($rootScope.$broadcast('updateParticipantGroups', utilityService.updateItemsModel(model.participantGroups, itemsData)));
 
   }).on('updateParticipants', function (itemsData) {
     $rootScope.$apply($rootScope.$broadcast('updateParticipants', utilityService.updateItemsModel(model.participants, itemsData)));
 
-  }).on('updateOccupations', function (itemsData) {
-    $rootScope.$apply($rootScope.$broadcast('updateOccupations', onOccupationsUpdated(itemsData)));
 
-
-  }).on('updateCareerProfiles', function (itemsData) {
-    $rootScope.$apply($rootScope.$broadcast('updateCareerProfiles', utilityService.updateItemsModel(model.careerProfiles, itemsData)));
-  }).on('updateCareerSteps', function (itemsData) {
-    $rootScope.$apply($rootScope.$broadcast('updateCareerSteps', utilityService.updateItemsModel(model.careerSteps, itemsData)));
-
-
-  }).on('updateClients', function (itemsData) {
-    $rootScope.$apply($rootScope.$broadcast('updateClients', utilityService.updateItemsModel(model.clients, itemsData)));
   }).on('updateProgress', function (progressData) {
     $rootScope.$apply($rootScope.$broadcast('updateProgress', progressData));
   }).on('touchInit', function (touchData) {

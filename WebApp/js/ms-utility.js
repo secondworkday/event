@@ -1202,19 +1202,45 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     };
 
     // returns a promise, whereas demand() returns a object.
-    modelItems.ensure = function (itemKey) {
-      if (!itemKey) {
+    modelItems.ensure = function (itemData) {
+
+      var missingItemKey;
+      var missingItemKeys;
+
+      if (angular.isString(itemData) || angular.isNumber(itemData)) {
+        // We're asked for 1 item
+        var item = modelItems.hashMap[itemData];
+        if (item) {
+          // We've got it - nothing to do
+          return $q.when(item);
+        }
+        // We've NOT got it
+        missingItemKey = itemData;
+        missingItemKeys = [itemData];
+      } else if (angular.isArray(itemData)) {
+        var missingItemKeys = itemData.filter(function (itemKey) {
+          return !modelItems.hashMap[itemKey];
+        });
+      } else {
+        console.log("modelItems.ensure(), unexpected", itemData);
+      }
+
+      if (!missingItemKeys) {
+        // nothing to do
         return $q.when();
       }
-      var item = modelItems.hashMap[itemKey];
-      if (!item) {
-        return modelItems.search("%" + itemKey, "", 0, 1)
-        .then(function (notificationData) {
-          // (search should have already cached any results)
+
+      var searchExpression = '%' + missingItemKeys.join(" %");
+      return modelItems.search(searchExpression, "", 0, 9999999)
+      .then(function (notificationData) {
+        // (search should have already cached any results)
+        if (missingItemKey) {
+          return modelItems.hashMap[missingItemKey];
+        }
+        return missingItemKeys.map(function (itemKey) {
           return modelItems.hashMap[itemKey];
         });
-      }
-      return $q.when(item);
+      });
     };
 
     return modelItems;
