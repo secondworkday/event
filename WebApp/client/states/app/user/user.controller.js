@@ -30,7 +30,7 @@ app.controller('ReportController', function ($scope, $log, $mdDialog, $msUI, uti
     });
   };
 
-  function NoShowReportDialogController($scope, $mdDialog, $filter, $log, $window, siteService, participantGroupsIndex, eventSessionsIndex, eventParticipantsIndex) {
+  function NoShowReportDialogController($scope, $mdDialog, $filter, $log, $window, $translate, siteService, participantGroupsIndex, eventSessionsIndex, eventParticipantsIndex) {
     $scope.participantGroups = siteService.model.participantGroups;
     $scope.eventSessions = siteService.model.eventSessions;
     $scope.eventParticipants = siteService.model.eventParticipants;
@@ -59,7 +59,14 @@ app.controller('ReportController', function ($scope, $log, $mdDialog, $msUI, uti
 
     function printEventParticipantInfo(eventParticipant) {
       var ep = eventParticipant;
-      return $filter('uppercase')(ep.lastName) + ", " + ep.firstName + printNote(ep.notes);
+      return $filter('uppercase')(ep.lastName) + ", " + ep.firstName + printLevel(ep.level);
+    }
+
+    function printLevel(level) {
+      if (level) {
+        return ", " + $translate.instant("PARTICIPANT_LEVEL") + " " + level;
+      }
+      return "";
     }
 
     function printNote(notes) {
@@ -84,28 +91,32 @@ app.controller('ReportController', function ($scope, $log, $mdDialog, $msUI, uti
 
           var eventStartDate = moment.utc(eventSession.startDate).toDate(); // convert to local time
 
-          var eventDetailsSection = "EVENT DETAILS:\n"
-            + eventSession.location + "\n"
-            + moment(eventStartDate).format("MMMM Do YYYY, h:mm a") + "\n"
-            + eventSession.locationStreetAddress + "\n"
-            + eventSession.locationCity + " " + eventSession.locationState + " " + eventSession.locationZipCode
-          ;
+          //var eventDetailsSection = "EVENT DETAILS:\n"
+          //  + eventSession.location + "\n"
+          //  + moment(eventStartDate).format("MMMM Do YYYY, h:mm a") + "\n"
+          //  + eventSession.locationStreetAddress + "\n"
+          //  + eventSession.locationCity + " " + eventSession.locationState + " " + eventSession.locationZipCode
+          //;
 
-          var participantSection = "PARTICIPANTS:\n";
+          var participantSection = "";
 
           for (i = 0; i < data.ids.length; i++) {
             participantSection += printEventParticipantInfo(data.hashMap[data.ids[i]]) + "\n";
           }
           
 
-          var emailSubject = "No Show report for " + eventSession.location + ", " + moment(eventStartDate).format("MMMM Do YYYY, h:mm a");
-          var emailBody = "Hi " + participantGroup.contactName + ","
+          //var emailSubject = "No Show report for " + eventSession.location + ", " + moment(eventStartDate).format("MMMM Do YYYY, h:mm a");
+          var emailSubject = "No Show report for " + $translate.instant("PROGRAM_NAME");
+          var emailBody = "Dear " + participantGroup.contactName + ","
             + "\n\n"
-            + "Lorem ipsum dolor..."
+            + "Listed below are the students that did not shop at " + $translate.instant("PROGRAM_NAME") + " last night."
             + "\n\n" 
-            + eventDetailsSection
-            + "\n\n"
+            //+ eventDetailsSection
+            //+ "\n\n"
             + participantSection
+            + "\n"
+            + "Regards,\n"
+            + utilityService.model.authenticatedUser.firstName
             + "\n\n"
           ;
 
@@ -116,7 +127,7 @@ app.controller('ReportController', function ($scope, $log, $mdDialog, $msUI, uti
 
           $window.location.href = link;
 
-          $mdDialog.close();
+          $scope.cancel();
         });
     };
 
