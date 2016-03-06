@@ -213,6 +213,7 @@
     <Content Include="client\states\app\site-admin\system-users.html" />
     <Content Include="client\states\app\user\checkin-participants.dialog.html" />
     <Content Include="client\states\app\user\bulk-edit-participants.dialog.html" />
+    <Content Include="client\states\app\user\generate-reminders.dialog.controller.js" />
     <Content Include="client\states\app\user\no-show-report.dialog.controller.js" />
     <Content Include="client\states\app\user\event.controller.js" />
     <Content Include="client\states\app\user\edit-user.dialog.html" />

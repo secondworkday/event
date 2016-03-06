@@ -1,19 +1,14 @@
 app.controller('NoShowReportDialogController', function ($scope, $window, $translate, $log, $filter, $state, $mdDialog, $msUI, utilityService, siteService, event, eventSessionsIndex) {
 
-  //  function NoShowReportDialogController($filter, $window,  participantGroupsIndex, eventSessionsIndex, eventParticipantsIndex) {
-  //  function NoShowReportDialogController($scope, $mdDialog, $filter, $log, $window, siteService, participantGroupsIndex, eventSessionsIndex, eventParticipantsIndex) {
+  $scope.eventSessionsIndex = eventSessionsIndex;
 
+  // for loading items from the model
   $scope.eventSessions = siteService.model.eventSessions;
   $scope.participantGroups = siteService.model.participantGroups;
   $scope.eventParticipants = siteService.model.eventParticipants;
 
-  $scope.eventSessionsIndex = eventSessionsIndex;
-
-  //$scope.participantGroupsIndex = participantGroupsIndex;
-  //$scope.eventParticipantsIndex = eventParticipantsIndex;
-
-  // find unique participantGroups for selected eventSession
   $scope.eventSessionIDChanged = function () {
+    // ** Build the cascading drop-down containing the participantGroups for selected eventSession
 
     // Count our slacker no-shows EventParticipants for this EventSession, gathered by ParticipantGroup
     var noShowSessionParticipantGroupsCounts = {};

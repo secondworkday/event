@@ -19,11 +19,11 @@
                   </md-option>
               </md-select>
           </md-input-container>
-        <md-input-container class="md-block" flex-gt-sm ng-if="formData.eventSessionID">
+        <md-input-container class="md-block" flex-gt-sm ng-if="sessionParticipantGroupsIndex">
           <label>{{'PARTICIPANT_GROUP' | translate}}</label>
           <md-select ng-model="formData.participantGroupID">
             <md-option ng-repeat="participantGroup in sessionParticipantGroupsIndex | objectLookup:participantGroups.hashMap track by participantGroup.id" value="{{participantGroup.id}}">
-              {{participantGroup.name}}<span ng-if="participantGroup.contactName"> ({{participantGroup.contactName}})</span>
+              {{participantGroup.name}} - {{sessionParticipantGroupsCounts[participantGroup.id]}}<span ng-if="participantGroup.contactName"> ({{participantGroup.contactName}})</span>
             </md-option>
           </md-select>
         </md-input-container>

@@ -132,9 +132,6 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
           locals: {
             // this is our event, not the browser $event
             event: event
-            //participantGroupsIndex: $scope.eventParticipantGroupsIndex,
-            //eventSessionsIndex: $scope.eventSessionsIndex,
-            //eventParticipantsIndex: $scope.eventParticipantsIndex
           },
           resolve: {
             // Fetch eventSessions before we show the dialog
@@ -148,6 +145,44 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         })
         .then(function () {
           //
+        }, function () {
+          // $scope.status = 'You cancelled the dialog.';
+        })
+        .finally(function () {
+          $state.go('^');
+        });
+      }
+    })
+
+    .state("app.user.event.documents.generate-reminders", {
+      onEnter: function ($state, $mdDialog, siteService, event) {
+        var ev = null; // this should be the $event 
+
+        $mdDialog.show({
+          controller: 'GenerateRemindersDialogController',
+          templateUrl: '/client/states/app/user/generate-reminders.dialog.html',
+          parent: angular.element(document.body),
+          targetEvent: ev,
+          clickOutsideToClose: true,
+          fullscreen: false,
+          locals: {
+            // this is our event, not the browser $event
+            event: event
+          },
+          resolve: {
+            // Fetch eventSessions before we show the dialog
+            eventSessionsIndex: function () {
+              return siteService.eventSessions.search("$event:" + event.id, "", 0, 999999)
+              .then(function (itemsData) {
+                return itemsData.ids;
+              });
+            }
+          }
+        })
+        .then(function (selectedData) {
+          //if (selectedData.sendEmail) {
+          //  sendMail(selectedData.participantGroupID);
+          //}
         }, function () {
           // $scope.status = 'You cancelled the dialog.';
         })
