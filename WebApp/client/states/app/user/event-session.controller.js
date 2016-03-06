@@ -58,10 +58,6 @@ app.controller('EventSessionController', function ($scope, $translate, $log, $st
   });
 
 
-  siteService.getEventSessionVolunteerAuthInfo($scope.eventSession)
-  .then(function (authInfo) {
-    $scope.authInfo = authInfo;
-  });
 
   // It's our responsibility to pre-load all the EventParticipants in scope
   siteService.model.eventParticipants.search("$eventSession:" + eventSession.id, "", 0, 99999);
