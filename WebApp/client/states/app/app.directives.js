@@ -121,3 +121,48 @@ app.directive('osbEventSessionPast', function (msAuthenticated, ngIfDirective) {
     }
   };
 });
+
+app.directive('showDuringResolve', function ($rootScope, $log) {
+
+  return {
+    link: function (scope, element) {
+
+      element.addClass('ng-hide');
+
+      var unregister = $rootScope.$on('$stateChangeStart', function () {
+        $log.debug("$stateChangeStart...............................");
+        element.removeClass('ng-hide');
+      });
+
+      var unregister = $rootScope.$on('$stateChangeSuccess', function () {
+        $log.debug("$stateChangeSuccess...............................");
+        element.addClass('ng-hide');
+      });
+
+      scope.$on('$destroy', unregister);
+    }
+  };
+});
+
+app.directive('resolveLoader', function ($rootScope, $timeout) {
+
+  return {
+    restrict: 'E',
+    replace: true,
+    template: '<div class="alert alert-success ng-hide"><strong>Welcome!</strong> Content is loading, please hold.</div>',
+    link: function (scope, element) {
+
+      $rootScope.$on('$routeChangeStart', function (event, currentRoute, previousRoute) {
+        if (previousRoute) return;
+
+        $timeout(function () {
+          element.removeClass('ng-hide');
+        });
+      });
+
+      $rootScope.$on('$routeChangeSuccess', function () {
+        element.addClass('ng-hide');
+      });
+    }
+  };
+});
