@@ -193,14 +193,14 @@
                 <span ng-hide="eventParticipant.checkInTimestamp">
                   <span ms-show="['EventSessionVolunteer']" ng-if="eventSession.checkInOpen" class="u-display-hover">
                     <md-button class="md-icon-button md-accent" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
-                               ng-click="checkIn(eventParticipant)">
+                               ng-click="showCheckInParticipantsDialog($event, eventParticipant)">
                       <md-tooltip>Check in {{'PARTICIPANT' | translate | lowercase}}</md-tooltip>
                       <i class="fa fa-check"></i>
                     </md-button>
                   </span>
                   <span ms-show="['Admin', 'EventPlanner', 'EventSessionManager']" class="u-display-hover">
                     <md-button class="md-icon-button md-accent" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
-                               ng-click="checkIn(eventParticipant)">
+                               ng-click="showCheckInParticipantsDialog($event, eventParticipant)">
                       <md-tooltip>Check in {{'PARTICIPANT' | translate | lowercase}}</md-tooltip>
                       <i class="fa fa-check"></i>
                     </md-button>
@@ -211,7 +211,7 @@
                 <span class="u-hide-hover text-support"><strong><i class="fa fa-check"></i> Checked in <span am-time-ago="eventParticipant.checkInTimestamp"></span></strong></span>
                 <span class="u-display-hover">
                   <md-button class="md-icon-button" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
-                             ng-click="undoCheckIn(eventParticipant)">
+                             ng-click="showUndoCheckInParticipantsDialog($event, eventParticipant)">
                     <md-tooltip>Undo check in</md-tooltip>
                     <i class="fa fa-undo"></i>
                   </md-button>

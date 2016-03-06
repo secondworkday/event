@@ -342,7 +342,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     }, function () {
       // $scope.status = 'You cancelled the dialog.';
     });
-  }
+  };
 
   $scope.showEditParticipantsDialog = function (ev, event, eventParticipant) {
     $mdDialog.show({
@@ -443,12 +443,75 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     }
   }
 
+  $scope.showCheckInParticipantsDialog = function (ev, eventParticipant) {
+    $mdDialog.show({
+      controller: CheckInParticipantsDialogController,
+      templateUrl: '/client/states/app/user/checkin-participants.dialog.html',
+      locals: {
+        eventParticipant: angular.copy(eventParticipant),
+        checkInOrUndo: "Check In"
+      },
+      parent: angular.element(document.body),
+      targetEvent: ev,
+      clickOutsideToClose: true,
+      fullscreen: false
+    })
+    .then(function (updatedEventParticipant) {
+      siteService.editEventParticipant(updatedEventParticipant);
+      $scope.checkIn(updatedEventParticipant);
+    }, function () {
+      // $scope.status = 'You cancelled the dialog.';
+    });
+  };
 
+  $scope.showUndoCheckInParticipantsDialog = function (ev, eventParticipant) {
+    $mdDialog.show({
+      controller: CheckInParticipantsDialogController,
+      templateUrl: '/client/states/app/user/checkin-participants.dialog.html',
+      locals: {
+        eventParticipant: angular.copy(eventParticipant),
+        checkInOrUndo: "Undo Check In"
+      },
+      parent: angular.element(document.body),
+      targetEvent: ev,
+      clickOutsideToClose: true,
+      fullscreen: false
+    })
+    .then(function (updatedEventParticipant) {
+      $scope.undoCheckIn(updatedEventParticipant);
+    }, function () {
+      // $scope.status = 'You cancelled the dialog.';
+    });
+  };
+
+  function CheckInParticipantsDialogController($scope, $mdDialog, $translate, utilityService, eventParticipant, checkInOrUndo) {
+    $scope.formData = eventParticipant;
+    $scope.checkInOrUndo = checkInOrUndo;
+    if (checkInOrUndo == "Undo Check In") {
+      $scope.formData.checkInTimestampString = moment($scope.formData.checkInTimestamp).format("MMM Do YYYY, h:mm a");
+      var checkedInByUser = utilityService.model.users.hashMap[eventParticipant.checkedInUserID];
+      $scope.formData.checkedInByUser = checkedInByUser.firstName + " " + checkedInByUser.lastName;
+    }
+    
+    $scope.cancel = function () {
+      $mdDialog.cancel();
+    };
+
+    $scope.checkInParticipant = function (updatedEventParticipant) {
+      $mdDialog.hide(updatedEventParticipant);
+    };
+
+    $scope.undoCheckInParticipant = function (updatedEventParticipant) {
+      $mdDialog.hide(updatedEventParticipant);
+    };
+  }
 
   $scope.checkIn = function (eventParticipant) {
     siteService.checkInEventParticipant(eventParticipant)
     .then(function (successData) {
       // success
+      $msUI.showToast("Checked in " + eventParticipant.firstName + " " + eventParticipant.lastName);
+      $log.debug(successData);
       return successData;
     }, function (failureData) {
       // failure
@@ -462,6 +525,8 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     siteService.undoCheckInEventParticipant(eventParticipant)
     .then(function (successData) {
       // success
+      $msUI.showToast("Undid check in for " + eventParticipant.firstName + " " + eventParticipant.lastName);
+      $log.debug(successData);
       return successData;
     }, function (failureData) {
       // failure

@@ -837,6 +837,10 @@ namespace App.Library
             public DateTime? CheckInTimestamp { get; internal set; }
             [JsonProperty("checkOutTimestamp")]
             public DateTime? CheckOutTimestamp { get; internal set; }
+            [JsonProperty("checkedInUserID")]
+            public int? CheckedInUserID { get; internal set; }
+            [JsonProperty("checkedOutUserID")]
+            public int? CheckedOutUserID { get; internal set; }
 
             [JsonProperty("donationLimit")]
             public Decimal? DonationLimit { get; internal set; }
@@ -870,6 +874,8 @@ namespace App.Library
 
                 this.CheckInTimestamp = exItem.item.CheckInTimestamp;
                 this.CheckOutTimestamp = exItem.item.CheckOutTimestamp;
+                this.CheckedInUserID = exItem.item.CheckedInUserID;
+                this.CheckedOutUserID = exItem.item.CheckedOutUserID;
 
                 this.DonationLimit = exItem.item.DonationLimit;
                 this.DonationAmount = exItem.item.DonationAmount;
