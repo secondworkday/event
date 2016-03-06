@@ -211,6 +211,7 @@
     <Content Include="client\states\app\site-admin\system-user.dialog.html" />
     <Content Include="client\states\app\site-admin\system-users.controller.js" />
     <Content Include="client\states\app\site-admin\system-users.html" />
+    <Content Include="client\states\app\user\checkin-participants.dialog.html" />
     <Content Include="client\states\app\user\bulk-edit-participants.dialog.html" />
     <Content Include="client\states\app\user\no-show-report.dialog.controller.js" />
     <Content Include="client\states\app\user\event.controller.js" />
@@ -434,7 +435,6 @@
     <Content Include="Scripts\jquery-2.1.4.min.map" />
     <Content Include="SignIn\Signout.ashx" />
     <Content Include="SignIn\SiteLogin.ashx" />
-    <Content Include="templates\OSB-Reminder-Form.docx" />
     <Content Include="SignIn\Reset-Password.ashx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

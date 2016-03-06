@@ -24,7 +24,9 @@ app.config(['$translateProvider', function ($translateProvider) {
     'SESSION_VOLUNTEER_ROLE': 'Session Volunteer',
     'SESSION_VOLUNTEERS_ROLE': 'Session Volunteers',
     'PARTICIPANT_GROUP_CONTACT_ROLE': 'Participant Group Contact',
-    'PARTICIPANT_GROUP_CONTACTS_ROLE': 'Participant Group Contacts'
+    'PARTICIPANT_GROUP_CONTACTS_ROLE': 'Participant Group Contacts',
+
+    'PROGRAM_NAME': 'the Program'
 });
 
   $translateProvider.translations('soccer', {
@@ -52,7 +54,9 @@ app.config(['$translateProvider', function ($translateProvider) {
     'SESSION_VOLUNTEER_ROLE': 'Assistant',
     'SESSION_VOLUNTEERS_ROLE': 'Assistants',
     'PARTICIPANT_GROUP_CONTACT_ROLE': 'Club Manager',
-    'PARTICIPANT_GROUP_CONTACTS_ROLE': 'Club Managers'
+    'PARTICIPANT_GROUP_CONTACTS_ROLE': 'Club Managers',
+
+    'PROGRAM_NAME': 'the Program'
 });
 
 
@@ -81,7 +85,9 @@ app.config(['$translateProvider', function ($translateProvider) {
     'SESSION_VOLUNTEER_ROLE': 'Check-in Volunteer',
     'SESSION_VOLUNTEERS_ROLE': 'Check-in Volunteers',
     'PARTICIPANT_GROUP_CONTACT_ROLE': 'School Contact',
-    'PARTICIPANT_GROUP_CONTACTS_ROLE': 'School Contacts'
+    'PARTICIPANT_GROUP_CONTACTS_ROLE': 'School Contacts',
+
+    'PROGRAM_NAME': 'Operation School Bell'
 });
 
   $translateProvider.preferredLanguage('ale');

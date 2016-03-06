@@ -837,6 +837,10 @@ namespace App.Library
             public DateTime? CheckInTimestamp { get; internal set; }
             [JsonProperty("checkOutTimestamp")]
             public DateTime? CheckOutTimestamp { get; internal set; }
+            [JsonProperty("checkedInUserID")]
+            public int? CheckedInUserID { get; internal set; }
+            [JsonProperty("checkedOutUserID")]
+            public int? CheckedOutUserID { get; internal set; }
 
             [JsonProperty("donationLimit")]
             public Decimal? DonationLimit { get; internal set; }
@@ -870,6 +874,8 @@ namespace App.Library
 
                 this.CheckInTimestamp = exItem.item.CheckInTimestamp;
                 this.CheckOutTimestamp = exItem.item.CheckOutTimestamp;
+                this.CheckedInUserID = exItem.item.CheckedInUserID;
+                this.CheckedOutUserID = exItem.item.CheckedOutUserID;
 
                 this.DonationLimit = exItem.item.DonationLimit;
                 this.DonationAmount = exItem.item.DonationAmount;
@@ -1369,40 +1375,46 @@ namespace App.Library
 
         private static TagProvider createParticipantTagProvider(AppDC appDC, int itemID)
         {
-            var exQuery = from epEventParticipant in ExtendedQuery(appDC)
-                          join epParticipant in Participant.Query(appDC) on epEventParticipant.item.ParticipantID equals epParticipant.ID
-                          join epParticipantGroup in ParticipantGroup.Query(appDC) on epParticipant.ParticipantGroupID equals epParticipantGroup.ID
-                          join epSession in EventSession.Query(appDC) on epEventParticipant.item.EventSessionID equals epSession.ID
-                          select new { epEventParticipant, epParticipant, epParticipantGroup, epSession };
+            var exQuery = from exEventParticipant in ExtendedQuery(appDC)
+                          join eventParticipant in Query(appDC) on exEventParticipant.item.ParticipantID equals eventParticipant.ID
+                          join participant in Participant.Query(appDC) on exEventParticipant.item.ParticipantID equals participant.ID
+                          join participantGroup in ParticipantGroup.Query(appDC) on participant.ParticipantGroupID equals participantGroup.ID
+                          join eventSession in EventSession.Query(appDC) on exEventParticipant.item.EventSessionID equals eventSession.ID
+                          join exParticipantGroup in ParticipantGroup.ExtendedQuery(appDC, new SearchExpression()) on participantGroup.ID equals exParticipantGroup.item.ID
+                          select new { exEventParticipant, participant, participantGroup, eventSession, exParticipantGroup, eventParticipant };
 
             var exResult = exQuery
-                .Where(exItem => exItem.epEventParticipant.item.ID == itemID)
+                .Where(exItem => exItem.exEventParticipant.item.ID == itemID)
                 .FirstOrDefault();
 
             //var eventParticipant = exResult.epEventParticipant;
 
+            //string SchoolCounselorPhoneNumber = exResult.exParticipantGroup.PrimaryPhoneNumber != null ? " - " + exResult.exParticipantGroup.PrimaryPhoneNumber.Proffered_CaseSensitive : "";
+
             IEnumerable<ProviderTag> tags = new ProviderTag[]
             {
-                StringProviderTag.Create("FirstName", exResult.epParticipant.FirstName),
-                StringProviderTag.Create("LastName", exResult.epParticipant.LastName),
-                StringProviderTag.Create("StudentName", exResult.epParticipant.FullName),
+                StringProviderTag.Create("FirstName", exResult.participant.FirstName),
+                StringProviderTag.Create("LastName", exResult.participant.LastName),
+                StringProviderTag.Create("StudentName", exResult.participant.FullName),
 
-                StringProviderTag.Create("SchoolName", exResult.epParticipantGroup.Name),
+                StringProviderTag.Create("SchoolName", exResult.participantGroup.Name),
+                StringProviderTag.Create("GradeLevel", exResult.eventParticipant.Level),
 
-                DateTimeProviderTag.Create("EventDate", exResult.epSession.StartDate, TimeZones.Pacific),
-                DateTimeProviderTag.Create("EventTime", exResult.epSession.StartDate, TimeZones.Pacific),
-                StringProviderTag.Create("EventLocation", exResult.epSession.Location),
+                DateTimeProviderTag.Create("EventDate", exResult.eventSession.StartDate, TimeZones.Pacific),
+                DateTimeProviderTag.Create("EventTime", exResult.eventSession.StartDate, TimeZones.Pacific),
+                DateTimeProviderTag.Create("EventTimeEnd", exResult.eventSession.EndDate, TimeZones.Pacific),
+                StringProviderTag.Create("EventLocation", exResult.eventSession.Location),
 
                 //StringProviderTag.Create("Address", "16722 NE 116th Street, Redmond WA 98052"),
-                StringProviderTag.Create("Address", String.Format("{0}, {1} {2} {3}", exResult.epSession.LocationStreetAddress, exResult.epSession.LocationCity, exResult.epSession.LocationState, exResult.epSession.LocationZipCode)),
+                StringProviderTag.Create("Address", String.Format("{0}, {1} {2} {3}", exResult.eventSession.LocationStreetAddress, exResult.eventSession.LocationCity, exResult.eventSession.LocationState, exResult.eventSession.LocationZipCode)),
 
-                StringProviderTag.Create("SchoolCounselorName", exResult.epParticipantGroup.ContactName),
+                StringProviderTag.Create("SchoolCounselorName", exResult.participantGroup.ContactName),
+                StringProviderTag.Create("SchoolCounselorPhoneNumber", exResult.exParticipantGroup.PrimaryPhoneNumber != null ? ", " + exResult.exParticipantGroup.PrimaryPhoneNumber.Proffered_CaseSensitive : ""),
 
                 // Check in is between «CheckinTimeStart» and «CheckinTimeEnd». All shopping must be completed by «ShoppingTimeEnd».
-                DateTimeProviderTag.Create("CheckinTimeStart", exResult.epSession.StartDate.AddMinutes(-30), TimeZones.Pacific),
-                DateTimeProviderTag.Create("CheckinTimeEnd", exResult.epSession.StartDate.AddHours(1), TimeZones.Pacific),
-                DateTimeProviderTag.Create("ShoppingTimeEnd", exResult.epSession.EndDate.ToLocalTime()),
-
+                DateTimeProviderTag.Create("CheckinTimeStart", exResult.eventSession.StartDate.AddMinutes(-30), TimeZones.Pacific),
+                DateTimeProviderTag.Create("CheckinTimeEnd", exResult.eventSession.StartDate.AddHours(1), TimeZones.Pacific),
+                DateTimeProviderTag.Create("ShoppingTimeEnd", exResult.eventSession.EndDate.ToLocalTime()),
             };
 
             return TagProvider.Create(tags);

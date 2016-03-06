@@ -171,14 +171,18 @@ namespace WebApp
                 /*0*/ participantGroupID,
                 /*1*/ eventSessionID);
             var searchExpression = SearchExpression.Create(searchExpressionString);
-            var eventParticipantIDsQuery = EventParticipant.Query(appDC, searchExpression)
-                .Select(eventParticipant => eventParticipant.ID);
+            //var eventParticipantIDsQuery = EventParticipant.Query(appDC, searchExpression, "Participant.LastName", 0, 99999)
+            //    .Select(eventParticipant => eventParticipant.ID);
 
-            List<MemoryStream> individualPdfReportStreams = new List<MemoryStream>();
+            var result = EventParticipant.Search(appDC, searchExpression, "Participant.LastName", 0, 99999);
+            var eventParticipantIDs = from item in result.Items
+                                      select item.id;
+
+            List < MemoryStream > individualPdfReportStreams = new List<MemoryStream>();
             var reportFileExtension = ".pdf";
             var reportContentType = "pdf";
 
-            foreach (int epID in eventParticipantIDsQuery)
+            foreach (int epID in eventParticipantIDs)
             {
                 var reportGenerator = EventParticipant.GetReportGenerator(appDC, "OSB-Reminder-Form-EN-ES.docx", ReportFormat.Pdf, epID);
                 reportFileExtension = reportGenerator.ReportFileExtension;
