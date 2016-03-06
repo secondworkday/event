@@ -2,25 +2,16 @@ app.controller('EventSessionController', function ($scope, $translate, $log, $st
   $log.debug('Loading EventSessionController...');
   $log.debug('Loading ' + $state.name + '...');
 
-  //$scope.model = utilityService.model;
   $scope.event = event;
   $scope.eventSession = eventSession;
 
-  $scope.participantGroups = siteService.model.participantGroups;
-  $scope.eventParticipants = siteService.model.eventParticipants;
 
-  $scope.searchParticipantGroups = siteService.model.participantGroups.search;
-  $scope.searchEventParticipants = siteService.model.eventParticipants.search;
-  $scope.searchEvents = siteService.model.events.search;
 
+  // ** Create some EventParticipant indexers - so we can track our check-in & check-out progress through the EventSession
 
   var baseParticipantFilter = function (item) {
     return item.eventSessionID === $scope.eventSession.id;
   };
-
-
-
-  //!! we rock so good. If this session is active, we want to track Participants - who hasn't checked it, who has checked in, and who's checked out.
 
   eventSession.allParticipants = {
     index: [],
@@ -72,9 +63,6 @@ app.controller('EventSessionController', function ($scope, $translate, $log, $st
     $scope.authInfo = authInfo;
   });
 
-
-  var eventSessionID = $scope.eventSession.id;
-  $scope.searchEventParticipants("$eventSession:" + eventSessionID, "", 0, 99999);
-
-
+  // It's our responsibility to pre-load all the EventParticipants in scope
+  siteService.model.eventParticipants.search("$eventSession:" + eventSession.id, "", 0, 99999);
 });

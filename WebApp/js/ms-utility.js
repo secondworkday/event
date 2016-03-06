@@ -1154,14 +1154,16 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         var insertOffset = indexerOffset >= 0 ? indexerOffset : ~indexerOffset;
         indexer.index.splice(insertOffset, 0, itemKey);
       }
-
-
     });
-
-
   };
 
   self.unRegisterIndexer = function (modelItems, indexer) {
+    if (angular.isArray(indexer)) {
+      angular.forEach(indexer, function (indexerItem) {
+        self.unRegisterIndexer(modelItems, indexerItem);
+      });
+      return;
+    }
     self.arrayRemove(modelItems.indexers, indexer);
   };
 

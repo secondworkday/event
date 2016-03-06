@@ -1,16 +1,14 @@
-app.controller('ParticipantGroupsController', function ($scope, $mdDialog, $log, $msUI, $translate, utilityService, siteService, eventParticipantGroupsIndex) {
+app.controller('ParticipantGroupsController', function ($scope, $mdDialog, $log, $msUI, $translate, utilityService, siteService, event) {
   $log.debug('Loading ParticipantGroupsController...');
 
   $scope.searchHandler = siteService.model.participantGroups.search;
-  $scope.demandParticipantGroup = siteService.demandParticipantGroup;
-  $scope.demandEventSession = siteService.demandEventSession;
 
   var PARTICIPANT_GROUP = "Participant Group";
   $translate('PARTICIPANT_GROUP').then(function (participantGroupText) {
     PARTICIPANT_GROUP = participantGroupText;
   })
     // sort UI depends on $translate service
-    .then(function () { 
+    .then(function () {
       $scope.sortOptions = [
         { name: PARTICIPANT_GROUP + ' Name', serverTerm: 'item.Name', clientFunction: utilityService.compareByProperties('name', 'id') },
         { name: PARTICIPANT_GROUP + ' Name Descending', serverTerm: 'item.Name DESC', clientFunction: utilityService.compareByProperties('name', 'id') },
@@ -19,25 +17,72 @@ app.controller('ParticipantGroupsController', function ($scope, $mdDialog, $log,
       ];
     });
 
-  
-
-  var filterByStateFactory = function (includeState) {
-    var includeStateLocal = includeState;
-    return function (item) {
-      return item.state === includeStateLocal;
-    };
-  };
-
-  $scope.filterOptions = [
-    //{ name: 'Active', serverTerm: '$Active', clientFunction: filterByStateFactory("Active") },
-    //{ name: 'Disabled', serverTerm: '$Disabled', clientFunction: filterByStateFactory("Disabled") },
-    { name: 'All' }
-  ];
-
   $scope.searchViewOptions = {
-    sort: $scope.sortOptions[0],
-    selectFilter: $scope.filterOptions[0]
+    sort: $scope.sortOptions[0]
   };
+
+
+  var eventParticipantIndexers = [];
+  var eventParticipantIndexerHashMap = {};
+
+  $scope.getParticipantCount = function (participantGroupID) {
+    // We assume our model already has loaded any participants - an assumption we inherit from our containers
+    // Lazy create an indexer for each participantGroup as a cheap way to count 'em
+    if (!eventParticipantIndexerHashMap[participantGroupID]) {
+      // create and register an indexer - so we can track the membership count in this group
+      var indexer = {
+        index: [],
+        sort: utilityService.compareByProperties('id'),
+        baseFilter: utilityService.filterByPropertyValue('eventID', event.id),
+        selectFilter: utilityService.filterByPropertyValue('participantGroupID', participantGroupID)
+      };
+      // register (& remember to unregister them in $scope.$on("$destroy");
+      utilityService.registerIndexer(siteService.eventParticipants, indexer);
+      eventParticipantIndexers.push(indexer);
+      eventParticipantIndexerHashMap[participantGroupID] = indexer;
+    }
+
+    return eventParticipantIndexerHashMap[participantGroupID].index.length;
+  };
+
+/*
+  $scope.participantGroupFilters = [];
+
+  siteService.model.participantGroups.search($scope.searchViewOptions.baseFilter.serverTerm, "", 0, 999999)
+  .then(function (itemsData) {
+    console.log("setting up participantGroupsFilters", itemsData);
+
+    angular.forEach(itemsData.ids, function (itemID) {
+      var item = itemsData.hashMap[itemID];
+      // create and register an indexer - so we can track the membership count in this group
+      // (remember to unregister them in $scope.$on("$destroy");
+      var indexer = {
+        index: [],
+        sort: utilityService.compareByProperties('id'),
+        baseFilter: $scope.searchViewOptions.baseFilter,
+        selectFilter: utilityService.filterByPropertyValue('participantGroupID', itemID)
+      };
+      utilityService.registerIndexer($scope.model.eventParticipants, indexer);
+      // Push a filter on the filter stack
+      $scope.participantGroupFilters.push(
+      {
+        name: item.name,
+        indexer: indexer,
+        serverTerm: '$participantGroup:' + itemID,
+        clientFunction: utilityService.filterByPropertyValue('participantGroupID', itemID)
+      });
+    });
+  });
+*/
+
+  $scope.$on("$destroy", function () {
+    utilityService.unRegisterIndexer(siteService.eventParticipants, eventParticipantIndexers);
+  });
+
+
+
+
+
 
 
   $scope.showUploadParticipantGroupsDialog = function (ev, event) {
@@ -101,26 +146,18 @@ app.controller('ParticipantGroupsController', function ($scope, $mdDialog, $log,
 
 
 
-
-
   $scope.download = function () {
-
     var searchExpression = utilityService.buildSearchExpression(
       $scope.searchViewOptions.baseFilter,
       $scope.searchViewOptions.stackFilters,
-
       $scope.searchViewOptions.filter,
       $scope.searchViewOptions.selectFilter,
       $scope.searchViewOptions.objectFilter,
       $scope.searchViewOptions.userSearch);
-
-
-
     var query = {
       type: 'participantGroups',
       searchExpression: searchExpression
     };
     utilityService.download(query);
   };
-
 });

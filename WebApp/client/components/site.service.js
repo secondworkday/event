@@ -343,24 +343,18 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
 
 
-  //** EventSessions Related
-  model.eventParticipants = {
-    hashMap: {},
-    index: [],
+  //** EventParticipants Related
+  self.eventParticipants = utilityService.createModelItems(siteHub.server.searchEventParticipants);
+  model.eventParticipants = self.eventParticipants;
 
-    search: function (searchExpression, sortExpression, startIndex, rowCount) {
-      return utilityService.callHub(function () {
-        return siteHub.server.searchEventParticipants(searchExpression, sortExpression, startIndex, rowCount);
-      }).then(function (itemsData) {
-        return utilityService.updateItemsModel(model.eventParticipants, itemsData);
-      });
-    },
+  siteHub.on('updateEventParticipants', function (itemsData) {
+    $rootScope.$apply($rootScope.$broadcast('updateEventParticipants', utilityService.updateItemsModel(self.eventParticipants, itemsData)));
+  });
 
-    getSet: function (searchExpression) {
-      return utilityService.callHub(function () {
-        return siteHub.server.getEventParticipantSet(searchExpression);
-      });
-    }
+  self.eventParticipants.getSet = function (searchExpression) {
+    return utilityService.callHub(function () {
+      return siteHub.server.getEventParticipantSet(searchExpression);
+    });
   };
 
   //this.ensureEventParticipants = function (eventID) {
@@ -382,23 +376,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
   //        });
   //    });
   //};
-
-  this.ensureEventParticipantsIndex = function (eventID) {
-    // Find EventParticipants that belong to EventID (foreign key)
-    // Always load latest from server because we can't know if we have them all on the client
-    return model.eventParticipants.search("", "", 0, 999999)    // TODO: search("EventID:" + eventID, ...
-      .then(function (itemsData) {
-        return model.participants.search("", "", 0, 999999)     // TODO: Need a EventParticipant-Participant JOIN on the server!!!
-          .then(function (itemsData) {
-            // TODO: doing client-side filtering for now, but filtering should be done server-side
-            return $.map(model.eventParticipants.hashMap, function (value, index) {
-              if (eventID == value.eventID) {
-                return value.id;
-              }
-            });
-          });
-      });
-  }
 
 
   self.parseEventParticipants = function (event, data) {
@@ -889,6 +866,7 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
     });
   };
 
+/*
   this.ensureEventParticipantGroups = function (siteService, eventParticipantsIndex) {
     // TODO: Server-side filtering of participant Group based on eventParticipantsIndex
     return model.participantGroups.search("", "", 0, 999999)
@@ -906,7 +884,7 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
         });
       });
   };
-
+*/
 
   // returns an Item (not a promise - see ensureXyz() for the promise variant)
   self.demandParticipantGroup = function (itemKey) {
@@ -989,13 +967,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
   }).on('updateParticipants', function (itemsData) {
     $rootScope.$apply($rootScope.$broadcast('updateParticipants', utilityService.updateItemsModel(model.participants, itemsData)));
-
-  }).on('updateEventParticipants', function (itemsData) {
-    $rootScope.$apply($rootScope.$broadcast('updateEventParticipants', utilityService.updateItemsModel(model.eventParticipants, itemsData)));
-
-
-
-
 
   }).on('updateOccupations', function (itemsData) {
     $rootScope.$apply($rootScope.$broadcast('updateOccupations', onOccupationsUpdated(itemsData)));

@@ -13,6 +13,22 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         templateUrl: '/client/states/app/user/user-container.html',
         controller: 'UserController'
     })
+
+    .state('app.user.team', {
+      url: '/team',
+      templateUrl: '/client/states/app/user/team.html',
+      //!! did we just re-use this controller as a shortcut?
+      controller: 'SystemUsersController'
+    })
+    .state('app.user.participant-groups', {
+      url: '/participant-groups',
+      templateUrl: '/client/states/app/user/participant-groups.html'
+    })
+    .state('app.user.locations', {
+      url: '/locations',
+      templateUrl: '/client/states/app/user/locations.html'
+    })
+
     .state('app.user.events', {
         url: '/events',
         templateUrl: '/client/states/app/user/events.html',
@@ -22,20 +38,7 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
           eventSessions: function (siteService, $stateParams) { return siteService.ensureAllEventSessions() }
         }
     })
-    .state('app.user.team', {
-        url: '/team',
-        templateUrl: '/client/states/app/user/team.html',
-        //!! did we just re-use this controller as a shortcut?
-        controller: 'SystemUsersController'
-    })
-    .state('app.user.participant-groups', {
-        url: '/participant-groups',
-        templateUrl: '/client/states/app/user/participant-groups.html'
-    })
-    .state('app.user.locations', {
-        url: '/locations',
-        templateUrl: '/client/states/app/user/locations.html'
-    })
+
     .state('app.user.event', {
       abstract: true,
       url: '/event/:eventID',
@@ -49,17 +52,6 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         //!! document why we need this
         eventSession: function () {
           return null;
-        },
-        eventSessionsIndex: function (siteService, $stateParams) {
-          var eventID = $stateParams.eventID;
-          return siteService.ensureEventSessions(eventID);
-        },
-        eventParticipantsIndex: function (siteService, $stateParams) {
-          var eventID = $stateParams.eventID;
-          return siteService.ensureEventParticipantsIndex(eventID);
-        },
-        eventParticipantGroupsIndex: function (siteService, eventParticipantsIndex) {
-          return siteService.ensureEventParticipantGroups(siteService, eventParticipantsIndex);
         }
       }
     })
@@ -72,41 +64,6 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         'sessions': {
           templateUrl: '/client/states/app/user/event-sessions.html',
           controller: "EventSessionsController"
-        }
-      }
-    })
-    .state('app.user.session', {
-      url: '/sessions/:eventSessionID',
-      templateUrl: '/client/states/app/user/event-session.html',
-      controller: 'EventSessionController',
-      resolve: {
-        eventSession: function ($stateParams, siteService) {
-          // careful - might be an invalid or unauthorized ID
-          var itemID = $stateParams.eventSessionID;
-          //!! should we use ensureXyz here - to rely on cached info if we've got it?
-          return siteService.ensureEventSession(itemID);
-        },
-        event: function ($stateParams, siteService, eventSession) {
-          var eventID = eventSession.eventID;
-          return siteService.events.ensure(eventID);
-        }
-      }
-    })
-    .state('app.user.session.participants', {
-      url: '/participants',
-      templateUrl: '/client/states/app/user/event-participants.html',
-      controller: 'EventParticipantsController',
-      resolve: {
-        initialSelection: function ($stateParams, utilityService) {
-          // careful - might be an invalid or unauthorized ID
-          var itemID = $stateParams.activityID;
-          if (itemID) {
-            return utilityService.model.activityLog.getSet(itemID)
-            .then(function (itemIDs) {
-              return itemIDs;
-            });
-          }
-          return null;
         }
       }
     })
@@ -161,6 +118,42 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         }
       }
     })
+
+    .state("app.user.event.documents.no-show", {
+      onEnter: function ($mdDialog, siteService, event) {
+        var ev = null; // this should be the $event 
+        $mdDialog.show({
+          controller: 'NoShowReportDialogController',
+          templateUrl: '/client/states/app/user/no-show-report.dialog.html',
+          parent: angular.element(document.body),
+          targetEvent: ev,
+          clickOutsideToClose: true,
+          fullscreen: false,
+          locals: {
+            // this is our event, not the browser $event
+            event: event
+            //participantGroupsIndex: $scope.eventParticipantGroupsIndex,
+            //eventSessionsIndex: $scope.eventSessionsIndex,
+            //eventParticipantsIndex: $scope.eventParticipantsIndex
+          },
+          resolve: {
+            // Fetch eventSessions before we show the dialog
+            eventSessionsIndex: function () {
+              return siteService.eventSessions.search("$event:" + event.id, "", 0, 999999)
+              .then(function (itemsData) {
+                return itemsData.ids;
+              });
+            }
+          }
+        })
+        .then(function () {
+          //
+        }, function () {
+          // $scope.status = 'You cancelled the dialog.';
+        });
+      }
+    })
+
     .state('app.user.event.activity-log', {
       url: '/activity-log',
       data: {
@@ -170,6 +163,43 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         'activity-log': {
           templateUrl: '/client/states/app/user/activity-log.html',
           controller: 'ActivityLogController'
+        }
+      }
+    })
+
+
+    .state('app.user.session', {
+      url: '/sessions/:eventSessionID',
+      templateUrl: '/client/states/app/user/event-session.html',
+      controller: 'EventSessionController',
+      resolve: {
+        eventSession: function ($stateParams, siteService) {
+          // careful - might be an invalid or unauthorized ID
+          var itemID = $stateParams.eventSessionID;
+          //!! should we use ensureXyz here - to rely on cached info if we've got it?
+          return siteService.ensureEventSession(itemID);
+        },
+        event: function ($stateParams, siteService, eventSession) {
+          var eventID = eventSession.eventID;
+          return siteService.events.ensure(eventID);
+        }
+      }
+    })
+    .state('app.user.session.participants', {
+      url: '/participants',
+      templateUrl: '/client/states/app/user/event-participants.html',
+      controller: 'EventParticipantsController',
+      resolve: {
+        initialSelection: function ($stateParams, utilityService) {
+          // careful - might be an invalid or unauthorized ID
+          var itemID = $stateParams.activityID;
+          if (itemID) {
+            return utilityService.model.activityLog.getSet(itemID)
+            .then(function (itemIDs) {
+              return itemIDs;
+            });
+          }
+          return null;
         }
       }
     })

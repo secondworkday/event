@@ -630,8 +630,8 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
   siteService.model.eventSessions.search(searchExpression, "", 0, 99999);
 
   // pre-load all our baseFilters participants - which loads up our Indexers
-  var searchExpression = utilityService.buildSearchExpression(
-    $scope.searchViewOptions.baseFilter);
-  $scope.searchHandler(searchExpression, "", 0, 99999);
+  //var searchExpression = utilityService.buildSearchExpression(
+//    $scope.searchViewOptions.baseFilter);
+//  $scope.searchHandler(searchExpression, "", 0, 99999);
 
 });
