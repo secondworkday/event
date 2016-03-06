@@ -34,7 +34,9 @@
       <md-button ng-click="cancel()">
        Cancel
       </md-button>
-      <md-button ms-option="'isDemo'" ng-click="generateRandomEvent()"><i class="fa fa-magic"></i> Create Demo {{'EVENT' | translate}}</md-button>
+      <span ms-option="'isDemo'">
+        <md-button ng-click="generateRandomEvent()"><i class="fa fa-magic"></i> Create Demo {{'EVENT' | translate}}</md-button>
+      </span>
       <md-button type="submit" class="md-primary" ng-click="createEvent()" ng-disabled="!formData.name" >
         Create {{'EVENT' | translate}}
       </md-button>
