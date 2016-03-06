@@ -36,30 +36,6 @@ app.controller('NoShowReportDialogController', function ($scope, $window, $trans
       $scope.noShowSessionParticipantGroupsCounts = noShowSessionParticipantGroupsCounts;
       $scope.noShowSessionParticipantGroupsIndex = noShowSessionParticipantGroupsIndex;
     });
-
-
-
-
-
-/*
-    var flags = [];
-
-    return siteService.participantGroups.search("$eventSession:" + $scope.formData.eventSessionID, "", 0, 999999)
-    .then(function (itemsData) {
-      $scope.sessionParticipantGroupsIndex = itemsData.ids;
-    });
-
-
-    $.each($scope.eventParticipantsIndex, function (index, value) {
-      var participant = $scope.eventParticipants.hashMap[value];
-      if ($scope.formData.eventSessionID == participant.eventSessionID) {
-        if (!flags[participant.participantGroupID]) {
-          flags[participant.participantGroupID] = true;
-          $scope.sessionParticipantGroupsIndex.push(participant.participantGroupID);
-        }
-      }
-    });
-*/
   };
 
   function printEventParticipantInfo(eventParticipant) {

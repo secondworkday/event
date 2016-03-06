@@ -120,7 +120,7 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
     })
 
     .state("app.user.event.documents.no-show", {
-      onEnter: function ($mdDialog, siteService, event) {
+      onEnter: function ($state, $mdDialog, siteService, event) {
         var ev = null; // this should be the $event 
         $mdDialog.show({
           controller: 'NoShowReportDialogController',
@@ -150,6 +150,9 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
           //
         }, function () {
           // $scope.status = 'You cancelled the dialog.';
+        })
+        .finally(function () {
+          $state.go('^');
         });
       }
     })
