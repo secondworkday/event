@@ -78,13 +78,15 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     // no filtering
   }
 
+  var PARTICIPANT_GROUP = $translate.instant('PARTICIPANT_GROUP');
+  var PARTICIPANT_LEVEL = $translate.instant('PARTICIPANT_LEVEL');
 
   $scope.sortOptions = [
     { name: 'First Name', serverTerm: 'Participant.FirstName', clientFunction: utilityService.compareByProperties('firstName', 'id') },
     { name: 'Last Name', serverTerm: 'Participant.LastName', clientFunction: utilityService.compareByProperties('lastName', 'id') },
     //!! this is currently broken - as we don't really want to sort by the ParticipantGroup ID
-    { name: 'School', serverTerm: 'Participant.ParticipantGroup.Name', clientFunction: utilityService.compareByProperties('participantGroupName', 'id') },
-    { name: 'Level', serverTerm: 'ExEventParticipant.item.Level', clientFunction: utilityService.compareByProperties('level', 'id') }
+    { name: PARTICIPANT_GROUP, serverTerm: 'Participant.ParticipantGroup.Name', clientFunction: utilityService.compareByProperties('participantGroupName', 'id') },
+    { name: PARTICIPANT_LEVEL, serverTerm: 'ExEventParticipant.item.Level', clientFunction: utilityService.compareByProperties('level', 'id') }
   ];
 
   $scope.searchViewOptions.sort = $scope.sortOptions[1];

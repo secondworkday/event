@@ -67,13 +67,13 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
         }
       }
     })
-    .state('app.user.event.schools', {
+    .state('app.user.event.participant-groups', {
       url: '/schools',
       data: {
         'selectedTab': 1
       },
       views: {
-        'schools': {
+        'participant-groups': {
           templateUrl: '/client/states/app/user/participant-groups.html',
           controller: "ParticipantGroupsController"
         }
