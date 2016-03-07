@@ -749,12 +749,19 @@ namespace App.Library
                 // (Need to call ExtendedProperty.QueryAssignedTags() since we're after ParticipantGroup, not our type EventParticipants
                 join tags in ExtendedProperty.QueryAssignedTags2(appDC, typeof(ParticipantGroup), EPCategory.UserAssigned, EPScope.Global) on participant.ParticipantGroupID equals tags.TargetID into participantGroupTagsGroup
 
+                join checkedInUser in User.Query(appDC) on eventParticipant.CheckedInUserID equals checkedInUser.ID into eventParticipantCheckedInUserGroup
+                from checkedInUser in eventParticipantCheckedInUserGroup.DefaultIfEmpty()
+                join checkedOutUser in User.Query(appDC) on eventParticipant.CheckedOutUserID equals checkedOutUser.ID into eventParticipantCheckedOutUserGroup
+                from checkedOutUser in eventParticipantCheckedOutUserGroup.DefaultIfEmpty()
+
+
+
                 join myEvent in Event.Query(appDC) on eventParticipant.EventID equals myEvent.ID
 
                 // outer join - optional
                 join session in EventSession.Query(appDC) on eventParticipant.EventSessionID equals session.ID into eventParticipantSessionGroup
                 from session in eventParticipantSessionGroup.DefaultIfEmpty()
-                select new { eventParticipant, participant, participantGroup, participantGroupTagsGroup, myEvent, session };
+                select new { eventParticipant, participant, participantGroup, checkedInUser, checkedOutUser, participantGroupTagsGroup, myEvent, session };
 
             var rowData = rowQuery
                 .Select(exItem => new
@@ -769,6 +776,8 @@ namespace App.Library
                         .Join(", "),
 
                     exItem.eventParticipant.Level,
+                    CheckInUserName = exItem.checkedInUser.DisplayName,
+                    CheckOutUserName = exItem.checkedOutUser.DisplayName,
                     CheckInTimestamp = exItem.eventParticipant.CheckInTimestamp.DatabaseToLocalTime(timeZoneInfo),
                     CheckOutTimestamp = exItem.eventParticipant.CheckOutTimestamp.DatabaseToLocalTime(timeZoneInfo),
                     exItem.eventParticipant.DonationLimit,
@@ -788,6 +797,8 @@ namespace App.Library
                 new { key = "School Tags", value = "ParticipantGroupTags" },
 
                 new { key = "Grade", value = "Level" },
+                new { key = "Check-In User", value = "CheckInUserName" },
+                new { key = "Check-Out User", value = "CheckOutUserName" },
                 new { key = "Check-In Timestamp", value = "CheckInTimestamp" },
                 new { key = "Check-Out Timestamp", value = "CheckOutTimestamp" },
                 new { key = "Donation Limit", value = "DonationLimit" },
