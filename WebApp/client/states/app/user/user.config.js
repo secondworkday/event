@@ -215,7 +215,7 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
           // careful - might be an invalid or unauthorized ID
           var itemID = $stateParams.eventSessionID;
           //!! should we use ensureXyz here - to rely on cached info if we've got it?
-          return siteService.ensureEventSession(itemID);
+          return siteService.eventSessions.ensure(itemID);
         },
         event: function ($stateParams, siteService, eventSession) {
           var eventID = eventSession.eventID;

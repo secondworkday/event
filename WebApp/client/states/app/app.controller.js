@@ -65,31 +65,3 @@ app.controller('AppController', function ($scope, $translate, $timeout, $mdSiden
   };
 
 });
-
-app.directive('zipcodeValidator', function ($q, $parse, siteService) {
-  return {
-    require: 'ngModel',
-    link: function (scope, element, attrs, ngModel) {
-      // If we're passed an expression, save back the ZipCode name
-      if (attrs.zipcodeValidator) {
-        var zipCodeNameParse = $parse(attrs.zipcodeValidator);
-      }
-      ngModel.$asyncValidators.zipcode = function (zipCode) {
-        return siteService.getZipCodeInfo(zipCode).then(
-          function (zipCodeInfo) {
-            if (zipCodeNameParse) {
-              zipCodeNameParse.assign(scope, zipCodeInfo.name);
-            }
-            ngModel.$errorMessage = undefined;
-            return zipCodeInfo;
-          }, function (errorResponse) {
-            if (zipCodeNameParse) {
-              zipCodeNameParse.assign(scope, undefined);
-            }
-            ngModel.$errorMessage = errorResponse.errorMessage;
-            return $q.reject(errorResponse);
-          });
-      };
-    }
-  };
-});

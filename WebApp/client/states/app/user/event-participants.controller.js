@@ -2,8 +2,8 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
   $log.debug('Loading EventParticipantsController...');
 
   $scope.searchHandler = siteService.model.eventParticipants.search;
-  $scope.demandParticipantGroup = siteService.demandParticipantGroup;
-  $scope.demandEventSession = siteService.demandEventSession;
+  $scope.demandParticipantGroup = siteService.participantGroups.demand;
+  $scope.demandEventSession = siteService.eventSessions.demand;
 
   $scope.event = event;
   // (optional - provided when we're looking at just one session, null when we're not)

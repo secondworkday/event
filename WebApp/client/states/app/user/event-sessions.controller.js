@@ -2,8 +2,8 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
   $log.debug('Loading EventSessionsController...');
 
   $scope.searchHandler = siteService.model.eventSessions.search;
-  $scope.demandParticipantGroup = siteService.demandParticipantGroup;
-  $scope.demandEventSession = siteService.demandEventSession;
+  $scope.demandParticipantGroup = siteService.participantGroups.demand;
+  $scope.demandEventSession = siteService.eventSessions.demand;
   $scope.setEventSessionCheckInOpen = siteService.setEventSessionCheckInOpen;
 
 

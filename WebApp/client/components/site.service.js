@@ -130,47 +130,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
 
 
-  self.searchCompanyLayTitle = function (searchExpression, sortExpression, startIndex, rowCount) {
-    return utilityService.callHub(function () {
-      return siteHub.server.searchCompanyLayTitle(searchExpression, sortExpression, startIndex, rowCount);
-    });
-  };
-
-  function onCompanyLayTitlesUpdated(itemsData) {
-
-    var notification = {
-      ids: $.map(itemsData.items, function (item) {
-        return item.id;
-      }),
-      deletedIDs: itemsData.deletedIDs,
-      totalCount: itemsData.totalCount,
-      resolvedIDs: []
-    };
-
-    return notification;
-  };
-
-
-
-
-  self.setCompanyLayTitleNoMatch = function (itemID) {
-    return utilityService.callHub(function () {
-      return siteHub.server.setCompanyLayTitleNoMatch(itemID);
-    });
-  };
-
-  self.setCompanyLayTitleMatch = function (itemID, companyName) {
-    return utilityService.callHub(function () {
-      return siteHub.server.setCompanyLayTitleMatch(itemID, companyName);
-    });
-  };
-
-
-
-
-
-
-
 
 
   //** Events Related
@@ -240,47 +199,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
       });
   };
 
-  this.ensureAllEventParticipants = function () {
-    return model.eventParticipants.search("", "", 0, 999999)    // TODO: search("EventID:" + eventID, ...
-      .then(function (itemsData) {
-        return model.eventParticipants;
-      });
-  };
-
-  this.countEventParticipantsPerEvent = function () {
-    return model.eventParticipants.search("", "", 0, 999999)    // TODO: search("EventID:" + eventID, ...
-      .then(function (itemsData) {
-        var epCounts = new Array();
-        for (i = 0; i < model.eventParticipants.index.length; i++) {
-          var epID = model.eventParticipants.index[i];
-          var eventID = model.eventParticipants.hashMap[epID].eventID;
-          if (!epCounts[eventID]) {
-            epCounts[eventID] = 1;
-          }
-          else {
-            epCounts[eventID] = epCounts[eventID] + 1;
-          }
-          
-        }
-        return epCounts;
-      });
-  };
-
-  this.ensureEventSessions = function (eventID) {
-    // Find EventSessions that belong to EventID (foreign key)
-    // Always load latest from server because we can't know if we have them all on the client
-    return model.eventSessions.search("", "", 0, 999999)    // TODO: search("EventID:" + eventID, ...
-      .then(function (itemsData) {
-        // TODO: doing client-side filtering for now, but filtering should be done server-side
-        return $.map(model.eventSessions.hashMap, function (value, index) {
-          if (eventID == value.eventID) {
-            return value.id;
-          }
-        });
-      });
-  };
-
-
   this.createEventSession = function (eventSessionData) {
     return utilityService.callHub(function () {
       return siteHub.server.createEventSession(eventSessionData);
@@ -299,46 +217,14 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
     });
   };
 
-
-  // returns a promise (not an Item - see demandXyz() for the delayed load Item variant)
-  self.ensureEventSession = function (itemID) {
-    var modelItems = model.eventSessions;
-    var item = modelItems.hashMap[itemID];
-    if (!item) {
-      return modelItems.search("%" + itemID, "", 0, 1)
-      .then(function (ignoredNotificationData) {
-        return modelItems.hashMap[itemID];
-      });
-    }
-
-    return $q.when(item);
-  };
-
-  // returns an Item (not a promise - see ensureXyz() for the promise variant)
-  self.demandEventSession = function (itemKey) {
-    var modelItems = model.eventSessions;
-    return modelItems.hashMap[itemKey] ||
-      (
-        modelItems.hashMap[itemKey] = { key: itemKey, id: itemKey, code: itemKey, displayTitle: 'loading...' },
-        utilityService.delayLoad2(modelItems, itemKey),
-        modelItems.hashMap[itemKey]
-      );
-  };
-
-
   self.setEventSessionCheckInOpen = function (eventSession, isOpen) {
     return utilityService.callHub(function () {
       return siteHub.server.setEventSessionCheckInOpen(eventSession.id, isOpen);
     });
   };
 
-/*
-  self.setEventSessionState = function (eventSession, stateName) {
-    return utilityService.callHub(function () {
-      return siteHub.server.setEventSessionState(eventSession.id, stateName);
-    });
-  };
-*/
+
+
 
 
 
@@ -356,27 +242,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
       return siteHub.server.getEventParticipantSet(searchExpression);
     });
   };
-
-  //this.ensureEventParticipants = function (eventID) {
-  //  // Find EventParticipants that belong to EventID (foreign key)
-  //  // Always load latest from server because we can't know if we have them all on the client
-  //  return model.eventParticipants.search("", "", 0, 999999)    // TODO: search("EventID:" + eventID, ...
-  //    .then(function (itemsData) {
-  //      return model.participants.search("", "", 0, 999999)     // TODO: Need a EventParticipant-Participant JOIN on the server!!!
-  //        .then(function (itemsData) {
-  //          // TODO: doing client-side filtering for now, but filtering should be done server-side
-  //          return $.map(model.eventParticipants.hashMap, function (value, index) {
-  //            if (eventID == value.eventID) {
-  //              var participant = model.participants.hashMap[value.participantID];
-  //              value.name = participant.name;
-  //              value.participantGroupID = participant.participantGroupID;
-  //              return value;
-  //            }
-  //          });
-  //        });
-  //    });
-  //};
-
 
   self.parseEventParticipants = function (event, data) {
     return utilityService.callHub(function () {
@@ -478,163 +343,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-  //** Clients (aka JobSeeker) Related
-  model.clients = {
-    hashMap: {},
-    index: [],
-
-    search: function (searchExpression, sortExpression, startIndex, rowCount) {
-      return utilityService.callHub(function () {
-        return siteHub.server.searchClients(searchExpression, sortExpression, startIndex, rowCount);
-      }).then(function (itemsData) {
-        return utilityService.updateItemsModel(model.clients, itemsData);
-      });
-    }
-  };
-
-
-
-  self.searchClients = function (searchExpression, sortExpression, startIndex, rowCount) {
-    return utilityService.callHub(function () {
-      return siteHub.server.searchClients(searchExpression, sortExpression, startIndex, rowCount);
-    }).then(function (itemsData) {
-      return onClientsUpdated(itemsData);
-    });
-  };
-
-  this.modifyClientTag = function (client, newTag, isAssigned) {
-    return utilityService.callHub(function () {
-      return siteHub.server.modifyClientTag(client.id, newTag, isAssigned);
-    });
-  };
-  this.modifyClientMyTag = function (client, newTag, isAssigned) {
-    return utilityService.callHub(function () {
-      return siteHub.server.modifyClientMyTag(client.id, newTag, isAssigned);
-    });
-  };
-
-
-
-  //** Project Related
-  model.projects = {};
-  model.projectsIndex = [];
-
-
-  function onProjectsUpdated(itemsData, isExternalEvent) {
-
-    //!! old one
-    //utilityService.purgeItems(projectsData.deletedIDs, model.projects, model.projectsIndex);
-    //utilityService.cacheItems(projectsData.items, model.projects, model.projectsIndex);
-    //model.projectsTotalCount = projectsData.totalCount;
-
-    // Update our main cache (model.issues) and cacheIndex (model.issuesIndex)
-    utilityService.purgeItems(itemsData.deletedIDs, model.projects, model.projectsIndex);
-    var newItemIDs = utilityService.cacheItems(itemsData.items, model.projects, model.projectsIndex);
-
-    var notification = {
-      hashMap: model.projects,
-      ids: $.map(itemsData.items, function (item) {
-        return item.id;
-      }),
-      newIDs: newItemIDs,
-      deletedIDs: itemsData.deletedIDs,
-      resolvedIDs: []
-    };
-
-    if (!isExternalEvent) {
-      notification.totalCount = itemsData.totalCount;
-    }
-
-    if (isExternalEvent) {
-      $rootScope.$broadcast('updateProjects', notification);
-    }
-
-    return notification;
-  };
-
-  this.searchProjects = function (searchExpression, sortExpression, startIndex, rowCount) {
-    return utilityService.callHub(function () {
-      return siteHub.server.searchProjects(searchExpression, sortExpression, startIndex, rowCount);
-    }).then(function (projectsData) {
-      return onProjectsUpdated(projectsData);
-    });
-  };
-
-
-
-  this.getProjects = function (searchExpression, sortExpression, startIndex, rowCount) {
-    return utilityService.callHub(function () {
-      var projects = siteHub.server.searchProjects(searchExpression, sortExpression, startIndex, rowCount);
-      return projects;
-    }).then(function (projectsData) {
-      onProjectsUpdated(projectsData);
-      return projectsData;
-    });
-  };
-
-  this.getFavoriteProjects = function (startIndex, rowCount) {
-    return utilityService.callHub(function () {
-      return siteHub.server.getFavoriteProjects(startIndex, rowCount);
-    }).then(function (projectsData) {
-      onProjectsUpdated(projectsData);
-      return projectsData;
-    });
-  };
-
-
-  this.modifyProjectTag = function (project, newTag, isAssigned) {
-    return utilityService.callHub(function () {
-      return siteHub.server.modifyProjectTag(project.id, newTag, isAssigned);
-    });
-  };
-  this.modifyProjectMyTag = function (project, newTag, isAssigned) {
-    return utilityService.callHub(function () {
-      return siteHub.server.modifyProjectMyTag(project.id, newTag, isAssigned);
-    });
-  };
-  this.modifyMyFavoriteProject = function (project, isFavorite) {
-    return utilityService.callHub(function () {
-      return siteHub.server.modifyMyFavoriteProject(project.id, isFavorite);
-    });
-  };
-
-
-
-  this.migrateProject = function (project) {
-    return utilityService.callHub(function () {
-      return siteHub.server.migrateProject(project.id);
-    });
-  };
-  this.migrateDemoProject = function (project) {
-    return utilityService.callHub(function () {
-      return siteHub.server.migrateDemoProject(project.id);
-    });
-  };
-
-
-  this.emailProjectReport = function (project, emailType, mailMessage) {
-    return utilityService.callHub(function () {
-      return siteHub.server.emailProjectReport(project.id, emailType, mailMessage);
-    });
-  };
-
-
-
-  // Transition Releated 
-
-
-
   this.modifyIsBetaUser = function (userID, isBetaUser) {
     model.users[userID].isBetaUser = isBetaUser;
     return utilityService.callHub(function () {
@@ -643,148 +351,7 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
   };
 
 
-  this.getZipCodeInfo = function (zipCode) {
-    return utilityService.callHub(function () {
-      return siteHub.server.getZipCodeInfo(zipCode);
-    });
-  };
 
-
-
-  this.getTouchOccupations = function (occupationCode, zipCode) {
-    var deferred = utilityService.callHub(function () {
-      return siteHub.server.getTouchOccupations(occupationCode, zipCode);
-    }).then(function (touchData) {
-      model.touch = touchData;
-      return touchData;
-    });
-
-    return deferred;
-  };
-
-
-  function onTouchData(touchData) {
-    model.touch = touchData;
-  };
-
-
-
-  self.startAutocoderThroughputTestTask = function (parameters) {
-    return utilityService.callHub(function () {
-      return siteHub.server.startAutocoderThroughputTestTask(parameters);
-    }).then(function (taskID) {
-
-      var taskItem = {
-        taskID: taskID
-      };
-
-      return taskItem;
-    });
-  };
-
-
-
-  self.getJobOpenings = function (occupationCode, zipCode, searchRadius, jobBoardCodes) {
-    return utilityService.callHub(function () {
-      return siteHub.server.getJobOpenings(occupationCode, zipCode, searchRadius, jobBoardCodes);
-    });
-  };
-
-
-  this.getTouchJobs = function (occupationCode, zipCode, searchRadius) {
-    var deferred = utilityService.callHub(function () {
-      return siteHub.server.getTouchJobs(occupationCode, zipCode, searchRadius);
-    });
-    return deferred;
-  };
-
-
-  this.getEducationInfo = function () {
-    return utilityService.callHub(function () {
-      return siteHub.server.getEducationInfo();
-    });
-  };
-
-
-  this.getEducationPrograms = function (occupationCode, zipCode) {
-    return utilityService.callHub(function () {
-      return siteHub.server.getEducationPrograms(occupationCode, zipCode);
-    });
-  };
-
-  this.getIpedsEducationPrograms = function (occupationCode, zipCode) {
-    return utilityService.callHub(function () {
-      return siteHub.server.getIpedsEducationPrograms(occupationCode, zipCode);
-    });
-  };
-
-  this.searchIpedsEducationPrograms = function (referenceDatabaseNamePrefix, searchExpression, sortExpression, startIndex, rowCount) {
-    return utilityService.callHub(function () {
-      return siteHub.server.searchIpedsEducationPrograms(referenceDatabaseNamePrefix, searchExpression, sortExpression, startIndex, rowCount);
-    });
-  };
-
-
-
-
-  this.getOccupationInfo = function (referenceDatabaseNamePrefix, searchTerm, limit) {
-    var deferred = utilityService.callHub(function () {
-      return siteHub.server.getOccupationInfo(referenceDatabaseNamePrefix, searchTerm, limit);
-    }).then(function (touchData) {
-      return touchData;
-    });
-
-    return deferred;
-  };
-
-  this.getRandomLayTitle = function (searchTerm) {
-    return utilityService.callHub(function () {
-      return siteHub.server.getRandomLayTitle(searchTerm);
-    });
-  };
-
-
-  this.getAutoCoderOccupationInfo = function (referenceDatabaseNamePrefix, searchTerm, limit) {
-    var deferred = utilityService.callHub(function () {
-      return siteHub.server.getAutoCoderOccupationInfo(searchTerm, limit);
-    }).then(function (touchData) {
-      return touchData;
-    });
-
-    return deferred;
-  };
-
-  self.lookupOccupation = function (referenceDatabaseNamePrefix, searchTerm, limit) {
-    return utilityService.callHub(function () {
-      return siteHub.server.lookupOccupation(referenceDatabaseNamePrefix, searchTerm, limit);
-    }).then(function (touchData) {
-      return touchData;
-    });
-  };
-
-
-
-
-
-
-  this.sendJobPostingsEmail = function (email, savedJobs) {
-    return utilityService.callHub(function () {
-      return siteHub.server.sendJobPostingsEmail(email, savedJobs);
-    });
-  };
-
-
-  this.getExtendedJobPostings = function (touch, selection) {
-    return utilityService.callHub(function () {
-      return siteHub.server.getExtendedJobPostings(touch, selection);
-    });
-  };
-
-  //this.generateCsvFile = function (touch, selection) {
-  //    return utilityService.callHub(function () {
-  //        return siteHub.server.generateCsvFile(touch, selection);
-  //    });
-  //};
 
   this.doCommand = function (command, commandData) {
     return utilityService.callHub(function () {
@@ -860,43 +427,6 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
     });
   };
 
-/*
-  this.ensureEventParticipantGroups = function (siteService, eventParticipantsIndex) {
-    // TODO: Server-side filtering of participant Group based on eventParticipantsIndex
-    return model.participantGroups.search("", "", 0, 999999)
-      .then(function (itemsData) {
-
-        //extract unique ParticipantGroupIDs
-        var flags = [];
-        return $.map(eventParticipantsIndex, function (value, index) {
-          var pID = model.eventParticipants.hashMap[value].participantID;
-          var pgID = model.participants.hashMap[pID].participantGroupID;
-          if (!flags[pgID]) {
-            flags[pgID] = true;
-            return pgID;
-          }
-        });
-      });
-  };
-*/
-
-  // returns an Item (not a promise - see ensureXyz() for the promise variant)
-  self.demandParticipantGroup = function (itemKey) {
-    var modelItems = model.participantGroups;
-    return modelItems.hashMap[itemKey] ||
-      (
-        modelItems.hashMap[itemKey] = { key: itemKey, id: itemKey, code: itemKey, displayTitle: 'loading...' },
-        utilityService.delayLoad2(modelItems, itemKey),
-        modelItems.hashMap[itemKey]
-      );
-  };
-
-
-
-
-
-
-
 
 
 
@@ -946,19 +476,12 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
 
 
-  }).on('updateProjects', function (projectsData) {
-    //var notification = onProjectsUpdated(projectsData);
-    $rootScope.$apply($rootScope.$broadcast('updateProjects', onProjectsUpdated(projectsData)));
-
-
   }).on('updateParticipants', function (itemsData) {
     $rootScope.$apply($rootScope.$broadcast('updateParticipants', utilityService.updateItemsModel(model.participants, itemsData)));
 
 
   }).on('updateProgress', function (progressData) {
     $rootScope.$apply($rootScope.$broadcast('updateProgress', progressData));
-  }).on('touchInit', function (touchData) {
-    $rootScope.$apply(onTouchData(touchData));
   });
 
   function onSetAuthenticatedEventSession(itemsData) {
