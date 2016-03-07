@@ -433,17 +433,12 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
 
 
   // ** Particpants related
-  model.participants = {
-    hashMap: {},
-    index: [],
-    search: function (searchExpression, sortExpression, startIndex, rowCount) {
-      return utilityService.callHub(function () {
-        return siteHub.server.searchParticipants(searchExpression, sortExpression, startIndex, rowCount);
-      }).then(function (itemsData) {
-        return utilityService.updateItemsModel(model.participants, itemsData);
-      });
-    }
-  };
+  self.participants = utilityService.createModelItems(siteHub.server.searchParticipants);
+  model.participants = self.participants;
+
+  siteHub.on('updateParticipants', function (itemsData) {
+    $rootScope.$apply($rootScope.$broadcast('updateParticipants', utilityService.updateItemsModel(self.participants, itemsData)));
+  });
 
   this.createParticipant = function (formData) {
     return utilityService.callHub(function () {
@@ -462,23 +457,13 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
     $rootScope.$apply(onSettingsUpdated(settingsObject));
   }).on('setAuthenticatedEventSession', function (itemsData) {
 
-
     // please hit me...
     $rootScope.$apply(onSetAuthenticatedEventSession(itemsData));
 
-
-
   }).on('setAuthenticatedItemUserSession', function (itemsData) {
-
 
     // please hit me...
     $rootScope.$apply(onSetAuthenticatedItemUserSession(itemsData));
-
-
-
-  }).on('updateParticipants', function (itemsData) {
-    $rootScope.$apply($rootScope.$broadcast('updateParticipants', utilityService.updateItemsModel(model.participants, itemsData)));
-
 
   }).on('updateProgress', function (progressData) {
     $rootScope.$apply($rootScope.$broadcast('updateProgress', progressData));
