@@ -139,7 +139,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr class="u-hover-container" ng-class="{'is-selected': eventParticipant.isSelected}"
+          <tr ng-class="{'is-selected': eventParticipant.isSelected}"
             ng-repeat="eventParticipant in $displayedIndex | objectLookup:$hashMap track by eventParticipant.id"
             ng-init=" eventParticipantEventSession = demandEventSession(eventParticipant.eventSessionID);
                       watchEventParticipantEventSession(this, 'eventParticipant.eventSessionID');
@@ -180,40 +180,32 @@
               {{ eventParticipantEventSession.startDate | date:"shortDate"}}
             </td>
             <td class="md-data-table__cell--non-numeric">
-              <span class="u-display-hover">
-                <md-button class="md-icon-button" style="margin-top:-6px;margin-bottom:0;"
+              <span>
+                <md-button style="margin-top:-6px;margin-bottom:0;"
                            ng-click="showEditParticipantsDialog($event, event, eventParticipant)">
-                  <md-tooltip>Edit {{'PARTICIPANT' | translate | lowercase}}</md-tooltip>
-                  <i class="fa fa-pencil"></i>
+                  <i class="fa fa-pencil"></i> Edit
                 </md-button>
               </span>
               <span osb-event-session-live="eventParticipantEventSession">
-                <span ng-hide="eventParticipant.checkInTimestamp" class="u-hide-hover text-hint">Not checked in</span>
+                <!-- <span ng-hide="eventParticipant.checkInTimestamp" class="text-hint">Not checked in</span> -->
                 <span ng-hide="eventParticipant.checkInTimestamp">
-                  <span ms-show="['EventSessionVolunteer']" ng-if="eventSession.checkInOpen" class="u-display-hover">
-                    <md-button class="md-icon-button md-accent" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
+                  <span ms-show="['EventSessionVolunteer']" ng-if="eventSession.checkInOpen">
+                    <md-button class="md-accent" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
                                ng-click="showCheckInParticipantsDialog($event, eventParticipant)">
-                      <md-tooltip>Check in {{'PARTICIPANT' | translate | lowercase}}</md-tooltip>
-                      <i class="fa fa-check"></i>
+                      <i class="fa fa-check"></i> Check-In
                     </md-button>
                   </span>
-                  <span ms-show="['Admin', 'EventPlanner', 'EventSessionManager']" class="u-display-hover">
-                    <md-button class="md-icon-button md-accent" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
+                  <span ms-show="['Admin', 'EventPlanner', 'EventSessionManager']">
+                    <md-button class="md-accent" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
                                ng-click="showCheckInParticipantsDialog($event, eventParticipant)">
-                      <md-tooltip>Check in {{'PARTICIPANT' | translate | lowercase}}</md-tooltip>
-                      <i class="fa fa-check"></i>
+                      <i class="fa fa-check"></i> Check-In
                     </md-button>
                   </span>
                 </span>
               </span>
               <span ng-if="eventParticipant.checkInTimestamp">
-                <span class="u-hide-hover text-support"><strong><i class="fa fa-check"></i> Checked in <span am-time-ago="eventParticipant.checkInTimestamp"></span></strong></span>
-                <span class="u-display-hover">
-                  <md-button class="md-icon-button" style="margin-top:-6px;margin-bottom:0;margin-right:0;"
-                             ng-click="showUndoCheckInParticipantsDialog($event, eventParticipant)">
-                    <md-tooltip>Undo check in</md-tooltip>
-                    <i class="fa fa-undo"></i>
-                  </md-button>
+                <span class="text-hint">Checked in <span am-time-ago="eventParticipant.checkInTimestamp"></span>
+                  <a href="" ng-click="showUndoCheckInParticipantsDialog($event, eventParticipant)">undo</a>
                 </span>
               </span>
             </td>
