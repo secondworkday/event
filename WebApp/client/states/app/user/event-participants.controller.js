@@ -491,10 +491,8 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     $scope.checkInOrUndo = checkInOrUndo;
     if (checkInOrUndo == "Undo Check In") {
       $scope.formData.checkInTimestampString = moment($scope.formData.checkInTimestamp).format("MMM Do YYYY, h:mm a");
-      var checkedInByUser = utilityService.model.users.hashMap[eventParticipant.checkedInUserID];
-      $scope.formData.checkedInByUser = checkedInByUser.firstName + " " + checkedInByUser.lastName;
     }
-    
+
     $scope.cancel = function () {
       $mdDialog.cancel();
     };
