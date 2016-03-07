@@ -5,19 +5,33 @@
     <div class="u-sm-space"></div>
     <span class="md-body-1">
       <!--Check In URL: <a href="{{authInfo.url}}">{{authInfo.url}}</a><br/>-->
-      Volunteer Code:  <strong>{{authInfo.authCode}}</strong>
+      Volunteer PIN:  <strong>{{eventSession.authInfo.authCode}}</strong>
+    </span>
+  </div>
+  <div class="text-center u-sm-margin-right">
+    <h2 class="md-display-1">{{eventSession.checkedInParticipantsKThrough5}} of {{eventSession.totalParticipantsKThrough5}}</h2>
+    <md-progress-linear style="margin-left:auto;margin-right:auto;max-width:300px;" md-mode="determinate" value="{{eventSession.checkedInParticipantsKThrough5 / eventSession.totalParticipantsKThrough5 * 100}}"></md-progress-linear><br/>
+    <span class="md-body-1 text-support">
+      K-5 Checked-In
+    </span>
+  </div>
+  <div class="text-center u-sm-margin-right">
+    <h2 class="md-display-1">{{eventSession.checkedInParticipants6Through12}} of {{eventSession.totalParticipants6Through12}}</h2>
+    <md-progress-linear style="margin-left:auto;margin-right:auto;max-width:300px;" md-mode="determinate" value="{{eventSession.checkedInParticipants6Through12 / eventSession.totalParticipants6Through12 * 100}}"></md-progress-linear><br/>
+    <span class="md-body-1 text-support">
+      6-12 Checked-In
     </span>
   </div>
   <div class="text-center">
     <h2 class="md-display-1">{{eventSession.checkedInParticipants.index.length}} of {{eventSession.allParticipants.index.length}}</h2>
     <md-progress-linear style="margin-left:auto;margin-right:auto;max-width:300px;" md-mode="determinate" value="{{eventSession.checkedInParticipants.index.length / eventSession.allParticipants.index.length * 100}}"></md-progress-linear><br/>
     <span class="md-body-1 text-support">
-      Checked-In
+      Total Checked-In
     </span>
   </div>
   <div ms-option="'isCheckOutEnabled'" class="text-center">
     <h2 class="md-display-1">{{eventSession.checkedInParticipants.index.length - eventSession.checkedOutParticipants.index.length}}</h2>
-    <md-progress-linear style="margin-left:auto;margin-right:auto;max-width:300px;" md-mode="determinate" value="{{eventSession.checkedInParticipants.index.length / eventSession.allParticipants.index.length * 100}}"></md-progress-linear><br/>
+    <!-- <md-progress-linear style="margin-left:auto;margin-right:auto;max-width:300px;" md-mode="determinate" value="{{eventSession.checkedInParticipants.index.length / eventSession.allParticipants.index.length * 100}}"></md-progress-linear><br/> -->
     <span class="md-body-1 text-support">
       Shopping
     </span>

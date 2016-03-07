@@ -5,6 +5,12 @@ app.controller('EventSessionController', function ($scope, $translate, $log, $st
   $scope.event = event;
   $scope.eventSession = eventSession;
 
+  //!! TODO: replace these hard coded values with real server-provided values
+  $scope.eventSession.checkedInParticipantsKThrough5 = 111;
+  $scope.eventSession.totalParticipantsKThrough5 = 999;
+  $scope.eventSession.checkedInParticipants6Through12 = 222;
+  $scope.eventSession.totalParticipants6Through12 = 888;
+
 
 
   // ** Create some EventParticipant indexers - so we can track our check-in & check-out progress through the EventSession
