@@ -90,9 +90,9 @@ app.controller('NoShowReportDialogController', function ($scope, $window, $trans
             //+ eventDetailsSection
             //+ "\n\n"
           + participantSection
-          + "\n"
-          + "Regards,\n"
-          + utilityService.model.authenticatedUser.firstName
+          //+ "\n"
+          //+ "Regards,\n"
+          //+ utilityService.model.authenticatedUser.firstName
           + "\n\n"
         ;
 
