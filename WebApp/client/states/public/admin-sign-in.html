@@ -1,6 +1,7 @@
 <div layout layout-align="center center" style="margin-top:4rem;">
   <md-card flex-xs flex-gt-xs="50">
-    <form name="signInForm">
+    <form name="signInForm"
+      ng-hide="working">
       <md-card-content>
         <div>
           <h2 class="md-title">Sign in to your account</h2>
@@ -34,5 +35,23 @@
         </md-button>
       </md-card-actions>
     </form>
+    <div ng-show="working">
+      <md-card-content>
+        <div>
+          <h2 class="md-title">Signing you in...</h2>
+        </div>
+        <div class="text-center">
+          <div layout="row" layout-align="space-around">
+            <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+          </div>
+        </div>
+      </md-card-content>
+      <md-card-actions layout="row" layout-align="end center">
+        <md-button class="md-primary" type="submit"
+          disabled>
+          Working...
+        </md-button>
+      </md-card-actions>
+    </div>
   </md-card>
 </div>
