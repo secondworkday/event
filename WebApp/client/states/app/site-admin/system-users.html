@@ -28,7 +28,49 @@
 </div>
 
 <ms-search-view change-event="updateUsers" search="searchUsers" options="searchViewOptions" user-search="userSearch">
-  <table class="md-data-table u-full-width">
+
+  <div layout layout-wrap>
+    <md-card flex="45" ng-repeat="user in $displayedIndex | objectLookup:$hashMap track by user.id">
+      <md-card-title>
+        <md-card-title-text>
+          <span ng-show="!user.firstName">
+            <span class="md-headline">{{ user.displayName | limitTo:22 }}<span ng-show="user.displayName.length > 22">&hellip;</span></span>
+          </span>
+          <span ng-hide="!user.firstName">
+            <span class="md-headline">{{ user.firstName }} {{user.lastName}}</span>
+          </span>
+          <span class="md-subhead">
+            {{ user.email }}<br/>
+            <span
+              ng-show="user.connectionState=='Online'">
+              <i class="fa fa-circle text-green"></i> Online now
+              <br/>
+            </span>
+            <span class="tag u-sm-margin-right"
+              ng-repeat="appRole in user.appRoles">
+              {{appRole}}
+            </span>
+          </span>
+        </md-card-title-text>
+        <md-card-title-media>
+          <div class="md-media-md card-media">
+            <img ng-src="{{user.profilePhotoUrl || '/images/user-img-placeholder.png'}}"/>
+          </div>
+        </md-card-title-media>
+      </md-card-title>
+      <md-card-actions layout="row" layout-align="end center">
+        <md-button ng-click="impersonateUser(user)"><i class="fa fa-user-secret"></i> Impersonate</md-button>
+        <md-button disabled class="md-warn">Delete</md-button>
+        <md-button class="md-primary" ng-click="showEditUserDialog($event, user)">Edit</md-button>
+      </md-card-actions>
+      <div ms-debug-only><pre>user: {{user | json}}</pre></div>
+    </md-card>
+  </div>
+</ms-search-view>
+
+
+
+  <!-- <table class="md-data-table u-full-width">
     <thead>
       <tr>
         <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
@@ -77,8 +119,8 @@
         <td class="md-data-table__cell--non-numeric"><i ng-show="user.connectionState=='Online'" class="fa fa-circle text-green"></i></td>
       </tr>
     </tbody>
-  </table>
-</ms-search-view>
+  </table> -->
+
 
 
 
