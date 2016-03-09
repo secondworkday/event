@@ -3443,11 +3443,17 @@ app.directive('msOption', function (ngIfDirective, msAuthenticated) {
     if (myAttribute.charAt(0) === '!') {
       myAttribute = myAttribute.substr(1);
       return function () {
-        return !msAuthenticated.group.accountOptions[myAttribute];
+        return !(msAuthenticated &&
+          msAuthenticated.group &&
+          msAuthenticated.group.accountOptions &&
+          msAuthenticated.group.accountOptions[myAttribute]);
       };
     }
     return function () {
-      return msAuthenticated.group.accountOptions[myAttribute];
+      return msAuthenticated &&
+        msAuthenticated.group &&
+        msAuthenticated.group.accountOptions &&
+        msAuthenticated.group.accountOptions[myAttribute];
     };
   });
 });

@@ -269,7 +269,7 @@ app.controller('SystemUsersController', function ($scope, $state, $mdDialog, $lo
       if (newOrEdit == "Edit") {
         $scope.user = user;
       }
-      
+
       $scope.APP_ROLE_TRANSLATION = APP_ROLE_TRANSLATION;
 
       var model = utilityService.model;

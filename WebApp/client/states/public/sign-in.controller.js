@@ -3,7 +3,11 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
 
   $scope.stateData = $state.current.data;
 
+  // this triggers the spinner for 'signing you in...'
+  $scope.working = false;
+
   $scope.signIn = function (credentials) {
+    $scope.working = true;
     utilityService.signIn(credentials)
       .then(function () {
         // success
@@ -11,6 +15,7 @@ app.controller('SignInController', function ($scope, $state, $mdToast, $mdDialog
         // $state.go('app.system.users', {}, { reload: true });
       }, function (failureData) {
         // failure
+        $scope.working = false;
         $scope.errorMessage = failureData.errorMessage;
       });
   };

@@ -285,9 +285,8 @@ namespace App.Library
             updateContent.message = "Uploading participants...";
             updateContent.updateProgressType = "bulkEventParticipantUpload";
             reportProjectScope.updateProgress(updateContent);
-            var hubResult = dc.SubmitLock<HubResult>(() =>
+            var hubResult = NotifyLock(dc, NotifyClients, (notifyExpression) =>
             {
-
                 var defaultParticipantGroupID = uploadData.Value<int?>("participantGroupID");
                 var defaultParticipantGroup = defaultParticipantGroupID.HasValue ? ParticipantGroup.FindByID(dc, defaultParticipantGroupID.Value) : null;
 
