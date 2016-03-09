@@ -30,7 +30,7 @@
 <ms-search-view change-event="updateUsers" search="searchUsers" options="searchViewOptions" user-search="userSearch">
 
   <div layout layout-wrap>
-    <md-card flex="45" ng-repeat="user in $displayedIndex | objectLookup:$hashMap track by user.id">
+    <md-card flex-xs="100" flex-sm="100" flex-md="45" flex-lg="45" flex-gt-lg="30" ng-repeat="user in $displayedIndex | objectLookup:$hashMap track by user.id">
       <md-card-title>
         <md-card-title-text>
           <span ng-show="!user.firstName">
