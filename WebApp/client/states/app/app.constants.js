@@ -1,4 +1,5 @@
 app.constant('CONSTANTS', {
+  version: "1.0.0",
   months: [
     {name: "January", number: 00},
     {name: "February", number: 01},
