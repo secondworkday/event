@@ -646,7 +646,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
       templateUrl: '/client/states/app/user/bulk-edit-participants.dialog.html',
       locals: {
         event: event,
-        eventSessionsIndex: $scope.eventSessionsIndex,
+        eventSessionsIndex: $scope.eventSessionsIndexer.index,
         selectedIndex: $scope.selectedIndex
       },
       controller: BulkEditParticipantsDialog
