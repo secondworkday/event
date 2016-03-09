@@ -3,8 +3,12 @@ app.controller('VolunteerSignInController', function ($scope, $state, $window, $
 
   $scope.stateData = $state.current.data;
 
+  // this triggers the spinner for 'signing you in...'
+  $scope.working = false;
+
   $scope.signIn = function () {
     $scope.invalidPIN = false;
+    $scope.working = true;
     utilityService.signIn($scope.formData)
       .then(function () {
         // success
@@ -14,6 +18,7 @@ app.controller('VolunteerSignInController', function ($scope, $state, $window, $
       }, function (failureData) {
         // failure
         //alert(failureData);
+        $scope.working = false;
         $scope.invalidPIN = true;
       });
   };
