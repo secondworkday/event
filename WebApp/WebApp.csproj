@@ -319,7 +319,7 @@
     <Content Include="node_modules\normalize.css\LICENSE.md" />
     <Content Include="node_modules\normalize.css\package.json" />
     <Content Include="node_modules\normalize.css\README.md" />
-    <None Include="Properties\PublishProfiles\demo.socialventuresoftware.org.pubxml" />
+    <None Include="Properties\PublishProfiles\staging-events.secondworkday.com.pubxml" />
     <None Include="Properties\PublishProfiles\www.socialventuresoftware.org.pubxml" />
     <None Include="Scripts\jquery-2.1.4.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.4.js" />
