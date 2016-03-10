@@ -222,7 +222,7 @@ namespace App.Library
             }
 
 
-            dc.SubmitLock(() =>
+            return NotifyLock(dc, notifyExpression =>
             {
                 var deleteItems = dc.EventParticipants
                     .Where(item => itemIDs.Contains(item.ID));
@@ -259,19 +259,12 @@ namespace App.Library
 
                 var epCategory = EPCategory.DefaultSetCategory;
                 activityItem.AddSet(dc, epCategory, itemIDs);
-            });
 
-            var notifyExpression = new NotifyExpression();
-            itemIDs.ForEach(itemID =>
-            {
-                notifyExpression.AddDeletedID(itemID);
-            });
-            NotifyClients(dc, notifyExpression);
+                notifyExpression.AddDeletedIDs(itemIDs);
 
-            //!! This is an undoable action! need a way to return info about that!
-            return HubResult.Success;
+                return HubResult.Success;
+            });
         }
-
 
 
 
@@ -441,14 +434,12 @@ namespace App.Library
                 return HubResult.NotFound;
             }
 
-            dc.SubmitLock(() =>
+            return NotifyLock(dc, notifyExpression =>
             {
-                var checkInItems = dc.EventParticipants
-                    .Where(item => itemIDs.Contains(item.ID));
-
-                foreach (var item in checkInItems)
+                foreach (var itemID in itemIDs)
                 {
-                    CheckIn(dc, item.ID);
+                    //!! hmm - some of these might already be checked In. Do we leave them untouched? Or modify the check-in time/user?
+                    CheckIn(dc, itemID);
                 }
 
                 int bulkTagIDThingy = 0;
@@ -458,9 +449,9 @@ namespace App.Library
                 var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
                 var activityType = ActivityType.BulkCheckIn;
                 ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
-            });
 
-            return HubResult.Success;
+                return HubResult.Success;
+            });
         }
 
         public static HubResult UndoCheckIn(AppDC dc, int[] itemIDs)
@@ -475,14 +466,11 @@ namespace App.Library
                 return HubResult.NotFound;
             }
 
-            dc.SubmitLock(() =>
+            return NotifyLock(dc, notifyExpression =>
             {
-                var undoCheckInItems = dc.EventParticipants
-                    .Where(item => itemIDs.Contains(item.ID));
-
-                foreach (var item in undoCheckInItems)
+                foreach (var itemID in itemIDs)
                 {
-                    UndoCheckIn(dc, item.ID);
+                    UndoCheckIn(dc, itemID);
                 }
 
                 int bulkTagIDThingy = 0;
@@ -492,9 +480,9 @@ namespace App.Library
                 var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
                 var activityType = ActivityType.BulkUndoCheckIn;
                 ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
-            });
 
-            return HubResult.Success;
+                return HubResult.Success;
+            });
         }
 
         public static HubResult CheckIn(AppDC dc, int itemID)
@@ -1290,6 +1278,12 @@ namespace App.Library
             return ReadLock(dc, itemID, FindByID, readHandler);
         }
 
+        protected static HubResult NotifyLock(AppDC dc, Func<NotifyExpression, HubResult> workHandler)
+        {
+            return NotifyLock(dc, NotifyClients, workHandler);
+        }
+
+
         internal static HubResult WriteLock(AppDC dc, int itemID, Func<EventParticipant, NotifyExpression, HubResult> writeHandler)
         {
             return WriteLock(dc, itemID, FindByID, NotifyClients, writeHandler);
@@ -1361,8 +1355,9 @@ namespace App.Library
 
         internal static void NotifyClients(AppDC dc, NotifyExpression notifyExpression)
         {
-            var notification = EventParticipant.Search(dc, notifyExpression, null, 0, int.MaxValue);
-            NotifyClients("siteHub", notifyExpression, notification, (hubClients, notificationItem) => hubClients.All.updateEventParticipants(notificationItem));
+            NotifyClients("siteHub", notifyExpression,
+                searchExpression => EventParticipant.Search(dc, searchExpression, null, 0, int.MaxValue),
+                (hubClients, notificationItem) => hubClients.All.updateEventParticipants(notificationItem));
         }
 
 

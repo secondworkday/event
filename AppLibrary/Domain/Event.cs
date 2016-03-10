@@ -924,8 +924,9 @@ namespace App.Library
 
         internal static void NotifyClients(AppDC dc, NotifyExpression notifyExpression)
         {
-            var notification = Event.Search(dc, notifyExpression, null, 0, int.MaxValue);
-            NotifyClients("siteHub", notifyExpression, notification, (hubClients, notificationItem) => hubClients.All.updateEvents(notificationItem));
+            NotifyClients("siteHub", notifyExpression,
+                searchExpression => Event.Search(dc, searchExpression, null, 0, int.MaxValue),
+                (hubClients, notificationItem) => hubClients.All.updateEvents(notificationItem));
         }
 
         public override string ToString()

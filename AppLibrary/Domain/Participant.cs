@@ -583,8 +583,9 @@ namespace App.Library
 
         internal static void NotifyClients(AppDC dc, NotifyExpression notifyExpression)
         {
-            var notification = Participant.Search(dc, notifyExpression, null, 0, int.MaxValue);
-            NotifyClients("siteHub", notifyExpression, notification, (hubClients, notificationItem) => hubClients.All.updateParticipants(notificationItem));
+            NotifyClients("siteHub", notifyExpression, 
+                searchExpression => Participant.Search(dc, searchExpression, null, 0, int.MaxValue), 
+                (hubClients, notificationItem) => hubClients.All.updateParticipants(notificationItem));
         }
 
         public override string ToString()
