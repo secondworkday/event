@@ -14,6 +14,8 @@ namespace WebApp
 {
     public partial class AngularJS_SignalR : System.Web.UI.MasterPage
     {
+        public string spaName = string.Empty;
+
         public bool includeAngularUI = false;
         public bool includeAngularStrap = false;
         public bool includeAngularStrapTypeahead = false;
@@ -22,6 +24,10 @@ namespace WebApp
 
         public bool includeD3 = false;
         public bool includeAngularSwing = false;
+
+
+        public bool includeAngularTranslate = false;
+
 
 
         public bool includePlayingCards = false;
@@ -35,6 +41,7 @@ namespace WebApp
                     isProductionSite = UtilityContext.Current.IsProductionSite,
                     isDevelopmentSite = UtilityContext.Current.IsDevelopmentSite,
                     serverStartTimeSeconds = UtilityContext.Current.ServerStart.ToCacheBreakSeconds(),
+                    this.spaName,
                 }
                 .ToJson();
                 return result;

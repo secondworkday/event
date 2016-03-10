@@ -26,5 +26,14 @@ namespace App.Library
             }
             return false;
         }
+
+        public static bool IsInExclusiveRole(this Identity identity, AppRole appRole)
+        {
+            if (identity != null)
+            {
+                return identity.IsInExclusiveAppRole(appRole.ToString());
+            }
+            return false;
+        }
     }
 }

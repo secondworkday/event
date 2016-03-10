@@ -1,6 +1,7 @@
-app.controller('SystemTenantsController', function ($scope, $mdDialog, $log, utilityService, siteService) {
+app.controller('SystemTenantsController', function ($scope, $mdDialog, $log, $msUI, utilityService, siteService) {
   $log.debug('Loading SystemTenantsController...');
 
+  $scope.searchTenants = utilityService.model.tenantGroups.search;
 
 
   $scope.sortOptions = [
@@ -16,19 +17,18 @@ app.controller('SystemTenantsController', function ($scope, $mdDialog, $log, uti
   };
 
   $scope.filterOptions = [
+    // '^' means items with null parents, aka topmost items
+    { name: 'Tenants', serverTerm: '^', clientFunction: utilityService.filterByPropertyHasValue("!parentID") }
+
     //{ name: 'Active', serverTerm: '$Active', clientFunction: filterByStateFactory("Active") },
     //{ name: 'Disabled', serverTerm: '$Disabled', clientFunction: filterByStateFactory("Disabled") },
-    { name: 'All' }
+
   ];
 
   $scope.searchViewOptions = {
     sort: $scope.sortOptions[0],
-    filter: $scope.filterOptions[0]
-  };
-
-
-  $scope.searchTenants = function (searchExpression, sortExpression, startIndex, rowCount) {
-    return utilityService.searchTenants(searchExpression, sortExpression, startIndex, rowCount);
+    selectFilter: $scope.filterOptions[0],
+    userSearch: null
   };
 
 
@@ -52,9 +52,22 @@ app.controller('SystemTenantsController', function ($scope, $mdDialog, $log, uti
        controller: NewTenantDialogController
     });
     function NewTenantDialogController($scope, $mdDialog) {
-      $scope.createTenant = function(newTenantName) {
-        // TODO add create Tenant code
-        $log.warn( "You tried to create a Tenant called " + newTenantName + ", but tenant creation is not yet working." );
+      $scope.createTenant = function (newTenantName) {
+
+        var data = {};
+        utilityService.createTenant(newTenantName, data)
+        .then(function (successData) {
+          // success
+          $msUI.showToast("Tenant Created");
+          $log.debug("Task completed.");
+          return successData;
+        }, function (failureData) {
+          // failure
+          $msUI.showToast(failureData.errorMessage);
+          $log.debug(failureData.errorMessage);
+          return failureData;
+        });
+
         $mdDialog.hide();
       };
       $scope.cancelDialog = function() {

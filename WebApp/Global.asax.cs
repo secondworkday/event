@@ -82,6 +82,31 @@ namespace WebApp
 
 
 
+
+
+            appInfo.RefreshIdentityDataHandler = (dc, ticketData, authenticatedTableHashCode, authenticatedID) =>
+            {
+                var appDC = dc as AppDC;
+                Debug.Assert(appDC != null);
+
+                Debug.Assert(authenticatedTableHashCode != MS.Utility.User.TableHashCode);
+                //if (authenticatedTableHashCode == MS.Utility.User.TableHashCode)
+                //{
+                //return MS.Utility.User.CreateIdentityData(dc, authenticatedID);
+                //}
+                Debug.Assert(authenticatedTableHashCode == EventSession.TableHashCode);
+
+                return ticketData;
+
+
+                //IdentityData identityData = IdentityData.Create(ticketData.TeamEPScope, tenantGroupID, eventSession.Name, null, volunteerRoles, null, timeZoneInfo);
+                //var identityData =  EventSession.CreateIdentityData(appDC, authenticatedID);
+                //return identityData;
+            };
+
+
+
+
 #if false
             var appInfo = AppInfo.Create(
                 applicationAbbreviation: "actooba",
@@ -142,6 +167,16 @@ namespace WebApp
         // This routine extends the MS.Utility provided "Permission" check infrastructure to include Application layer permissions
         private bool permissionCheckHandler(Identity authorizedBy, MS.Utility.Permission permission, params object[] parameters)
         {
+            if (permission == Permission.ResetPassword)
+            {
+                if (authorizedBy.IsInExclusiveAppRole(AppRole.EventSessionVolunteer.ToString()))
+                {
+                    return false;
+                }
+                return true;
+            }
+
+
             // better safe than sorry...
             return false;
         }
@@ -190,6 +225,28 @@ namespace WebApp
             }
 
 
+            var identity = context.GetIdentity();
+
+            bool isEventSessionVolunteer = false;
+            if (identity != null && identity.IsInExclusiveRole(AppRole.EventSessionVolunteer))
+            {
+                isEventSessionVolunteer = true;
+            }
+
+
+            //!! the application layer should be able to configure these paths.
+            // Html5 mode - our SPA will handle these requests
+            if (isEventSessionVolunteer ||
+                requestPathLower == "/check-in" ||
+                requestPathLower.StartsWith("/check-out")
+                )
+            {
+                context.RewritePath("/Spas/VolunteerSpa.aspx");
+                // context.RewritePath("/app/default.aspx");
+                return true;
+            }
+
+
             //!! the application layer should be able to configure these paths.
             // Html5 mode - our SPA will handle these requests
             if (spaRootRequest ||
@@ -197,6 +254,9 @@ namespace WebApp
                 //requestPathLower == "/home" ||
                 requestPathLower == "/home/" ||
                 requestPathLower.StartsWith("/jobs/") ||
+
+                requestPathLower.StartsWith("/event/") ||
+                requestPathLower.StartsWith("/sessions/") ||
 
                 //!! what is the correct one here?
                 requestPathLower.StartsWith("/c/") ||
@@ -210,7 +270,7 @@ namespace WebApp
                 // Signup ...
                 requestPathLower.StartsWith("/signup/") ||
                 // AuthTokens ...
-                requestPathLower.StartsWith("/resetpassword/") ||
+                requestPathLower.StartsWith("/reset-password/") ||
                 // CareerStep ...
                 requestPathLower.StartsWith("/my-plan/") ||
                 // Occupations ...
@@ -220,7 +280,7 @@ namespace WebApp
                 requestPathLower.StartsWith("/inbox")
                 )
             {
-                context.RewritePath("/Spas/Material.aspx");
+                context.RewritePath("/Spas/DefaultSpa.aspx");
                 // context.RewritePath("/app/default.aspx");
                 return true;
             }

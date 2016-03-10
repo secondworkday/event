@@ -37,8 +37,9 @@
     </Type>
   </Table>
 
-  <Table Name="dbo.ParticipantGroup" Member="ParticipantGroups">
-    <Type Name="ParticipantGroup" >
+
+  <Table Name="dbo.Event" Member="Events">
+    <Type Name="Event" >
       <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="ScopeType" Type="global::MS.Utility.ExtendedPropertyScopeType" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="ScopeID" Type="System.Int32" DbType="Int" CanBeNull="true" />
@@ -49,10 +50,80 @@
       <Column Name="Name" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
       <Column Name="Overview" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true"/>
 
-      <Association Name="ParticipantGroup_Participant" Member="Participants" ThisKey="ID" OtherKey="ParticipantGroupID" Type="Participant" />
+      <Column Name="Sponsor" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />
+
+      <Column Name="Budget" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="ParticipantGoal" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ParticipantCapacity" Type="System.Int32" DbType="Int" CanBeNull="true" />
+
+      <Association Name="EventSession_Event" Member="EventSessions" ThisKey="ID" OtherKey="EventID" Type="EventSession" />
+
+      <Association Name="EventParticipant_Event" Member="EventParticipants" ThisKey="ID" OtherKey="EventID" Type="EventParticipant" />
+
     </Type>
   </Table>
 
+
+
+  <Table Name="dbo.EventSession" Member="EventSessions">
+    <Type Name="EventSession" >
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ScopeType" Type="global::MS.Utility.ExtendedPropertyScopeType" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ScopeID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+
+      <Column Name="CreatedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+
+      <Column Name="Name" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
+      <Column Name="Overview" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true"/>
+
+      <Column Name="Location" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
+
+      <Column Name="LocationStreetAddress" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />
+      <Column Name="LocationCity" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />
+      <Column Name="LocationState" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />
+      <Column Name="LocationZipCode" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />
+      
+      
+
+      <Column Name="StartDate" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+      <Column Name="EndDate" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+
+      <Column Name="CheckInOpen" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+
+      <Column Name="ParticipantGoal" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ParticipantCapacity" Type="System.Int32" DbType="Int" CanBeNull="true" />
+
+      <Association Name="EventParticipant_EventSession" Member="EventParticipants" ThisKey="ID" OtherKey="EventSessionID" Type="EventParticipant" />
+
+      <Column Name="EventID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="EventSession_Event" Member="Event" ThisKey="EventID" OtherKey="ID" Type="Event" IsForeignKey="true" />
+    </Type>
+  </Table>
+
+
+
+
+  <Table Name="dbo.ParticipantGroup" Member="ParticipantGroups">
+    <Type Name="ParticipantGroup" >
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ScopeType" Type="global::MS.Utility.ExtendedPropertyScopeType" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ScopeID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+
+      <Column Name="CreatedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+
+      <Column Name="Name" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
+      
+      <Column Name="ContactName" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />
+      <Column Name="Overview" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true"/>
+
+      <Column Name="BadgeName" Type="System.String" DbType="nvarchar(128)" CanBeNull="true" />
+
+
+      <Association Name="ParticipantGroup_Participant" Member="Participants" ThisKey="ID" OtherKey="ParticipantGroupID" Type="Participant" />
+    </Type>
+  </Table>
 
   <Table Name="dbo.Participant" Member="Participants">
     <Type Name="Participant">
@@ -63,15 +134,51 @@
       <Column Name="CreatedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
       <Column Name="LastModifiedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
 
-      <Column Name="Grade" Type="System.UInt32" DbType="Int" CanBeNull="true" />
+      <Column Name="FirstName" Type="System.String" DbType="nvarchar(256)" CanBeNull="true"/>
+      <Column Name="LastName" Type="System.String" DbType="nvarchar(256)" CanBeNull="true"/>
 
-      <Column Name="Name" Type="System.String" DbType="nvarchar(256)" CanBeNull="true"/>
-      <Column Name="Overview" Type="System.String" DbType="nvarchar(MAX)" CanBeNull="true"/>
+      <Column Name="Gender" Type="global::MS.Utility.UserGender?" DbType="Int" CanBeNull="true" />
+
 
       <Column Name="ParticipantGroupID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="ParticipantGroup_Participant" Member="ParticipantGroup" ThisKey="ParticipantGroupID" OtherKey="ID" Type="ParticipantGroup" IsForeignKey="true" />
-
     </Type>
   </Table>
+
+
+  <Table Name="dbo.EventParticipant" Member="EventParticipants">
+    <Type Name="EventParticipant">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ScopeType" Type="global::MS.Utility.ExtendedPropertyScopeType" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ScopeID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ParticipantID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+
+      <Column Name="CreatedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+      <Column Name="LastModifiedTimestamp" Type="System.DateTime" DbType="DATETIME2 NOT NULL" CanBeNull="false" />
+
+      <Column Name="Level" Type="System.String" DbType="nvarchar(32)" CanBeNull="true"/>
+
+      <Column Name="CheckInTimestamp" Type="System.DateTime" DbType="DATETIME2" CanBeNull="true" />
+      <Column Name="CheckOutTimestamp" Type="System.DateTime" DbType="DATETIME2" CanBeNull="true" />
+
+      <Column Name="CheckedInUserID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="CheckedOutUserID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      
+      <Column Name="DonationLimit" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="DonationAmount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+
+      <Column Name="EventID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="EventParticipant_Event" Member="Event" ThisKey="EventID" OtherKey="ID" Type="Event" IsForeignKey="true" />
+
+      <Column Name="EventSessionID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="EventParticipant_EventSession" Member="EventSession" ThisKey="EventSessionID" OtherKey="ID" Type="EventSession" IsForeignKey="true" />
+    </Type>
+  </Table>
+
+
+
+
+
+
 
 </Database>

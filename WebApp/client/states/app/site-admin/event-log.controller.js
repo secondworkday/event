@@ -5,7 +5,7 @@ app.controller('EventLogController', function ($scope, $log, utilityService, sit
 
   $scope.searchViewOptions = {
     sort: { name: 'Recent First', serverTerm: '', clientFunction: utilityService.compareByProperties('-firstOccurenceTimestamp', '-id') },
-    filter: { name: 'All' }
+    selectFilter: { name: 'All' }
   };
 
   $scope.$on("$destroy", function () {

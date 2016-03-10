@@ -1,7 +1,9 @@
-app.controller('SiteAdminController', function ($scope, $rootScope, $state, $log, siteService) {
+app.controller('SiteAdminController', function ($scope, $rootScope, $state, $log, siteService, CONSTANTS) {
   $log.debug('Loading SiteAdminController...');
 
   $scope.stateData = $state.current.data;
+
+  $scope.CONSTANTS = CONSTANTS;
 
   $scope.systemAdminPages = [
     { pageTitle: "Dashboard", icon: "fa fa-table", uiSref: "app.site-admin.system.dashboard", active: false},

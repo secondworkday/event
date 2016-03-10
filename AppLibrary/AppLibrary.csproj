@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Category.cs" />
+    <Compile Include="Domain\ActivityLog.cs" />
     <Compile Include="Domain\AppDataClasses.cs">
       <DependentUpon>AppDataClasses.dbml</DependentUpon>
     </Compile>
@@ -84,6 +85,9 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Domain\AuthToken.cs" />
+    <Compile Include="Domain\EventParticipant.cs" />
+    <Compile Include="Domain\EventSession.cs" />
+    <Compile Include="Domain\Event.cs" />
     <Compile Include="Domain\ExtendedTenantGroup.cs" />
     <Compile Include="Domain\ExtendedUser.cs" />
     <Compile Include="Domain\Participant.cs" />
@@ -109,6 +113,8 @@
       <LastGenOutput>AppDataClasses.designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </None>
+    <EmbeddedResource Include="Reports\OSB-Reminder-Form-2.docx" />
+    <EmbeddedResource Include="Reports\OSB-Reminder-Form-EN-ES.docx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Domain\AppDataClasses.dbml.layout">

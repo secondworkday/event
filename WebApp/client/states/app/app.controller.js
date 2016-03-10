@@ -1,7 +1,15 @@
-app.controller('AppController', function ($scope, $timeout, $mdSidenav, $mdDialog, $mdUtil, $log, $msUI, $stateParams, $state, utilityService, siteService, AUTHORIZATION_ROLES) {
+app.controller('AppController', function ($scope, $translate, $timeout, $mdSidenav, $mdDialog, $mdUtil, $log, $msUI, $stateParams, $state, utilityService, siteService, AUTHORIZATION_ROLES, APP_ROLE_TRANSLATION) {
   $log.debug('Loading AppController...');
 
   $scope.model = siteService.getModel();
+
+  $scope.APP_ROLE_TRANSLATION = APP_ROLE_TRANSLATION;
+
+  $scope.tenantTerms = [
+    { name: "Demo Terms", langKey: 'demo' },
+    { name: "ALE Terms", langKey: 'ale' },
+    { name: "Soccer Terms", langKey: 'soccer' }
+];
 
   $scope.months = [
     {name: "January", number: 00},
@@ -45,36 +53,15 @@ app.controller('AppController', function ($scope, $timeout, $mdSidenav, $mdDialo
     $state.go('.', { debug: $scope.debugMode ? true : undefined });
   };
 
+  $scope.changeLanguage = function (langKey) {
+    $translate.use(langKey).then(function () {
+      $state.go($state.current, $stateParams, { reload: true });
+    });
+  };
+
+
   $scope.goToState = function(state) {
     $state.go(state);
   };
 
-});
-
-app.directive('zipcodeValidator', function ($q, $parse, siteService) {
-  return {
-    require: 'ngModel',
-    link: function (scope, element, attrs, ngModel) {
-      // If we're passed an expression, save back the ZipCode name
-      if (attrs.zipcodeValidator) {
-        var zipCodeNameParse = $parse(attrs.zipcodeValidator);
-      }
-      ngModel.$asyncValidators.zipcode = function (zipCode) {
-        return siteService.getZipCodeInfo(zipCode).then(
-          function (zipCodeInfo) {
-            if (zipCodeNameParse) {
-              zipCodeNameParse.assign(scope, zipCodeInfo.name);
-            }
-            ngModel.$errorMessage = undefined;
-            return zipCodeInfo;
-          }, function (errorResponse) {
-            if (zipCodeNameParse) {
-              zipCodeNameParse.assign(scope, undefined);
-            }
-            ngModel.$errorMessage = errorResponse.errorMessage;
-            return $q.reject(errorResponse);
-          });
-      };
-    }
-  };
 });

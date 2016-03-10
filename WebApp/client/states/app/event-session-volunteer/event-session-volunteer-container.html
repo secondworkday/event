@@ -1,0 +1,71 @@
+<div class="appbar">
+  <md-toolbar>
+    <div class="md-toolbar-tools" layout layout-align="start center">
+      <span class="brand">
+        ALE
+      </span>
+
+      <span class="u-sm-margin-left">
+        {{'EVENT' | translate}} - {{event.name}}
+      </span>
+      <span flex></span>
+      <md-menu>
+        <md-button md-menu-origin aria-label="User menu" ng-click="$mdOpenMenu()">
+          <span layout layout-align="start center">
+            <img alt="user img" class="mini-user-img"
+              ng-show="model.authenticatedUser.profilePhotoUrl"
+              ng-src="{{model.authenticatedIdentity.profilePhotoUrl}}" />
+            <img alt="user img" class="mini-user-img"
+              ng-hide="model.authenticatedUser.profilePhotoUrl"
+              ng-src="/images/user-img-placeholder.png" />
+            <span hide-xs>{{model.authenticatedIdentity.displayName}} &nbsp;</span> <i class="fa fa-caret-down"></i>
+          </span>
+        </md-button>
+        <md-menu-content width="4">
+          <md-menu-item>
+            <md-button disabled ng-click="goToState('app.user.account')">
+              <i class="fa fa-user"></i> Your Account
+            </md-button>
+          </md-menu-item>
+          <md-menu-divider></md-menu-divider>
+          <md-menu-item>
+            <md-button ng-click="signOut()">
+              <i class="fa fa-sign-out"></i> Sign Out
+            </md-button>
+          </md-menu-item>
+        </md-menu-content>
+      </md-menu>
+      <div ms-debug-only>
+        <md-button ng-click="toggleDebugMode()" class="md-icon-button" aria-label="debug mode">
+          <md-tooltip>Debug Mode</md-tooltip>
+          <span class="fa-stack fa-lg">
+            <i class="fa fa-circle fa-stack-2x text-black"></i>
+            <i class="fa fa-code fa-stack-1x text-yellow" style="margin-top:-0.1rem;"></i>
+          </span>
+        </md-button>
+      </div>
+      <span ms-development>
+        <div ng-include="'/client/states/app/app-bar-menu.html'"></div>
+      </span>
+    </div>
+  </md-toolbar>
+</div>
+
+
+
+<div class="content-canvas" style="margin-left:auto;margin-right:auto;">
+
+<!-- <h2>Hello and welcome to the {{'EVENT_SESSION' | translate}} Page</h2> -->
+<!-- AuthInfo: {{authInfo}} -->
+
+
+  <div class="content" ui-view></div>
+</div>
+
+<div hide-xs layout layout-align="start center" class="footer">
+  <nav>
+    <ul>
+      <li>&copy; 2016 Social Venture Software</li>
+    </ul>
+  </nav>
+</div>

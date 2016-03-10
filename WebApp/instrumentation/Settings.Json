@@ -1,0 +1,156 @@
+﻿/* This Service Profiler settings file has been customized for this app to collect custom events from EventSourceActivity. */
+/* See https://serviceprofiler.azurewebsites.net for more information. */
+{
+  "ServiceName": "aleosbtest", /* A string that uniquely identifies the application. */
+  "CircularEtlBufferMB": 200, /* ETL trace circular buffer size in MB */
+  "InMemoryCircularBuffer": true, /* Control if the agent use memory based circular buffer. (defaut is true. false means using file based circular buffer) */
+  "LocalEtlFileFolder": "", /* If the folder is not specified, the agent will use temp folder */
+  "AzureStorageConnection": "DefaultEndpointsProtocol=https;AccountName=aleosbtest;AccountKey=1PXBwxgL61xFz7p5mIuwQRQP5wpwdfJPmV5wNqYs0iht3gtIbQbpz3nm5eeh3qYgznN7NKunj7sO7LktSMKqWw==;BlobEndpoint=https://aleosbtest.blob.core.windows.net/;TableEndpoint=https://aleosbtest.table.core.windows.net/;QueueEndpoint=https://aleosbtest.queue.core.windows.net/;FileEndpoint=https://aleosbtest.file.core.windows.net/",
+  "MonitorSamplingRate": 1.0, /* Controls the duty cycle of the activity monitor. The value should be in the range of [0,1]. Setting the value to 1 will enable full time, 0 to disable collection. */
+  "ProfileSamplingRate": 1.0, /* The value controls the frequency of collecting detailed ETW events. The value should be in the range of [0,1]. Setting the value to 1 will enable collection full time, 0 to disable collection. */
+  "AgentLogFilter": "Warning", /* The value controls the verbosity of the agent logs. The value can be Error, Warning, Information */
+  "CollectMemorySummary": true, /* true to enable capturing memory summary, false to disable it (default is false). */
+  "CollectGCDump": true, /* true to enable capturing gcdump, false to disable it (default is false). */
+  "MemoryDumpPriority": "Normal", /* Process priority at which memory dumps are collected. Normal, Low or High (default is Normal) */
+  "ProvideUsageTelemetryData": true, /* Agree to send usage data to Microsoft. So that we can improve our product.*/
+  "MaxConcurrentRecording": 0, /* Across multiple machines, the max number of simultaneous profiling sessions. 0 means unlimited. */
+  /*"EnableAutoUpdate": true,*/ /* true to allow dynamically update agent executable and setting file from the cloud (default is false) */
+  /*"CompliantWithFIPS": true,*/ /* Controls if the agent uses FIPS compliant algorithm for encryption (default is false) */
+  /*"HistogramNameTokenizationRegexPattern" :  "[a-zA-Z0-9-.@=(),'_<>\n ]+",*/ /*Controls how the histogram will tokenize names in order to build the histogram graph*/
+  "EtwMetrics": [ /* Defines ETW events to monitor. Both start/stop duration and single event with a metric are supported. */
+    {
+      /* AspNet RequestStart/Stop duration is the default metric. */
+      "ProviderName": "Microsoft-Windows-ASPNET",
+      "ProviderKeywords": 72057594037927935, /*0xFFFFFFFFFFFFFF*/
+      "ProviderLevel": "Informational",
+      "Event": "Request/Start",
+      "EventStop": "Request/Stop",
+      "Name": "FullUrl"
+
+      /* Optional: The following defines base url transforms, they would be applied before 'UrlBasedNameTransforms'*/
+      /* Note that the 'Match' must be in lower case, all base url would be converted to lower case. */
+      //,"NameTransforms": [
+      //  {
+      //    "Match": "^/application/.+/session/.+/option/.+",
+      //    "Replacement": "/Application/{applicationId}/Session/{sessionId}/Option/{optionId}"
+      //  },
+      //  {
+      //    "Match": "^/api/user/.+",
+      //    "Replacement": "/api/User"
+      //  }
+      //]
+
+      ///* Optional: The following defines using some url parameters to differentiate requests. */
+      //,"UrlBasedNameTransforms": [
+      //  {
+      //    "BaseUrl": "/api/Users",
+      //    "ParameterTransforms": [
+      //      /* The following regular expression transforms would be applied in the literal order. */
+      //      {
+      //        "Match": "name=",
+      //        "Replacement": "/QueryByName"
+      //      },
+      //      {
+      //        "Match": "role=admin",
+      //        "Replacement": "/QueryByAdminRole"
+      //      }
+      //    ]
+      //  },
+      //  {
+      //    "BaseUrl": "/Api",
+      //    "ParameterTransforms": [
+      //      {
+      //        "Match": "createAccount=",
+      //        "Replacement": "/CreateAccount"
+      //      },
+      //      {
+      //        "Match": "setPassword=",
+      //        "Replacement": "/SetPassword"
+      //      }
+      //    ]
+      //  }
+      //]
+
+    },
+    {
+      /* Custom metric example. You can use your own etw events.*/
+      "ProviderName": "Microsoft-ServiceProfiler-Web", /* Required: Name of the ETW provider to monitor */
+      "ProviderKeywords": 72057594037927935, /*Required: Keywords used to enable the ETW provider */
+      "ProviderLevel": "Informational", /* Required: The ETW verbosity to turn on */
+      "Event": "ProcessProfileTree/Start", /* Required: The ETW event to monitor */
+      "EventStop": "ProcessProfileTree/Stop" /* Optional: If specified, the duration between Event and EventStop is monitored. */
+      /*"EventStopCorrelator":  "",*/ /* Optional: The ETW property to match start and stop event. Default is ActivityID. */
+      /*"Metric":  "",*/ /* Optional: If specified, contains the name of the payload property to monitor. Metric and EventStop canot be specified at the same time. */
+      /*"Name": "",*/ /* Optional: Payload property that names the activity. */
+
+      ///* Optional: An optional set of regular expression transforms that can be applied to the activity name. This will invoke Regex.Replace to perform the string replacement. */
+
+      //,"NameTransforms": [
+      //  {
+      //    "Match": "(?i)^defaultcollection/[^/]*/[^/]*/api/burndown/.*$",
+      //    "Replacement": "api/burndown"
+      //  },
+      //  {
+      //    "Match": "(?i)^/_static/.*$",
+      //    "Replacement": "static"
+      //  }
+      //]
+    },
+    {
+      "ProviderName": "MS-Activities",
+      "ProviderKeywords": 72057594037927935,
+      "ProviderLevel": "Informational",
+      "Event": "Request/Start",
+      "EventStop": "Request/Stop",
+      "Name": "url"
+    }
+  ],
+  "Tags": [
+    {
+      "Type": "Performance",
+      "Settings": {
+        "SampleIntervalInSeconds": "5",
+        "SamplesToConsider": "6",
+        "Triggers": [
+          {
+            "Name": "High CPU",
+            "Description": "High CPU usage",
+            "PerfCounter": "Processor Information\\% Processor Time\\_Total",
+            "Operator": ">",
+            "Metric": "70"
+          },
+          {
+            "Name": "Busy Disk",
+            "Description": "High disk usage",
+            "PerfCounter": "PhysicalDisk\\% Disk Time\\_Total",
+            "Operator": ">",
+            "Metric": "10"
+          },
+          {
+            "Name": "Memory Pressure",
+            "Description": "High memory usage",
+            "PerfCounter": "Memory\\Available MBytes",
+            "Operator": "<",
+            "Metric": "400"
+          },
+          {
+            "Name": "High GC",
+            "Description": "High GC time",
+            "PerfCounter": ".NET CLR Memory\\% Time in GC\\_Global_",
+            "Operator": ">",
+            "Metric": "10"
+          }
+        ]
+      }
+    }
+    /*{
+      "Type": "Version",
+      "Settings": {
+        "Source": {
+          "Type": "FileVersion",
+          "Identity": "WebApplication1.dll"
+        }
+      }
+    }*/
+  ]
+}

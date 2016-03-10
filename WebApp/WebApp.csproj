@@ -43,6 +43,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
     <Reference Include="DotNetOpenAuth.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetOpenAuth.Core.4.3.4.13329\lib\net45-full\DotNetOpenAuth.Core.dll</HintPath>
       <Private>True</Private>
@@ -158,17 +162,25 @@
     <Content Include="Bootstrap\bootstrap.html" />
     <Content Include="Bootstrap\bootstrap.js" />
     <Content Include="Bootstrap\Default.aspx" />
+    <Content Include="bower_components\angular-translate\angular-translate.js" />
+    <Content Include="bower_components\angular-translate\angular-translate.min.js" />
     <Content Include="client\app.css" />
     <Content Include="client\components\site.service.js" />
     <Content Include="client\states\app\app-bar-menu.html" />
     <Content Include="client\states\app\app.config.js" />
+    <Content Include="client\states\app\app.constants.js" />
     <Content Include="client\states\app\app.controller.js" />
+    <Content Include="client\states\app\app.directives.js" />
     <Content Include="client\states\app\app.html" />
+    <Content Include="client\states\app\app.translate.js" />
+    <Content Include="client\states\app\event-session-volunteer\event-session-volunteer-container.html" />
+    <Content Include="client\states\app\event-session-volunteer\event-session-volunteer.config.js" />
+    <Content Include="client\states\app\event-session-volunteer\event-session-volunteer.controller.js" />
+    <Content Include="client\states\app\event-session-volunteer\check-in.html" />
     <Content Include="client\states\app\site-admin\database-dashboard.controller.js" />
     <Content Include="client\states\app\site-admin\database-dashboard.html" />
     <Content Include="client\states\app\site-admin\database-data-export.controller.js" />
     <Content Include="client\states\app\site-admin\database-data-export.html" />
-    <Content Include="client\states\app\site-admin\database-data-import.controller.js" />
     <Content Include="client\states\app\site-admin\database-data-import.html" />
     <Content Include="client\states\app\site-admin\database-log.controller.js" />
     <Content Include="client\states\app\site-admin\database-log.html" />
@@ -199,27 +211,76 @@
     <Content Include="client\states\app\site-admin\system-user.dialog.html" />
     <Content Include="client\states\app\site-admin\system-users.controller.js" />
     <Content Include="client\states\app\site-admin\system-users.html" />
-    <Content Include="client\states\app\user\home.html" />
+    <Content Include="client\states\app\user\checkin-participants.dialog.html" />
+    <Content Include="client\states\app\user\bulk-edit-participants.dialog.html" />
+    <Content Include="client\states\app\user\generate-reminders.dialog.controller.js" />
+    <Content Include="client\states\app\user\no-show-report.dialog.controller.js" />
+    <Content Include="client\states\app\user\event.controller.js" />
+    <Content Include="client\states\app\user\edit-user.dialog.html" />
+    <Content Include="client\states\app\user\event-activity-log.controller.js" />
+    <Content Include="client\states\app\user\events.controller.js" />
+    <Content Include="client\states\app\user\events.html" />
+    <Content Include="client\states\app\user\activity-log.html" />
+    <Content Include="client\states\app\user\no-show-report.dialog.html" />
+    <Content Include="client\states\app\user\locations.html" />
+    <Content Include="client\states\app\user\team.html" />
+    <Content Include="client\states\app\user\upload-participant-groups.controller.js" />
+    <Content Include="client\states\app\user\upload-participant-groups.dialog.html" />
+    <Content Include="client\states\app\user\edit-event.dialog.html" />
+    <Content Include="client\states\app\user\event-session.controller.js" />
+    <Content Include="client\states\app\user\event-session.html" />
+    <Content Include="client\states\app\user\generate-reminders.dialog.html" />
+    <Content Include="client\states\app\user\add-participants.dialog.html" />
+    <Content Include="client\states\app\user\add-participant-group.dialog.html" />
+    <Content Include="client\states\app\user\add-session.dialog.html" />
+    <Content Include="client\states\app\user\add-user.dialog.html" />
+    <Content Include="client\states\app\user\upload-participants.controller.js" />
+    <Content Include="client\states\app\user\upload-participants.dialog.html" />
+    <Content Include="client\states\app\user\create-event.dialog.html" />
+    <Content Include="client\states\app\user\documents.html" />
+    <Content Include="client\states\app\user\participant-groups.html" />
+    <Content Include="client\states\app\user\participant-groups.controller.js" />
+    <Content Include="client\states\app\user\event-sessions.controller.js" />
+    <Content Include="client\states\app\user\event.html" />
+    <Content Include="client\states\app\user\event-participants.controller.js" />
+    <Content Include="client\states\app\user\event-sessions.html" />
+    <Content Include="client\states\app\user\event-participants.html" />
     <Content Include="client\states\app\user\user-container.html" />
     <Content Include="client\states\app\user\user.config.js" />
     <Content Include="client\states\app\user\user.controller.js" />
+    <Content Include="client\states\public\admin-sign-in.html" />
+    <Content Include="client\states\public\connection\disconnected.controller.js" />
     <Content Include="client\states\public\connection\disconnected.html" />
+    <Content Include="client\states\public\connection\reconnecting.controller.js" />
     <Content Include="client\states\public\connection\reconnecting.html" />
+    <Content Include="client\states\public\volunteer-sign-in.controller.js" />
     <Content Include="client\states\public\create-account.controller.js" />
     <Content Include="client\states\public\create-account.html" />
+    <Content Include="client\states\public\forgot-password.dialog.html" />
     <Content Include="client\states\public\landing.html" />
     <Content Include="client\states\public\public.config.js" />
     <Content Include="client\states\public\public.controller.js" />
     <Content Include="client\states\public\public.html" />
+    <Content Include="client\states\public\reset-password.controller.js" />
+    <Content Include="client\states\public\reset-password.html" />
+    <Content Include="client\states\public\sign-in-demo-account.dialog.html" />
     <Content Include="client\states\public\sign-in.controller.js" />
-    <Content Include="client\states\public\sign-in.html" />
+    <Content Include="client\states\public\volunteer-sign-in.html" />
     <Content Include="client\states\public\wait.html" />
     <Content Include="Content\angular-material\angular-material.css" />
     <Content Include="Content\angular-material\angular-material.min.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
+    <Content Include="Content\nv.d3.css" />
+    <Content Include="Content\nv.d3.min.css" />
     <Content Include="default.html" />
+    <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />
+    <Content Include="images\ale-photo-blurred.png" />
+    <Content Include="images\ale-two-people-at-table-bw-blurred.png" />
+    <Content Include="images\boy-guitar-laith-abuabdu-unsplash.jpg" />
+    <Content Include="images\logo-eastside.png" />
+    <Content Include="images\user-img-placeholder.png" />
     <Content Include="js\mk-editable-span.js" />
     <Content Include="js\mk-editable-span.min.js" />
     <Content Include="js\ms-utility.js" />
@@ -228,6 +289,7 @@
     <Content Include="js\ng-infinite-scroll-1.2.0.min.js" />
     <Content Include="js\xml2json.js" />
     <Content Include="js\xml2json.min.js" />
+    <Content Include="node_modules\normalize.css\normalize.css" />
     <Content Include="Scripts\angular-animate.js" />
     <Content Include="Scripts\angular-animate.min.js" />
     <Content Include="Scripts\angular-aria.js" />
@@ -248,6 +310,17 @@
     <Content Include="Scripts\angular-xeditable\xeditable.min.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
+    <Content Include="api.ashx" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="instrumentation\Settings.Json" />
+    <Content Include="node_modules\normalize.css\LICENSE.md" />
+    <Content Include="node_modules\normalize.css\package.json" />
+    <Content Include="node_modules\normalize.css\README.md" />
+    <None Include="Properties\PublishProfiles\staging-events.secondworkday.com.pubxml" />
+    <None Include="Properties\PublishProfiles\www.socialventuresoftware.org.pubxml" />
     <None Include="Scripts\jquery-2.1.4.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.4.js" />
     <Content Include="Scripts\jquery-2.1.4.min.js" />
@@ -266,7 +339,9 @@
     <Content Include="SignIn\signin.html" />
     <Content Include="SignIn\signin.js" />
     <Content Include="SignIn\welcome.html" />
-    <Content Include="Spas\Material.aspx" />
+    <Content Include="Spas\DefaultSpa.aspx" />
+    <Content Include="Spas\VolunteerSpa.aspx" />
+    <Content Include="Spas\UserSpa.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -286,19 +361,23 @@
     <Compile Include="Bootstrap\Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
+    <Compile Include="api.ashx.cs">
+      <DependentUpon>api.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Download.ashx.cs">
       <DependentUpon>Download.ashx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="instrumentation\EventSourceActivity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resource.ashx.cs">
       <DependentUpon>Resource.ashx</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
-    <Compile Include="SignIn\ResetPassword.ashx.cs">
-      <DependentUpon>ResetPassword.ashx</DependentUpon>
+    <Compile Include="SignIn\Reset-Password.ashx.cs">
+      <DependentUpon>Reset-Password.ashx</DependentUpon>
     </Compile>
     <Compile Include="SignIn\ResetPassword.aspx.cs">
       <DependentUpon>ResetPassword.aspx</DependentUpon>
@@ -314,12 +393,26 @@
       <DependentUpon>SiteLogin.ashx</DependentUpon>
     </Compile>
     <Compile Include="SiteHub.cs" />
-    <Compile Include="Spas\Material.aspx.cs">
-      <DependentUpon>Material.aspx</DependentUpon>
+    <Compile Include="Spas\DefaultSpa.aspx.cs">
+      <DependentUpon>DefaultSpa.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Spas\Material.aspx.designer.cs">
-      <DependentUpon>Material.aspx</DependentUpon>
+    <Compile Include="Spas\DefaultSpa.aspx.designer.cs">
+      <DependentUpon>DefaultSpa.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Spas\VolunteerSpa.aspx.cs">
+      <DependentUpon>VolunteerSpa.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Spas\VolunteerSpa.aspx.designer.cs">
+      <DependentUpon>VolunteerSpa.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Spas\UserSpa.aspx.cs">
+      <DependentUpon>UserSpa.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Spas\UserSpa.aspx.designer.cs">
+      <DependentUpon>UserSpa.aspx</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
     <Compile Include="System\Impersonate.ashx.cs">
@@ -341,10 +434,9 @@
     <Content Include="Scripts\angular-sanitize.min.js.map" />
     <Content Include="Scripts\angular.min.js.map" />
     <Content Include="Scripts\jquery-2.1.4.min.map" />
-    <Content Include="SignIn\ResetPassword.ashx" />
     <Content Include="SignIn\Signout.ashx" />
     <Content Include="SignIn\SiteLogin.ashx" />
-    <Content Include="templates\OSB-Reminder-Form.docx" />
+    <Content Include="SignIn\Reset-Password.ashx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -366,6 +458,7 @@
       <Name>MSWebUtility</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

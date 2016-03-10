@@ -77,7 +77,7 @@ app.controller('SignInController', function ($scope, $state, $modal, $http, $win
     $scope.demoUsers = demoTenants[0].users;
 
     $scope.jobSeekerUsers = $scope.demoUsers.filter(function (user) {
-      return user.roles.indexOf("JobSeeker") != -1;
+      return user.appRoles.indexOf("JobSeeker") != -1;
     })
 
   }
@@ -88,8 +88,8 @@ app.controller('SignInController', function ($scope, $state, $modal, $http, $win
     $scope.roles = [
         { name: 'System Administrator', filter: { systemRoles: 'SystemAdmin' } },
         { name: 'Administrator', filter: { systemRoles: 'TenantAdmin' } },
-        { name: 'Radiologist', filter: { roles: 'Radiologist' } },
-        { name: 'Technologist', filter: { roles: 'Technologist' } }
+        { name: 'Radiologist', filter: { appRoles: 'Radiologist' } },
+        { name: 'Technologist', filter: { appRoles: 'Technologist' } }
     ];
 
     $scope.demo = false;

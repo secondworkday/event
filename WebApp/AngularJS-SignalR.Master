@@ -14,24 +14,22 @@
     <meta name="mobile-web-app-capable" content="yes">
 
 
-    <!-- Bootstrap -->
 <%if (includeAngularUI || includeAngularStrap || includeAngularStrapTypeahead) { %>
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="<%=VersionedUri.MapPath("/Content/bootstrap.css")%>">
 <% } %>
 
 
     <!-- Angular-Material -->
 <%if (includeAngularMaterial) { %>
+    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/node_modules/normalize.css/normalize.css")%>">
     <link rel="stylesheet" href="<%=VersionedUri.MapPath("/Content/angular-material/angular-material.css")%>">
-
-    <!-- extra, overriding theme files 
-    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/scripts/angular-material/themes/indigo-theme.css")%>">
-    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/scripts/angular-material/themes/green-theme.css")%>">
-    -->
-
 <% } %>
 
 <%if (includeAngularMaterialCdnLatest) { %>
+
+    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/node_modules/normalize.css/normalize.css")%>">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-material/0.10.0-rc2/angular-material.css">
     <!-- extra, overriding theme files -->
     <link rel="stylesheet" href="<%=VersionedUri.MapPath("/scripts/angular-material/themes/indigo-theme.css")%>">
@@ -104,6 +102,10 @@
 <% } %>
 
 
+<%if (this.includeAngularTranslate) { %>
+    <script src="<%=VersionedUri.MapPath("/bower_components/angular-translate/angular-translate.js")%>"></script>
+<% } %>
+
 
 
 
@@ -153,6 +155,12 @@
 <%if (this.includeD3) { %>
                 'nvd3',
 <% } %>
+
+                // Angular-Translate
+<%if (this.includeAngularTranslate) { %>
+                'pascalprecht.translate',
+<% } %>
+
 
 
 

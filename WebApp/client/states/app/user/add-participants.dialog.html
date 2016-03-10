@@ -1,0 +1,82 @@
+<md-dialog aria-label="add {{'PARTICIPANT' | translate}}" ng-cloak>
+  <form>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>{{newOrEdit}} {{'PARTICIPANT' | translate}}</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <i class="fa fa-times"></i>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-dialog-content>
+      <div class="md-dialog-content">
+        <div ms-show="['Admin', 'EventPlanner', 'EventSessionManager']">
+          <div layout-gt-sm="row">
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>First Name</label>
+              <input ng-model="formData.firstName">
+            </md-input-container>
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>Last Name</label>
+              <input ng-model="formData.lastName">
+            </md-input-container>
+          </div>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>{{'PARTICIPANT_GROUP' | translate}}</label>
+            <md-select ng-model="formData.participantGroupID">
+              <md-option ng-repeat="participantGroup in participantGroups.index | objectLookup:participantGroups.hashMap | orderBy: 'name' track by participantGroup.id" value="{{participantGroup.id}}">
+                {{participantGroup.name}}<span ng-if="participantGroup.contactName"> ({{participantGroup.contactName}})</span>
+              </md-option>
+            </md-select>
+          </md-input-container>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>{{'PARTICIPANT_LEVEL' | translate}}</label>
+            <input type="text" ng-model="formData.level">
+          </md-input-container>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Gender</label>
+            <!--<input type="number" ng-model="formData.gender">-->
+            <md-select ng-model="formData.gender">
+              <md-option ng-repeat="gender in formInput.genders" value="{{gender}}">{{gender}}</md-option>
+            </md-select>
+          </md-input-container>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>{{'EVENT_SESSION' | translate}}</label>
+            <md-select ng-model="formData.eventSessionID">
+              <md-option
+                ng-repeat="eventSession in eventSessionsIndex | objectLookup:eventSessions.hashMap track by eventSession.id"
+                value="{{eventSession.id}}">
+                {{eventSession.name}} - {{eventSession.startDate | date:'MM/dd/yyyy'}}
+              </md-option>
+            </md-select>
+          </md-input-container>
+        </div>
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Notes</label>
+            <textarea ng-model="formData.notes"></textarea>
+          </md-input-container>
+        </div>
+        <br />
+        <!--<md-button ng-disabled="!formData.participantGroupID" ng-click="generateRandomParticipants(formData.participantGroupID, 25)"><i class="fa fa-magic"></i> Generate 25 {{'PARTICIPANTS' | translate}}</md-button>-->
+      </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row" layout-align="end center">
+      <span ms-show="['Admin', 'EventPlanner', 'EventSessionManager']">
+        <md-button ng-click="showDeleteConfirmationDialog($event, formData)" ng-if="newOrEdit == 'Edit'">
+          Delete {{'PARTICIPANT' | translate}}
+        </md-button>
+      </span>
+      <md-button ng-click="cancel()">
+        Cancel
+      </md-button>
+      <md-button ng-if="newOrEdit == 'New'" ng-disabled="!(formData.participantGroupID && formData.firstName && formData.lastName)" ng-click="createEventParticipant(event, formData)">OK</md-button>
+      <md-button ng-if="newOrEdit == 'Edit'" ng-disabled="!(formData.participantGroupID && formData.firstName && formData.lastName)" ng-click="editEventParticipant(formData)">Save</md-button>
+    </md-dialog-actions>
+    <div ms-debug-only>
+      <pre>{{formData | json}}</pre>
+    </div>
+  </form>
+</md-dialog>

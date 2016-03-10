@@ -22,10 +22,20 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       templateUrl: '/client/states/public/create-account.html',
       controller: 'CreateAccountController'
   })
-  .state('public.sign-in', {
+  .state('public.admin-sign-in', {
       url: '/sign-in',
-      templateUrl: '/client/states/public/sign-in.html',
+      templateUrl: '/client/states/public/admin-sign-in.html',
       controller: 'SignInController'
+  })
+  .state('public.volunteer-sign-in', {
+      url: '/volunteer',
+      templateUrl: '/client/states/public/volunteer-sign-in.html',
+      controller: 'VolunteerSignInController'
+  })
+  .state('public.reset-password', {
+      url: '/reset-password/:authCode',
+      templateUrl: '/client/states/public/reset-password.html',
+      controller: 'ResetPasswordController'
   })
   .state('public.wait', {
       url: '/wait',

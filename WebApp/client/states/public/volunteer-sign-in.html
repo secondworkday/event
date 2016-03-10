@@ -1,0 +1,60 @@
+<div layout layout-align="center center" style="margin-top:4rem;">
+  <md-card flex-xs flex-gt-xs="50">
+    <form name="signInForm"
+      ng-hide="working">
+      <md-card-content>
+        <div>
+          <h2 class="md-title">Enter your {{'EVENT_SESSION' | translate}} information</h2>
+        </div>
+        <div layout="column">
+          <div layout>
+            <md-input-container flex>
+              <label>First Name</label>
+              <input ng-model="formData.firstName" type="text" required>
+            </md-input-container>
+            <md-input-container flex>
+              <label>Last Name</label>
+              <input ng-model="formData.lastName" type="text" required>
+            </md-input-container>
+          </div>
+          <md-input-container flex>
+            <label>Access Code</label>
+            <input ng-model="formData.authCode" type="text" required>
+            <div ng-show="invalidPIN" style="color:red;">Invalid Access Code, please try again.</div>
+          </md-input-container>
+        </div>
+        <!--<span class="md-caption u-sm-margin-right">
+          <a href="#">Need Help?</a>
+        </span>-->
+      </md-card-content>
+      <md-card-actions layout="row" layout-align="end center">
+        <md-button ui-sref="public.landing">
+          Cancel
+        </md-button>
+        <md-button class="md-primary"
+          ng-disabled="signInForm.$invalid"
+          ng-click="signIn()">
+          Go
+        </md-button>
+      </md-card-actions>
+    </form>
+    <div ng-show="working">
+      <md-card-content>
+        <div>
+          <h2 class="md-title">One moment please...</h2>
+        </div>
+        <div class="text-center">
+          <div layout="row" layout-align="space-around">
+            <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+          </div>
+        </div>
+      </md-card-content>
+      <md-card-actions layout="row" layout-align="end center">
+        <md-button class="md-primary" type="submit"
+          disabled>
+          Working...
+        </md-button>
+      </md-card-actions>
+    </div>
+  </md-card>
+</div>

@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 
 using MS.Utility;
+using MS.TemplateReports;
 
 namespace App.Library
 {
@@ -30,6 +31,11 @@ namespace App.Library
         protected override int objectID { get { return this.ID; } }
         protected override ExtendedPropertyScopeType objectScopeType { get { return this.ScopeType; } }
         protected override int? objectScopeID { get { return this.ScopeID; } }
+
+        public string FullName
+        {
+            get { return User.GenerateFullName(this.FirstName, this.LastName); }
+        }
 
 
         private static IQueryable<Participant> query(AppDC dc)
@@ -54,7 +60,8 @@ namespace App.Library
         private static Func<IQueryable<Participant>, string, IQueryable<Participant>> termFilter = (query, searchTermLower) =>
         {
             return query.Where(item =>
-                item.Name.ToLower().Contains(searchTermLower));
+                item.FirstName.Contains(searchTermLower) ||
+                item.LastName.Contains(searchTermLower));
         };
 
         public static IQueryable<Participant> Query(AppDC dc, SearchExpression searchExpression)
@@ -165,8 +172,10 @@ namespace App.Library
 
         public class SearchItem : ExtendedSearchItem
         {
-            public string name { get; internal set; }
-            public string overview { get; internal set; }
+            [JsonProperty("firstName")]
+            public string FirstName { get; internal set; }
+            [JsonProperty("lastName")]
+            public string LastName { get; internal set; }
 
             [JsonProperty("participantGroupID")]
             public int ParticipantGroupID { get; internal set; }
@@ -177,15 +186,15 @@ namespace App.Library
             public SearchItem(ExtendedItem<Participant> exItem, SearchItemContext context)
                 : base(exItem, context)
             {
-                this.name = exItem.item.Name;
-                this.overview = exItem.item.Overview;
+                this.FirstName = exItem.item.FirstName;
+                this.LastName = exItem.item.LastName;
                 this.ParticipantGroupID = exItem.item.ParticipantGroupID;
 
                 this.CreatedTimestamp = exItem.item.CreatedTimestamp;
 
                 // https://s3.amazonaws.com/gopvr-com-lab-public/tvdb/S-124971/P-posters/124971-1.jpg
                 //this.imageUrl = string.IsNullOrEmpty(exItem.item.ImageS3Path) ? null :
-                    //new Uri(SiteContext.Current.PublicBucketUrl + exItem.item.ImageS3Path);
+                //new Uri(SiteContext.Current.PublicBucketUrl + exItem.item.ImageS3Path);
             }
 
             public static SearchItem Create(ExtendedItem<Participant> item, SearchItemContext context)
@@ -202,7 +211,7 @@ namespace App.Library
             var resultSetQuery = ExtendedQuery(dc, searchExpression);
 
             //resultSetQuery = resultSetQuery
-                //.OrderBy(foo => foo.item.ReleasedTimestamp);
+            //.OrderBy(foo => foo.item.ReleasedTimestamp);
 
             var results = Search(dc, searchExpression, sortExpression, startRowIndex, maximumRows, resultSetQuery, SearchItem.Create);
             return results;
@@ -483,9 +492,14 @@ namespace App.Library
             return HubResult.Error;
         }
 
+        private static Participant exCreateLock(AppDC dc, JToken data, Func<Participant> createHandler)
+        {
+            return exCreateLock(dc, data, NotifyClients, createHandler);
+        }
+
         private static Participant createLock(AppDC dc, Func<Participant> createHandler)
         {
-            return CreateLock(dc, NotifyClients, createHandler);
+            return createLock(dc, NotifyClients, createHandler);
         }
 
         internal static T ReadLock<T>(AppDC dc, int itemID, Func<Participant, T> readHandler)
@@ -567,20 +581,184 @@ namespace App.Library
 #endif
 
 
-        internal static void NotifyClients(AppDC dc, SearchExpression notifyExpression)
+        internal static void NotifyClients(AppDC dc, NotifyExpression notifyExpression)
         {
-            var siteContext = SiteContext.Current;
-
             var notification = Participant.Search(dc, notifyExpression, null, 0, int.MaxValue);
-
-            var hubClients = siteContext.ConnectionManager.GetHubContext("siteHub").Clients;
-            Debug.Assert(hubClients != null);
-            hubClients.All.updateEpisodesData(notification);
+            NotifyClients("siteHub", notifyExpression, notification, (hubClients, notificationItem) => hubClients.All.updateParticipants(notificationItem));
         }
 
         public override string ToString()
         {
-            return this.Name;
+            return this.FullName;
+        }
+
+        public static Participant GenerateRandom(AppDC dc)
+        {
+            return GenerateRandom(dc, null);
+        }
+
+        public static Participant GenerateRandom(AppDC dc, int[] participantGroups)
+        {
+            var random = RandomProvider.GetThreadRandom();
+
+            // generate a random contact
+            var randomContactJson = User.GenerateRandomContact();
+
+            dynamic userNameJson = randomContactJson.name;
+            string firstName = userNameJson.first;
+            string lastName = userNameJson.last;
+            string gender = randomContactJson.gender;
+
+            dynamic userLocationJson = randomContactJson.location;
+            string streetAddress = userLocationJson.street;
+
+            string phoneNumber = randomContactJson.phone;
+            string email = randomContactJson.email;
+            string profilePhotoUrlString = randomContactJson.picture;
+            string ssn = randomContactJson.SSN;
+
+            var textInfo = new System.Globalization.CultureInfo("en-US", false).TextInfo;
+            var firstNameCapitalized = textInfo.ToTitleCase(firstName);
+            var lastNameCapitalized = textInfo.ToTitleCase(lastName);
+            var mailAddress = email.ParseMailAddress();
+
+            var data = new
+            {
+                firstName = firstNameCapitalized,
+                lastName = lastNameCapitalized,
+
+                gender = gender,
+
+                participantGroupID = participantGroups.ChooseRandom(),
+            }.ToJson().FromJson();
+
+            var result = Participant.createLock(dc, () =>
+            {
+                var newParticipant = Participant.Create(dc, data);
+                return newParticipant;
+            });
+
+            return result;
+
+        }
+
+        public static Participant Create(AppDC dc, dynamic data)
+        {
+            return Participant.createLock(dc, () =>
+            {
+                var createdTimestamp = dc.TransactionTimestamp;
+                var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+
+                var firstName = (string)data.firstName;
+                var lastName = (string)data.lastName;
+
+                Debug.Assert(!string.IsNullOrEmpty(firstName));
+                Debug.Assert(!string.IsNullOrEmpty(lastName));
+
+                var participantGroupID = (int)data.participantGroupID;
+
+                var newItem = new Participant(createdTimestamp, teamEPScope, firstName, lastName, participantGroupID);
+
+                var genderString = (string)data.gender;
+                UserGender? userGender = genderString.ParseUserGenderOrNull();
+                newItem.Gender = userGender;
+
+                dc.Save(newItem);
+
+                Debug.Assert(newItem.ID > 0);
+
+                return newItem;
+            });
+        }
+
+    private void updateData(AppDC dc, dynamic data)
+    {
+      this.FirstName = (string)data.firstName;
+      this.LastName = (string)data.lastName;
+
+      var genderString = (string)data.gender;
+      UserGender? userGender = genderString.ParseUserGenderOrNull();
+      this.Gender = userGender;
+
+      var participantGroupID = (int?)data.participantGroupID;
+      if (participantGroupID.HasValue)
+      {
+        var participantGroup = participantGroupID.HasValue ? ParticipantGroup.FindByID(dc, participantGroupID.Value) : null;
+        if (participantGroup != null)
+        {
+          this.ParticipantGroupID = participantGroupID.Value;
+        }
+      }
+    }
+
+    public static HubResult Edit(AppDC dc, int itemID, dynamic data)
+        {
+          return WriteLock(dc, itemID, (item, notifyExpression) =>
+          {
+            item.updateData(dc, data);
+
+            notifyExpression.AddModifiedID(item.ID);
+            return HubResult.Success;
+          });
+        }
+
+    protected Participant(DateTime createdTimestamp, EPScope epScope, string firstName, string lastName, int participantGroupID)
+            : this()
+        {
+            Debug.Assert(!string.IsNullOrEmpty(firstName));
+            Debug.Assert(!string.IsNullOrEmpty(lastName));
+
+            this.CreatedTimestamp = createdTimestamp;
+            this.ScopeType = epScope.ScopeType;
+            this.ScopeID = epScope.ID;
+
+            this.FirstName = firstName;
+            this.LastName = lastName;
+
+            this.ParticipantGroupID = participantGroupID;
+        }
+
+        public static ReportGenerator GetReportGenerator(AppDC appDC, string templateName, ReportFormat reportFormat, int itemID)
+        {
+            var siteContext = SiteContext.Current;
+
+            TagProvider tagProvider = null;
+            tagProvider = Participant.createParticipantTagProvider(appDC, itemID);
+
+            ReportGenerator reportGenerator = null;
+            if (tagProvider != null)
+            {
+                var documentTemplate = DocumentTemplate.FromResource("AppLibrary.Reports." + templateName, null);
+                reportGenerator = siteContext.TemplateReports.Generate(reportFormat, tagProvider, documentTemplate);
+            }
+
+            return reportGenerator;
+        }
+
+        private static TagProvider createParticipantTagProvider(AppDC appDC, int itemID)
+        {
+            var exQuery =
+                from epParticipant in ExtendedQuery(appDC)
+                join school in ParticipantGroup.Query(appDC) on epParticipant.item.ParticipantGroupID equals school.ID
+                select new { epParticipant };
+
+            var exResult = exQuery
+                .Where(exItem => exItem.epParticipant.item.ID == itemID)
+                .FirstOrDefault();
+
+            var participant = exResult.epParticipant.item;
+
+            IEnumerable<ProviderTag> tags = new ProviderTag[]
+            {
+                StringProviderTag.Create("FirstName", participant.FirstName),
+                StringProviderTag.Create("LastName", participant.LastName),
+                StringProviderTag.Create("FullName", participant.FullName),
+
+                StringProviderTag.Create("SchoolName", participant.ParticipantGroup.Name),
+                StringProviderTag.Create("Address", "Main Street, Redmond WA 98052"),
+            };
+
+            return TagProvider.Create(tags);
         }
     }
 }

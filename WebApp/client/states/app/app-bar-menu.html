@@ -8,29 +8,35 @@
         <p><i class="fa fa-code"></i> Debug Mode: {{debugMode ? "On" : "Off"}}</p>
       </md-button>
     </md-menu-item>
-    <md-menu-divider></md-menu-divider>
-    <md-menu-item>
-      <md-button ng-click="goToState('app.user.home')">
-        <p><i class="fa fa-user"></i> Switch to User</p>
+    <md-menu-item
+      ng-repeat="tenantTerm in tenantTerms">
+      <md-button ng-click="changeLanguage(tenantTerm.langKey)">
+        <p><i class="fa fa-quote-left"></i> Use {{tenantTerm.name}}</p>
       </md-button>
     </md-menu-item>
     <md-menu-divider></md-menu-divider>
     <md-menu-item>
+      <md-button ng-click="goToState('app.user.events')">
+        <p><i class="fa fa-user"></i> Switch to Event Manager</p>
+      </md-button>
+    </md-menu-item>
+    <md-menu-divider></md-menu-divider>
+    <md-menu-item ms-show="'SystemAdmin'">
       <md-button ng-click="goToState('app.goodies')">
         <p><i class="fa fa-gift"></i> Goodies</p>
       </md-button>
     </md-menu-item>
-    <md-menu-item>
+    <md-menu-item ms-show="'SystemAdmin'">
       <md-button ng-click="goToState('app.site-admin.system.dashboard')">
         <p><i class="fa fa-bolt"></i> System Admin</p>
       </md-button>
     </md-menu-item>
-    <md-menu-item>
+    <md-menu-item ms-show="'OperationsAdmin'">
       <md-button ng-click="goToState('app.site-admin.ops.dashboard')">
         <p><i class="fa fa-bolt"></i> Ops Admin</p>
       </md-button>
     </md-menu-item>
-    <md-menu-item>
+    <md-menu-item ms-show="'DatabaseAdmin'">
       <md-button ng-click="goToState('app.site-admin.database.dashboard')">
         <p><i class="fa fa-bolt"></i> Database Admin</p>
       </md-button>

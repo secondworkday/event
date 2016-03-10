@@ -1,0 +1,9 @@
+<div><pre>{{tenant | json}}</pre></div>
+
+
+<md-button ng-click="modifyAccountOption(tenant, 'isDemo', !tenant.accountOptions.isDemo)" aria-label="Toggle Demo Tenant">
+  Toggle Demo Tenant
+</md-button>
+Demo is currently: {{tenant.accountOptions.isDemo ? 'ON' : 'OFF'}}
+
+

@@ -1,0 +1,54 @@
+<md-dialog aria-label="check in {{'PARTICIPANT' | translate}}" ng-cloak style="min-width: 400px;">
+  <form>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>{{checkInOrUndo}} {{'PARTICIPANT' | translate}}</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <i class="fa fa-times"></i>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-dialog-content>
+      <div class="md-dialog-content">
+
+        <md-input-container class="md-block" flex-gt-sm>
+          <label>{{'PARTICIPANT' | translate }}</label>
+          <input type="text" ng-model="formData.fullName" readonly>
+        </md-input-container>
+
+        <div ng-if="checkInOrUndo == 'Check In'">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>{{'PARTICIPANT_LEVEL' | translate}}</label>
+            <input type="text" ng-model="formData.level" readonly>
+          </md-input-container>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Notes</label>
+            <textarea ng-model="formData.notes"></textarea>
+          </md-input-container>
+        </div>
+
+        <div ng-if="checkInOrUndo == 'Undo Check In'">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Check In Time</label>
+            <input type="text" ng-model="formData.checkInTimestampString" readonly>
+          </md-input-container>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Checked In By</label>
+            <input type="text" readonly value="{{(formData.checkedInUserID | demandUser).displayName}}">
+          </md-input-container>
+        </div>
+      </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row" layout-align="end center">
+      <md-button ng-click="cancel()">
+        Cancel
+      </md-button>
+      <md-button ng-if="checkInOrUndo == 'Check In'" ng-click="checkInParticipant(formData)" type="submit">Check in</md-button>
+      <md-button ng-if="checkInOrUndo == 'Undo Check In'" ng-click="undoCheckInParticipant(formData)" type="submit">Undo Check in</md-button>
+    </md-dialog-actions>
+    <div ms-debug-only>
+      <pre>{{formData | json}}</pre>
+    </div>
+  </form>
+</md-dialog>

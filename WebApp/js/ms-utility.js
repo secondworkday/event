@@ -2,6 +2,12 @@
 // Define basic Authorization roles here.
 // They allow states to be protected based on Role. (Only SystemAdmins can enter system admin states, etc.)
 
+//app.constant('APP_ROLE_TRANSLATION', {
+  // Note: This is intended to be defined by the application
+//});
+
+
+
 app.constant('AUTHORIZATION_ROLES', {
   // Other
   anonymous: "Anonymous",
@@ -20,6 +26,13 @@ app.constant('AUTHORIZATION_ROLES', {
 
 
 app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'utilityService', 'AUTHORIZATION_ROLES', function ($rootScope, $state, $stateParams, $http, $templateCache, utilityService, AUTHORIZATION_ROLES) {
+
+  // this is the generic way to tell an md-tab that user changed to another tab
+  // as long as tabs are looking for 'currentTab' and the state definition file
+  // includes data for 'selectedTab' Index then this will work
+  $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+    $rootScope.currentTab = toState.data.selectedTab;
+  });
 
   $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
 
@@ -50,6 +63,13 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
   });
 
   $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+
+
+    if (toState.redirectTo) {
+      event.preventDefault();
+      $state.go(toState.redirectTo, toParams);
+    }
+
     //set variables to false
     $rootScope.isAdminState = toState.name.indexOf(".admin.") > -1;
     $rootScope.isSystemState = toState.name.indexOf(".system.") > -1;
@@ -88,7 +108,7 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
 
       // See if identity has any roles in common with stateAllowedRoles
       var intersection = stateAllowedRoles.filter(function (n) {
-        return identityRoles.indexOf(n) != -1
+        return identityRoles.indexOf(n) != -1;
       });
       if (intersection.length > 0) {
         return true;
@@ -96,7 +116,7 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
 
       // If we can't find a reason to allow - we've got to deny
       return false;
-    }
+    };
 
     if (authenticate(stateAllowedRoles, authenticatedIdenity)) {
       return;
@@ -118,7 +138,7 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
 
         if (!authenticatedIdenity) {
           // log on / sign in...
-          $state.go("public.sign-in", null, { location: 'replace' });
+          $state.go("public.landing", null, { location: 'replace' });
         }
         if (authenticate(stateAllowedRoles, authenticatedIdenity)) {
           // location: 'replace' prevents the browser back button from returning a logged in user to the login page.
@@ -162,7 +182,7 @@ app.controller('SpaController', function ($scope, $http, $window, $state, SYSTEM
   $scope.signOut = function () {
     utilityService.signOut()
       .then(function () {
-        $state.go('public.sign-in', {}, { reload: true });
+        $state.go('public.landing', {}, { reload: true });
         // $state.go('app.system.users', {}, { reload: true });
       });
   };
@@ -263,7 +283,7 @@ app.service('bootstrapService', ['$rootScope', '$q', 'utilityService', function 
 app.constant('CONNECTION_EVENT', {
   connectionStarting: 'connection-starting',
   connectionStarted: 'connection-started',
-  connectionStopped: 'connection-stopped',
+  connectionStopped: 'connection-stopped'
 })
 .constant('CONNECTION_STATUS', {
   online: 'online',
@@ -271,19 +291,84 @@ app.constant('CONNECTION_EVENT', {
   reconnecting: 'reconnecting'
 });
 
-// Authenticated Identity - generally represents a specific User
+// Authenticated Identity - generally represents a specific User, but could also be a Kiosk, one-time access User, etc.
 app.service('msIdentity', function () {
-  this.create = function (type, id, displayName, roles, profilePhotoUrl) {
-    if (!angular.isArray(roles)) {
-      roles = [roles];
+  this.create = function (type, id, displayName, appRoles, systemRoles, profilePhotoUrl) {
+    if (!angular.isArray(appRoles)) {
+      appRoles = [appRoles];
+    }
+    if (!angular.isArray(systemRoles)) {
+      systemRoles = [systemRoles];
     }
     this.type = type;
     this.id = id;
     this.displayName = displayName;
-    this.roles = roles;
+    this.appRoles = appRoles;
+    this.systemRoles = systemRoles;
     this.profilePhotoUrl = profilePhotoUrl;
+
+    //!! do we still require this?
+    this.roles = systemRoles.concat(appRoles);
+
+
     return this;
   };
+
+
+  //  model.authenticatedIdentity = msIdentity.createItemUser(type, appRoles, systemRoles, userID, userDisplayName, profilePhotoUrl, itemID);
+  this.createUser = function (user) {
+    this.appRoles = user.appRoles || [];
+    this.systemRoles = user.systemRoles || [];
+    this.displayName = user.displayName;
+    this.profilePhotoUrl = user.profilePhotoUrl;
+
+    this.userID = user.id;
+    this.notGotItSet = user.notGotItSet;
+
+    // (used for permission checks)
+    //!! though not really required - could be refactored out
+    this.roles = this.systemRoles.concat(this.appRoles);
+
+    return this;
+  };
+
+
+
+
+
+//  model.authenticatedIdentity = msIdentity.createItemUser(type, appRoles, systemRoles, userID, userDisplayName, profilePhotoUrl, itemID);
+  this.createItemUser = function (appRoles, systemRoles, displayName, profilePhotoUrl, userID, itemType, itemID) {
+    if (!appRoles) {
+      appRoles = [];
+    } else if (!angular.isArray(appRoles)) {
+      appRoles = [appRoles];
+    }
+    if (!systemRoles) {
+      systemRoles = [];
+    } else if (!angular.isArray(systemRoles)) {
+      systemRoles = [systemRoles];
+    }
+    this.appRoles = appRoles;
+    this.systemRoles = systemRoles;
+    this.displayName = displayName;
+    this.profilePhotoUrl = profilePhotoUrl;
+
+    this.userID = userID;
+
+    this.itemType = itemType;
+    this.itemID = itemID;
+
+    //!! what about this???
+    // this.id = id;
+
+    // (used for permission checks)
+    //!! though not really required - could be refactored out
+    this.roles = systemRoles.concat(appRoles);
+
+    return this;
+  };
+
+
   this.destroy = function () {
     this.type = null;
     this.id = null;
@@ -293,6 +378,102 @@ app.service('msIdentity', function () {
   };
   return this;
 });
+
+
+app.service('msAuthenticated', function (AUTHORIZATION_ROLES) {
+
+  var self = this;
+
+  self.setAuthenticatedGroup = function (group) {
+    self.group = group;
+  };
+
+  self.setAuthenticatedIdentity = function (msIdentity) {
+    self.identity = msIdentity;
+  };
+
+
+  self.isNotGotIt = function (gotItLabel) {
+    if (self.identity && self.identity.notGotItSet) {
+      return self.identity.notGotItSet.indexOf(gotItLabel) > -1;
+    }
+    return false;
+  };
+
+  self.setGotIt = function (gotItLabel) {
+    if (self.identity && self.identity.notGotItSet) {
+      var idx = self.identity.notGotItSet.indexOf(gotItLabel);
+      if (idx > -1) {
+        // toggle off...
+        self.identity.notGotItSet.splice(idx, 1);
+      }
+    }
+  };
+
+  self.authorizeRole = function (allowedRoles) {
+
+    allowedRoles = angular.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+
+    // anyone can enter a state which allows AUTHORIZATION_ROLES.anonymous
+    if (allowedRoles.indexOf(AUTHORIZATION_ROLES.anonymous) > -1) {
+      return true;
+    }
+
+    if (!self.identity) {
+      // deny if we don't have an identity
+      return false;
+    }
+
+    // anyone authenticated can enter a state which allows (the default) AUTHORIZATION_ROLES.authenticated
+    if (allowedRoles.indexOf(AUTHORIZATION_ROLES.authenticated) > -1) {
+      return true;
+    }
+
+    var identityRoles = self.identity.roles;
+    if (identityRoles) {
+      // See if identityAppRoles has any roles in common with allowedRoles
+      var intersection = allowedRoles.filter(function (n) {
+        return identityRoles.indexOf(n) > -1;
+      });
+      if (intersection.length > 0) {
+        return true;
+      }
+    }
+
+
+    var identitySystemRoles = self.identity.systemRoles;
+    if (identitySystemRoles) {
+      // See if identitySystemRoles has any roles in common with allowedRoles
+      var intersection = allowedRoles.filter(function (n) {
+        return identitySystemRoles.indexOf(n) > -1;
+      });
+      if (intersection.length > 0) {
+        return true;
+      }
+    }
+
+    var identityAppRoles = self.identity.appRoles;
+    if (identityAppRoles) {
+      // See if identityAppRoles has any roles in common with allowedRoles
+      var intersection = allowedRoles.filter(function (n) {
+        return identityAppRoles.indexOf(n) > -1;
+      });
+      if (intersection.length > 0) {
+        return true;
+      }
+    }
+
+    // If we can't find a reason to allow - we've got to deny
+    return false;
+  };
+
+  return this;
+});
+
+
+
+
+
 
 app.constant('BADGE_COLORS', [
     '#950c00',
@@ -305,7 +486,7 @@ app.constant('BADGE_COLORS', [
     '#8a3e0c'
 ]);
 
-app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window', '$log', 'msIdentity', 'SYSTEM_INFO', 'TEMPLATE_URL', 'CONNECTION_STATUS', 'CONNECTION_EVENT', 'USER_STATE', 'BADGE_COLORS', function ($rootScope, $q, $state, $http, $window, $log, msIdentity, SYSTEM_INFO, TEMPLATE_URL, CONNECTION_STATUS, CONNECTION_EVENT, USER_STATE, BADGE_COLORS) {
+app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window', '$log', 'msIdentity', 'msAuthenticated', 'SYSTEM_INFO', 'TEMPLATE_URL', 'CONNECTION_STATUS', 'CONNECTION_EVENT', 'USER_STATE', 'BADGE_COLORS', function ($rootScope, $q, $state, $http, $window, $log, msIdentity, msAuthenticated, SYSTEM_INFO, TEMPLATE_URL, CONNECTION_STATUS, CONNECTION_EVENT, USER_STATE, BADGE_COLORS) {
 
   var self = this;
 
@@ -317,6 +498,97 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
   var connectionLostState;
 
 
+  // Helper routine, primarily in support of ms-search-view
+  // Takes filters and converts them into a string searchExpression that is compatible with the server SearchExpression class.
+  // Helpful for creating the searchExpression parameter passed to server XxxSearch() methods.
+  self.buildSearchExpression = function (/*filters*/) {
+    var filterHandler = function (searchTerms, filter) {
+      if (typeof filter === 'string') {
+        // direct search component like 'pete'
+        searchTerms.push(filter);
+      }
+      else if (angular.isObject(filter)) {
+        if (filter.serverTerm) {
+          //!! consider what type of serverTerm we've got. If it's a string add it, else if it's an object, add its properties (as we do below)
+          searchTerms.push(filter.serverTerm);
+        }
+        else {
+          // add the properties of this object as serverTerms (presumably there's no associated clientFilter as for immutable data)
+
+          angular.forEach(filter, function (value, key) {
+            if (key && value) {
+              searchTerms.push('$' + key + ':' + value);
+            }
+          });
+
+          // $log.debug('object type?', filter);
+        }
+      }
+    };
+
+    var filterTerms = buildFilterTerms(arguments, filterHandler);
+    var searchExpression = filterTerms.join(' ');
+    return searchExpression;
+  };
+
+  self.buildClientFilter = function (/*filters*/) {
+    var clientFilterHandler = function (clientFilterTerms, filter) {
+
+      if (angular.isUndefined(filter)) {
+        // nothing to do
+      }
+      else if (angular.isFunction(filter)) {
+        clientFilterTerms.push(filter);
+      }
+      else if (angular.isObject(filter)) {
+        if (filter.clientFunction) {
+          clientFilterTerms.push(filter.clientFunction);
+        }
+        else {
+          $log.debug('object type?', filter);
+        }
+      }
+    };
+
+    var filterTerms = buildFilterTerms(arguments, clientFilterHandler);
+    return filterTerms;
+  };
+
+  function buildFilterTerms(hierarchy, filterHandler) {
+    var filterTerms = [];
+    angular.forEach(hierarchy, function (filter) {
+      if (angular.isArray(filter)) {
+        angular.forEach(filter, function (filter) {
+          filterHandler(filterTerms, filter);
+        });
+      } else {
+        filterHandler(filterTerms, filter);
+      }
+    });
+    return filterTerms;
+  }
+
+
+  self.toggleList = function (list, item) {
+    var idx = list.indexOf(item);
+    if (idx > -1) {
+      // toggle off...
+      list.splice(idx, 1);
+    }
+    else {
+      // toggle on...
+      list.push(item);
+    }
+  };
+
+  self.listContains = function (list, item) {
+    return list.indexOf(item) > -1;
+  };
+
+
+
+
+
   // Some handy compare functions
 
     function compareByID(left, right) {
@@ -326,7 +598,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
     function compareByIDDescending(left, right) {
       return compareByID(right, left);
-    };
+    }
     this.compareByIDDescending = compareByIDDescending;
 
 
@@ -362,7 +634,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
             i++;
           }
           return result;
-        }
+        };
       }
       var sortOrder = 1;
       if (propertyName[0] === "-") {
@@ -381,8 +653,35 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         var result = (left[propertyName] < right[propertyName]) ? -1 : (left[propertyName] > right[propertyName]) ? 1 : 0;
         return result * sortOrder;
       }
-    }
+    };
 
+    self.filterByPropertyValue = function (propertyName, value) {
+      var value = value;
+      return function (item) {
+        return item[propertyName] === value;
+      };
+    };
+
+    self.filterByPropertyHasValue = function (propertyName) {
+      var propertyName = propertyName;
+      if (propertyName[0] === "!") {
+        propertyName = propertyName.substr(1);
+        return function (item) {
+          return !item[propertyName];
+        };
+      }
+      return function (item) {
+        return item[propertyName];
+      };
+    };
+
+
+
+
+
+
+
+  //!! Think these are all depricated - in favor of compareByProperties() above!!!!!
 
 
     self.compareByPropertyThenByID = function (propertyName) {
@@ -586,7 +885,10 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
-
+  // ** handy Group helpers
+  // SignalR groups are used to track ad-hoc collections of clients, generally for notification purposes.
+  // For example, clients join the "eventlog" group if they want to receive server notifications when something changes in the eventlog.
+  // Clients then join that group when they enter the eventlog page/state, and leave it when they exit the eventlog page/state.
 
     function joinGroup(groupName) {
         return callHub(function () {
@@ -650,9 +952,26 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
+  self.getReportTemplateInfo = function () {
+    return callHub(function () {
+      return utilityHub.server.getReportTemplateInfo();
+    });
+  };
+
+  self.removeReportTemplateOverrideFile = function (reportTemplate) {
+    return callHub(function () {
+      return utilityHub.server.removeReportTemplateOverrideFile(reportTemplate);
+    });
+  };
+
+
+
+
+
 
     //** Authentication Related
 
+  //!! depricated - do we still need this?
     this.isInRole = function (role) {
         if (model.authenticatedIdentity) {
             // role == authenticatedIdentity.type == "hospital" --> kiosk mode
@@ -675,7 +994,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     // tracks in memory the presumably few myTasks that are active
     activeIndexer: {
       index: [],
-      sort: self.localeCompareByPropertyThenByID('name'),
+      sort: self.compareByProperties('name', 'id'),
       filter: function (item) {
         return item.state == 'Active';
       }
@@ -712,15 +1031,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
   };
 
 
-/*
-    this.getActiveAndBlockedCases = function () {
-      this.searchCases('$Submitted $Rejected', '', 0, 999999);
-    };
 
-    this.getClosedCases = function (startIndex, rowCount) {
-      return this.searchClosedCases('', startIndex, rowCount);
-    };
-*/
 
   self.searchMyTasks = function (searchExpression, sortExpression, startIndex, rowCount) {
     return self.callHub(function () {
@@ -785,64 +1096,206 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
-  //** Tenant Related
 
-  model.tenantGroups = {
-    hashMap: {},
-    index: [],
 
-    groupsIndexer: {
-      index: [],
-      sort: self.compareByProperties('name', 'id'),
-      filter: function (item) {
-        return item.parentID;
+
+
+
+
+
+
+
+
+
+
+
+
+  //!! INDEXER Helpers - so that controllers can keep things up-to-date based on the standard notifications we send from our services!! 
+
+  self.registerIndexer = function (modelItems, indexer) {
+
+    var clientFilters = self.buildClientFilter(
+      //!! hmm - nonstandard name?
+      indexer.filter,
+
+      indexer.baseFilter,
+      indexer.stackFilters,
+      indexer.selectFilter,
+      indexer.objectFilter,
+      indexer.userSearch);
+
+    indexer.clientFilter = function (item) {
+      // If we fail any filter, return false
+      for (var i = 0; i < clientFilters.length; i++) {
+        if (!clientFilters[i](item)) {
+          return false;
+        }
       }
-    },
-
-    tenantsIndexer: {
-      index: [],
-      sort: self.compareByProperties('name', 'id'),
-      filter: function (item) {
-        return !item.parentID;
-      }
-    },
-
-    search: function (searchExpression, sortExpression, startIndex, rowCount) {
-      return callHub(function () {
-        return utilityHub.server.searchTenantGroups(searchExpression, sortExpression, startIndex, rowCount);
-      }).then(function (itemsData) {
-        return onTenantGroupsUpdated(model.tenantGroups, itemsData);
-      });
-    }
-  };
-
-  // (actually supports both tenants (top level) and groups (children of tenants)
-  function onTenantGroupsUpdated(itemsModel, itemsData) {
-    // Update our main cache (model.xxx) and cacheIndex (model.xxxIndex)
-
-    self.purgeItems(itemsData.deletedKeys, itemsModel.hashMap, itemsModel.index, itemsModel.groupsIndexer.index, itemsModel.tenantsIndexer.index);
-    var newItemIDs = cacheSortedItems(itemsData.items, itemsModel.hashMap, itemsModel.index, itemsModel.tenantsIndexer, itemsModel.groupsIndexer);
-
-    if (model.authenticatedGroup) {
-      // refresh our authenticated group (might be a no-op)
-      model.authenticatedGroup = itemsModel.hashMap[model.authenticatedGroup.id];
-    }
-
-    var notification = {
-      hashMap: itemsModel.hashMap,
-      ids: $.map(itemsData.items, function (item) {
-        return item.id;
-      }),
-      newIDs: newItemIDs,
-      deletedKeys: itemsData.deletedKeys,
-      totalCount: itemsData.totalCount,
-      resolvedIDs: []
+      // Otherwise return true
+      return true;
     };
 
-    return notification;
+
+    var modelItemsIndexers = modelItems.indexers;
+    if (!modelItemsIndexers) {
+      modelItems.indexers = modelItemsIndexers = [];
+    }
+
+    //!! should check if we really need to add it!!!
+    modelItemsIndexers.push(indexer);
+
+    // now 'catch up' the indexer with any items that are already in the cache
+    angular.forEach(modelItems.index, function (itemKey) {
+      var item = modelItems.hashMap[itemKey];
+      var indexerOffset = indexerBinarySearch(indexer, modelItems.hashMap, item);
+
+      // determine if we need to add a new index entry
+      if (indexerOffset != null) {
+        var insertOffset = indexerOffset >= 0 ? indexerOffset : ~indexerOffset;
+        indexer.index.splice(insertOffset, 0, itemKey);
+      }
+    });
   };
 
-  // returns a promise (not an Item - see demandXyz() for the delayed load Item variant)
+  self.unRegisterIndexer = function (modelItems, indexer) {
+    if (angular.isArray(indexer)) {
+      angular.forEach(indexer, function (indexerItem) {
+        self.unRegisterIndexer(modelItems, indexerItem);
+      });
+      return;
+    }
+    self.arrayRemove(modelItems.indexers, indexer);
+  };
+
+
+
+
+
+
+  self.createModelItems = function (searchHandler) {
+    var modelItems = {
+      hashMap: {},
+      index: [],
+    };
+
+    // Add a 'search' handler, which fetches items server-side, and caches the results
+    modelItems.search = function (searchExpression, sortExpression, startIndex, rowCount) {
+      return self.callHub(function () {
+        return searchHandler(searchExpression, sortExpression, startIndex, rowCount);
+      }).then(function (itemsData) {
+        return self.updateItemsModel(modelItems, itemsData);
+      });
+    };
+
+    // returns an object, whereas ensure() returns a promise.
+    modelItems.demand = function (itemKey) {
+      if (!itemKey) {
+        return null;
+      }
+      return modelItems.hashMap[itemKey] ||
+        (
+          modelItems.hashMap[itemKey] = { id: itemKey, code: itemKey, displayTitle: 'loading...' },
+          // fetches requested objects that aren't already cached asynchronously
+          self.delayLoad2(modelItems, itemKey),
+          modelItems.hashMap[itemKey]
+        );
+    };
+
+    // returns a promise, whereas demand() returns a object.
+    modelItems.ensure = function (itemData) {
+
+      var missingItemKey;
+      var missingItemKeys;
+
+      if (angular.isString(itemData) || angular.isNumber(itemData)) {
+        // We're asked for 1 item
+        var item = modelItems.hashMap[itemData];
+        if (item) {
+          // We've got it - nothing to do
+          return $q.when(item);
+        }
+        // We've NOT got it
+        missingItemKey = itemData;
+        missingItemKeys = [itemData];
+      } else if (angular.isArray(itemData)) {
+        var missingItemKeys = itemData.filter(function (itemKey) {
+          return !modelItems.hashMap[itemKey];
+        });
+      } else {
+        console.log("modelItems.ensure(), unexpected", itemData);
+      }
+
+      if (!missingItemKeys) {
+        // nothing to do
+        return $q.when();
+      }
+
+      var searchExpression = '%' + missingItemKeys.join(" %");
+      return modelItems.search(searchExpression, "", 0, 9999999)
+      .then(function (notificationData) {
+        // (search should have already cached any results)
+        if (missingItemKey) {
+          return modelItems.hashMap[missingItemKey];
+        }
+        return missingItemKeys.map(function (itemKey) {
+          return modelItems.hashMap[itemKey];
+        });
+      });
+    };
+
+    return modelItems;
+  };
+
+
+
+
+
+
+  //** Tenant Related
+  self.tenantGroups = self.createModelItems(utilityHub.server.searchTenantGroups);
+  model.tenantGroups = self.tenantGroups;
+
+
+  utilityHub.on('updateTenantGroups', function (itemsData) {
+    $rootScope.$apply(function () {
+      $rootScope.$broadcast('updateTenantGroups', self.updateItemsModel(self.tenantGroups, itemsData))
+      // After an update, freshen our authenticatedGroup
+      if (model.authenticatedGroup) {
+        // refresh our authenticated group (might be a no-op if nothing in our authenticatedGroup has changed)
+        model.authenticatedGroup = itemsModel.hashMap[model.authenticatedGroup.id];
+        msAuthenticated.setAuthenticatedGroup(model.authenticatedGroup);
+      }
+    });
+  }).on('setAuthenticatedTenantGroup', function (itemsData) {
+    $rootScope.$apply(function () {
+      self.updateItemsModel(self.tenantGroups, itemsData);
+      if (itemsData && itemsData.items) {
+        // Set our authenticatedGroup
+        model.authenticatedGroup = itemsData.items[0];
+        msAuthenticated.setAuthenticatedGroup(model.authenticatedGroup);
+      }
+    });
+  });
+
+  self.tenantGroups.tenantsIndexer = {
+    index: [],
+    sort: self.compareByProperties('name', 'id'),
+    filter: function (item) {
+      return !item.parentID;
+    }
+  };
+  self.registerIndexer(self.tenantGroups, self.tenantGroups.tenantsIndexer);
+
+  self.tenantGroups.groupsIndexer = {
+    index: [],
+    sort: self.compareByProperties('name', 'id'),
+    filter: function (item) {
+      return item.parentID;
+    }
+  };
+  self.registerIndexer(self.tenantGroups, self.tenantGroups.groupsIndexer);
+
+  // depricated - use standard one
   self.ensureTenantGroup = function (itemKey) {
     var modelItems = model.tenantGroups;
     var item = modelItems.hashMap[itemKey];
@@ -861,13 +1314,11 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     var modelItems = model.tenantGroups;
     return modelItems.hashMap[itemKey] ||
       (
-        modelItems.hashMap[itemID] = { id: itemKey, code: itemKey, displayTitle: 'loading...' },
-        utilityService.delayLoad2(modelItems, itemKey),
+        modelItems.hashMap[itemKey] = { id: itemKey, code: itemKey, displayTitle: 'loading...' },
+        self.delayLoad2(modelItems, itemKey),
         modelItems.hashMap[itemKey]
       );
   };
-
-
 
 
 
@@ -884,25 +1335,6 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       return model.tenantGroups.search("^" + parentGroup.id, "", 0, 999999);
     };
 
-    self.getTenant = function (tenantID) {
-      var searchExpression = "%" + tenantID;
-      return self.searchTenants(searchExpression, '', 0, 1)
-      .then(function (itemsData) {
-        var tenant = model.tenantGroups[tenantID];
-        if (tenant) {
-          return tenant;
-        }
-        return $q.reject("not found");
-      });
-    };
-
-    self.searchTenants = function (searchExpression, sortExpression, startIndex, rowCount) {
-      var searchTenantGroupExpression = "^";
-      if (searchExpression) {
-        searchTenantGroupExpression += " " + searchExpression;
-      }
-      return model.tenantGroups.search(searchTenantGroupExpression, sortExpression, startIndex, rowCount);
-    };
 
     this.createTenant = function (tenantName, data) {
         return callHub(function () {
@@ -1004,7 +1436,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     function onUsersUpdated(itemsModel, itemsData) {
       // Update our main cache (model.xxx) and cacheIndex (model.xxxIndex)
 
-      self.purgeItems(itemsData.deletedKeys, itemsModel.hashMap, itemsModel.index, itemsModel.activeUsersIndexer.index, itemsModel.disabledUsersIndexer.index);
+      self.purgeItems(itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index, itemsModel.activeUsersIndexer.index, itemsModel.disabledUsersIndexer.index);
       //!! do we need a self?
       var newItemIDs = cacheSortedItems(itemsData.items, itemsModel.hashMap, itemsModel.index, itemsModel.activeUsersIndexer, itemsModel.disabledUsersIndexer);
       //!! check the sorted bit, and that we're doing the indexers right
@@ -1023,7 +1455,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
           return item.id;
         }),
         newIDs: newItemIDs,
-        deletedKeys: itemsData.deletedKeys,
+        deletedIDs: itemsData.deletedIDs,
         totalCount: itemsData.totalCount,
         resolvedIDs: []
       };
@@ -1059,11 +1491,20 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       var modelItems = model.users;
       return modelItems.hashMap[itemKey] ||
         (
-          modelItems.hashMap[itemID] = { id: itemKey, code: itemKey, displayTitle: 'loading...' },
-          utilityService.delayLoad2(modelItems, itemKey),
+          modelItems.hashMap[itemKey] = { id: itemKey, code: itemKey, displayTitle: 'loading...' },
+          self.delayLoad2(modelItems, itemKey),
           modelItems.hashMap[itemKey]
         );
     };
+
+
+    self.setUserGotIt = function (identity, gotItLabel) {
+      return callHub(function () {
+        return utilityHub.server.setUserGotIt(identity.userID, gotItLabel);
+      });
+    };
+
+
 
 
 
@@ -1281,6 +1722,13 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     };
 
 
+    this.createDemoUser = function (appRole) {
+      return callHub(function () {
+        return utilityHub.server.createDemoUser(appRole);
+      });
+    };
+
+
     //!! for testing
     this.createRandomUser = function (appRole) {
       return callHub(function () {
@@ -1310,68 +1758,6 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
-    self.delayLoad2 = function (modelItems, itemKey) {
-
-      if (!modelItems.delayLoad) {
-        modelItems.delayLoad = {
-          busy: false,
-          deferred: $q.defer(),
-          itemKeys: [],
-          search: function (searchTerm) {
-            return modelItems.search(searchTerm, "", 0, 999999);
-          }
-        };
-      }
-
-      var delayLoadData = modelItems.delayLoad;
-
-
-
-      if (itemKey) {
-
-        //!! could add a check here to see if we're already featching this itemID - and if so, return that promise.
-
-        if (delayLoadData.itemKeys.indexOf(itemKey) < 0) {
-          // this is a new itemID - add it to our work Q ...
-          delayLoadData.itemKeys.push(itemKey);
-          // ... and mark the target with an object - so Angular can reference the final object that will eventually be hydrated.
-          if (!modelItems.hashMap[itemKey]) {
-            modelItems.hashMap[itemKey] = {};
-          }
-        }
-      }
-
-      if (delayLoadData.busy) {
-        //!! huh?
-        return delayLoadData.deferred.promise;
-      }
-
-      if (delayLoadData.itemKeys.length > 0) {
-        // we're going to issue a new request!
-
-        delayLoadData.busy = true;
-
-        var activeDeferred = delayLoadData.deferred;
-        var searchTerm = '%' + delayLoadData.itemKeys.join(" %");
-
-        // create a new promise and array for our next batch of work
-        delayLoadData.deferred = $q.defer();
-        delayLoadData.itemKeys = [];
-
-        delayLoadData.search(searchTerm)
-        .then(function () {
-          activeDeferred.resolve();
-
-          delayLoadData.busy = false;
-
-          if (delayLoadData.itemKeys.length > 0) {
-            self.delayLoad2(modelItems);
-          }
-        });
-
-        return activeDeferred.promise;
-      }
-    }
 
 
     this.createUser = function (user) {
@@ -1397,6 +1783,13 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
             return utilityHub.server.editUser(UserID, editUser);
         });
     };
+
+    this.updateUser = function (userID, data) {
+      return callHub(function () {
+        return utilityHub.server.updateUser(userID, data);
+      });
+    };
+
 
     this.modifyUserSystemRole = function (user, systemRole, isAssigned) {
         return callHub(function () {
@@ -1457,34 +1850,38 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
+  self.impersonateUser = function (user) {
+    return this.impersonate({ uid: user.id });
+  };
 
-    this.impersonateSystem = function (tenant) {
-        return this.impersonate({ tid: tenant.id });
-    };
+  self.impersonateSystem = function (tenant) {
+    return this.impersonate({ tid: tenant.id });
+  };
 
-    this.impersonate = function (params) {
-        // Post to server and try to login...
+  self.impersonate = function (params) {
+    // Post to server and try to login...
 
-        // null our authenticatedUser, which indicates this hub stoppage is expected
-        var authenticatedUser = model.authenticatedUser;
-        //model.authenticatedIdentity = null;
-        //model.authenticatedUser = null;
-        stopConnection();
+    // null our authenticatedUser, which indicates this hub stoppage is expected
+    var authenticatedUser = model.authenticatedUser;
+    //model.authenticatedIdentity = null;
+    //model.authenticatedUser = null;
+    stopConnection();
 
-        return $http({ method: 'POST', url: '/system/impersonate.ashx', params: params })
-            .success(function (data, status, headers, config) {
-                return startConnection();
-            }).error(function (data, status, headers, config) {
-                // called asynchronously if an error occurs
-                // or server returns response with an error status.
-            });
-    };
+    return $http({ method: 'POST', url: '/system/impersonate.ashx', params: params })
+        .success(function (data, status, headers, config) {
+          return startConnection();
+        }).error(function (data, status, headers, config) {
+          // called asynchronously if an error occurs
+          // or server returns response with an error status.
+        });
+  };
+
 
     this.resetPassword = function (authCode, newPassword) {
         stopConnection();
 
         var credentials = { authCode: authCode, newPassword: newPassword };
-        return $http({ method: 'POST', url: '/signin/resetpassword.ashx', data: credentials });
+        return $http({ method: 'POST', url: '/signin/reset-password.ashx', data: credentials });
         // Note we don't restart the connection ...
     };
 
@@ -1563,7 +1960,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
   function onEventLogUpdated(itemsModel, itemsData) {
     // Update our main cache (model.xxx) and cacheIndex (model.xxxIndex)
 
-    self.purgeItems(itemsData.deletedKeys, itemsModel.hashMap, itemsModel.index);
+    self.purgeItems(itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index);
     var newItemIDs = cacheItems(itemsData.items, itemsModel.hashMap, itemsModel.index, self.compareByProperties('-firstOccurenceTimestamp', '-id'));
 
     var notification = {
@@ -1572,7 +1969,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         return item.id;
       }),
       newIDs: newItemIDs,
-      deletedKeys: itemsData.deletedKeys,
+      deletedIDs: itemsData.deletedIDs,
       totalCount: itemsData.totalCount,
       resolvedIDs: []
     };
@@ -1634,20 +2031,96 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
+
+  //** ActivityLog related
+
+    model.activityLog = {
+      hashMap: {},
+      index: [],
+
+      search: function (searchExpression, sortExpression, startIndex, rowCount) {
+        return callHub(function () {
+          return utilityHub.server.searchActivityLog(searchExpression, sortExpression, startIndex, rowCount);
+        }).then(function (itemsData) {
+          return onActivityLogUpdated(model.activityLog, itemsData);
+        });
+      },
+
+      getSet: function (itemID) {
+        return callHub(function () {
+          return utilityHub.server.getActivityLogSet(itemID);
+        });
+      }
+
+    };
+
+    function onActivityLogUpdated(itemsModel, itemsData) {
+      // Update our main cache (model.xxx) and cacheIndex (model.xxxIndex)
+
+      self.purgeItems(itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index);
+      var newItemIDs = cacheItems(itemsData.items, itemsModel.hashMap, itemsModel.index, self.compareByProperties('-id'));
+
+      var notification = {
+        hashMap: itemsModel.hashMap,
+        ids: $.map(itemsData.items, function (item) {
+          return item.id;
+        }),
+        newIDs: newItemIDs,
+        deletedIDs: itemsData.deletedIDs,
+        totalCount: itemsData.totalCount,
+        resolvedIDs: []
+      };
+
+      return notification;
+    };
+
+  // reference count of the number of callers that require server notifications of changes
+    var trackActivityLogCount = 0;
+    this.trackActivityLog = function () {
+      if (++trackActivityLogCount == 1) {
+        joinGroup("activityLog");
+      }
+    };
+    this.untrackActivityLog = function () {
+      if (--trackActivityLogCount == 0) {
+        leaveGroup("activityLog");
+      }
+    };
+
+    this.getActivityLog = function (startIndex, rowCount) {
+      return model.activityLog.search('', '', startIndex, rowCount);
+    };
+
+
+
+  // returns a promise (not an Item - see demandXyz() for the delayed load Item variant)
+    self.ensureActivityLog = function (itemKey) {
+      var modelItems = model.activityLog;
+      var item = modelItems.hashMap[itemKey];
+      if (!item) {
+        return modelItems.search("%" + itemKey, "", 0, 1)
+        .then(function (ignoredNotificationData) {
+          return modelItems.hashMap[itemKey];
+        });
+      }
+
+      return $q.when(item);
+    };
+
+
+
+
+
     this.updateAuthUserAway = function (away) {
         return utilityHub.server.updateAuthUserAway(away);
     }
 
-    utilityHub.on('setAuthenticatedTenantGroup', function (tenantGroupsData) {
-      $rootScope.$apply(onSetAuthenticatedTenantGroup(tenantGroupsData));
-    }).on('setAuthenticatedUser', function (usersData) {
+    utilityHub.on('setAuthenticatedUser', function (usersData) {
       $rootScope.$apply(onSetAuthenticatedUser(usersData));
     }).on('setSystemAuthenticated', function (tenantID) {
       $rootScope.$apply(onSetSystemAuthenticated(tenantID));
     }).on('updateJobsData', function (jobsData) {
       $rootScope.$apply(onJobsDataUpdated(jobsData));
-    }).on('updateTenantGroups', function (itemsData) {
-      $rootScope.$apply($rootScope.$broadcast('updateTenantGroups', onTenantGroupsUpdated(model.tenantGroups, itemsData)));
     }).on('updateUsers', function (itemsData) {
       $rootScope.$apply($rootScope.$broadcast('updateUsers', onUsersUpdated(model.users, itemsData)));
     }).on('updateMyTasks', function (itemsData) {
@@ -1667,12 +2140,6 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       $rootScope.$apply(self.onServerRestart());
     });
 
-    function onSetAuthenticatedTenantGroup(tenantGroupsData) {
-      onTenantGroupsUpdated(model.tenantGroups, tenantGroupsData);
-      if (tenantGroupsData && tenantGroupsData.items) {
-        model.authenticatedGroup = tenantGroupsData.items[0];
-      }
-    };
 
     function onSetAuthenticatedUser(usersData) {
       // usersData is expected to contain just one user - the authenticated user
@@ -1681,18 +2148,24 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
         //!! TODO - this users' data might change - need to track that in onUsersUpdated() - but do that after we change the server notification
         var authenticatedUser = usersData.items[0];
-        var roles = authenticatedUser.systemRoles.concat(authenticatedUser.roles);
-        model.authenticatedIdentity = msIdentity.create('user', authenticatedUser.id, authenticatedUser.displayName, roles, authenticatedUser.profilePhotoUrl);
+        model.authenticatedIdentity = msIdentity.createUser(authenticatedUser);
         //!! retire this guy...
         model.authenticatedUser = authenticatedUser;
+
+        msAuthenticated.setAuthenticatedIdentity(model.authenticatedIdentity);
 
         $rootScope.$broadcast('authenticated:', model.authenticatedIdentity);
       }
     };
 
     function onSetSystemAuthenticated(tenantID) {
-      model.authenticatedIdentity = msIdentity.create('tenant', tenantID, "System Admin", ["SystemAdmin", "TenantAdmin"], null);
+      var appRoles = ['Admin'];
+      var systemRoles = ["SystemAdmin", "TenantAdmin"];
+      model.authenticatedIdentity = msIdentity.create('tenant', tenantID, "System Admin", appRoles, systemRoles, null);
       model.authenticatedUser = null;
+
+        msAuthenticated.setAuthenticatedIdentity(authenticatedUser);
+
 
       $rootScope.$broadcast('authenticated:', model.authenticatedIdentity);
     };
@@ -1828,7 +2301,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         }
         else {
           // shouldn't happen
-          $state.go('public.sign-in');
+          $state.go('public.landing');
         }
       }).fail(function (reason) {
         //!! show the button or change states
@@ -1846,7 +2319,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         }
         else {
           // shouldn't happen
-          $state.go('public.sign-in');
+          $state.go('public.landing');
         }
       });
     });
@@ -1962,6 +2435,77 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
+    self.delayLoad2 = function (modelItems, itemKey) {
+
+      if (!modelItems.delayLoad) {
+        modelItems.delayLoad = {
+          busy: false,
+          deferred: $q.defer(),
+          itemKeys: [],
+          search: function (searchTerm) {
+            return modelItems.search(searchTerm, "", 0, 999999);
+          }
+        };
+      }
+
+      var delayLoadData = modelItems.delayLoad;
+
+      if (itemKey) {
+
+        //!! could add a check here to see if we're already featching this itemID - and if so, return that promise.
+
+        if (delayLoadData.itemKeys.indexOf(itemKey) < 0) {
+          // this is a new itemID - add it to our work Q ...
+          delayLoadData.itemKeys.push(itemKey);
+          // ... and mark the target with an object - so Angular can reference the final object that will eventually be hydrated.
+          if (!modelItems.hashMap[itemKey]) {
+            modelItems.hashMap[itemKey] = {};
+          }
+        }
+      }
+
+      if (delayLoadData.busy) {
+        //!! huh?
+        return delayLoadData.deferred.promise;
+      }
+
+      if (delayLoadData.itemKeys.length > 0) {
+        // we're going to issue a new request!
+
+        delayLoadData.busy = true;
+
+        var activeDeferred = delayLoadData.deferred;
+        var searchTerm = '%' + delayLoadData.itemKeys.join(" %");
+
+        // create a new promise and array for our next batch of work
+        delayLoadData.deferred = $q.defer();
+        delayLoadData.itemKeys = [];
+
+        delayLoadData.search(searchTerm)
+        .then(function () {
+          activeDeferred.resolve();
+
+          delayLoadData.busy = false;
+
+          if (delayLoadData.itemKeys.length > 0) {
+            self.delayLoad2(modelItems);
+          }
+        });
+
+        return activeDeferred.promise;
+      }
+    };
+
+
+
+
+
+
+
+
+
+
+
     function cacheSortedItems(items, hashMap, hashMapIndex /*, indexer1, indexer2, ..., indexerN*/) {
       var indexers = Array.prototype.slice.call(arguments, 3);
 
@@ -1972,9 +2516,14 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         return newItemsIndex;
       }
 
-      // create a customized compareBy that knows how to compare an Item with an ID in our index array
-      var rightIDCompareBy = function (left, rightID) {
-        return left.id - rightID;
+      // create a customized compareBy that knows how to compare an Item with a Key in our index array
+      // Remember, a Key can be an integer (id) or a string (code).
+      var rightKeyCompareBy = function (left, rightKey) {
+        var keyPropertyName = "id";
+        var result = (left[keyPropertyName] < rightKey) ? -1 : (left[keyPropertyName] > rightKey) ? 1 : 0;
+        return result;
+
+        //return left.id - rightID;
         //var right = hashMap[rightID];
         //return compareByID(left, right);
       };
@@ -1985,7 +2534,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         // ** Updated our primary hashMapIndex (sorted based on item.ID)
         if (hashMapIndex) {
           // (item IDs are immutable, so we don't have to worry about an item changing location in the hashMapIndex)
-          var hashMapIndexOffset = binarySearch(hashMapIndex, item, rightIDCompareBy);
+          var hashMapIndexOffset = binarySearch(hashMapIndex, item, rightKeyCompareBy);
           if (hashMapIndexOffset < 0) {
             var insertOffset = ~hashMapIndexOffset;
             hashMapIndex.splice(insertOffset, 0, item.id);
@@ -1999,14 +2548,14 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
           var afterOffset = indexerBinarySearch(indexer, hashMap, item);
 
           // determine if we need to remove the existing index entry
-          if (beforeOffset && beforeOffset >= 0) {
+          if (beforeOffset != null && beforeOffset >= 0) {
             if (beforeOffset === afterOffset || beforeOffset === ~afterOffset || beforeOffset+1 === ~afterOffset) {
               // no sense removing and adding back at the same location
               afterOffset = null;
             } else {
               // remove the existing ID
               indexer.index.splice(beforeOffset, 1);
-              if (afterOffset) {
+              if (afterOffset != null) {
                 // fixup the afterOffset if it comes later in the list than the item we just removed, to account for the missing beforeID
                 if (afterOffset > beforeOffset) {
                   // (should never happen, if all Items are unique, we shouldn't have different before & after Offsets which are both *positive*!)
@@ -2018,13 +2567,14 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
             }
           }
           // determine if we need to add a new index entry
-          if (afterOffset) {
+          if (afterOffset != null) {
             var insertOffset = afterOffset >= 0 ? afterOffset : ~afterOffset;
             indexer.index.splice(insertOffset, 0, item.id);
           }
         });
 
-        // ** Update the actual hashMap
+        // ** Update the actual hashMap (so we have accurate records of the data we're storing)
+        //    And update newItemsIndex (so we can send out an accurate notification of any new items that have been added)
         if (existingItem) {
           angular.extend(existingItem, item);
         } else {
@@ -2041,7 +2591,15 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       if (!item) {
         return null;
       }
-      if (indexer.filter && !indexer.filter(item)) {
+      // Perform filtering - so our indexer only contains items we want included
+      if (indexer.clientFilter) {
+        // If we have a .clientFilter - use it exclusively. It should be a compliation of any sub-filters
+        if (!indexer.clientFilter(item)) {
+          return null;
+        }
+      }
+      else if (indexer.filter && !indexer.filter(item)) {
+        // old-school - think we should depricate this
         return null;
       }
       return hashMapBinarySearch(indexer.index, item, indexer.sort, hashMap);
@@ -2098,8 +2656,16 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
         }
       } else {
         if (includeInIndex) {
-          // currently in Index and required to be ... so think about a resort?
-          console.log("resort?", source);
+          // currently in Index and required to be in the Index ... so think about a resort?
+          if (destinationIndexOffset < destinationIndex.length && destinationIndex[destinationIndexOffset] == source) {
+            // noting to do - the item is already in the correct spot
+          } else {
+            // 
+            // Something changed about an element in our list that caused it to change position.
+            // TODO: Seems like the correct response is to move it to the new correct position.
+            // CONSIDER: But what if tons of stuff has changed - when do we panic and just do a complete resort?
+            console.log("resort?", source);
+          }
         } else {
           // currently in Index but not required to be ... so remove it
           destinationIndex.splice(destinationIndexOffset, 1);
@@ -2107,6 +2673,8 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       }
     }
 
+
+  //!! this is deprecated in favor of cacheSortedItems()
     function cacheItems(items, hashMap, hashMapIndex, compareBy) {
       // track any new items we're adding to the hashMap
       var newItemsIndex = [];
@@ -2152,7 +2720,22 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       });
     }
 
-    //!! consider adding an outer optimization which looks to see if the item is added first/last - as is the very common case
+  //!! consider adding an outer optimization which looks to see if the item is added first/last - as is the very common case
+
+
+  /*
+   * Binary search in JavaScript.
+   * Returns the index of of the element in a sorted array or (-n-1) where n is the insertion point for the new element.
+   * Parameters:
+   *     ar - A sorted array
+   *     el - An element to search for
+   *     compare_fn - A comparator function. The function takes two arguments: (a, b) and returns:
+   *        a negative number  if a is less than b;
+   *        0 if a is equal to b;
+   *        a positive number of a is greater than b.
+   * The array may contain duplicate elements. If there are more than one equal elements in the array, 
+   * the returned value can be the index of any one of the equal elements.
+   */
     function binarySearch(ar, el, compare_fn) {
       var m = 0;
       var n = ar.length - 1;
@@ -2191,10 +2774,27 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
     self.updateItemsModel = function(itemsModel, itemsData) {
-      // Update our main cache (model.xxx) and cacheIndex (model.xxxIndex)
 
-      self.purgeItems(itemsData.deletedKeys, itemsModel.hashMap, itemsModel.index);
-      var newItemIDs = self.cacheItems(itemsData.items, itemsModel.hashMap, itemsModel.index);
+
+      // Purge any Indexers we've got
+
+
+      // Update our main cache (model.xxx) and cacheIndex (model.xxxIndex)
+      var purgeItemsArguments = [itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index];
+      if (itemsModel.indexers) {
+        purgeItemsArguments.push.apply(purgeItemsArguments, itemsModel.indexers);
+      }
+      self.purgeItems.apply(self, purgeItemsArguments);
+      //!!self.purgeItems(itemsData.deletedIDs, itemsModel.hashMap, itemsModel.index);
+
+      // Dynamically build the argument list for a call to self.cacheSortedItems()
+      // self.cacheSortedItems(itemsData.items, itemsModel.hashMap, itemsModel.index, /* add in any indexers here */ );
+      var cacheItemsArguments = [itemsData.items, itemsModel.hashMap, itemsModel.index];
+      if (itemsModel.indexers) {
+        cacheItemsArguments.push.apply(cacheItemsArguments, itemsModel.indexers);
+      }
+      var newItemIDs = cacheSortedItems.apply(self, cacheItemsArguments);
+      //!!var newItemIDs = self.cacheItems(itemsData.items, itemsModel.hashMap, itemsModel.index);
 
       var notification = {
         hashMap: itemsModel.hashMap,
@@ -2202,13 +2802,19 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
           return item.id;
         }),
         newIDs: newItemIDs,
-        deletedKeys: itemsData.deletedKeys,
+        deletedIDs: itemsData.deletedIDs,
         totalCount: itemsData.totalCount,
         resolvedIDs: []
       };
 
       return notification;
     };
+
+
+
+
+
+
 
 
 
@@ -2272,8 +2878,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
   //!! I suck. I'm using the time as our ID - and don't want two with the same ID
     var tick = new Date().getTime();
-    while (new Date().getTime() == tick)
-    {
+  while (new Date().getTime() == tick) {
       var i;
       i = i + 2;
       // do nothing
@@ -2315,6 +2920,111 @@ app.service('webUtilityService', ['$rootScope', 'utilityService', function ($roo
     };
 }]);
 
+app.directive('fsmStickyHeader', [function () {
+  return {
+    restrict: 'EA',
+    replace: false,
+    scope: {
+      scrollBody: '=',
+      scrollStop: '=',
+      scrollableContainer: '=',
+      contentOffset: '='
+    },
+    link: function (scope, element, attributes, control) {
+      var header = $(element, this);
+      var clonedHeader = null;
+      var content = $(scope.scrollBody);
+      var scrollableContainer = $(scope.scrollableContainer);
+      var contentOffset = scope.contentOffset || 0;
+
+      if (scrollableContainer.length === 0) {
+        scrollableContainer = $(window);
+      }
+
+      function setColumnHeaderSizes() {
+        if (clonedHeader.is('tr') || clonedHeader.is('thead')) {
+          var clonedColumns = clonedHeader.find('th');
+          header.find('th').each(function (index, column) {
+            var clonedColumn = $(clonedColumns[index]);
+            clonedColumn.css('width', column.offsetWidth + 'px');
+          });
+        }
+      };
+
+      function determineVisibility() {
+        var scrollTop = scrollableContainer.scrollTop() + scope.scrollStop;
+        var contentTop = content.offset().top + contentOffset;
+        var contentBottom = contentTop + content.outerHeight(false);
+
+        if ((scrollTop > contentTop) && (scrollTop < contentBottom)) {
+          if (!clonedHeader) {
+            createClone();
+            clonedHeader.css({ "visibility": "visible" });
+          }
+
+          if (scrollTop < contentBottom && scrollTop > contentBottom - clonedHeader.outerHeight(false)) {
+            var top = contentBottom - scrollTop + scope.scrollStop - clonedHeader.outerHeight(false);
+            clonedHeader.css('top', top + 'px');
+          } else {
+            calculateSize();
+          }
+        } else {
+          if (clonedHeader) {
+            /*
+             * remove cloned element (switched places with original on creation)
+             */
+            header.remove();
+            header = clonedHeader;
+            clonedHeader = null;
+
+            header.removeClass('fsm-sticky-header');
+            header.css({
+              position: 'relative',
+              left: 0,
+              top: 0,
+              width: 'auto',
+              'z-index': 0,
+              visibility: 'visible'
+            });
+          }
+        }
+      };
+
+      function calculateSize() {
+        clonedHeader.css({
+          top: scope.scrollStop,
+          width: header.outerWidth(),
+          left: header.offset().left
+        });
+
+        setColumnHeaderSizes();
+      };
+
+      function createClone() {
+        /*
+         * switch place with cloned element, to keep binding intact
+         */
+        clonedHeader = header;
+        header = clonedHeader.clone();
+        clonedHeader.after(header);
+        clonedHeader.addClass('fsm-sticky-header');
+        clonedHeader.css({
+          position: 'fixed',
+          'z-index': 10000,
+          visibility: 'hidden'
+        });
+        calculateSize();
+      };
+
+      scrollableContainer.on('scroll.fsmStickyHeader', determineVisibility).trigger("scroll");
+      scrollableContainer.on('resize.fsmStickyHeader', determineVisibility);
+
+      scope.$on('$destroy', function () {
+        scrollableContainer.off('.fsmStickyHeader');
+      });
+    }
+  };
+}]);
 
 app.directive('msSearchView', function ($parse, utilityService) {
   return {
@@ -2335,14 +3045,39 @@ app.directive('msSearchView', function ($parse, utilityService) {
       $scope.displayedIndex = [];
       $scope.totalCount = null;
 
+      $scope.updateClientFilter = function () {
+
+        var clientFilters = utilityService.buildClientFilter(
+          $scope.options.baseFilter,
+          $scope.options.stackFilters,
+          $scope.options.selectFilter,
+          $scope.options.objectFilter,
+          $scope.options.userSearch);
+
+
+        $scope.clientFilterFunction = function (item) {
+
+          // If we fail any filter, return false
+          for (var i = 0; i < clientFilters.length; i++) {
+            if (!clientFilters[i](item)) {
+              return false;
+            }
+          }
+
+          // Otherwise return true
+          return true;
+        };
+      };
+
+
       $scope.onChangeEvent = function (eventData) {
 
         // Handle deleted items - no point showing the user things that don't exist any more
-        utilityService.arrayRemove($scope.displayedIndex, eventData.deletedKeys);
+        utilityService.arrayRemove($scope.displayedIndex, eventData.deletedIDs);
 
         // account for totalCount! did we count these before or not?
-        if ($scope.totalCount && eventData.deletedKeys) {
-          $scope.totalCount -= eventData.deletedKeys.length;
+        if ($scope.totalCount && eventData.deletedIDs) {
+          $scope.totalCount -= eventData.deletedIDs.length;
         }
 
         // Now we have a choice - what to do about objects that are changing. At a minimum their UI should update to reflect reality. But what else?
@@ -2361,12 +3096,13 @@ app.directive('msSearchView', function ($parse, utilityService) {
         // Otherwise fall back on the hashMap specified as a directive attribute
         var hashMap = eventData.hashMap || $scope.hashMap;
 
-        utilityService.indexMerge($scope.displayedIndex, eventData.ids, hashMap, $scope.options.filter.clientFunction, $scope.options.sort.clientFunction);
+        //!! utilityService.indexMerge($scope.displayedIndex, eventData.ids, hashMap, $scope.options.filter.clientFunction, $scope.options.sort.clientFunction);
+        utilityService.indexMerge($scope.displayedIndex, eventData.ids, hashMap, $scope.clientFilterFunction, $scope.options.sort.clientFunction);
 
         if ($scope.totalCount) {
           $scope.totalCount += eventData.ids.length;
         }
-      }
+      };
 
 
       $scope.loadPage = function (searchExpression) {
@@ -2375,15 +3111,13 @@ app.directive('msSearchView', function ($parse, utilityService) {
 
         var searchStartIndex = $scope.displayedIndex.length;
 
-        var requestedSearchExpressionTerms = [];
-        angular.forEach($scope.options.userFilters, function (value, key) {
-          if (key && value) {
-            requestedSearchExpressionTerms.push('$' + key + ':' + value);
-          }
-        });
-        requestedSearchExpressionTerms.push($scope.options.filter.serverTerm);
-        requestedSearchExpressionTerms.push($scope.options.userSearch);
-        var requestedSearchExpression = requestedSearchExpressionTerms.join(' ');
+
+        var requestedSearchExpression = utilityService.buildSearchExpression(
+          $scope.options.baseFilter,
+          $scope.options.stackFilters,
+          $scope.options.selectFilter,
+          $scope.options.objectFilter,
+          $scope.options.userSearch);
 
         var requestedSortExpression = $scope.options.sort.serverTerm;
 
@@ -2409,7 +3143,7 @@ app.directive('msSearchView', function ($parse, utilityService) {
               //!!   return;
             }
           }
-        }
+        };
 
 
 
@@ -2436,8 +3170,12 @@ app.directive('msSearchView', function ($parse, utilityService) {
               // establish our hashMap - which contains our item objects
               var hashMap = searchData.hashMap || $scope.hashMap;
 
+
+
+
               if ($scope.displayedIndex && $scope.displayedIndex.length) {
-                utilityService.indexMerge($scope.displayedIndex, searchData.ids, hashMap, $scope.options.filter.clientFunction, $scope.options.sort.clientFunction);
+                //!! utilityService.indexMerge($scope.displayedIndex, searchData.ids, hashMap, $scope.options.filter.clientFunction, $scope.options.sort.clientFunction);
+                utilityService.indexMerge($scope.displayedIndex, searchData.ids, hashMap, $scope.clientFilterFunction, $scope.options.sort.clientFunction);
               } else {
                 // Special case loading the first page - no need to sort and/or filter as the server just did that for us
                 utilityService.indexMerge($scope.displayedIndex, searchData.ids);
@@ -2469,6 +3207,9 @@ app.directive('msSearchView', function ($parse, utilityService) {
       };
 
       $scope.reload = function () {
+
+        $scope.updateClientFilter();
+
         if ($scope.loadPageBusy) {
           $scope.loadPageAgain = true;
         } else {
@@ -2499,23 +3240,41 @@ app.directive('msSearchView', function ($parse, utilityService) {
             scope.reload();
           }
         });
-        scope.$watch('options.filter', function (newValue, oldValue, scope) {
+
+        // note 'deep' watch used on some of these ...
+
+        scope.$watch('options.baseFilter', function (newValue, oldValue, scope) {
+          if (newValue !== oldValue) {
+            scope.reload();
+          }
+        }, true);
+
+        scope.$watch('options.stackFilters', function (newValue, oldValue, scope) {
+          if (newValue !== oldValue) {
+            scope.reload();
+          }
+        }, true);
+
+        scope.$watch('options.selectFilter', function (newValue, oldValue, scope) {
           if (newValue !== oldValue) {
             scope.reload();
           }
         });
+
+        scope.$watch('options.objectFilter', function (newValue, oldValue, scope) {
+          if (newValue !== oldValue) {
+            scope.reload();
+          }
+        }, true);
+
         scope.$watch('options.userSearch', function (newValue, oldValue, scope) {
           if (newValue !== oldValue) {
             scope.reload();
           }
         });
 
-        // note 'deep' watch on this one
-        scope.$watch('options.userFilters', function (newValue, oldValue, scope) {
-          if (newValue !== oldValue) {
-            scope.reload();
-          }
-        }, true);
+        scope.updateClientFilter();
+
       }
 
       scope.$on(scope.changeEvent, function (event, eventData) {
@@ -2537,7 +3296,7 @@ app.directive('msSearchView', function ($parse, utilityService) {
       var templateHtml =
         '<div>' +
           // 'Search: <input type="text" class="form-control" placeholder="Search for any text, &commat;name, or even &num;tag" ng-model="userSearch">' +
-          '<div class="ms-search-view"' + container + ' data-infinite-scroll="loadPage()" data-infinite-scroll-disabled="loadPageDone" data-infinite-scroll-distance="0" data-infinite-scroll-immediate-check="true">' +
+          '<div class="ms-search-view"' + container + ' data-infinite-scroll="loadPage()" data-infinite-scroll-disabled="loadPageDone" data-infinite-scroll-distance="2" data-infinite-scroll-immediate-check="true">' +
           '</div>' +
         '</div>';
 
@@ -2570,37 +3329,165 @@ app.directive('passwordMatch', [function () {
     }
   };
 }]);
+
 // http://stackoverflow.com/questions/20325480/angularjs-whats-the-best-practice-to-add-ngif-to-a-directive-programmatically
-app.directive('msDebugOnly', function ($stateParams, ngIfDirective) {
+function ngIfVariation(ngIfDirective, customLink) {
   var ngIf = ngIfDirective[0];
   return {
     transclude: ngIf.transclude,
-    priority: ngIf.priority,
+    priority: ngIf.priority - 1,
     terminal: ngIf.terminal,
     restrict: ngIf.restrict,
-    link: function ($scope, $element, $attr) {
-      $attr.ngIf = function () {
-        return $stateParams.debug;
-      };
+    link: function (scope, element, attributes) {
+      // grab our custom ng-if function
+      var customNgIf = customLink(scope, element, attributes);
+      // grab the initial ng-if attribute (if any)
+      var initialNgIf = attributes.ngIf, ifEvaluator;
+      if (initialNgIf) {
+        ifEvaluator = function () {
+          // ng-if exists! evaluate both
+          return scope.$eval(initialNgIf) && customNgIf();
+        };
+      } else {
+        ifEvaluator = function () {
+          // ng-if doesn't exist, just use our custom one
+          return customNgIf();
+        };
+      }
+      attributes.ngIf = ifEvaluator;
       ngIf.link.apply(ngIf, arguments);
     }
   };
+}
+
+app.directive('msDebugOnly', function (ngIfDirective, $stateParams) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    return function () {
+      return $stateParams.debug;
+    };
+  });
 });
-app.directive('msFacadeOnly', function ($stateParams, ngIfDirective) {
-  var ngIf = ngIfDirective[0];
-  return {
-    transclude: ngIf.transclude,
-    priority: ngIf.priority,
-    terminal: ngIf.terminal,
-    restrict: ngIf.restrict,
-    link: function ($scope, $element, $attr) {
-      $attr.ngIf = function () {
-        return $stateParams.facade;
+
+app.directive('msFacadeOnly', function (ngIfDirective, $stateParams) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    return function () {
+      return $stateParams.facade;
+    };
+  });
+});
+
+app.directive('msShow', function (ngIfDirective, msAuthenticated) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    var myAttribute = scope.$eval(attributes.msShow);
+    return function () {
+      return msAuthenticated.authorizeRole(myAttribute);
+    };
+  });
+});
+
+app.directive('msHide', function (ngIfDirective, msAuthenticated) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    var myAttribute = scope.$eval(attributes.msHide);
+    return function () {
+      return !msAuthenticated.authorizeRole(myAttribute);
+    };
+  });
+});
+
+// ms-show ms-not-got-it ms-spa
+
+// ms-production
+// ms-development
+// ms-spa="user"
+// ms-spa="volunteer"
+// ms-spa="!volunteer"
+
+app.directive('msDevelopment', function (ngIfDirective, SYSTEM_INFO) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    return function () {
+      return SYSTEM_INFO.isDevelopmentSite;
+    };
+  });
+});
+
+app.directive('msProduction', function (ngIfDirective, SYSTEM_INFO) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    return function () {
+      return SYSTEM_INFO.isProductionSite;
+    };
+  });
+});
+
+
+app.directive('msSpa', function (ngIfDirective, SYSTEM_INFO) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    var myAttribute = scope.$eval(attributes.msSpa);
+    if (myAttribute.charAt(0) === '!') {
+      myAttribute = myAttribute.substr(1);
+      return function () {
+        return SYSTEM_INFO.spaName !== myAttribute;
       };
-      ngIf.link.apply(ngIf, arguments);
     }
-  };
+    return function () {
+      return SYSTEM_INFO.spaName === myAttribute;
+    };
+  });
 });
+
+
+
+
+app.directive('msOption', function (ngIfDirective, msAuthenticated) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+    var myAttribute = scope.$eval(attributes.msOption);
+    if (myAttribute.charAt(0) === '!') {
+      myAttribute = myAttribute.substr(1);
+      return function () {
+        return !(msAuthenticated &&
+          msAuthenticated.group &&
+          msAuthenticated.group.accountOptions &&
+          msAuthenticated.group.accountOptions[myAttribute]);
+      };
+    }
+    return function () {
+      return msAuthenticated &&
+        msAuthenticated.group &&
+        msAuthenticated.group.accountOptions &&
+        msAuthenticated.group.accountOptions[myAttribute];
+    };
+  });
+});
+
+
+
+
+
+
+
+app.directive('msNotGotIt', function (ngIfDirective, utilityService, msAuthenticated) {
+  return ngIfVariation(ngIfDirective, function (scope, element, attributes) {
+
+    scope.setGotIt = function (gotItLabel) {
+      // optimistic clear it first
+      msAuthenticated.setGotIt(gotItLabel);
+
+      if (msAuthenticated.identity && msAuthenticated.identity.userID) {
+        utilityService.setUserGotIt(msAuthenticated.identity, gotItLabel);
+      }
+    };
+
+    var gotItLabel = scope.$eval(attributes.msNotGotIt);
+    return function () {
+      return msAuthenticated.isNotGotIt(gotItLabel);
+    };
+  });
+});
+
+
+
+
+
+
 app.directive('autoSaveForm', function ($timeout) {
 
   return {

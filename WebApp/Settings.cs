@@ -281,7 +281,7 @@ namespace WebApp
             Debug.Assert(hubClients != null);
 
             // !! Used to indicate if a connectionID should be excluded from the notification. Do we need that here?
-            SearchExpression notifyExpression = null;
+            NotifyExpression notifyExpression = NotifyExpression.Empty;
 
             utilityContext.PresenceManager.NotifyClients(authorizedBy, notifyExpression, identityFilter,
                 connectionIDs => hubClients.Clients(connectionIDs).updateSettings(notification)

@@ -87,3 +87,4 @@ packages/
 */App_Data
 
 *.scssc
+.vs/config/applicationhost.config

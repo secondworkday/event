@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,9 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 
 using MS.Utility;
+using MS.TemplateReports;
+
+using MS.WebUtility;
 
 namespace App.Library
 {
@@ -49,12 +53,202 @@ namespace App.Library
             this.Name = name;
         }
 
+        protected ParticipantGroup(DateTime createdTimestamp, EPScope epScope, string name)
+            : this()
+        {
+            this.CreatedTimestamp = createdTimestamp;
+            this.ScopeType = epScope.ScopeType;
+            this.ScopeID = epScope.ID;
 
+            this.Name = name;
+        }
+
+        public static ParticipantGroup GenerateRandom(AppDC dc)
+        {
+            JToken data = new
+            {
+                name = "Eastside Elementary"
+            }
+            .ToJson().FromJson() as JToken;
+
+            var result = ParticipantGroup.createLock(dc, () =>
+            {
+                var newParticipantGroup = ParticipantGroup.Create(dc, data);
+                return newParticipantGroup;
+            });
+
+            return result;
+        }
+
+        public static ParticipantGroup Create(AppDC dc, JToken data)
+        {
+            return ParticipantGroup.exCreateLock(dc, data, () =>
+            {
+                var createdTimestamp = dc.TransactionTimestamp;
+                var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+
+                var name = data.Value<string>("name");
+
+                var newItem = new ParticipantGroup(createdTimestamp, teamEPScope, name);
+
+          // optional
+          var badgeName = data.Value<string>("badgeName");
+                newItem.BadgeName = badgeName;
+
+                var contactName = data.Value<string>("contactName");
+                newItem.ContactName = contactName;
+                var overview = data.Value<string>("overview");
+                newItem.Overview = overview;
+
+                dc.Save(newItem);
+                Debug.Assert(newItem.ID > 0);
+
+                var primaryPhoneNumber = data.Value<string>("primaryPhoneNumber");
+                if (!string.IsNullOrEmpty(primaryPhoneNumber))
+                {
+                    newItem.SetContactPhoneNumber(dc, primaryPhoneNumber);
+                }
+
+                var primaryEmail = data.GetMailAddress("primaryEmail");
+                if (primaryEmail != null)
+                {
+                    newItem.AssignMailAddress(dc, primaryEmail);
+                }
+
+                newItem.SetNotes(dc, data.Value<string>("notes"));
+
+                return newItem;
+            });
+        }
+
+        private void updateData(AppDC dc, dynamic data)
+        {
+            this.Name = (string)data.name;
+            this.ContactName = (string)data.contactName;
+            this.Overview = (string)data.overview;
+            this.SetNotes(dc, (string)data.notes);
+            var primaryPhoneNumber = (string)data.primaryPhoneNumber;
+            if (!string.IsNullOrEmpty(primaryPhoneNumber))
+            {
+                this.SetContactPhoneNumber(dc, primaryPhoneNumber);
+            }
+        }
+
+        public static HubResult Edit(AppDC dc, int itemID, dynamic data)
+        {
+            return WriteLock(dc, itemID, (item, notifyExpression) =>
+            {
+                item.updateData(dc, data);
+
+                notifyExpression.AddModifiedID(item.ID);
+                return HubResult.Success;
+            });
+        }
+
+        public static HubResult Delete(AppDC dc, int itemID)
+        {
+            var deleteItem = dc.ParticipantGroups
+                      .FirstOrDefault(item => item.ID == itemID);
+
+            if (deleteItem == null)
+            {
+                return HubResult.CreateError("Not found");
+            }
+
+            dc.Participants.DeleteAllOnSubmit(deleteItem.Participants);
+            dc.ParticipantGroups.DeleteOnSubmit(deleteItem);
+
+            //!! TODO remove any Tags that have their last reference with this Pipeline
+            //!! Should we have an ExtendedObject call to remove all extended properties?
+            dc.SubmitChanges();
+
+            var notifyExpression = new NotifyExpression();
+            notifyExpression.AddDeletedID(itemID);
+            NotifyClients(dc, notifyExpression);
+
+            return HubResult.Success;
+        }
+
+
+
+
+
+
+        public static HubResult Parse(AppDC dc, int eventID, string parseData)
+        {
+            BulkUpload.ColumnHandler[] availableColumnHandlers = new[]
+            {
+                new BulkUpload.ColumnHandler("name", BulkUpload.ColumnOptions.Required, "school"),
+                new BulkUpload.ColumnHandler("contactName", BulkUpload.ColumnOptions.Optional, "counselor", "contact name"),
+                new BulkUpload.ColumnHandler("primaryPhoneNumber", BulkUpload.ColumnOptions.Optional, "phone"),
+                new BulkUpload.ColumnHandler("primaryEmail", BulkUpload.ColumnOptions.Optional, "email"),
+            };
+
+            return BulkUpload.Parse(parseData, availableColumnHandlers);
+        }
+
+
+
+        public static HubResult Upload(AppDC dc, int eventID, JToken uploadData)
+        {
+            // take a submit lock
+            // go through each EventParticipant
+            // add them to the table
+            // return CRUD results
+
+            var hubResult = dc.SubmitLock<HubResult>(() =>
+            {
+                return Upload<ParticipantGroup>(dc, uploadData, itemData =>
+                {
+                    var eventParticipant = ParticipantGroup.Create(dc, itemData);
+                    if (eventParticipant != null)
+                    {
+                        return (int?)eventParticipant.ID;
+                    }
+                    else
+                    {
+                        return (int?)null;
+                    }
+                });
+            });
+
+            return hubResult;
+        }
+
+
+
+
+
+
+
+
+
+
+
+        public static List<int> GetParticipantsYYY(AppDC dc, int ParticipantGroupID)
+        {
+            var myQuery = from epParticipantGroup in ExtendedQuery(dc)
+                          join epParticipant in Participant.Query(dc) on epParticipantGroup.item.ID equals ParticipantGroupID
+                          select new { epParticipant };
+
+            var exResult = myQuery
+                .Where(exItem => exItem.epParticipant.ParticipantGroupID == ParticipantGroupID);
+
+            List<int> participantIDs = new List<int>();
+
+            foreach (var p in exResult)
+            {
+                participantIDs.Add(p.epParticipant.ID);
+            }
+
+            return participantIDs;
+        }
 
         private static Func<IQueryable<ParticipantGroup>, string, IQueryable<ParticipantGroup>> termFilter = (query, searchTermLower) =>
         {
             return query.Where(item =>
-                item.Name.Contains(searchTermLower));
+                item.Name.Contains(searchTermLower) ||
+                item.ContactName.Contains(searchTermLower));
         };
 
 
@@ -83,6 +277,7 @@ namespace App.Library
         {
             var query = Query(dc);
             query = FilterBy(dc, query, searchExpression, termFilter);
+
             return query;
         }
 
@@ -133,11 +328,85 @@ namespace App.Library
 
 
 
+        public static void GetExportRows(HttpResponse response, AppDC dc, SearchExpression searchExpression)
+        {
+            var epQuery =
+                from exParticipantGroup in ParticipantGroup.ExtendedQuery(dc, searchExpression)
+
+                // Join with our 1:many 
+                join tags in QueryGlobalEPTags2(dc, EPCategory.UserAssigned) on exParticipantGroup.itemID equals tags.TargetID into tagsGroup
+
+                join eventParticipant in EventParticipant.Query(dc) on exParticipantGroup.itemID equals eventParticipant.ParticipantID into eventParticipantsGroup
+
+                //join epGlobalSystemRoleTags in User.QueryGlobalEPTags2(dc, EPCategory.SystemRoleCategory) on exParticipantGroup.itemID equals epGlobalSystemRoleTags.TargetID into epGlobalSystemRoleTagsGroup
+                //join epTeamSystemRoleTags in User.QueryItemEPTags2(dc, EPCategory.SystemRoleCategory, teamEPScope) on user.ID equals epTeamSystemRoleTags.TargetID into epTeamSystemRoleTagsGroup
+                //join epAppRoleTags in User.QueryItemEPTags2(dc, EPCategory.AppRoleCategory, teamEPScope) on user.ID equals epAppRoleTags.TargetID into epAppRoleTagsGroup
+
+                //join epOptionTags in User.QueryGlobalEPTags2(dc, EPCategory.OptionCategory) on user.ID equals epOptionTags.TargetID into epOptionTagsGroup
+
+                select new
+                    {
+                        exParticipantGroup,
+                        participantGroup = exParticipantGroup.item,
+
+                        exParticipantGroup.item.Name,
+                        //user.DisplayName,
+                        //user.TimeZoneIndex,
+                        Email = exParticipantGroup.PrimaryMailAddress.Address,
+                        PhoneNumber = exParticipantGroup.PrimaryPhoneNumber.Proffered_CaseSensitive,
+
+
+                        tags = tagsGroup
+                            .Select(mm => mm.Item.Name)
+                            .Join(", "),
+
+                        totalParticipants = eventParticipantsGroup.Count(),
+                    };
+
+            var headerMap = new[]
+                {
+                new { key = "Name", value = "participantGroup.Name" },
+                //!! need to translate term
+                new { key = "Total Students", value = "totalParticipants" },
+                new { key = "Contact Name", value = "participantGroup.ContactName" },
+                new { key = "Email", value = "exParticipantGroup.PrimaryMailAddress.Address" },
+                new { key = "Phone", value = "exParticipantGroup.PrimaryPhoneNumber.Proffered_CaseSensitive" },
+                new { key = "Tags", value = "tags" },
+
+/*
+                new { key = "First Name", value = "participant.FirstName" },
+                new { key = "Last Name", value = "participant.LastName" },
+                new { key = "Gender", value = "participant.Gender" },
+
+                new { key = "School", value = "participantGroup.Name" },
+
+                new { key = "Grade", value = "eventParticipant.Grade" },
+                new { key = "CheckInTimestamp", value = "eventParticipant.CheckInTimestamp" },
+                new { key = "CheckOutTimestamp", value = "eventParticipant.CheckOutTimestamp" },
+                new { key = "DonationLimit", value = "eventParticipant.DonationLimit" },
+                new { key = "DonationAmount", value = "eventParticipant.DonationAmount" },
+
+                new { key = "Event Name", value = "myEvent.Name" },
+                new { key = "Session Name", value = "session.Name" },
+*/
+            }
+            .ToDictionary(item => item.key, item => item.value);
+
+            response.SendCsvFileToBrowser("ParticipantGroups.csv", epQuery, headerMap);
+        }
+
+
+
         public class SearchItem : ExtendedSearchItem
         {
-            //public string type { get; internal set; }
-            public string name { get; internal set; }
-            public string overview { get; internal set; }
+            [JsonProperty("name")]
+            public string Name { get; internal set; }
+            [JsonProperty("contactName")]
+            public string ContactName { get; internal set; }
+            [JsonProperty("badgeName")]
+            public string BadgeName { get; internal set; }
+            [JsonProperty("overview")]
+            public string Overview { get; internal set; }
 
             [JsonProperty("createdTimestamp")]
             public DateTime CreatedTimestamp { get; internal set; }
@@ -148,8 +417,10 @@ namespace App.Library
                 : base(exItem, context)
             {
                 //this.type = exItem.item.Ty
-                this.name = exItem.item.Name;
-                this.overview = exItem.item.Overview;
+                this.Name = exItem.item.Name;
+                this.ContactName = exItem.item.ContactName;
+                this.BadgeName = exItem.item.BadgeName;
+                this.Overview = exItem.item.Overview;
 
                 this.CreatedTimestamp = exItem.item.CreatedTimestamp;
                 this.LastModifiedTimestamp = exItem.item.LastModifiedTimestamp;
@@ -558,13 +829,13 @@ namespace App.Library
         }
 
         // probably need to use ShowNameAlias.FindShowOrCreateUnmatched() instead
-        internal static ParticipantGroup FindByName(AppDC dc, string showName)
+        internal static ParticipantGroup FindByName(AppDC dc, string name)
         {
-            var existingShow = ParticipantGroup.Query(dc)
-                .Where(show => show.Name == showName)
+            var existingItem = ParticipantGroup.Query(dc)
+                .Where(item => item.Name == name)
                 .FirstOrDefault();
 
-            return existingShow;
+            return existingItem;
         }
 
 
@@ -584,7 +855,12 @@ namespace App.Library
 
         private static ParticipantGroup createLock(AppDC dc, Func<ParticipantGroup> createHandler)
         {
-            return CreateLock(dc, NotifyClients, createHandler);
+            return createLock(dc, NotifyClients, createHandler);
+        }
+
+        private static ParticipantGroup exCreateLock(AppDC dc, JToken data, Func<ParticipantGroup> createHandler)
+        {
+            return exCreateLock(dc, data, NotifyClients, createHandler);
         }
 
         internal static T ReadLock<T>(AppDC dc, int itemID, Func<ParticipantGroup, T> readHandler)
@@ -607,15 +883,10 @@ namespace App.Library
 
 
 
-        internal static void NotifyClients(AppDC dc, SearchExpression notifyExpression)
+        internal static void NotifyClients(AppDC dc, NotifyExpression notifyExpression)
         {
-            var siteContext = SiteContext.Current;
-
             var notification = ParticipantGroup.Search(dc, notifyExpression, null, 0, int.MaxValue);
-
-            var hubClients = siteContext.ConnectionManager.GetHubContext("siteHub").Clients;
-            Debug.Assert(hubClients != null);
-            hubClients.All.updateShows(notification);
+            NotifyClients("siteHub", notifyExpression, notification, (hubClients, notificationItem) => hubClients.All.updateParticipantGroups(notificationItem));
         }
 
         public override string ToString()

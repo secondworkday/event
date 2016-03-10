@@ -1,0 +1,42 @@
+<md-dialog flex-sm="95" flex-md="80" flex-gt-md="60">
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2 class="md-title">Demo</h2>
+      <span flex></span>
+      <md-button ng-click="cancelDialog()" class="md-icon-button" aria-label="Cancel dialog"><i class="fa fa-times"></i></md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content>
+    <div ng-show="working">
+      <div class="u-sm-space"></div>
+      <div class="text-center">
+        <h2 class="md-subhead">Creating demo user...</h2>
+        <div layout="row" layout-align="space-around">
+          <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+        </div>
+        <p class="md-body-1">
+          Preparing a demo user for you, one moment please...
+        </p>
+      </div>
+      <div class="u-sm-space"></div>
+    </div>
+    <div ng-hide="working" class="layout">
+      <div flex style="max-height:400px;overflow-y:scroll;" ng-repeat="(key, value) in APP_ROLE_TRANSLATION">
+        <md-list>
+          <md-subheader class="md-no-sticky">{{value | translate}}</md-subheader>
+          <md-list-item ng-click="loginAsDemoUser(user)" ng-repeat="user in demoTenant.users | filter: key">
+            <img ng-show="user.profilePhotoUrl" ng-src="{{user.profilePhotoUrl}}" alt="user img" class="mini-user-img" />
+            <img ng-hide="user.profilePhotoUrl" ng-src="/images/user-img-placeholder.png" alt="user img" class="mini-user-img" />
+            <p>{{user.firstName}} {{user.lastName}}</p>
+          </md-list-item>
+        </md-list>
+      </div>
+    </div>
+  </md-dialog-content>
+  <div class="md-actions" layout="row">
+    <div flex ng-repeat="(key, value) in APP_ROLE_TRANSLATION">
+      <md-button ng-hide="working" ng-click="createDemoUser(key)" class="md-primary"><i class="fa fa-plus"></i> New {{value | translate}} </md-button>
+      <md-button ng-show="working" class="md-primary" ng-disabled="true"> Working... </md-button>
+    </div>
+  </div>
+</md-dialog>

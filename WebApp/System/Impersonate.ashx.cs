@@ -15,9 +15,9 @@ namespace WebApp
     /// <summary>
     /// Summary description for Impersonate
     /// </summary>
-    public class Impersonate : IHttpHandler
+    public class Impersonate : HubResultHttpHandler
     {
-        public void ProcessRequest(HttpContext context)
+        public override HubResult ProcessRequest(HttpContext context)
         {
             Identity authorizedBy = context.GetIdentity();
             DateTime requestTimestamp = context.UtcTimestamp();
@@ -29,28 +29,23 @@ namespace WebApp
             using (var dc = utilityContext.CreateDefaultAccountsOnlyDC<AppDC>(requestTimestamp, authorizedBy))
             {
                 var tenantID = context.Request.QueryString.GetNullableInt32("tid");
-                if (tenantID.HasValue)
+                var tenantGroupInfo = TenantGroup.GetCachedTenantGroupInfo(tenantID);
+                if (tenantGroupInfo != null)
                 {
                     WebAuthentication.AccessCheckOrRedirectToLoginPage(authorizedBy, SystemRole.SystemAdmin.ToEnumerable());
 
-                    var tenant = TenantGroup.FindByID(dc, tenantID.Value);
-                    MS.WebUtility.Authentication.WebIdentityAuthentication.ImpersonateSystem(authorizedBy, tenant);
-                    return;
+                    MS.WebUtility.Authentication.WebIdentityAuthentication.ImpersonateSystem(authorizedBy, tenantGroupInfo);
+                    return HubResult.Success;
                 }
 
                 // Make sure we've got authoritity to impersonate
                 WebAuthentication.AccessCheckOrRedirectToLoginPage(authorizedBy, SystemRole.SystemAdmin.ToEnumerable());
                 Debug.Assert(context.User.IsInRole("SystemAdmin"));
 
-                User impersonatedUser = context.Request.GetUserOrTransfer(dc, "uid", "/default.aspx");
+                User impersonatedUser = context.Request.GetUserOrTransfer(dc, "uid", "/Spas/UserSpa.aspx");
                 WebIdentityAuthentication.ImpersonateUser(dc, authorizedBy, impersonatedUser);
-                return;
+                return HubResult.Success;
             }
-        }
-
-        public bool IsReusable
-        {
-            get { return true; }
         }
     }
 }

@@ -1,0 +1,66 @@
+<div layout layout-align="start center">
+  <div flex>
+    <md-button style="margin-left:0;" ui-sref="app.user.event.sessions({eventID:event.id})"><i class="fa fa-chevron-left"></i> Back</md-button><br/>
+    <span class="md-display-1">{{'EVENT_SESSION' | translate}}: {{eventSession.name}}</span>
+    <div class="u-sm-space"></div>
+    <span class="md-body-1">
+      <!--Check In URL: <a href="{{authInfo.url}}">{{authInfo.url}}</a><br/>-->
+      Volunteer PIN:  <strong>{{eventSession.authInfo.authCode}}</strong>
+    </span>
+  </div>
+  <div class="text-center u-sm-margin-right" ng-if="eventSession.noLevelParticipants.index.length">
+    <h2 class="md-display-1">{{eventSession.noLevelCheckedInParticipants.index.length}} of {{eventSession.noLevelParticipants.index.length}}</h2>
+    <md-progress-linear style="margin-left:auto;margin-right:auto;max-width:300px;" md-mode="determinate" value="{{eventSession.noLevelCheckedInParticipants.index.length / eventSession.noLevelParticipants.index.length * 100}}"></md-progress-linear><br/>
+    <span class="md-body-1 text-support">
+      No {{'PARTICIPANT_LEVEL' | translate}} Checked-In
+    </span>
+  </div>
+  <div class="text-center u-sm-margin-right">
+    <h2 class="md-display-1">{{eventSession.lowLevelCheckedInParticipants.index.length}} of {{eventSession.lowLevelParticipants.index.length}}</h2>
+    <md-progress-linear style="margin-left:auto;margin-right:auto;max-width:300px;" md-mode="determinate" value="{{eventSession.lowLevelCheckedInParticipants.index.length / eventSession.lowLevelParticipants.index.length * 100}}"></md-progress-linear><br/>
+    <span class="md-body-1 text-support">
+      K-5 Checked-In
+    </span>
+  </div>
+  <div class="text-center u-sm-margin-right">
+    <h2 class="md-display-1">{{eventSession.highLevelCheckedInParticipants.index.length}} of {{eventSession.highLevelParticipants.index.length}}</h2>
+    <md-progress-linear style="margin-left:auto;margin-right:auto;max-width:300px;" md-mode="determinate" value="{{eventSession.highLevelCheckedInParticipants.index.length / eventSession.highLevelParticipants.index.length * 100}}"></md-progress-linear><br/>
+    <span class="md-body-1 text-support">
+      6-12 Checked-In
+    </span>
+  </div>
+  <div class="text-center">
+    <h2 class="md-display-1">{{eventSession.checkedInParticipants.index.length}} of {{eventSession.allParticipants.index.length}}</h2>
+    <md-progress-linear style="margin-left:auto;margin-right:auto;max-width:300px;" md-mode="determinate" value="{{eventSession.checkedInParticipants.index.length / eventSession.allParticipants.index.length * 100}}"></md-progress-linear><br/>
+    <span class="md-body-1 text-support">
+      Total Checked-In
+    </span>
+  </div>
+  <div ms-option="'isCheckOutEnabled'" class="text-center">
+    <h2 class="md-display-1">{{eventSession.checkedInParticipants.index.length - eventSession.checkedOutParticipants.index.length}}</h2>
+    <!-- <md-progress-linear style="margin-left:auto;margin-right:auto;max-width:300px;" md-mode="determinate" value="{{eventSession.checkedInParticipants.index.length / eventSession.allParticipants.index.length * 100}}"></md-progress-linear><br/> -->
+    <span class="md-body-1 text-support">
+      Shopping
+    </span>
+  </div>
+</div>
+
+<div class="u-sm-space"></div>
+<md-divider></md-divider>
+<div class="u-sm-space"></div>
+
+<div ms-debug-only><pre>eventSession: {{eventSession | json}}</pre></div>
+
+<!--
+all Participants Indexer: {{eventSession.allParticipants}}<br />
+expected Participants Indexer: {{eventSession.expectedParticipants}}<br />
+checked-in Participants Indexer: {{eventSession.checkedInParticipants}}<br />
+checked-out Participants Indexer: {{eventSession.checkedOutParticipants}}<br />
+<br />
+
+AuthInfo: {{authInfo}} -->
+
+
+
+
+<div ui-view></div>

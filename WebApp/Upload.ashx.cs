@@ -16,11 +16,11 @@ using Torq.Library.Education;
 
 namespace WebApp
 {
-    public class Upload : IHttpHandler
+    public class Upload : HubResultHttpHandler
     {
         // upload.ashx?type=userprofilephoto
         // upload.ashx?type=tenantlogo
-        public void ProcessRequest(HttpContext context)
+        public override HubResult ProcessRequest(HttpContext context)
         {
             var siteContext = TorqContext.Current;
             HttpRequest request = context.Request;
@@ -28,7 +28,7 @@ namespace WebApp
 
             if (request.Files.Count == 0)
             {
-                return;
+                return HubResult.Error;
             }
 
             DateTime requestTimestamp = context.UtcTimestamp();
@@ -126,14 +126,9 @@ namespace WebApp
 
                     default:
                         Debug.Fail("Unexpected type: " + type);
-                        break;
+                        return HubResult.CreateError("Unexpected type: " + type);
                 }
             }
-        }
-
-        public bool IsReusable
-        {
-            get { return true; }
         }
     }
 }

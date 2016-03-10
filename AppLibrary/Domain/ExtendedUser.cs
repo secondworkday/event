@@ -441,7 +441,7 @@ namespace App.Library
             // (handles firstName, lastName too)
             try
             {
-                User user = User.Create(dc, authCode, mailAddress, systemRoles, appRoles, password, options);
+                User user = User.Create(dc, authCode, mailAddress, password, systemRoles, appRoles, options);
                 if (user == null)
                 {
                     errorMessage = null;

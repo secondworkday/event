@@ -27,7 +27,7 @@ app.controller('CreateAccountController', function ($scope, $log, $filter, $stat
       utilityService.signIn(newUserCred)
       .then(function () {
         // success (sign in)
-        $state.go('app.user.home');
+        $state.go('app.user.events');
       }, function () {
         // failure (sign in) (shouldn't happen)
         alert("nope");

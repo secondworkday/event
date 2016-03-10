@@ -14,770 +14,492 @@ using System.Security.Cryptography;
 
 using MS.Utility;
 using MS.WebUtility;
+using MS.WebUtility.Authentication;
 
 namespace App.Library
 {
-#if false
-    public struct AuthCode
+
+
+    /// <summary>
+    /// Supplies the ability to login to the application. Supports both "User" and "Object" logins
+    /// </summary>
+    public class ItemPinAuthTemplate : WebAuthTemplate
     {
-        internal enum StringFormat
-        {
-            Storage,
-            Display,
-            Url,
-        }
+        private const string AUTH_TOKEN_TYPE_NAME = "ItemPin";
+        private const string AUTH_CODE_PATTERN = "####";
 
-        // 0-9 literal number
-        // a-z, A-Z literal letter
-        // ^^^-### would be the template for ABC-123
-        private const char anyLetterLowerOrDigit = '&';
-        private const char anyLetterUpperOrDigit = '%';
-        private const char anyDigit = '#';
-        private const char anyLetterLower = '@';
-        private const char anyLetterUpper = '^';
-        private static readonly char[] allPlaceholders = { anyLetterLowerOrDigit, anyLetterUpperOrDigit, anyDigit, anyLetterLower, anyLetterUpper };
+        public static readonly TimeSpan? defaultDuration = null;
 
-        public static AuthCode Invalid = new AuthCode(string.Empty, null);
+        //!! thoughts on the right URL?
+        public static ItemPinAuthTemplate Instance = new ItemPinAuthTemplate(defaultDuration, "/pin/", AUTH_CODE_PATTERN, true, "/goober");
 
-        private static object cryptoProviderSyncRoot = new object();
-        private static RNGCryptoServiceProvider cryptoProvider = new RNGCryptoServiceProvider();
-        private static byte[] cryptoBuffer = new byte[4];
-
-        // http://www.crockford.com/wrmg/base32.html
-        private static readonly char[] base32EncodeSymbolUpper = 
-        {
-            '0','1','2','3','4','5','6','7',
-            '8','9','A','B','C','D','E','F',
-            'G','H','J','K','M','N','P','Q',
-            'R','S','T','V','W','X','Y','Z'
-        };
-
-        // http://www.crockford.com/wrmg/base32.html
-        private static readonly char[] base32EncodeSymbolLower = 
-        {
-            '0','1','2','3','4','5','6','7',
-            '8','9','a','b','c','d','e','f',
-            'g','h','j','k','m','n','p','q',
-            'r','s','t','v','w','x','y','z'
-        };
-
-        private static readonly char[] validDigitsAndLetters =
-        {
-            '0','1','2','3','4','5','6','7','8','9',
-            'a','b','c','d','e','f','g','h','j','k','m','n','p','q','r','s','t','v','w','x','y','z',
-            'A','B','C','D','E','F','G','H','J','K','M','N','P','Q','R','S','T','V','W','X','Y','Z'
-        };
-
-        private static char[] digits = 
-        {
-            '0','1','2','3','4','5','6','7','8','9'
-        };
-
-        private string authCodeString;
-        private AuthTokenType authTokenType;
-
-        private AuthCode(string authCodeString, AuthTokenType authTokenType)
-        {
-            // (We expect at least string.Empty for an invalid AuthCode)
-            Debug.Assert(authCodeString != null);
-            Debug.Assert(authCodeString == string.Empty || authTokenType != null);
-
-            this.authCodeString = authCodeString;
-            this.authTokenType = authTokenType;
-        }
-
-        internal static AuthCode FromStorage(string authCodeString, AuthTokenType authTokenType)
-        {
-            return new AuthCode(authCodeString, authTokenType);
-        }
-
-        public static AuthCode Parse(string authCodeString, AuthTokenType authTokenType)
-        {
-            Debug.Assert(!string.IsNullOrEmpty(authCodeString));
-            if (string.IsNullOrEmpty(authCodeString))
-            {
-                return AuthCode.Invalid;
-            }
-
-            StringBuilder sb = new StringBuilder(authCodeString.Length);
-
-            foreach (char c in authCodeString)
-            {
-                if (c == 'l' || c == 'L' || c == 'i' || c == 'I')
+        /*
+                // We use XML to persist the fields in this Data class.
+                public class Data : XmlSerializableClass<Data>
                 {
-                    sb.Append('1');
-                }
-                else if (c == 'o' || c == 'O')
-                {
-                    sb.Append('0');
-                }
-                else
-                {
-                    if (c == 'u')
+                    public string TargetTable { get; set; }
+                    public int TargetID { get; set; }
+
+                    public Data()
                     {
-                        sb.Append('v');
-                    }
-                    else if (c == 'U')
-                    {
-                        sb.Append('V');
-                    }
-                    else if (authTokenType.RequireAuthCodeFormatting || char.IsLetterOrDigit(c))
-                    {
-                        sb.Append(c);
+                        Debug.Assert(!string.IsNullOrEmpty(this.TargetTable));
+                        Debug.Assert(this.TargetID > 0);
                     }
                 }
-            }
+        */
 
-            if (sb.Length == 0)
-            {
-                return AuthCode.Invalid;
-            }
+        protected ItemPinAuthTemplate(TimeSpan? defaultDuration, string urlPatternPrefix, string authCodePattern, bool requireAuthCodeFormatting, string tokenNotFoundPage) :
+            base(defaultDuration, urlPatternPrefix, authCodePattern, requireAuthCodeFormatting, tokenNotFoundPage)
+        { }
 
-            return new AuthCode(sb.ToString(), authTokenType);
-        }
-
-        public static AuthCode Create(AuthTokenType authTokenType)
+        public static Uri RevokeAndCreateNewUserUrl(WebUtilityDC dc, int userID, int usageQuota, TimeSpan? validDuration)
         {
-            Debug.Assert(authTokenType != null);
+            var utilityContext = UtilityContext.Current;
 
-            string authCodePattern = authTokenType.AuthCodePattern;
-            Debug.Assert(!string.IsNullOrEmpty(authCodePattern));
+            //!! nextgen - do we need a permission check?
 
-            // The AuthCode value we create should only include formatting characters if we require them
-            if (authTokenType.AuthCodePatternContainsFormatting && !authTokenType.RequireAuthCodeFormatting)
-            {
-                var authCodePatternNonFormattingChars = authCodePattern
-                    .ToCharArray()
-                    .Where(c => !IsFormatCharacter(c))
-                    .ToArray();
+            var userLoginAuthToken = WebAuthTemplate.RevokeAndCreateNewAuthToken(dc, () => QueryValidUsers(dc, userID), () => CreateAuthToken(dc, typeof(User), userID, usageQuota, validDuration));
 
-                authCodePattern = new string(authCodePatternNonFormattingChars);
-            }
-
-            int placeholders = authCodePattern.ToCharArray().Count(c => allPlaceholders.Contains(c));
-            Debug.Assert(placeholders > 0);
-
-            StringBuilder authCodeStringBuilder = new StringBuilder(authCodePattern);
-
-            int placeholderIndex = authCodePattern.IndexOfAny(allPlaceholders);
-            while (placeholderIndex >= 0)
-            {
-                char placeholder = authCodePattern[placeholderIndex];
-                authCodeStringBuilder[placeholderIndex] = GetRandomChar(placeholder);
-                placeholderIndex = authCodePattern.IndexOfAny(allPlaceholders, placeholderIndex + 1);
-            }
-
-            return new AuthCode(authCodeStringBuilder.ToString(), authTokenType);
+            var url = Instance.GetUrl(userLoginAuthToken, utilityContext.RequireSslLogin);
+            return url;
         }
 
-        internal static bool IsFormatCharacter(char c)
+
+#if false
+        public static Uri RevokeAndCreateNewItemUrl(AppDC accountsDC, Type targetType, int targetID, int? usageQuota, TimeSpan? validDuration)
         {
-            if (AuthCode.validDigitsAndLetters.Contains(c) || AuthCode.allPlaceholders.Contains(c))
-            {
-                return false;
-            }
+            var utilityContext = UtilityContext.Current;
 
-            if (char.IsLetterOrDigit(c))
-            {
-                // We disallow 'i', 'l', 'o' and 'u' in our patterns
-                throw new ArgumentOutOfRangeException("Invalid pattern character");
-            }
+            //!! nextgen - do we need this access check?
+            //!! nextgen - does it help to pass in a Project so we can directly access check it?
+            //!! nextgen - do we need to change the Project.Get() call to pass a DC?
 
-            return true;
+            //var authCheckProject = Project.Get(accountsDC, projectID);
+            //if (authCheckProject == null)
+            //{
+                //return null;
+            //}
+
+            var projectLoginAuthToken = WebAuthTemplate.RevokeAndCreateNewAuthToken(accountsDC, () => QueryValidProjects(accountsDC, projectID), () => CreateAuthToken(accountsDC, typeof(Project), projectID, usageQuota, validDuration));
+
+            var url = Instance.GetUrl(projectLoginAuthToken, utilityContext.RequireSslLogin);
+            return url;
         }
 
-        private static char GetRandomChar(char placeholder)
+        public static Uri ExtendOrCreateNewItemUrl(AppDC accountsDC, Type targetType, int targetID, int? usageQuota, TimeSpan? validDuration)
         {
-            uint randomNumber;
-            lock (cryptoProviderSyncRoot)
-            {
-                // Fill the array with a random value.
-                cryptoProvider.GetBytes(cryptoBuffer);
-                randomNumber = BitConverter.ToUInt32(cryptoBuffer, 0);
-            }
+            var utilityContext = UtilityContext.Current;
 
-            switch (placeholder)
-            {
-                case AuthCode.anyLetterLowerOrDigit:
-                    // we allow 32 unique characters
-                    return base32EncodeSymbolLower[randomNumber % 32];
-                case AuthCode.anyLetterUpperOrDigit:
-                    // we allow 32 unique characters
-                    return base32EncodeSymbolUpper[randomNumber % 32];
-                case anyDigit:
-                    return digits[randomNumber % 10];
-                case anyLetterLower:
-                    // we allow 22 unique letters
-                    return base32EncodeSymbolLower[10 + (randomNumber % 22)];
-                case anyLetterUpper:
-                    // we allow 22 unique letters
-                    return base32EncodeSymbolUpper[10 + (randomNumber % 22)];
-                default:
-                    Debug.Fail("Unexpected placeholder: " + placeholder);
-                    return '.';
-            }
+            //!! nextgen - do we need this access check?
+            //!! nextgen - does it help to pass in a Project so we can directly access check it?
+            //!! nextgen - do we need to change the Project.Get() call to pass a DC?
+
+            //var authCheckProject = Project.Get(accountsDC, projectID);
+            //if (authCheckProject == null)
+            //{
+                //return null;
+            //}
+
+            var projectLoginAuthToken = WebAuthTemplate.ExtendOrCreateNewAuthToken(accountsDC, () => QueryValidEventSessions(accountsDC, projectID), () => CreateAuthToken(accountsDC, typeof(Project), projectID, usageQuota, validDuration), validDuration);
+
+            var url = Instance.GetUrl(projectLoginAuthToken, utilityContext.RequireSslLogin);
+            return url;
         }
-
-        internal string ToString(StringFormat format)
-        {
-            Debug.Assert(this.authCodeString != null);
-
-            if (format == StringFormat.Storage || !this.authTokenType.AuthCodePatternContainsFormatting || this.authTokenType.RequireAuthCodeFormatting)
-            {
-                return this.authCodeString;
-            }
-
-            switch (format)
-            {
-                case StringFormat.Display:
-                case StringFormat.Url:
-
-                    // Expand out this.authCodeString to include any formatting
-                    string formatPattern = this.authTokenType.AuthCodePattern;
-                    StringBuilder sb = new StringBuilder(formatPattern.Length);
-                    var authCodeStringEnumerator = this.authCodeString.GetEnumerator();
-                    foreach (char c in formatPattern)
-                    {
-                        if (!AuthCode.IsFormatCharacter(c))
-                        {
-                            // replace placeholders with the actual code
-                            authCodeStringEnumerator.MoveNext();
-                            char codeValue = authCodeStringEnumerator.Current;
-                            // If the pattern contains a literal code value (not a placeholder), then we should match that value in our code
-                            Debug.Assert(AuthCode.allPlaceholders.Contains(c) || c == codeValue);
-                            sb.Append(codeValue);
-                        }
-                        else
-                        {
-                            sb.Append(c);
-                        }
-                    }
-
-                    var formattedAuthCodeString = sb.ToString();
-                    if (format == StringFormat.Url)
-                    {
-                        return HttpUtility.UrlPathEncode(formattedAuthCodeString);
-                    }
-                    return formattedAuthCodeString;
-
-                case StringFormat.Storage:
-                default:
-                    Debug.Fail("Unexpected format: " + format);
-                    return this.authCodeString;
-            }
-        }
-
-        public override string ToString()
-        {
-            return this.ToString(StringFormat.Display);
-        }
-    }
 #endif
 
+
+        public static AuthToken ExtendOrCreateNewEventSession(AppDC accountsDC, int targetID, int? usageQuota, TimeSpan? validDuration)
+        {
+            var utilityContext = UtilityContext.Current;
+
+            //!! nextgen - do we need this access check?
+            //!! nextgen - does it help to pass in a Project so we can directly access check it?
+            //!! nextgen - do we need to change the Project.Get() call to pass a DC?
+
+            //var authCheckProject = Project.Get(accountsDC, projectID);
+            //if (authCheckProject == null)
+            //{
+            //return null;
+            //}
+
+            var authToken = WebAuthTemplate.ExtendOrCreateNewAuthToken(accountsDC, () => QueryValidEventSessions(accountsDC, targetID), () => CreateAuthToken(accountsDC, typeof(EventSession), targetID, usageQuota, validDuration), validDuration);
+            return authToken;
+        }
+
+
+
+
+        public static AuthToken ExtendOrCreateNew<T>(AppDC accountsDC, T item, int? usageQuota, TimeSpan? validDuration)
+            where T : IObject
+        {
+            var authToken = WebAuthTemplate.ExtendOrCreateNewAuthToken(accountsDC, () => QueryValidItems(accountsDC, item), () => CreateAuthToken(accountsDC, typeof(T), item.ObjectID, usageQuota, validDuration), validDuration);
+            return authToken;
+        }
+
+        public static Uri ExtendOrCreateNewUrl<T>(AppDC accountsDC, T item, int? usageQuota, TimeSpan? validDuration)
+            where T : IObject
+        {
+            var authToken = ExtendOrCreateNew(accountsDC, item, usageQuota, validDuration);
+            var url = Instance.GetUrl(authToken, UtilityContext.Current.RequireSslLogin);
+            return url;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        //!! think we can switch over from "Project" to "Event"!!!!
 #if false
-    public class AuthTokenType
-    {
-        private static AuthTokenType[] registeredAuthTokenTypes =
-            {    
-                AuthTokenType.Create(typeof(LoginAuthToken), "/login/", "@@@##-&&&&-32#"),
-                AuthTokenType.Create(typeof(PasswordResetAuthToken), "/pw/", "@##-&&&&-10#"),
-                AuthTokenType.Create(typeof(ProjectAuthToken), "/proj/", "&&&&&&&&"),
-                AuthTokenType.Create(typeof(ReportAuthToken), "/report/", "&26&&-&&&&-&&", true),
-                // (Note, we can have multiple entries with different paths...)
-                AuthTokenType.Create(typeof(CreateProjectAuthToken), "/getstarted/", "^^^-###", "/getstarted/default.aspx"),
-                AuthTokenType.Create(typeof(CreateProjectAuthToken), "/", "^^^-###", "/getstarted/default.aspx"),
-                AuthTokenType.Create(typeof(CreateUserAuthToken), "/invite/", "&23&&-&&&&-&&", true),
-
-                AuthTokenType.Create(typeof(CreateUserSsoAuthorized), "CreateUserSsoAuth"),
-                AuthTokenType.Create(typeof(CreateUserSsoRequested), "CreateUserSsoReq"),
-            };
-
-        private Type authTokenTypeType;
-        internal string AuthTokenTypeString { get; private set; }
-        internal string UrlPatternPrefix { get; private set; }
-        internal string AuthCodePattern { get; private set; }
-        internal bool AuthCodePatternContainsFormatting { get; private set; }
-        internal bool RequireAuthCodeFormatting { get; private set; }
-        internal string TokenNotFoundPage { get; private set; }
-
-        static AuthTokenType()
+        public static Uri RevokeAndCreateNewProjectUrl(AppDC accountsDC, int projectID, int? usageQuota, TimeSpan? validDuration)
         {
-            Debug.Assert(registeredAuthTokenTypes.All(authTokenType => authTokenType != null));
-        }
+            var utilityContext = UtilityContext.Current;
 
-        private AuthTokenType(Type authTokenTypeType, string authTokenTypeString)
-        {
-            Debug.Assert(authTokenTypeType != null);
-
-            this.authTokenTypeType = authTokenTypeType;
-            this.AuthTokenTypeString = authTokenTypeString;
-        }
-
-        private AuthTokenType(Type authTokenTypeType, string urlPatternPrefix, string authCodePattern, bool requireAuthCodeFormatting, string tokenNotFoundPage)
-        {
-            Debug.Assert(authTokenTypeType != null);
-            Debug.Assert(authTokenTypeType.Name.EndsWith("AuthToken"));
-
-            this.authTokenTypeType = authTokenTypeType;
-
-            this.AuthTokenTypeString = authTokenTypeType.Name.TrimEnd("AuthToken");
-            this.UrlPatternPrefix = urlPatternPrefix;
-            this.AuthCodePattern = authCodePattern;
-            this.AuthCodePatternContainsFormatting = authCodePattern.ToCharArray().Any(c => AuthCode.IsFormatCharacter(c));
-            this.RequireAuthCodeFormatting = requireAuthCodeFormatting;
-            this.TokenNotFoundPage = tokenNotFoundPage;
-        }
-
-        private static AuthTokenType Create(Type authCodeTypeType, string authTokenTypeString)
-        {
-            return new AuthTokenType(authCodeTypeType, authTokenTypeString);
-        }
-
-        public static AuthTokenType Create(Type authCodeTypeType, string urlPatternPrefix, string authCodePattern)
-        {
-            return Create(authCodeTypeType, urlPatternPrefix, authCodePattern, false, null);
-        }
-
-        public static AuthTokenType Create(Type authCodeTypeType, string urlPatternPrefix, string authCodePattern, bool requireAuthCodeFormatting)
-        {
-            return Create(authCodeTypeType, urlPatternPrefix, authCodePattern, requireAuthCodeFormatting, null);
-        }
-
-        public static AuthTokenType Create(Type authCodeTypeType, string urlPatternPrefix, string authCodePattern, string tokenNotFoundPage)
-        {
-            return Create(authCodeTypeType, urlPatternPrefix, authCodePattern, false, tokenNotFoundPage);
-        }
-
-        public static AuthTokenType Create(Type authCodeTypeType, string urlPatternPrefix, string authCodePattern, bool requireAuthCodeFormatting, string tokenNotFoundPage)
-        {
-            Debug.Assert(authCodeTypeType != null);
-            Debug.Assert(!string.IsNullOrEmpty(authCodePattern));
-
-            // We can only ignore AuthCode formatting if the pattern actually has some formatting in it
-            if (!authCodePattern.ToCharArray().Any(c => AuthCode.IsFormatCharacter(c)))
+            //!! nextgen - do we need this access check?
+            //!! nextgen - does it help to pass in a Project so we can directly access check it?
+            //!! nextgen - do we need to change the Project.Get() call to pass a DC?
+            var authCheckProject = Project.Get(accountsDC, projectID);
+            if (authCheckProject == null)
             {
-                // no formatting to ignore
-                Debug.Assert(!requireAuthCodeFormatting);
-                requireAuthCodeFormatting = false;
-            }
-
-            return new AuthTokenType(authCodeTypeType, urlPatternPrefix, authCodePattern, requireAuthCodeFormatting, tokenNotFoundPage);
-        }
-
-        public static AuthCode ParseAuthCode<T>(string authCodeString) where T : AuthToken
-        {
-            var authTokenType = AuthTokenType.Find(typeof(T));
-            var authCode = authTokenType.ParseAuthCode(authCodeString);
-            return authCode;
-        }
-
-        private AuthCode ParseAuthCode(string authCodeString)
-        {
-            return AuthCode.Parse(authCodeString, this);
-        }
-
-        public static AuthTokenType Find(Type authTokenTypeType)
-        {
-            var authTokenType = registeredAuthTokenTypes
-                .FirstOrDefault(type => type.authTokenTypeType == authTokenTypeType);
-
-            Debug.Assert(authTokenType != null);
-
-            return authTokenType;
-        }
-
-        public static AuthTokenType Find(string authTokenTypeString)
-        {
-            var authTokenType = registeredAuthTokenTypes
-                .FirstOrDefault(type => type.AuthTokenTypeString == authTokenTypeString);
-
-            return authTokenType;
-        }
-
-        public static void ProcessRequest(HttpContext context)
-        {
-            string path = context.Request.Path;
-            Debug.Assert(path.StartsWith("/"));
-
-            foreach (AuthTokenType authTokenType in registeredAuthTokenTypes.Where(type => !string.IsNullOrEmpty(type.UrlPatternPrefix)))
-            {
-                Debug.Assert(authTokenType.UrlPatternPrefix.StartsWith("/"));
-
-                if (path.StartsWith(authTokenType.UrlPatternPrefix))
-                {
-                    string pathSubString = path.TrimStart(authTokenType.UrlPatternPrefix);
-                    Debug.Assert(!pathSubString.StartsWith("/"));
-
-                    int secondSlashIndex = pathSubString.IndexOf('/', 0);
-                    bool singlePathSegment = secondSlashIndex == -1 || secondSlashIndex == (pathSubString.Length - 1);
-
-                    if (singlePathSegment && pathSubString.Length > 2 && !pathSubString.Contains('.'))
-                    {
-                        int slashCount = secondSlashIndex == -1 ? 0 : 1;
-                        string authCodeString = pathSubString.Substring(0, pathSubString.Length - slashCount);
-                        AuthCode authCode = authTokenType.ParseAuthCode(authCodeString);
-                        AuthToken authToken = AuthToken.FirstOrDefault(authCode);
-                        if (authToken != null)
-                        {
-                            authToken.Click(context);
-                        }
-                        else
-                        {
-                            // Avoid handling the "not found" case at the root - since some of our regular URL paths look like auth codes
-                            //!! Consider beefing up ParseAuthCode to see if authCodeString matches the token pattern. If it does match the pattern,
-                            //   we could consider allowing this case at the root again.
-                            if (authTokenType.UrlPatternPrefix != "/")
-                            {
-                                authTokenType.OnTokenNotFound(context, authCodeString);
-                            }
-                        }
-                        return;
-                    }
-                }
-            }
-        }
-
-        protected void OnTokenNotFound(HttpContext context, string authCodeString)
-        {
-            //!! track the click in some click usage table
-
-            if (!string.IsNullOrEmpty(this.TokenNotFoundPage))
-            {
-                string queryString = string.Format("authCode={0}",
-                    /*0*/ authCodeString);
-                context.RewritePath(this.TokenNotFoundPage, string.Empty, queryString);
-            }
-        }
-    }
-
-    public partial class AuthToken
-    {
-        protected static readonly int? NullProjectID = null;
-        protected static readonly string NullSettings = null;
-        public static readonly TimeSpan? InfiniteDuration = null;
-
-        protected AuthToken(AuthCode authCode, int clientID, int? userID, int? projectID, string settingsData, TimeSpan? validDuration)
-            : this()
-        {
-            this.AuthCodeString = authCode.ToString(AuthCode.StringFormat.Storage);
-            this.AuthClientID = clientID;
-            this.AuthUserID = userID;
-            this.AuthProjectID = projectID;
-            this.Settings = settingsData;
-
-            DateTime utcNow = DateTime.UtcNow;
-            this.CreateDate = utcNow;
-            if (validDuration != null)
-            {
-                this.ExpireDate = this.CreateDate + validDuration;
-            }
-        }
-
-        public TimeSpan? TotalDuration
-        {
-            get
-            {
-                if (this.ExpireDate != null)
-                {
-                    return this.ExpireDate - this.CreateDate;
-                }
                 return null;
             }
+
+            var projectLoginAuthToken = WebAuthTemplate.RevokeAndCreateNewAuthToken(accountsDC, () => QueryValidProjects(accountsDC, projectID), () => CreateAuthToken(accountsDC, typeof(Project), projectID, usageQuota, validDuration));
+
+            var url = Instance.GetUrl(projectLoginAuthToken, utilityContext.RequireSslLogin);
+            return url;
         }
 
-        public AuthCode AuthCode
+        public static Uri ExtendOrCreateNewProjectUrl(AppDC accountsDC, int projectID, int? usageQuota, TimeSpan? validDuration)
         {
-            get
+            var utilityContext = UtilityContext.Current;
+
+            //!! nextgen - do we need this access check?
+            //!! nextgen - does it help to pass in a Project so we can directly access check it?
+            //!! nextgen - do we need to change the Project.Get() call to pass a DC?
+            var authCheckProject = Project.Get(accountsDC, projectID);
+            if (authCheckProject == null)
             {
-                var authTokenType = AuthTokenType.Find(this.Type);
-                return AuthCode.FromStorage(this.AuthCodeString, authTokenType);
-            }
-        }
-
-        protected Uri ToUrl(string urlPatternPrefix)
-        {
-            return ToUrl(urlPatternPrefix, false);
-        }
-
-        protected Uri ToSecureUrl(string urlPatternPrefix)
-        {
-            return ToUrl(urlPatternPrefix, true);
-        }
-
-        private Uri ToUrl(string urlPatternPrefix, bool useSsl)
-        {
-            TorqContext torq = TorqContext.Current;
-
-            var urlAuthCodeString = this.AuthCode.ToString(AuthCode.StringFormat.Url);
-
-            UriBuilder uriBuilder = new UriBuilder(torq.SiteUrl);
-            uriBuilder.Path = urlPatternPrefix + urlAuthCodeString;
-            if (useSsl)
-            {
-                uriBuilder.Scheme = "https";
-                uriBuilder.Port = -1;
+                return null;
             }
 
-            return uriBuilder.Uri;
+            var projectLoginAuthToken = WebAuthTemplate.ExtendOrCreateNewAuthToken(accountsDC, () => QueryValidProjects(accountsDC, projectID), () => CreateAuthToken(accountsDC, typeof(Project), projectID, usageQuota, validDuration), validDuration);
+
+            var url = Instance.GetUrl(projectLoginAuthToken, utilityContext.RequireSslLogin);
+            return url;
         }
-
-        internal static AuthToken FirstOrDefault(AuthCode authCode)
-        {
-            try
-            {
-                string authCodeString = authCode.ToString(AuthCode.StringFormat.Storage);
-                string authCodeStringLower = authCodeString.ToLower();
-                string authCodeStringUpper = authCodeString.ToUpper();
-                //!! hmm. I can't decide how best to handle casing for our tokens.
-                // So the comparison here looks for either exact match or uppper or lower cases.
-                // I'm doing the above because it's not clear if we can specify that SQL should perform a case insensative compare for us.
-                // Also not clear if we'll ever be generating mixed case tokens, or if they'll always be entirely upper or lower.
-
-                var matchedAuthToken = TorqDataContext.AccountsOnlyDCInstance.AuthTokens
-                    // Not really sure if we need this OrderBy - does it speed up our search? Do we need an index on AuthCode?
-                    .OrderByDescending(authToken => authToken.AuthTokenID)
-                    .FirstOrDefault(authToken => authToken.AuthCodeString == authCodeString || authToken.AuthCodeString == authCodeStringUpper || authToken.AuthCodeString == authCodeStringLower);
-
-                return matchedAuthToken;
-            }
-            catch (Exception e)
-            {
-                Diagnostic.TraceError(e);
-            }
-
-            return null;
-        }
-
-        public static T FirstOrDefault<T>(AuthCode authCode) where T : AuthToken
-        {
-            return FirstOrDefault(authCode) as T;
-        }
-
-        public virtual bool IsValid
-        {
-            get
-            {
-                DateTime utcNow = DateTime.UtcNow;
-                return this.ExpireDate == null || (DateTime)this.ExpireDate >= utcNow;
-            }
-        }
-
-        internal void Click(HttpContext context)
-        {
-            bool isValid = this.IsValid;
-            OnClicked(context, IsValid);
-        }
-
-        protected virtual void OnClicked(HttpContext context, bool isValid)
-        {
-            Debug.Assert(this.AuthClientID.HasValue);
-
-            TorqContext torq = TorqContext.Current;
-            string siteName = torq.SiteName;
-
-            var authTokenType = AuthTokenType.Find(this.Type);
-            AuthTokenClickItem.LogClick(siteName, context, authTokenType, this.AuthTokenID, this.AuthClientID.Value, this.AuthUserID, isValid, this.AuthProjectID);
-        }
-
-        protected static IQueryable<T> FindValid<T>(int clientID) where T : AuthToken
-        {
-            //!! consider removing this method - and requiring an authorizedBy parameter
-
-            //!! do we care that time marches on as we do this check?
-            DateTime utcNow = DateTime.UtcNow;
-
-            var authTokenQuery = Find<T>()
-                .Where(authToken => authToken.ExpireDate == null || authToken.ExpireDate > utcNow)
-                .Where(authToken => authToken.AuthClientID != null && authToken.AuthClientID == clientID);
-
-            return authTokenQuery;
-        }
-
-        protected static IQueryable<T> Find<T>() where T : AuthToken
-        {
-            //!! consider removing this method - and requiring an authorizedBy parameter
-
-            var authTokenType = AuthTokenType.Find(typeof(T));
-            var authTokenTypeString = authTokenType.AuthTokenTypeString;
-
-            var authTokenQuery = TorqDataContext.AccountsOnlyDCInstance.AuthTokens
-                .OrderByDescending(authToken => authToken.AuthTokenID)
-                .Where(authToken => authToken.Type == authTokenTypeString)
-                .Cast<T>();
-
-            return authTokenQuery;
-        }
-
-        protected static IQueryable<T> Find<T>(TorqIdentity authorizedBy) where T : AuthToken
-        {
-            Debug.Assert(authorizedBy != null);
-            if (authorizedBy == null)
-            {
-                return new T[0].AsQueryable();
-            }
-
-            var authTokenType = AuthTokenType.Find(typeof(T));
-            var authTokenTypeString = authTokenType.AuthTokenTypeString;
-
-            var authTokenQuery = TorqDataContext.AccountsOnlyDCInstance.AuthTokens
-                .OrderByDescending(authToken => authToken.AuthTokenID)
-                .Where(authToken => authToken.Type == authTokenTypeString)
-                .Cast<T>();
-
-            if (authorizedBy.IsSystemAdmin)
-            {
-                // no restrictions
-            }
-            else if (authorizedBy.IsAccountAdmin)
-            {
-                // restrict to all clients w/in the account's hierarchy
-                ClientInfo info = Client.GetCachedClientInfo(authorizedBy.ClientID);
-                if (info != null && info.AncestorsAndSelf != null)
-                {
-                    List<int> clientIds = info.Root.DescendentsAndSelf.Select(c => c.ClientID).ToList();
-                    authTokenQuery = authTokenQuery.Where(authToken => authToken.AuthClientID.HasValue && clientIds.Contains(authToken.AuthClientID.Value));
-                }
-            }
-            else if (authorizedBy.IsGroupAdmin)
-            {
-                authTokenQuery = authTokenQuery
-                    .Where(authToken => authToken.AuthClientID.HasValue && authToken.AuthClientID.Value == authorizedBy.ClientID);
-            }
-            else
-            {
-                return new T[0].AsQueryable();
-            }
-
-            return authTokenQuery;
-        }
-
-        /// <summary>
-        /// Creates a new AuthToken, without consideration of any outstanding valid or expired AuthTokens
-        /// </summary>
-        protected static T CreateNew<T>(Func<AuthCode, T> authTokenConstructor) where T : AuthToken
-        {
-            var authTokenType = AuthTokenType.Find(typeof(T));
-            Debug.Assert(authTokenType != null);
-
-            while (true)
-            {
-                AuthCode authCode = AuthCode.Create(authTokenType);
-
-                // Check we've got a unique AuthToken ...
-                AuthToken existingToken = FirstOrDefault(authCode);
-                if (existingToken == null)
-                {
-                    // ... Phew, it's unique.
-                    T newAuthToken = authTokenConstructor(authCode);
-                    Debug.Assert(newAuthToken != null);
-
-                    // For LINQ purposes, we need to save the base type
-                    AuthToken authToken = newAuthToken;
-                    authToken.AccountsDBSave();
-
-                    return newAuthToken;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Returns an existing valid AuthToken (after setting its lifespan to validDuration) if one is found, else creates and returns a new AuthToken.
-        /// </summary>
-        protected static T ExtendOrCreateNew<T>(Func<T> authTokenFindValid, Func<T> authTokenCreateNew, TimeSpan? validDuration) where T : AuthToken
-        {
-            Debug.Assert(authTokenFindValid != null);
-            Debug.Assert(authTokenCreateNew != null);
-            Debug.Assert(validDuration == null || ((TimeSpan)validDuration).Ticks > 0);
-
-            T existingAuthToken = authTokenFindValid();
-            if (existingAuthToken != null)
-            {
-                // We've already got an AuthToken. Fix up the expiry and reuse it.
-                existingAuthToken.setRemainingDuration(validDuration);
-                existingAuthToken.AccountsDBUpdate();
-                return existingAuthToken;
-            }
-
-            T newAuthToken = authTokenCreateNew();
-            Debug.Assert(newAuthToken != null);
-            // (newly created tokens should already have the correct duration set)
-            Debug.Assert(validDuration == null || newAuthToken.TotalDuration == validDuration);
-            return newAuthToken;
-        }
-
-        protected static T ExpireAndCreateNew<T>(Func<T> authTokenFindValid, Func<T> authTokenCreateNew) where T : AuthToken
-        {
-            return ExpireAndCreateNew(authTokenFindValid, authTokenCreateNew, null);
-        }
-
-        /// <summary>
-        /// Expires any currently valid AuthTokens, then creates and returns a new AuthToken.
-        /// </summary>
-        protected static T ExpireAndCreateNew<T>(Func<T> authTokenFindValid, Func<T> authTokenCreateNew, TimeSpan? validDuration) where T : AuthToken
-        {
-            Debug.Assert(authTokenFindValid != null);
-            Debug.Assert(authTokenCreateNew != null);
-            Debug.Assert(validDuration == null || ((TimeSpan)validDuration).Ticks > 0);
-
-            T existingAuthToken;
-            while((existingAuthToken = authTokenFindValid()) != null)
-            {
-                Debug.Assert(existingAuthToken.IsValid);
-
-                // We've already got a valid AuthToken. Expire it before we create a new one.
-                existingAuthToken.expireAndUpdateDB();
-            }
-
-            T newAuthToken = authTokenCreateNew();
-            Debug.Assert(newAuthToken != null);
-            // (newly created tokens should already have the correct duration set)
-            Debug.Assert(validDuration == null || newAuthToken.TotalDuration == validDuration);
-            return newAuthToken;
-        }
-
-        protected void expireAndUpdateDB()
-        {
-            this.ExpireDate = DateTime.UtcNow;
-            UpdateDB();
-        }
-
-        protected void UpdateDB()
-        {
-            try
-            {
-                this.AccountsDBUpdate();
-            }
-            catch (Exception ex)
-            {
-                TorqContext.Current.EventLog.LogException(ex);
-            }
-        }
-
-        private void setRemainingDuration(TimeSpan? validDuration)
-        {
-            if (validDuration != null)
-            {
-                DateTime utcNow = DateTime.UtcNow;
-                this.ExpireDate = utcNow + validDuration;
-            }
-            else
-            {
-                this.ExpireDate = null;
-            }
-        }
-    }
 #endif
 
-    //  AuthTokenType.Create(typeof(LoginAuthToken), "/login/", "@@@##-&&&&-32#"),
+        private static AuthToken CreateAuthToken(WebUtilityDC dc, Type targetTableType, int targetID, int? usageQuota, TimeSpan? validDuration)
+        {
+            // Login tokens are defined within a Group scope (either TenantGroup or UserGroup)
+            var teamEPScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
 
-    //AuthTokenType.Create(typeof(PasswordResetAuthToken), "/pw/", "@##-&&&&-10#"),
+            var issuedByUserID = dc.TransactionAuthorizedBy.UserIDOrNull;
 
-    //AuthTokenType.Create(typeof(ProjectAuthToken), "/proj/", "&&&&&&&&"),
-    //AuthTokenType.Create(typeof(ReportAuthToken), "/report/", "&26&&-&&&&-&&", true),
-    // (Note, we can have multiple entries with different paths...)
-    //AuthTokenType.Create(typeof(CreateProjectAuthToken), "/getstarted/", "^^^-###", "/getstarted/default.aspx"),
-    //AuthTokenType.Create(typeof(CreateProjectAuthToken), "/", "^^^-###", "/getstarted/default.aspx"),
-    //AuthTokenType.Create(typeof(CreateUserAuthToken), "/invite/", "&23&&-&&&&-&&", true),
+            var authToken = AuthToken.Create(dc, AUTH_CODE_PATTERN, authCode => AuthToken.Create(dc, teamEPScope, AUTH_TOKEN_TYPE_NAME, authCode, targetTableType, targetID, null, usageQuota, validDuration, issuedByUserID));
+            return authToken;
+        }
+
+
+        public static IQueryable<AuthToken> Query(UtilityDC dc)
+        {
+            return AuthTemplate.QueryAuthTokens(dc, AUTH_TOKEN_TYPE_NAME);
+        }
+        public static IQueryable<AuthToken> QueryValid(UtilityDC dc)
+        {
+            return AuthTemplate.QueryValidAuthTokens(dc, AUTH_TOKEN_TYPE_NAME);
+        }
+
+
+        /*
+
+                public static Uri ExpireAndCreateNewUserUrl(int clientID, int userID, TimeSpan? validDuration)
+                {
+                    return ExpireAndCreateNewUser(clientID, userID, validDuration).ToSecureUrl(AuthTokenType.UrlPatternPrefix);
+                }
+
+                public static Uri ExpireAndCreateNewProjectUrl(int clientID, int projectID, TimeSpan? validDuration)
+                {
+                    return ExpireAndCreateNewProject(clientID, projectID, validDuration).ToSecureUrl(AuthTokenType.UrlPatternPrefix);
+                }
+
+                private static LoginAuthToken ExpireAndCreateNewUser(int clientID, int userID, TimeSpan? validDuration)
+                {
+                    return AuthToken.ExpireAndCreateNew(() => FindValidUser(clientID, userID), () => CreateNew(clientID, userID, null, validDuration));
+                }
+
+                private static AuthToken ExpireAndCreateNewProject(UtilityDC dc, int clientID, int projectID, TimeSpan? validDuration)
+                {
+                    return AuthToken.ExpireAndCreateNew(() => FindValidProject(dc, projectID), () => CreateNew(clientID, null, projectID, validDuration));
+                }
+
+                private static AuthToken CreateNew(int clientID, int? userID, int? projectID, TimeSpan? validDuration)
+                {
+                    return AuthToken.CreateNew(authCode => new LoginAuthToken(authCode, clientID, userID, projectID, validDuration));
+                }
+        */
+        public static IQueryable<AuthToken> QueryValidUsers(UtilityDC dc, int userID)
+        {
+            return AuthTemplate.QueryValidAuthTokens(dc, AUTH_TOKEN_TYPE_NAME)
+                .Where(authToken => authToken.TargetTable == typeof(User).Name)
+                .Where(authToken => authToken.TargetID == userID);
+        }
+
+        //!! we can specific ExtendedProperties on things that aren't actually database types
+        //   
+
+
+        public static IQueryable<AuthToken> QueryValidItems<T>(UtilityDC dc, T item)
+            where T : IObject
+        {
+            return AuthTemplate.QueryValidAuthTokens(dc, AUTH_TOKEN_TYPE_NAME)
+                .Where(authToken => authToken.TargetTable == typeof(T).Name)
+                .Where(authToken => authToken.TargetID == item.ObjectID);
+        }
+
+
+        public static IQueryable<AuthToken> QueryValidEventSessions(UtilityDC dc, int targetID)
+        {
+            return AuthTemplate.QueryValidAuthTokens(dc, AUTH_TOKEN_TYPE_NAME)
+                .Where(authToken => authToken.TargetTable == typeof(EventSession).Name)
+                .Where(authToken => authToken.TargetID == targetID);
+        }
+
+
+#if false
+        public static IQueryable<AuthToken> QueryValidProjects(UtilityDC dc, int projectID)
+        {
+            return AuthTemplate.QueryValidAuthTokens(dc, LoginAuthTemplate.authTokenTypeName)
+                .Where(authToken => authToken.TargetTable == typeof(Project).Name)
+                .Where(authToken => authToken.TargetID == projectID);
+        }
+#endif
+
+        /*
+        public Uri CreateSingle(WebUtilityDC dc, int userID)
+        {
+            var utilityContext = UtilityContext.Current;
+
+            var passwordResetAuthToken = CreateSingleAuthToken(dc, userID);
+
+            if (utilityContext.RequireSslLogin)
+            {
+                var secureUrl = GetSecureUrl(utilityContext.SiteUrl, passwordResetAuthToken.AuthCode, this.UrlPatternPrefix);
+                return secureUrl;
+            }
+
+            var url = GetUrl(utilityContext.SiteUrl, passwordResetAuthToken.AuthCode, this.UrlPatternPrefix);
+            return url;
+        }
+*/
+
+
+        protected override HubResult OnRedeemed(UtilityDC utilityDC, AuthToken authToken, dynamic data)
+        {
+            if (authToken.Redeem(utilityDC))
+            {
+                var authTokenEPScope = authToken.ItemEPScope;
+                Debug.Assert(authTokenEPScope.ScopeType == ExtendedPropertyScopeType.TenantGroupID);
+                Debug.Assert(authToken.TargetID.HasValue);
+
+
+                // Our item's tenant is our tenant
+                var tenantGroupID = authTokenEPScope.ID.Value;
+                var tenantGroupInfo = TenantGroup.GetCachedTenantGroupInfo(tenantGroupID);
+
+                Debug.Assert(authToken.ContextUserID.HasValue);
+                var authTokenContextUserID = authToken.ContextUserID.Value;
+
+                var authorizedBy = utilityDC.TransactionAuthorizedBy;
+                var authTokenAuthorizingIdentity = authorizedBy.GetImpersonatedIdentity(utilityDC, authTokenContextUserID);
+
+                var appRoles = new AppRole[] { AppRole.EventSessionVolunteer }
+                    .Select(appRole => appRole.ToString());
+
+                // If we're given a firstName/lastName, we'll have a User Volunteer. Otherwise an Anonymous Volunteer
+                string firstName = data.firstName;
+                string lastName = data.lastName;
+
+                //!! do we need a non-null display name?
+                string identityDisplayName = null;
+                int? identityUserID = null;
+                TimeZoneInfo identityTimeZoneInfo = tenantGroupInfo.TimeZoneInfo;
+
+                User volunteerUser = null;
+                if (!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName))
+                {
+                    var trimFirstName = firstName.Trim();
+                    var trimLastName = lastName.Trim();
+
+                    volunteerUser = User.FindOrCreateVisitor(utilityDC, authTokenAuthorizingIdentity, trimFirstName, trimLastName, appRoles);
+                    Debug.Assert(volunteerUser != null);
+                    Debug.Assert(volunteerUser.ID > 0);
+
+                    identityDisplayName = volunteerUser.DisplayName;
+                    identityUserID = volunteerUser.ID;
+                    identityTimeZoneInfo = volunteerUser.EffectiveTimeZoneInfo;
+                }
+
+                // If they authenticate this way, we only allow these roles. (Log in normally if your User account has greater permissions)
+                var systemRoles = Enumerable.Empty<SystemRole>();
+
+                IdentityData identityData = IdentityData.Create(authTokenEPScope, tenantGroupID, identityUserID, identityDisplayName, systemRoles, appRoles, null, identityTimeZoneInfo);
+
+                //var systemIdentity = authorizedBy.GetSystemIdentity(dc, tenantGroupInfo);
+                //Debug.Assert(systemIdentity != null);
+
+                utilityDC.UsingIdentity<AppDC>(authTokenAuthorizingIdentity, authTokenIdentityDC =>
+                {
+                    if (authToken.TargetID.HasValue)
+                    {
+                        WebIdentityAuthentication.StartObjectSession(authTokenIdentityDC, identityData, TimeZones.Pacific, tenantGroupID, identityUserID, typeof(EventSession), authToken.TargetID.Value, authToken.Type, authToken.ID);
+                    }
+                });
+                return HubResult.Success;
+            }
+            return HubResult.Forbidden;
+        }
+
+
+
+        protected override AuthTokenState OnTokenClicked(HttpContext context, WebUtilityDC dc, AuthToken authToken)
+        {
+            UtilityContext utilityContext = UtilityContext.Current;
+
+            //!! nextgen - do we require an indication on the AuthToken if it requires SSL?
+
+            if (utilityContext.RequireSslLogin)
+            {
+                // (If we redirect here, the link the user clicked on will remain in the browser URL)
+                context.RedirectToSecureConnection();
+                Debug.Assert(context.Request.IsSecureConnection);
+            }
+
+            var authTokenState = base.OnTokenClicked(context, dc, authToken);
+
+
+
+            if (authTokenState == AuthTokenState.Valid)
+            {
+                //!! how do we pass firstName/lastName? Is the intent to show UI? Or specify the volunteer Name in the authToken? Guess if we have it, we should pass a userID. 
+                var result = OnRedeemed(dc, authToken, new {});
+
+                if (result == HubResult.Success)
+                {
+                    //!! hmm should we always jump to the SPA, success or no on redeeming?
+                    context.Response.Redirect("/Spas/VolunteerSpa.aspx");
+                    Debug.Fail("Shouldn't get here...");
+                }
+            }
+
+            // (this page handles both valid and invalid clicks)
+
+            string queryString = string.Format("authCode={0}",
+                /*0*/ FormatAuthCode(authToken.AuthCode, AuthCodeFormat.Url));
+
+            context.RewritePath("/ResetPassword.aspx", string.Empty, queryString);
+
+            return authTokenState;
+        }
+
+
+        /*
+                private LoginAuthToken(AuthCode authCode, int clientID, int? userID, int? projectID, TimeSpan? validDuration)
+                    : base(authCode, clientID, userID, projectID, NullSettings, validDuration)
+                {
+                    // Login as a user or to a project, but not both
+                    Debug.Assert(userID.HasValue ^ projectID.HasValue);
+                }
+        */
+
+        /*
+
+
+
+                public Uri SecureUrl
+                {
+                    get { return base.ToSecureUrl(AuthTokenType.UrlPatternPrefix); }
+                }
+        */
+        /*
+                protected override void OnClicked(HttpContext context, bool isValid)
+                {
+                    TorqContext torq = TorqContext.Current;
+
+                    base.OnClicked(context, isValid);
+
+                    if (isValid)
+                    {
+                        if (torq.RequireSslLogin)
+                        {
+                            context.RedirectToSecureConnection();
+                            Debug.Assert(context.Request.IsSecureConnection);
+                        }
+
+                        // Expire - as this is a one-shot AuthToken
+                        this.expireAndUpdateDB();
+
+                        Debug.Assert(this.AuthUserID.HasValue ^ this.AuthProjectID.HasValue);
+
+                        if (this.AuthUserID.HasValue)
+                        {
+                            TorqUserAuthentication.LoginAuthTokenSession(this.AuthUser, Product.cTORQ);
+
+                            //!! is this really where we want to redirect?
+                            // Redirect - so the client can save the AuthCookie
+                            string qs = context.Request.QueryString.ToString();
+                            context.Response.Redirect("/project/" + qs);
+                            Debug.Fail("Shouldn't get here...");
+                        }
+
+                        if (this.AuthProjectID.HasValue)
+                        {
+                            TorqProjectAuthentication.StartSession(context, this.AuthProject, AccessLicense.Unlimited, Product.cTORQ, this.AuthTokenID);
+
+                            //!! is this really where we want to redirect?
+                            // Redirect - so the client can save the AuthCookie
+                            string qs = context.Request.QueryString.ToString();
+                            if (qs.Length > 0)
+                            {
+                                qs = "&" + qs;
+                            }
+                            context.Response.Redirect("/project/JobCounselor.aspx?pid=" + this.AuthProjectID.Value.ToString() + qs);
+                            Debug.Fail("Shouldn't get here...");
+                        }
+                    }
+
+                    string requestUrlString = context.Request.Url.ToString();
+
+                    context.Server.Transfer("/Message.aspx?mid=exp_url&url=" + requestUrlString);
+                    Debug.Fail("Shouldn't get here...");
+                }
+        */
+        /*
+                public override bool IsValid
+                {
+                    get
+                    {
+                        if (this.AuthProject == null && this.AuthUser == null)
+                        {
+                            return false;
+                        }
+                        return base.IsValid;
+                    }
+                }
+        */
+    }
+
+
+
+
+
 
 
 
@@ -824,6 +546,97 @@ namespace App.Library
             var url = Instance.GetUrl(userLoginAuthToken, utilityContext.RequireSslLogin);
             return url;
         }
+
+
+#if false
+        public static Uri RevokeAndCreateNewItemUrl(AppDC accountsDC, Type targetType, int targetID, int? usageQuota, TimeSpan? validDuration)
+        {
+            var utilityContext = UtilityContext.Current;
+
+            //!! nextgen - do we need this access check?
+            //!! nextgen - does it help to pass in a Project so we can directly access check it?
+            //!! nextgen - do we need to change the Project.Get() call to pass a DC?
+
+            //var authCheckProject = Project.Get(accountsDC, projectID);
+            //if (authCheckProject == null)
+            //{
+                //return null;
+            //}
+
+            var projectLoginAuthToken = WebAuthTemplate.RevokeAndCreateNewAuthToken(accountsDC, () => QueryValidProjects(accountsDC, projectID), () => CreateAuthToken(accountsDC, typeof(Project), projectID, usageQuota, validDuration));
+
+            var url = Instance.GetUrl(projectLoginAuthToken, utilityContext.RequireSslLogin);
+            return url;
+        }
+
+        public static Uri ExtendOrCreateNewItemUrl(AppDC accountsDC, Type targetType, int targetID, int? usageQuota, TimeSpan? validDuration)
+        {
+            var utilityContext = UtilityContext.Current;
+
+            //!! nextgen - do we need this access check?
+            //!! nextgen - does it help to pass in a Project so we can directly access check it?
+            //!! nextgen - do we need to change the Project.Get() call to pass a DC?
+
+            //var authCheckProject = Project.Get(accountsDC, projectID);
+            //if (authCheckProject == null)
+            //{
+                //return null;
+            //}
+
+            var projectLoginAuthToken = WebAuthTemplate.ExtendOrCreateNewAuthToken(accountsDC, () => QueryValidEventSessions(accountsDC, projectID), () => CreateAuthToken(accountsDC, typeof(Project), projectID, usageQuota, validDuration), validDuration);
+
+            var url = Instance.GetUrl(projectLoginAuthToken, utilityContext.RequireSslLogin);
+            return url;
+        }
+#endif
+
+
+        public static AuthToken ExtendOrCreateNewEventSession(AppDC accountsDC, int targetID, int? usageQuota, TimeSpan? validDuration)
+        {
+            var utilityContext = UtilityContext.Current;
+
+            //!! nextgen - do we need this access check?
+            //!! nextgen - does it help to pass in a Project so we can directly access check it?
+            //!! nextgen - do we need to change the Project.Get() call to pass a DC?
+
+            //var authCheckProject = Project.Get(accountsDC, projectID);
+            //if (authCheckProject == null)
+            //{
+            //return null;
+            //}
+
+            var authToken = WebAuthTemplate.ExtendOrCreateNewAuthToken(accountsDC, () => QueryValidEventSessions(accountsDC, targetID), () => CreateAuthToken(accountsDC, typeof(EventSession), targetID, usageQuota, validDuration), validDuration);
+            return authToken;
+        }
+
+
+
+
+        public static AuthToken ExtendOrCreateNew<T>(AppDC accountsDC, T item, int? usageQuota, TimeSpan? validDuration)
+            where T : IObject
+        {
+            var authToken = WebAuthTemplate.ExtendOrCreateNewAuthToken(accountsDC, () => QueryValidItems(accountsDC, item), () => CreateAuthToken(accountsDC, typeof(T), item.ObjectID, usageQuota, validDuration), validDuration);
+            return authToken;
+        }
+
+        public static Uri ExtendOrCreateNewUrl<T>(AppDC accountsDC, T item, int? usageQuota, TimeSpan? validDuration)
+            where T : IObject
+        {
+            var authToken = ExtendOrCreateNew(accountsDC, item, usageQuota, validDuration);
+            var url = Instance.GetUrl(authToken, UtilityContext.Current.RequireSslLogin);
+            return url;
+        }
+
+
+
+
+
+
+
+
+
+
+
 
         //!! think we can switch over from "Project" to "Event"!!!!
 #if false
@@ -922,6 +735,27 @@ namespace App.Library
                 .Where(authToken => authToken.TargetID == userID);
         }
 
+        //!! we can specific ExtendedProperties on things that aren't actually database types
+        //   
+
+
+        public static IQueryable<AuthToken> QueryValidItems<T>(UtilityDC dc, T item)
+            where T : IObject
+        {
+            return AuthTemplate.QueryValidAuthTokens(dc, LoginAuthTemplate.authTokenTypeName)
+                .Where(authToken => authToken.TargetTable == typeof(T).Name)
+                .Where(authToken => authToken.TargetID == item.ObjectID);
+        }
+
+
+        public static IQueryable<AuthToken> QueryValidEventSessions(UtilityDC dc, int targetID)
+        {
+            return AuthTemplate.QueryValidAuthTokens(dc, LoginAuthTemplate.authTokenTypeName)
+                .Where(authToken => authToken.TargetTable == typeof(EventSession).Name)
+                .Where(authToken => authToken.TargetID == targetID);
+        }
+
+
 #if false
         public static IQueryable<AuthToken> QueryValidProjects(UtilityDC dc, int projectID)
         {
@@ -951,7 +785,7 @@ namespace App.Library
 
 
 
-        protected override void OnTokenClicked(HttpContext context, WebUtilityDC dc, AuthToken authToken)
+        protected override AuthTokenState OnTokenClicked(HttpContext context, WebUtilityDC dc, AuthToken authToken)
         {
             UtilityContext utilityContext = UtilityContext.Current;
 
@@ -964,8 +798,51 @@ namespace App.Library
                 Debug.Assert(context.Request.IsSecureConnection);
             }
 
-            base.OnTokenClicked(context, dc, authToken);
+            var authTokenState = base.OnTokenClicked(context, dc, authToken);
 
+
+            var authorizedBy = dc.TransactionAuthorizedBy;
+
+            if (authTokenState == AuthTokenState.Valid)
+            {
+                var authTokenEPScope = authToken.ItemEPScope;
+                Debug.Assert(authTokenEPScope.ScopeType == ExtendedPropertyScopeType.TenantGroupID);
+                Debug.Assert(authToken.TargetID.HasValue);
+
+
+                // Impersonate the TenantGroup "System" - so we're contrained to the correct EPScope
+                var tenantGroupID = authTokenEPScope.ID.Value;
+                var tenantGroupInfo = TenantGroup.GetCachedTenantGroupInfo(tenantGroupID);
+
+
+                Debug.Assert(authToken.ContextUserID.HasValue);
+                var contextUserID = authToken.ContextUserID.Value;
+
+                var authTokenAuthorizingIdentity = authorizedBy.GetImpersonatedIdentity(dc, contextUserID);
+
+
+                //var systemIdentity = authorizedBy.GetSystemIdentity(dc, tenantGroupInfo);
+                //Debug.Assert(systemIdentity != null);
+
+                dc.UsingIdentity<AppDC>(authTokenAuthorizingIdentity, tenantDC =>
+                    {
+                        if (authToken.TargetID.HasValue)
+                        {
+                            int? nullUserID = null;
+                            var displayName = "login auth token display name";
+                            var systemRoles = Enumerable.Empty<SystemRole>();
+                            var appRoles = Enumerable.Empty<string>();
+                            var tenantGroupTimeZoneInfo = tenantGroupInfo.TimeZoneInfo;
+
+                            IdentityData identityData = IdentityData.Create(authTokenEPScope, tenantGroupID, nullUserID, displayName, systemRoles, appRoles, null, tenantGroupTimeZoneInfo);
+
+                            WebIdentityAuthentication.StartObjectSession(dc, identityData, TimeZones.Pacific, tenantGroupID, null, typeof(EventSession), authToken.TargetID.Value, null, null);
+                            context.Response.Redirect("/Spas/VolunteerSpa.aspx");
+                            Debug.Fail("Shouldn't get here...");
+                        }
+                    });
+
+            }
 
             // (this page handles both valid and invalid clicks)
 
@@ -973,6 +850,9 @@ namespace App.Library
                 /*0*/ FormatAuthCode(authToken.AuthCode, AuthCodeFormat.Url));
 
             context.RewritePath("/ResetPassword.aspx", string.Empty, queryString);
+
+
+            return authTokenState;
         }
 
 
