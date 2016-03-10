@@ -3047,23 +3047,62 @@ app.directive('msSearchView', function ($parse, utilityService) {
 
       $scope.updateClientFilter = function () {
 
+        // stack filters are "special" in that we need to OR together any filters in the same ".group".
+        // (So a school group would allow choices of 'Wilder' OR 'Eastlake')
+        var stackFilterGroups = [];
+        var groupStackFilters = {};
+        angular.forEach($scope.options.stackFilters, function (stackFilter) {
+          if (!stackFilter.group) {
+            // directly add any filters that aren't part of a 'group'
+            stackFilterGroups.push(stackFilter);
+          } else {
+            if (!groupStackFilters[stackFilter.group]) {
+              // first time seeing this group, create an array property
+              groupStackFilters[stackFilter.group] = [];
+            }
+            groupStackFilters[stackFilter.group].push(stackFilter);
+          }
+        });
+
+        angular.forEach(groupStackFilters, function (groupFilters, key) {
+          var groupServerTerms = [];
+          var groupClientFunctions = [];
+          angular.forEach(groupFilters, function (groupFilter) {
+            groupServerTerms.push(groupFilter.serverTerm);
+            groupClientFunctions.push(groupFilter.clientFunction);
+          });
+          var combinedGroupStackFilter = {
+            name: key,
+            serverTerm: groupServerTerms.join(' '),
+            clientFunction: function (item) {
+              // OR behavior - if we PASS any filter, return true
+              for (var i = 0; i < groupClientFunctions.length; i++) {
+                if (groupClientFunctions[i](item)) {
+                  return true;
+                }
+              }
+              // Otherwise return false
+              return false;
+            }
+          };
+          stackFilterGroups.push(combinedGroupStackFilter);
+        });
+
         var clientFilters = utilityService.buildClientFilter(
           $scope.options.baseFilter,
-          $scope.options.stackFilters,
+          // note - we've converted $scope.options.stackFilters into stackFilterGroups
+          stackFilterGroups,
           $scope.options.selectFilter,
           $scope.options.objectFilter,
           $scope.options.userSearch);
 
-
         $scope.clientFilterFunction = function (item) {
-
-          // If we fail any filter, return false
+          // AND behavior - if we fail any filter, return false
           for (var i = 0; i < clientFilters.length; i++) {
             if (!clientFilters[i](item)) {
               return false;
             }
           }
-
           // Otherwise return true
           return true;
         };

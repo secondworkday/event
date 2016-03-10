@@ -127,6 +127,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
   $scope.eventParticipantStateFilters = [
     {
       name: 'Not Checked-In',
+      group: 'eventParticipantState',
       indexer: {
         index: [],
         sort: utilityService.compareByProperties('id'),
@@ -138,6 +139,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
     },
     {
       name: 'Checked-In',
+      group: 'eventParticipantState',
       indexer: {
         index: [],
         sort: utilityService.compareByProperties('id'),
@@ -191,7 +193,8 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
       // Push a filter on the filter stack
       $scope.eventSessionFilters.push(
       {
-        name: "Unregistered",
+        name: 'Unregistered',
+        group: 'eventSession',
         indexer: indexer,
         serverTerm: '$eventSession:',
         clientFunction: utilityService.filterByPropertyHasValue('!eventSessionID')
@@ -213,6 +216,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
         $scope.eventSessionFilters.push(
         {
           name: item.name,
+          group: 'eventSession',
           indexer: indexer,
           serverTerm: '$eventSession:' + itemID,
           clientFunction: utilityService.filterByPropertyValue('eventSessionID', itemID)
@@ -256,6 +260,7 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
       $scope.participantGroupFilters.push(
       {
         name: item.name,
+        group: 'participantGroups',
         indexer: indexer,
         serverTerm: '$participantGroup:' + itemID,
         clientFunction: utilityService.filterByPropertyValue('participantGroupID', itemID)
