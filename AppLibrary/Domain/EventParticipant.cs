@@ -1381,12 +1381,10 @@ namespace App.Library
         private static TagProvider createParticipantTagProvider(AppDC appDC, int itemID)
         {
             var exQuery = from exEventParticipant in ExtendedQuery(appDC)
-                          join eventParticipant in Query(appDC) on exEventParticipant.item.ParticipantID equals eventParticipant.ID
                           join participant in Participant.Query(appDC) on exEventParticipant.item.ParticipantID equals participant.ID
-                          join participantGroup in ParticipantGroup.Query(appDC) on participant.ParticipantGroupID equals participantGroup.ID
                           join eventSession in EventSession.Query(appDC) on exEventParticipant.item.EventSessionID equals eventSession.ID
-                          join exParticipantGroup in ParticipantGroup.ExtendedQuery(appDC, new SearchExpression()) on participantGroup.ID equals exParticipantGroup.item.ID
-                          select new { exEventParticipant, participant, participantGroup, eventSession, exParticipantGroup, eventParticipant };
+                          join exParticipantGroup in ParticipantGroup.ExtendedQuery(appDC) on participant.ParticipantGroupID equals exParticipantGroup.item.ID
+                          select new { exEventParticipant, participant, eventSession, exParticipantGroup };
 
             var exResult = exQuery
                 .Where(exItem => exItem.exEventParticipant.item.ID == itemID)
@@ -1402,8 +1400,8 @@ namespace App.Library
                 StringProviderTag.Create("LastName", exResult.participant.LastName),
                 StringProviderTag.Create("StudentName", exResult.participant.FullName),
 
-                StringProviderTag.Create("SchoolName", exResult.participantGroup.Name),
-                StringProviderTag.Create("GradeLevel", exResult.eventParticipant.Level),
+                StringProviderTag.Create("SchoolName", exResult.exParticipantGroup.item.Name),
+                StringProviderTag.Create("GradeLevel", exResult.exEventParticipant.item.Level),
 
                 DateTimeProviderTag.Create("EventDate", exResult.eventSession.StartDate, TimeZones.Pacific),
                 DateTimeProviderTag.Create("EventTime", exResult.eventSession.StartDate, TimeZones.Pacific),
@@ -1413,7 +1411,7 @@ namespace App.Library
                 //StringProviderTag.Create("Address", "16722 NE 116th Street, Redmond WA 98052"),
                 StringProviderTag.Create("Address", String.Format("{0}, {1} {2} {3}", exResult.eventSession.LocationStreetAddress, exResult.eventSession.LocationCity, exResult.eventSession.LocationState, exResult.eventSession.LocationZipCode)),
 
-                StringProviderTag.Create("SchoolCounselorName", exResult.participantGroup.ContactName),
+                StringProviderTag.Create("SchoolCounselorName", exResult.exParticipantGroup.item.ContactName),
                 StringProviderTag.Create("SchoolCounselorPhoneNumber", exResult.exParticipantGroup.PrimaryPhoneNumber != null ? ", " + exResult.exParticipantGroup.PrimaryPhoneNumber.Proffered_CaseSensitive : ""),
 
                 // Check in is between «CheckinTimeStart» and «CheckinTimeEnd». All shopping must be completed by «ShoppingTimeEnd».
