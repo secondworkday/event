@@ -307,7 +307,7 @@ namespace App.Library
 #endif
 
 
-        protected static IQueryable<ExtendedItem<ParticipantGroup>> ExtendedQuery(AppDC dc)
+        public static IQueryable<ExtendedItem<ParticipantGroup>> ExtendedQuery(AppDC dc)
         {
             return ExtendedQuery(dc, Query(dc));
         }
