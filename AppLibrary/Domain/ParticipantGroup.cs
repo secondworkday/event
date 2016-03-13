@@ -338,12 +338,6 @@ namespace App.Library
 
                 join eventParticipant in EventParticipant.Query(dc) on exParticipantGroup.itemID equals eventParticipant.ParticipantID into eventParticipantsGroup
 
-                //join epGlobalSystemRoleTags in User.QueryGlobalEPTags2(dc, EPCategory.SystemRoleCategory) on exParticipantGroup.itemID equals epGlobalSystemRoleTags.TargetID into epGlobalSystemRoleTagsGroup
-                //join epTeamSystemRoleTags in User.QueryItemEPTags2(dc, EPCategory.SystemRoleCategory, teamEPScope) on user.ID equals epTeamSystemRoleTags.TargetID into epTeamSystemRoleTagsGroup
-                //join epAppRoleTags in User.QueryItemEPTags2(dc, EPCategory.AppRoleCategory, teamEPScope) on user.ID equals epAppRoleTags.TargetID into epAppRoleTagsGroup
-
-                //join epOptionTags in User.QueryGlobalEPTags2(dc, EPCategory.OptionCategory) on user.ID equals epOptionTags.TargetID into epOptionTagsGroup
-
                 select new
                     {
                         exParticipantGroup,

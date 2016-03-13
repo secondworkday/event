@@ -740,8 +740,8 @@ namespace App.Library
         {
             var exQuery =
                 from epParticipant in ExtendedQuery(appDC)
-                join school in ParticipantGroup.Query(appDC) on epParticipant.item.ParticipantGroupID equals school.ID
-                select new { epParticipant };
+                join participantGroup in ParticipantGroup.Query(appDC) on epParticipant.item.ParticipantGroupID equals participantGroup.ID
+                select new { epParticipant, participantGroup };
 
             var exResult = exQuery
                 .Where(exItem => exItem.epParticipant.item.ID == itemID)
@@ -755,7 +755,7 @@ namespace App.Library
                 StringProviderTag.Create("LastName", participant.LastName),
                 StringProviderTag.Create("FullName", participant.FullName),
 
-                StringProviderTag.Create("SchoolName", participant.ParticipantGroup.Name),
+                StringProviderTag.Create("SchoolName", exResult.participantGroup.Name),
                 StringProviderTag.Create("Address", "Main Street, Redmond WA 98052"),
             };
 
