@@ -112,7 +112,7 @@ namespace App.Library
                 var primaryEmail = data.GetMailAddress("primaryEmail");
                 if (primaryEmail != null)
                 {
-                    newItem.AssignMailAddress(dc, primaryEmail);
+                    newItem.SetMailAddress(dc, primaryEmail);
                 }
 
                 newItem.SetNotes(dc, data.Value<string>("notes"));
@@ -127,10 +127,18 @@ namespace App.Library
             this.ContactName = (string)data.contactName;
             this.Overview = (string)data.overview;
             this.SetNotes(dc, (string)data.notes);
+
             var primaryPhoneNumber = (string)data.primaryPhoneNumber;
             if (!string.IsNullOrEmpty(primaryPhoneNumber))
             {
                 this.SetContactPhoneNumber(dc, primaryPhoneNumber);
+            }
+
+            var primaryEmailString = (string)data.primaryEmail;
+            if (!string.IsNullOrEmpty(primaryEmailString))
+            {
+                var primaryMailAddress = primaryEmailString.ParseMailAddress();
+                this.SetMailAddress(dc, primaryMailAddress);
             }
         }
 
