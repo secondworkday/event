@@ -14,7 +14,7 @@
           <md-input-container class="md-block" flex-gt-sm>
             <label>{{'EVENT_SESSION' | translate}}</label>
               <md-select ng-model="formData.eventSessionID" ng-change="eventSessionIDChanged()">
-                  <md-option ng-repeat="eventSession in eventSessionsIndex | objectLookup:eventSessions.hashMap track by eventSession.id" value="{{eventSession.id}}">
+                  <md-option ng-repeat="eventSession in eventSessionsIndex | objectLookup:eventSessions.hashMap | orderBy: 'startDate' track by eventSession.id" value="{{eventSession.id}}">
                       {{eventSession.name}} - {{eventSession.startDate | date:'MM/dd/yyyy'}}
                   </md-option>
               </md-select>
@@ -22,7 +22,7 @@
         <md-input-container class="md-block" flex-gt-sm ng-if="sessionParticipantGroupsIndex">
           <label>{{'PARTICIPANT_GROUP' | translate}}</label>
           <md-select ng-model="formData.participantGroupID">
-            <md-option ng-repeat="participantGroup in sessionParticipantGroupsIndex | objectLookup:participantGroups.hashMap track by participantGroup.id" value="{{participantGroup.id}}">
+            <md-option ng-repeat="participantGroup in sessionParticipantGroupsIndex | objectLookup:participantGroups.hashMap | orderBy: 'name' track by participantGroup.id" value="{{participantGroup.id}}">
               {{participantGroup.name}} - {{sessionParticipantGroupsCounts[participantGroup.id]}}<span ng-if="participantGroup.contactName"> ({{participantGroup.contactName}})</span>
             </md-option>
           </md-select>
