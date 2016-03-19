@@ -8,8 +8,36 @@
 <!--<md-divider></md-divider>-->
 <!--<div class="u-sm-space"></div>-->
 
+<nav>
+  <md-divider style="margin-bottom:4px;"></md-divider>
+  <span>
+    <md-button style="margin-left:0;" ui-sref=".sessions">{{'EVENT_SESSIONS' | translate}}</md-button>
+  </span>
+  <span ms-show="['Admin', 'EventPlanner']">
+    <md-button ui-sref=".participant-groups">{{'PARTICIPANT_GROUP_CONTACTS_ROLE' | translate}}</md-button>
+  </span>
+  <span>
+    <md-button ui-sref=".participants">{{'PARTICIPANTS' | translate}}</md-button>
+  </span>
+  <span ms-show="['Admin', 'EventPlanner']">
+    <md-button ui-sref=".documents">Documents</md-button>
+  </span>
+  <span ms-development>
+    <md-button ui-sref=".activity-log"><i class="fa fa-code"></i> Activity Log</md-button>
+  </span>
+  <md-divider></md-divider>
+</nav>
 
-  <md-tabs class="u-expand-sm"
+<section>
+  <div ui-view="sessions"></div>
+  <div ui-view="participant-groups"></div>
+  <div ui-view="participants"></div>
+  <div ui-view="documents"></div>
+  <div ui-view="activity-log"></div>
+</section>
+
+
+  <!-- <md-tabs class="u-expand-sm"
       md-selected="currentTab"
       md-dynamic-height
       md-border-bottom>
@@ -43,4 +71,4 @@
         <div ui-view="activity-log"></div>
       </md-tab-body>
     </md-tab>
-  </md-tabs>
+  </md-tabs> -->
