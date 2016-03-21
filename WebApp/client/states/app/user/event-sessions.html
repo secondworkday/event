@@ -1,6 +1,6 @@
 <div layout layout-align="start center">
   <div>
-    <h2 class="md-title">{{'EVENT_SESSIONS' | translate}}</h2>
+    <span class="md-title">{{'EVENT_SESSIONS' | translate}}</span>
   </div>
   <div ms-show="['Admin', 'EventPlanner']">
     <md-button class="md-primary" aria-label="new"
@@ -9,7 +9,6 @@
     </md-button>
   </div>
 </div>
-
 
 <ms-search-view change-event="updateEventSessions" search="searchHandler" options="searchViewOptions" user-search="userSearch">
   <div layout layout-wrap>
