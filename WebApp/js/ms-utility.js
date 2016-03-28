@@ -36,8 +36,8 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
 
   $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
 
-    // lots 'o debug info
-    console.log.bind(console);
+    console.log('$stateChangeError - fired when an error occurs during transition.');
+    console.log(arguments);
 
     // Standard behavior is to walk up the state tree until we find a safe haven.
     // Note - we also check for {parent}.dashboard as we meander up the tree
@@ -503,12 +503,12 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
   // Helpful for creating the searchExpression parameter passed to server XxxSearch() methods.
   self.buildSearchExpression = function (/*filters*/) {
     var filterHandler = function (searchTerms, filter) {
-      if (typeof filter === 'string') {
+      if (angular.isString(filter)) {
         // direct search component like 'pete'
         searchTerms.push(filter);
       }
       else if (angular.isObject(filter)) {
-        if (filter.serverTerm) {
+        if (angular.isString(filter.serverTerm)) {
           //!! consider what type of serverTerm we've got. If it's a string add it, else if it's an object, add its properties (as we do below)
           searchTerms.push(filter.serverTerm);
         }
@@ -545,7 +545,14 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
           clientFilterTerms.push(filter.clientFunction);
         }
         else {
-          $log.debug('object type?', filter);
+          $log.error('unsure how to handle this object type:', filter);
+
+          // Is this an object filter? 
+          // - If objects are immutable - no need for a clientFilter! We should never be notified about objects changing
+          // - Can we use $filter('filter')? Though it's better suited to processing the entire set at once, not one-by-one as we're doing here?
+          // - What if we need > or < comparisons? Do we need to extend $filter('filter') to handle that? 
+          // -- We could look for the suffix xxxMin or xxxMax?
+          // -- Or we could look for an associated comparitor function (property medianAnnualWagesMax and associated function medianAnnualWagesMaxComparitor)
         }
       }
     };
@@ -681,48 +688,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
-  //!! Think these are all depricated - in favor of compareByProperties() above!!!!!
 
-
-    self.compareByPropertyThenByID = function (propertyName) {
-      var propertyName = propertyName;
-      return function (left, right) {
-        // first try to compare by the property
-        return (left[propertyName] || 0) - (right[propertyName] || 0)
-          // if they're equal, fall back on comparing the IDs
-          || left.id - right.id;
-      };
-    };
-    self.compareByPropertyThenByIDDescending = function (propertyName) {
-      var propertyName = propertyName;
-      // swap left/right to achieve descending
-      return function (right, left) {
-        // first try to compare by the property
-        return (left[propertyName] || 0) - (right[propertyName] || 0)
-          // if they're equal, fall back on comparing the IDs
-          || left.id - right.id;
-      };
-    };
-
-    self.localeCompareByPropertyThenByID = function (propertyName) {
-      var propertyName = propertyName;
-      return function (left, right) {
-        // first try to compare by the (text) property
-        return (left[propertyName] || "").localeCompare(right[propertyName] || "")
-          // if they're equal, fall back on comparing the IDs
-          || left.id - right.id;
-      };
-    };
-    self.localeCompareByPropertyThenByIDDescending = function (propertyName) {
-      var propertyName = propertyName;
-      // swap left/right to achieve descending
-      return function (right, left) {
-        // first try to compare by the (text) property
-        return (left[propertyName] || "").localeCompare(right[propertyName] || "")
-          // if they're equal, fall back on comparing the IDs
-          || left.id - right.id;
-      };
-    };
 
     var model = {
 
@@ -1121,7 +1087,8 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       indexer.baseFilter,
       indexer.stackFilters,
       indexer.selectFilter,
-      indexer.objectFilter,
+      //!! Ignore this for now - as we don't have a way to build up an appropriate client filter.
+      // indexer.objectFilter,
       indexer.userSearch);
 
     indexer.clientFilter = function (item) {
@@ -1172,7 +1139,19 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
 
-  self.createModelItems = function (searchHandler) {
+  // used by *internal* callers providing a hub search method - like 'utilityHub.server.searchTenantGroups'
+  self.createModelCache = function (hubSearchHandler) {
+    var serviceSearchHandler = function (searchExpression, sortExpression, startIndex, rowCount) {
+      return callHub(function () {
+        return hubSearchHandler(searchExpression, sortExpression, startIndex, rowCount);
+      });
+    };
+
+    return self.createItemCache(serviceSearchHandler);
+  };
+
+  // used by *external* callers, providing a service search method - like 'siteService.searchShowNameAliases'
+  self.createItemCache = function (serviceSearchHandler) {
     var modelItems = {
       hashMap: {},
       index: [],
@@ -1180,9 +1159,8 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
     // Add a 'search' handler, which fetches items server-side, and caches the results
     modelItems.search = function (searchExpression, sortExpression, startIndex, rowCount) {
-      return self.callHub(function () {
-        return searchHandler(searchExpression, sortExpression, startIndex, rowCount);
-      }).then(function (itemsData) {
+      return serviceSearchHandler(searchExpression, sortExpression, startIndex, rowCount)
+      .then(function (itemsData) {
         return self.updateItemsModel(modelItems, itemsData);
       });
     };
@@ -1247,6 +1225,9 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
   };
 
 
+  //!! depricated - change over the name used by callers;
+  self.createModelItems = self.createModelCache;
+
 
 
 
@@ -1280,7 +1261,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
   self.tenantGroups.tenantsIndexer = {
     index: [],
     sort: self.compareByProperties('name', 'id'),
-    filter: function (item) {
+    baseFilter: function (item) {
       return !item.parentID;
     }
   };
@@ -1289,7 +1270,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
   self.tenantGroups.groupsIndexer = {
     index: [],
     sort: self.compareByProperties('name', 'id'),
-    filter: function (item) {
+    baseFilter: function (item) {
       return item.parentID;
     }
   };
@@ -1408,15 +1389,15 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
       activeUsersIndexer: {
         index: [],
-        sort: self.localeCompareByPropertyThenByID('displayName'),
-        filter: function (item) {
+        sort: self.compareByProperties('id'),
+        baseFilter: function (item) {
           return item.state === USER_STATE.active;
         }
       },
       disabledUsersIndexer: {
         index: [],
-        sort: self.localeCompareByPropertyThenByID('displayName'),
-        filter: function (item) {
+        sort: self.compareByProperties('id'),
+        baseFilter: function (item) {
           return item.state === USER_STATE.disabled;
         }
       },
@@ -2034,6 +2015,14 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
   //** ActivityLog related
 
+    self.searchActivityLog = function (searchExpression, sortExpression, startIndex, rowCount) {
+      return callHub(function () {
+        return utilityHub.server.searchActivityLog(searchExpression, sortExpression, startIndex, rowCount);
+      });
+    };
+
+
+
     model.activityLog = {
       hashMap: {},
       index: [],
@@ -2130,6 +2119,9 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
     }).on('updateAuthTokens', function (authTokensData) {
       // rebroadcast out to any controllers that are listening
       $rootScope.$apply($rootScope.$broadcast('updateAuthTokens:', authTokensData));
+    }).on('updateActivityLog', function (itemsData) {
+      // rebroadcast out to any controllers that are listening
+      $rootScope.$apply($rootScope.$broadcast('updateActivityLog', itemsData));
     }).on('updateEventLog', function (logData) {
       $rootScope.$apply($rootScope.$broadcast('updateEventLog', onEventLogUpdated(model.eventLog, logData)));
     }).on('updateDatabaseLog', function (logData) {
@@ -3093,7 +3085,8 @@ app.directive('msSearchView', function ($parse, utilityService) {
           // note - we've converted $scope.options.stackFilters into stackFilterGroups
           stackFilterGroups,
           $scope.options.selectFilter,
-          $scope.options.objectFilter,
+          //!! Ignore this for now - as we don't have a way to build up an appropriate client filter.
+          // $scope.options.objectFilter,
           $scope.options.userSearch);
 
         $scope.clientFilterFunction = function (item) {
@@ -3155,6 +3148,7 @@ app.directive('msSearchView', function ($parse, utilityService) {
           $scope.options.baseFilter,
           $scope.options.stackFilters,
           $scope.options.selectFilter,
+          // Note: We include objectFilter here as it provides serverTerms even though we don't yet have equivalent client filtering
           $scope.options.objectFilter,
           $scope.options.userSearch);
 
@@ -3272,7 +3266,7 @@ app.directive('msSearchView', function ($parse, utilityService) {
 
       if (!attrs.options) {
         // if we weren't provided options, default to an empty object instead of undefined
-        scope.options = { sort: {}, filter: {} };
+        scope.options = { sort: {}, baseFilter: {} };
       } else {
         scope.$watch('options.sort', function (newValue, oldValue, scope) {
           if (newValue !== oldValue) {

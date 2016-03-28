@@ -372,25 +372,63 @@ namespace App.Library
             }
         }
 
-        private void updateEventSession(AppDC dc, int eventSessionID)
+
+
+        // (should be past all validation checks at this point)
+        private static bool setEventSession(AppDC dc, int itemID, EventSession eventSession)
         {
-            this.EventSessionID = eventSessionID;
+            WriteLock(dc, itemID, (item, notifyExpression) =>
+            {
+                Debug.Assert(eventSession == null || item.EventID == eventSession.EventID);
+
+                if (eventSession != null && item.EventID != eventSession.EventID)
+                {
+                    throw new HubResultException(HubResult.Error);
+                }
+
+                if (item.EventSessionID != eventSession.ID)
+                {
+                    item.EventSession = eventSession;
+
+                    notifyExpression.AddModifiedID(item.ID);
+                }
+
+                // (ignored)
+                return HubResult.Success;
+            });
+
+            return true;
         }
 
-        public static HubResult SetEventSession(AppDC dc, int itemID, int eventSessionID)
+        public static HubResult SetEventSession(AppDC dc, int itemID, int? eventSessionID)
         {
-            return WriteLock(dc, itemID, (item, notifyExpression) =>
+            return NotifyLock(dc, notifyExpression =>
             {
-                item.updateEventSession(dc, eventSessionID);
+                var eventSession = EventSession.FindByID(dc, eventSessionID);
 
-                notifyExpression.AddModifiedID(item.ID);
+                var change = setEventSession(dc, itemID, eventSession);
+
+                if (change)
+                {
+                    Debug.Assert(notifyExpression.ModifiedIDs.Contains(itemID));
+
+                    var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+                    var activityType = ActivityType.SetEventSession;
+                    string activityDescription = "SetEventSession EventParticipant";
+                    var contextObject = new { eventSessionID = eventSessionID };
+                    ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), itemID, contextObject, typeof(Event), eventSession.EventID);
+                }
+
                 return HubResult.Success;
             });
         }
 
-        public static HubResult SetEventSession(AppDC dc, int[] itemIDs, int eventSessionID)
+        public static HubResult SetEventSession(AppDC dc, int eventID, int[] itemIDs, int? eventSessionID)
         {
+            Debug.Assert(dc != null);
+            Debug.Assert(eventID > 0);
             Debug.Assert(itemIDs != null);
+
             if (itemIDs == null)
             {
                 return HubResult.Error;
@@ -400,31 +438,82 @@ namespace App.Library
                 return HubResult.NotFound;
             }
 
-            dc.SubmitLock(() =>
-            {
-                var editItems = dc.EventParticipants
-                    .Where(item => itemIDs.Contains(item.ID));
+            var eventSession = EventSession.FindByID(dc, eventSessionID);
+            Debug.Assert(!eventSessionID.HasValue || eventSession != null);
 
-                foreach (var item in editItems)
+            if (eventSessionID.HasValue && eventSession == null)
+            {
+                return HubResult.NotFound;
+            }
+
+            Debug.Assert(eventSession == null || eventSession.EventID == eventID);
+            if (eventSession != null && eventSession.EventID != eventID)
+            {
+                return HubResult.Error;
+            }
+
+            return NotifyLock(dc, notifyExpression =>
+            {
+                foreach (var itemID in itemIDs)
                 {
-                    SetEventSession(dc, item.ID, eventSessionID);
+                    setEventSession(dc, itemID, eventSession);
                 }
 
-                int bulkTagIDThingy = 0;
-
-                string activityDescription = string.Format("Bulk CheckIn {0} EventParticipant(s)",
+                string activityDescription = string.Format("Bulk SetEventSession {0} EventParticipant(s)",
                     /*0*/ itemIDs.Length);
                 var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
-                var activityType = ActivityType.BulkEdit;
-                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
-            });
+                var activityType = ActivityType.BulkSetEventSession;
+                var contextObject = new { itemCount = itemIDs.Length, eventSessionID = eventSessionID };
+                var activityItem = ActivityItem.Log(dc, epScope, activityType, activityDescription, contextObject, typeof(Event), eventID);
+                Debug.Assert(activityItem != null);
+                Debug.Assert(activityItem.ID > 0);
 
-            return HubResult.Success;
+                var epCategory = EPCategory.DefaultSetCategory;
+                activityItem.AddSet(dc, epCategory, itemIDs);
+
+                return HubResult.Success;
+            });
         }
 
-        public static HubResult CheckIn(AppDC dc, int[] itemIDs)
+        private static void setCheckIn(AppDC dc, int itemID, DateTime? checkInTimestamp)
         {
+            WriteLock(dc, itemID, (item, notifyExpression) =>
+            {
+                item.CheckInTimestamp = checkInTimestamp;
+                item.CheckedInUserID = dc.TransactionAuthorizedBy.UserIDOrNull;
+
+                notifyExpression.AddModifiedID(item.ID);
+
+                // (ignored)
+                return HubResult.Success;
+            });
+        }
+
+        private static HubResult checkIn(AppDC dc, ActivityType activityType, int itemID, DateTime? checkInTimestamp)
+        {
+            Debug.Assert(dc != null);
+            Debug.Assert(itemID > 0);
+            Debug.Assert(activityType == ActivityType.CheckIn || activityType == ActivityType.UndoCheckIn);
+
+            return NotifyLock(dc, notifyExpression =>
+            {
+                setCheckIn(dc, itemID, checkInTimestamp);
+
+                var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
+                string activityDescription = activityType.Name + " EventParticipant";
+                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), itemID);
+
+                return HubResult.Success;
+            });
+        }
+
+        private static HubResult checkIn(AppDC dc, ActivityType activityType, int eventID, int[] itemIDs, DateTime? checkInTimestamp)
+        {
+            Debug.Assert(dc != null);
+            Debug.Assert(eventID > 0);
             Debug.Assert(itemIDs != null);
+            Debug.Assert(activityType == ActivityType.BulkCheckIn || activityType == ActivityType.BulkUndoCheckIn);
+
             if (itemIDs == null)
             {
                 return HubResult.Error;
@@ -439,89 +528,44 @@ namespace App.Library
                 foreach (var itemID in itemIDs)
                 {
                     //!! hmm - some of these might already be checked In. Do we leave them untouched? Or modify the check-in time/user?
-                    CheckIn(dc, itemID);
+                    setCheckIn(dc, itemID, checkInTimestamp);
                 }
 
-                int bulkTagIDThingy = 0;
-
-                string activityDescription = string.Format("Bulk CheckIn {0} EventParticipant(s)",
+                string activityDescription = string.Format(activityType.Name + " {0} EventParticipant(s)",
                     /*0*/ itemIDs.Length);
                 var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
-                var activityType = ActivityType.BulkCheckIn;
-                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
+                var contextObject = new { itemCount = itemIDs.Length };
+                var activityItem = ActivityItem.Log(dc, epScope, activityType, activityDescription, contextObject, typeof(Event), eventID);
+                Debug.Assert(activityItem != null);
+                Debug.Assert(activityItem.ID > 0);
+
+                var epCategory = EPCategory.DefaultSetCategory;
+                activityItem.AddSet(dc, epCategory, itemIDs);
 
                 return HubResult.Success;
             });
         }
 
-        public static HubResult UndoCheckIn(AppDC dc, int[] itemIDs)
-        {
-            Debug.Assert(itemIDs != null);
-            if (itemIDs == null)
-            {
-                return HubResult.Error;
-            }
-            if (!itemIDs.Any())
-            {
-                return HubResult.NotFound;
-            }
-
-            return NotifyLock(dc, notifyExpression =>
-            {
-                foreach (var itemID in itemIDs)
-                {
-                    UndoCheckIn(dc, itemID);
-                }
-
-                int bulkTagIDThingy = 0;
-
-                string activityDescription = string.Format("Bulk Undo-CheckIn {0} EventParticipant(s)",
-                    /*0*/ itemIDs.Length);
-                var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
-                var activityType = ActivityType.BulkUndoCheckIn;
-                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
-
-                return HubResult.Success;
-            });
-        }
 
         public static HubResult CheckIn(AppDC dc, int itemID)
         {
-            return WriteLock(dc, itemID, (item, notifyExpression) =>
-            {
-                Debug.Assert(!item.CheckInTimestamp.HasValue);
-                item.CheckInTimestamp = dc.TransactionTimestamp;
-                item.CheckedInUserID = dc.TransactionAuthorizedBy.UserIDOrNull;
+            return checkIn(dc, ActivityType.CheckIn, itemID, dc.TransactionTimestamp);
+        }
 
-                notifyExpression.AddModifiedID(item.ID);
-
-                int bulkTagIDThingy = 0;
-                string activityDescription = "CheckIn EventParticipant";
-                var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
-                var activityType = ActivityType.CheckIn;
-                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
-
-                return HubResult.Success;
-            });
+        public static HubResult CheckIn(AppDC dc, int eventID, int[] itemIDs)
+        {
+            return checkIn(dc, ActivityType.BulkCheckIn, eventID, itemIDs, dc.TransactionTimestamp); 
         }
 
         public static HubResult UndoCheckIn(AppDC dc, int itemID)
         {
-            return WriteLock(dc, itemID, (item, notifyExpression) =>
-            {
-                Debug.Assert(item.CheckInTimestamp.HasValue);
-                item.CheckInTimestamp = null;
-                item.CheckedInUserID = dc.TransactionAuthorizedBy.UserIDOrNull;
+            //!! consider some cool logic which says if someone tries to do an Undo within 2 minutes we just wipe out the activity log record altogether. 
+            return checkIn(dc, ActivityType.UndoCheckIn, itemID, null);
+        }
 
-                int bulkTagIDThingy = 0;
-                string activityDescription = "UndoCheckIn EventParticipant";
-                var epScope = dc.TransactionAuthorizedBy.TeamEPScopeOrThrow;
-                var activityType = ActivityType.UndoCheckIn;
-                ActivityItem.Log(dc, epScope, activityType, activityDescription, typeof(EventParticipant), bulkTagIDThingy);
-
-                notifyExpression.AddModifiedID(item.ID);
-                return HubResult.Success;
-            });
+        public static HubResult UndoCheckIn(AppDC dc, int eventID, int[] itemIDs)
+        {
+            return checkIn(dc, ActivityType.BulkUndoCheckIn, eventID, itemIDs, null);
         }
 
         public static HubResult CheckOut(AppDC dc, int itemID)
@@ -905,7 +949,6 @@ namespace App.Library
         public static SearchResult<SearchItem> Search(AppDC dc, SearchExpression searchExpression, string sortExpression, int startRowIndex, int maximumRows)
         {
             var clientQuery =
-                // Note: We don't define a searchExpression termFilter above as we need to do the join first
                 from exEventParticipant in EventParticipant.ExtendedQuery(dc, searchExpression)
                 join participant in Participant.Query(dc) on exEventParticipant.item.ParticipantID equals participant.ID
                 join participantGroup in ParticipantGroup.Query(dc) on participant.ParticipantGroupID equals participantGroup.ID
@@ -1268,12 +1311,7 @@ namespace App.Library
             return createLock(dc, NotifyClients, createHandler);
         }
 
-        internal static T ReadLock<T>(AppDC dc, int itemID, Func<EventParticipant, T> readHandler)
-        {
-            return ReadLock(dc, itemID, FindByID, readHandler);
-        }
-
-        internal static HubResult ReadLock(AppDC dc, int itemID, Func<EventParticipant, HubResult> readHandler)
+        internal static R ReadLock<R>(AppDC dc, int itemID, Func<EventParticipant, R> readHandler)
         {
             return ReadLock(dc, itemID, FindByID, readHandler);
         }
@@ -1283,15 +1321,10 @@ namespace App.Library
             return NotifyLock(dc, NotifyClients, workHandler);
         }
 
-
-        internal static HubResult WriteLock(AppDC dc, int itemID, Func<EventParticipant, NotifyExpression, HubResult> writeHandler)
+        internal static R WriteLock<R>(AppDC dc, int itemID, Func<EventParticipant, NotifyExpression, R> writeHandler)
         {
             return WriteLock(dc, itemID, FindByID, NotifyClients, writeHandler);
         }
-
-
-
-
 
 #if false
         internal static void NotifyClients(AppDC dc, SearchExpression notifyExpression)

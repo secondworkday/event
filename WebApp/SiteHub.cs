@@ -161,21 +161,21 @@ namespace WebApp
 
         public HubResult EditParticipantGroup(int itemID, dynamic editParticipantGroupData)
         {
-          return accountsOnlyHeader((utilityContext, dc) =>
-          {
-            return ParticipantGroup.Edit(dc, itemID, editParticipantGroupData);
-          });
+            return accountsOnlyHeader((utilityContext, dc) =>
+            {
+                return ParticipantGroup.Edit(dc, itemID, editParticipantGroupData);
+            });
         }
 
-    public HubResult DeleteParticipantGroup(int itemID)
-    {
-      return accountsOnlyHeader((utilityContext, dc) =>
-      {
-        return ParticipantGroup.Delete(dc, itemID);
-      });
-    }
+        public HubResult DeleteParticipantGroup(int itemID)
+        {
+            return accountsOnlyHeader((utilityContext, dc) =>
+            {
+                return ParticipantGroup.Delete(dc, itemID);
+            });
+        }
 
-    public HubResult SearchParticipantGroups(string searchExpressionString)
+        public HubResult SearchParticipantGroups(string searchExpressionString)
         {
             return SearchParticipantGroups(searchExpressionString, string.Empty, 0, int.MaxValue);
         }
@@ -465,7 +465,8 @@ namespace WebApp
         {
             return accountsOnlyHeader((siteContext, dc) =>
             {
-                for (int i=0; i < numberOfParticipants; i++) { 
+                for (int i = 0; i < numberOfParticipants; i++)
+                {
                     var randomParticipant = Participant.GenerateRandom(dc, participantGroupID.ToEnumerable().ToArray());
                 }
                 return HubResult.CreateSuccessData(participantGroupID);
@@ -476,7 +477,7 @@ namespace WebApp
         {
             return accountsOnlyHeader((siteContext, dc) =>
             {
-                var randomParticipant = Participant.GenerateRandom(dc, new [] {participantGroupID});
+                var randomParticipant = Participant.GenerateRandom(dc, new[] { participantGroupID });
                 return HubResult.CreateSuccessData(randomParticipant.ID);
             });
         }
@@ -537,16 +538,16 @@ namespace WebApp
             });
         }
 
-/*
-        public HubResult SetEventSessionState(int itemID, EventSessionState state)
-        {
-            return accountsOnlyHeader((siteContext, dc) =>
-            {
-                var result = EventSession.SetState(dc, itemID, state);
-                return HubResult.CreateSuccessData(result);
-            });
-        }
-*/
+        /*
+                public HubResult SetEventSessionState(int itemID, EventSessionState state)
+                {
+                    return accountsOnlyHeader((siteContext, dc) =>
+                    {
+                        var result = EventSession.SetState(dc, itemID, state);
+                        return HubResult.CreateSuccessData(result);
+                    });
+                }
+        */
 
 
 
@@ -596,59 +597,31 @@ namespace WebApp
 
         public HubResult CreateEventParticipant(int eventID, dynamic data)
         {
-          return accountsOnlyHeader((siteContext, dc) =>
-          {
-            var result = EventParticipant.CreateParticipantAndEventParticipant(dc, eventID, data);
-            return HubResult.CreateSuccessData(result);
-          });
+            return accountsOnlyHeader((siteContext, dc) =>
+            {
+                var result = EventParticipant.CreateParticipantAndEventParticipant(dc, eventID, data);
+                return HubResult.CreateSuccessData(result);
+            });
         }
 
-    public HubResult EditEventParticipant(int itemID, dynamic editEventParticipantData)
-    {
-      return accountsOnlyHeader((utilityContext, dc) =>
-      {
-        return EventParticipant.Edit(dc, itemID, editEventParticipantData);
-      });
-    }
 
-    public HubResult DeleteEventParticipant(int itemID)
-    {
-        return accountsOnlyHeader((utilityContext, dc) =>
-        {
-            return EventParticipant.Delete(dc, itemID);
-        });
-    }
 
-    public HubResult DeleteEventParticipants(int[] itemIDs)
-    {
-        return accountsOnlyHeader((utilityContext, dc) =>
-        {
-            return EventParticipant.Delete(dc, itemIDs);
-        }, "/SiteHub/DeleteEventParticipants");
-    }
 
-        public HubResult CheckInEventParticipants(int[] itemIDs)
+
+        public HubResult EditEventParticipant(int itemID, dynamic editEventParticipantData)
         {
             return accountsOnlyHeader((utilityContext, dc) =>
             {
-                return EventParticipant.CheckIn(dc, itemIDs);
-            }, "/SiteHub/CheckInEventParticipants");
+                return EventParticipant.Edit(dc, itemID, editEventParticipantData);
+            });
         }
 
-        public HubResult BulkEditEventParticipants(int[] itemIDs, int eventSessionID)
+        public HubResult EditEventParticipants(int eventID, int[] itemIDs, int eventSessionID)
         {
             return accountsOnlyHeader((utilityContext, dc) =>
             {
-                return EventParticipant.SetEventSession(dc, itemIDs, eventSessionID);
-            }, "/SiteHub/BulkEditEventParticipants");
-        }
-
-        public HubResult UndoCheckInEventParticipants(int[] itemIDs)
-        {
-            return accountsOnlyHeader((utilityContext, dc) =>
-            {
-                return EventParticipant.UndoCheckIn(dc, itemIDs);
-            }, "/SiteHub/UndoCheckInEventParticipants");
+                return EventParticipant.SetEventSession(dc, eventID, itemIDs, eventSessionID);
+            }, "/SiteHub/EditEventParticipants");
         }
 
 
@@ -662,6 +635,14 @@ namespace WebApp
             });
         }
 
+        public HubResult CheckInEventParticipants(int eventID, int[] itemIDs)
+        {
+            return accountsOnlyHeader((utilityContext, dc) =>
+            {
+                return EventParticipant.CheckIn(dc, eventID, itemIDs);
+            }, "/SiteHub/CheckInEventParticipants");
+        }
+
         public HubResult UndoCheckInEventParticipant(int itemID)
         {
             return accountsOnlyHeader((siteContext, dc) =>
@@ -669,6 +650,14 @@ namespace WebApp
                 var result = EventParticipant.UndoCheckIn(dc, itemID);
                 return HubResult.CreateSuccessData(result);
             });
+        }
+
+        public HubResult UndoCheckInEventParticipants(int eventID, int[] itemIDs)
+        {
+            return accountsOnlyHeader((utilityContext, dc) =>
+            {
+                return EventParticipant.UndoCheckIn(dc, eventID, itemIDs);
+            }, "/SiteHub/UndoCheckInEventParticipants");
         }
 
 
@@ -680,6 +669,29 @@ namespace WebApp
                 return HubResult.CreateSuccessData(result);
             });
         }
+
+
+        public HubResult DeleteEventParticipant(int itemID)
+        {
+            return accountsOnlyHeader((utilityContext, dc) =>
+            {
+                return EventParticipant.Delete(dc, itemID);
+            });
+        }
+
+        public HubResult DeleteEventParticipants(int[] itemIDs)
+        {
+            return accountsOnlyHeader((utilityContext, dc) =>
+            {
+                return EventParticipant.Delete(dc, itemIDs);
+            }, "/SiteHub/DeleteEventParticipants");
+        }
+
+
+
+
+
+
 
 
 

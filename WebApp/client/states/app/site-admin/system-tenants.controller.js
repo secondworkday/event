@@ -5,8 +5,8 @@ app.controller('SystemTenantsController', function ($scope, $mdDialog, $log, $ms
 
 
   $scope.sortOptions = [
-    { name: 'Name', serverTerm: 'item.name', clientFunction: utilityService.localeCompareByPropertyThenByID('name') },
-    { name: 'Name Descending', serverTerm: 'item.name DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('name') }
+    { name: 'Name', serverTerm: 'item.name', clientFunction: utilityService.compareByProperties('name', 'id') },
+    { name: 'Name Descending', serverTerm: 'item.name DESC', clientFunction: utilityService.compareByProperties('-name', '-id') }
   ];
 
   var filterByStateFactory = function (includeState) {

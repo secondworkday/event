@@ -1,13 +1,69 @@
-app.controller('ActivityLogController', function ($scope, $state, $log, utilityService, siteService) {
+app.controller('ActivityLogController', function ($scope, $state, $log, $q, utilityService, siteService) {
   $log.debug('Loading ActivityLogController...');
 
-  $scope.searchActivityLog = utilityService.model.activityLog.search;
+
+  // UtilityService doesn't track ActivityItems, so we have to setup a cache and manage that ourselves
+  $scope.activityLog = utilityService.createItemCache(utilityService.searchActivityLog);
 
   $scope.demandUser = utilityService.demandUser;
+  $scope.model = utilityService.model;
+
+  $scope.searchActivityLog = function (searchExpression, sortExpression, startIndex, rowCount) {
+    return $scope.activityLog.search(searchExpression, sortExpression, startIndex, rowCount)
+    .then(function (itemsData) {
+      return expandItems(itemsData.newIDs)
+      .then(function () {
+        // (caller still expects to see the original itemsData)
+        return itemsData;
+      });
+    });
+  };
+
+  function expandItems(itemIDs) {
+    var model = utilityService.model;
+
+    var promises = [];
+
+    angular.forEach(itemIDs, function (itemID) {
+      var item = $scope.activityLog.hashMap[itemID];
+      if (item.createdByUserID) {
+        //!!promises.push(utilityService.
+        item.user = utilityService.demandUser(item.createdByUserID);
+      }
+
+      if (item.targetTable === "EventParticipant") {
+        item.eventParticipantID = item.targetID;
+        promises.push(siteService.eventParticipants.ensure(item.eventParticipantID)
+          .then(function (eventParticipant) {
+            item.eventID = eventParticipant.eventID;
+            item.eventSessionID = eventParticipant.eventSessionID;
+            return eventParticipant;
+          }));
+      }
+
+      if (item.contextTable === "Event") {
+        item.eventID = item.contextID;
+      }
+    });
+
+    return $q.all(promises);
+  }
+
+  $scope.$on('updateActivityLog', function (event, itemsData) {
+    console.log("hey");
+
+    var notification = utilityService.updateItemsModel($scope.activityLog, itemsData);
+
+    expandItems(notification.newIDs)
+    .then(function () {
+      // We have to delay sending out this notification until the item is expanded as we might need that expanded info for sorting/filtering
+      $scope.$broadcast('activityLogUpdated', notification);
+    });
+  });
+
 
 
   $scope.searchViewOptions = {};
-
 
   // Establish our Base filtering (evaluatuating in order of most restrictive to least restrictive)
   if ($scope.eventSession) {
@@ -22,16 +78,20 @@ app.controller('ActivityLogController', function ($scope, $state, $log, utilityS
 
 
   $scope.sortOptions = [
-    { name: 'All', serverTerm: '', clientFunction: utilityService.compareByProperties('id') }
+    { name: 'All', serverTerm: '', clientFunction: utilityService.compareByProperties('id') },
 
-    //{ name: 'First Name', serverTerm: 'Participant.FirstName', clientFunction: utilityService.compareByProperties('firstName', 'id') },
+    { name: 'Most Recent Descending', serverTerm: 'CreatedTimestamp DESC', clientFunction: utilityService.compareByProperties('-createdTimestamp', '-id') },
+    { name: 'Most Recent Descending', serverTerm: 'CreatedTimestamp DESC', clientFunction: utilityService.compareByProperties('-createdTimestamp', '-id') }
+
+
+
     //{ name: 'Last Name', serverTerm: 'Participant.LastName', clientFunction: utilityService.compareByProperties('lastName', 'id') },
     //!! this is currently broken - as we don't really want to sort by the ParticipantGroup ID
     //{ name: 'School', serverTerm: 'Participant.ParticipantGroup.Name', clientFunction: utilityService.compareByProperties('participantGroupName', 'id') },
     //{ name: 'Grade', serverTerm: 'ExEventParticipant.item.Grade', clientFunction: utilityService.compareByProperties('grade', 'id') }
   ];
 
-  $scope.searchViewOptions.sort = $scope.sortOptions[0];
+  $scope.searchViewOptions.sort = $scope.sortOptions[1];
 
   $scope.filterOptions = [
     //{ name: 'Active', serverTerm: '$Active', clientFunction: filterByStateFactory("Active") },
@@ -46,58 +106,16 @@ app.controller('ActivityLogController', function ($scope, $state, $log, utilityS
 
 
 
-  $scope.sampleActivities = [
-    {
-      type: "bulkAddParticipants",
-      amount: "34",
-      target: "event",
-      actor: "Jerry Seinfeld",
-      timeStamp: "2016-02-20T19:21:34.525Z"
-    },
-/*
-    {
-      type: "singleAddParticipant",
-      participant: { firstName: "Jon", lastName: "Snow", participantGroup: "Parkside Elementary"},
-      target: "event",
-      actor: "George Constanza",
-      timeStamp: "2016-02-19T19:21:34.525Z"
-    },
-    {
-      type: "singleAddParticipant",
-      participant: { firstName: "Daenerys", lastName: "Targaryen", participantGroup: "Parkside Elementary"},
-      target: "event",
-      actor: "George Constanza",
-      timeStamp: "2016-02-19T19:21:34.525Z"
-    },
-    {
-      type: "singleAddParticipant",
-      participant: { firstName: "Arya", lastName: "Stark", participantGroup: "Greendale Middle School"},
-      target: "event",
-      actor: "George Constanza",
-      timeStamp: "2016-02-19T19:21:34.525Z"
-    },
-    {
-      type: "singleAddParticipant",
-      participant: { firstName: "Tyrion", lastName: "Lannister", participantGroup: "Greendale Middle School"},
-      target: "event",
-      actor: "George Constanza",
-      timeStamp: "2016-02-19T19:21:34.525Z"
-    },
-    {
-      type: "singleAddParticipant",
-      participant: { firstName: "Sansa", lastName: "Stark", participantGroup: "Parkside Elementary"},
-      target: "event",
-      actor: "George Constanza",
-      timeStamp: "2016-02-19T19:21:34.525Z"
-    },
-*/
-    {
-      type: "bulkDeleteParticipants",
-      amount: "12",
-      target: "event",
-      actor: "Elaine Bennett",
-      timeStamp: "2016-02-12T19:21:34.525Z"
-    },
-  ];
+
+  $scope.$on("$destroy", function () {
+    // unrequest server notifications
+    utilityService.untrackActivityLog();
+  });
+
+  // init
+
+  // request server notifications
+  utilityService.trackActivityLog();
+
 
 });

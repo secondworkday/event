@@ -7,12 +7,11 @@ app.controller('EventSessionsController', function ($scope, $mdDialog, $log, $ms
   $scope.setEventSessionCheckInOpen = siteService.setEventSessionCheckInOpen;
 
 
-
   $scope.sortOptions = [
-    { name: 'Session Date', serverTerm: 'item.StartDate', clientFunction: utilityService.localeCompareByPropertyThenByID('startDate') },
-    { name: 'Session Date Descending', serverTerm: 'item.StartDate DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('startDate') },
-    { name: 'Session Name', serverTerm: 'item.Name', clientFunction: utilityService.localeCompareByPropertyThenByID('name') },
-    { name: 'Session Name Descending', serverTerm: 'item.Name DESC', clientFunction: utilityService.localeCompareByPropertyThenByIDDescending('name') }
+    { name: 'Session Date', serverTerm: 'item.StartDate', clientFunction: utilityService.compareByProperties('startDate', 'id') },
+    { name: 'Session Date Descending', serverTerm: 'item.StartDate DESC', clientFunction: utilityService.compareByProperties('-startDate', '-id') },
+    { name: 'Session Name', serverTerm: 'item.Name', clientFunction: utilityService.compareByProperties('name', 'id') },
+    { name: 'Session Name Descending', serverTerm: 'item.Name DESC', clientFunction: utilityService.compareByProperties('-name', '-id') }
   ];
 
   var filterByStateFactory = function (includeState) {

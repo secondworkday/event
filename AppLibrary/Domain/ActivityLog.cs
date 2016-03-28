@@ -28,5 +28,8 @@ namespace App.Library
         public static readonly ActivityType CheckIn = create(3);
         public static readonly ActivityType UndoCheckIn = create(4);
         public static readonly ActivityType CheckOut = create(5);
+
+        public static readonly ActivityType BulkSetEventSession = create(10);
+        public static readonly ActivityType SetEventSession = create(11);
     }
 }

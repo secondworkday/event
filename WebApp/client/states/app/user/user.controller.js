@@ -32,7 +32,7 @@ app.controller('UserController', function ($scope, $log, $state, $mdDialog, $msU
   $scope.searchEvents = siteService.model.events.search;
 
   $scope.sortOptions = [
-    { name: 'Name', serverTerm: 'item.name', clientFunction: utilityService.localeCompareByPropertyThenByID('name') },
+    { name: 'Name', serverTerm: 'item.name', clientFunction: utilityService.compareByProperties('name', 'id') },
   ];
 
   var filterByStateFactory = function (includeState) {

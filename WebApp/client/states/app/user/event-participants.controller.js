@@ -464,6 +464,9 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
       fullscreen: false
     })
     .then(function (updatedEventParticipant) {
+      //!! this feels a bit scary.
+      // - shouldn't we sequence these?
+      // - and it feels like in the 99% case there's no editing going on - so maybe only make that call if it's necessary?
       siteService.editEventParticipant(updatedEventParticipant);
       $scope.checkIn(updatedEventParticipant);
     }, function () {
@@ -590,10 +593,11 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
 
   $scope.checkInEventParticipants = function () {
 
+    var eventID = $scope.event.id;
     var itemIDs = $scope.selectedIndex;
     var itemIDsLength = itemIDs.length;
 
-    siteService.checkInEventParticipants(itemIDs)
+    siteService.checkInEventParticipants(eventID, itemIDs)
     .then(function (successData) {
       var PARTICIPANT = $translate.instant('PARTICIPANT');
       $msUI.showToast(itemIDsLength + " " + PARTICIPANT + "(s) Checked in");
@@ -608,10 +612,11 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
 
   $scope.undoCheckInEventParticipants = function () {
 
+    var eventID = $scope.event.id;
     var itemIDs = $scope.selectedIndex;
     var itemIDsLength = itemIDs.length;
 
-    siteService.undoCheckInEventParticipants(itemIDs)
+    siteService.undoCheckInEventParticipants(eventID, itemIDs)
     .then(function (successData) {
       var PARTICIPANT = $translate.instant('PARTICIPANT');
       $msUI.showToast(itemIDsLength + " " + PARTICIPANT + "(s) Check-in Undone");
@@ -674,10 +679,10 @@ app.controller('EventParticipantsController', function ($scope, $translate, $mdD
         var itemIDs = selectedIndex;
 
         $log.debug("You applied the bulk edit.");
-        siteService.bulkEditEventParticipants(itemIDs, formData.eventSessionID)
+        siteService.editEventParticipants($scope.event.id, itemIDs, formData.eventSessionID)
         .then(function (successData) {
-          var PARTICIPANT = $translate.instant('PARTICIPANT');
-          $msUI.showToast(itemIDs.length + " " + PARTICIPANT + "s Edited");
+          var PARTICIPANTS = $translate.instant('PARTICIPANTS');
+          $msUI.showToast(itemIDs.length + " " + PARTICIPANTS + " Edited");
           $log.debug(itemIDs.length + " Event Participants Edited.");
           return successData;
         }, function (failureData) {

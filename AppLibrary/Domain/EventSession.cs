@@ -858,6 +858,16 @@ namespace App.Library
 
 
 
+        public static EventSession FindByID(AppDC dc, int? itemID)
+        {
+            if (itemID.HasValue)
+            {
+                return FindByID(dc, itemID.Value);
+            }
+
+            return null;
+        }
+
         public static EventSession FindByID(AppDC dc, int itemID)
         {
             var result = EventSession.Query(dc)

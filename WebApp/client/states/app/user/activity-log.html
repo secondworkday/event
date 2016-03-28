@@ -14,40 +14,85 @@
   </div>
 
 </div>
-<div ms-debug-only><pre>sampleActivities: {{sampleActivities | json}}</pre></div>
 
-<ms-search-view change-event="updateActivityLog" search="searchActivityLog" options="searchViewOptions">
+<ms-search-view change-event="activityLogUpdated" search="searchActivityLog" options="searchViewOptions">
 
   <div class="md-body-1 text-support"
        ng-repeat="activity in $displayedIndex | objectLookup:$hashMap track by activity.id"
-       ng-switch on="activity.activityType + activity.targetTable"
-       ng-init="user = demandUser(activity.createdByUserID)">
+       ng-switch on="activity.activityType"
+       ng-init="user = demandUser(activity.createdByUserID); eventParticipant = model.eventParticipants.demand(activity.eventParticipantID)">
 
     <div ng-show="!$first" style="height:.25rem;"></div>
 
     <div ms-debug-only><pre>activity: {{activity | json}}</pre></div>
 
-    <span ng-switch-when="CheckInEventParticipant">
+    <span ng-switch-default>
+      Switch Value: {{activity.activityType}}
+      <pre>activity: {{activity | json}}</pre>
+    </span>
+
+
+    <span ng-switch-when="BulkSetEventSession">
       <a href="#" class="no-style text-support text-bold">
         {{user.displayName}}
       </a>
-      <span> checked-in a </span>
-      <a href="#" class="no-style text-support text-bold">{{'PARTICIPANT' | translate | lowercase}}</a>
+      <span> edited the {{'EVENT_SESSION' | translate | lowercase}} for </span>
+      <a ui-sref="app.user.event.participants({eventID: activity.eventID, activityID: activity.id })"  class="no-style text-support text-bold">{{activity.context.itemCount}} {{'PARTICIPANTS' | translate | lowercase}}</a>
       <span class="u-sm-margin-left">
         <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
       </span>
     </span>
 
-    <span ng-switch-when="UndoCheckInEventParticipant">
+
+
+
+    <span ng-switch-when="CheckIn">
       <a href="#" class="no-style text-support text-bold">
         {{user.displayName}}
       </a>
-      <span> undid check-in for a </span>
+      <span> checked-in </span>
       <a href="#" class="no-style text-support text-bold">{{'PARTICIPANT' | translate | lowercase}}</a>
+      {{eventParticipant.fullName}}
       <span class="u-sm-margin-left">
         <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
       </span>
     </span>
+
+    <span ng-switch-when="BulkCheckIn">
+      <a href="#" class="no-style text-support text-bold">
+        {{user.displayName}}
+      </a>
+      <span> checked-in </span>
+      <a ui-sref="app.user.event.participants({eventID: activity.eventID, activityID: activity.id })"  class="no-style text-support text-bold">{{activity.context.itemCount}} {{'PARTICIPANTS' | translate | lowercase}}</a>
+      <span class="u-sm-margin-left">
+        <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
+      </span>
+    </span>
+
+
+    <span ng-switch-when="UndoCheckIn">
+      <a href="#" class="no-style text-support text-bold">
+        {{user.displayName}}
+      </a>
+      <span> undid check-in </span>
+      <a href="#" class="no-style text-support text-bold">{{'PARTICIPANT' | translate | lowercase}}</a>
+      {{eventParticipant.fullName}}
+      <span class="u-sm-margin-left">
+        <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
+      </span>
+    </span>
+
+    <span ng-switch-when="BulkUndoCheckIn">
+      <a href="#" class="no-style text-support text-bold">
+        {{user.displayName}}
+      </a>
+      <span> undid check-in for </span>
+      <a ui-sref="app.user.event.participants({eventID: activity.eventID, activityID: activity.id })"  class="no-style text-support text-bold">{{activity.context.itemCount}} {{'PARTICIPANTS' | translate | lowercase}}</a>
+      <span class="u-sm-margin-left">
+        <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
+      </span>
+    </span>
+
 
     <span ng-switch-when="CheckOutEventParticipant">
       <a href="#" class="no-style text-support text-bold">
@@ -55,28 +100,6 @@
       </a>
       <span> checked out a </span>
       <a href="#" class="no-style text-support text-bold">{{'PARTICIPANT' | translate | lowercase}}</a>
-      <span class="u-sm-margin-left">
-        <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
-      </span>
-    </span>
-
-    <span ng-switch-when="BulkCheckInEventParticipant">
-      <a href="#" class="no-style text-support text-bold">
-        {{user.displayName}}
-      </a>
-      <span> checked-in </span>
-      <a href="#" class="no-style text-support text-bold">{{activity.amount}} {{'PARTICIPANTS' | translate | lowercase}}</a>
-      <span class="u-sm-margin-left">
-        <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
-      </span>
-    </span>
-
-    <span ng-switch-when="BulkUndoCheckInEventParticipant">
-      <a href="#" class="no-style text-support text-bold">
-        {{user.displayName}}
-      </a>
-      <span> undid check-in for </span>
-      <a href="#" class="no-style text-support text-bold">{{activity.amount}} {{'PARTICIPANTS' | translate | lowercase}}</a>
       <span class="u-sm-margin-left">
         <span class="md-caption" am-time-ago="activity.createdTimestamp"></span>
       </span>

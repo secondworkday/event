@@ -261,40 +261,17 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
     });
   };
 
+
+
   self.editEventParticipant = function (item) {
     return utilityService.callHub(function () {
       return siteHub.server.editEventParticipant(item.id, item);
     });
   };
 
-  //deleteEventParticipant
-  this.deleteEventParticipant = function (item) {
+  self.editEventParticipants = function (eventID, itemIDs, eventSessionID) {
     return utilityService.callHub(function () {
-      return siteHub.server.deleteEventParticipant(item.id);
-    });
-  };
-  this.deleteEventParticipants = function (itemIDs) {
-    return utilityService.callHub(function () {
-      return siteHub.server.deleteEventParticipants(itemIDs);
-    });
-  };
-
-
-  self.checkInEventParticipants = function (itemIDs) {
-    return utilityService.callHub(function () {
-      return siteHub.server.checkInEventParticipants(itemIDs);
-    });
-  };
-
-  self.undoCheckInEventParticipants = function (itemIDs) {
-    return utilityService.callHub(function () {
-      return siteHub.server.undoCheckInEventParticipants(itemIDs);
-    });
-  };
-
-  self.bulkEditEventParticipants = function (itemIDs, eventSessionID) {
-    return utilityService.callHub(function () {
-      return siteHub.server.bulkEditEventParticipants(itemIDs, eventSessionID);
+      return siteHub.server.editEventParticipants(eventID, itemIDs, eventSessionID);
     });
   };
 
@@ -304,9 +281,21 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
     });
   };
 
+  self.checkInEventParticipants = function (eventID, itemIDs) {
+    return utilityService.callHub(function () {
+      return siteHub.server.checkInEventParticipants(eventID, itemIDs);
+    });
+  };
+
   self.undoCheckInEventParticipant = function (item) {
     return utilityService.callHub(function () {
       return siteHub.server.undoCheckInEventParticipant(item.id);
+    });
+  };
+
+  self.undoCheckInEventParticipants = function (eventID, itemIDs) {
+    return utilityService.callHub(function () {
+      return siteHub.server.undoCheckInEventParticipants(eventID, itemIDs);
     });
   };
 
@@ -315,6 +304,21 @@ app.service('siteService', ['$rootScope', '$q', '$state', 'utilityService', 'msI
       return siteHub.server.checkOutEventParticipant(item.id);
     });
   };
+
+  this.deleteEventParticipant = function (item) {
+    return utilityService.callHub(function () {
+      return siteHub.server.deleteEventParticipant(item.id);
+    });
+  };
+
+  this.deleteEventParticipants = function (itemIDs) {
+    return utilityService.callHub(function () {
+      return siteHub.server.deleteEventParticipants(itemIDs);
+    });
+  };
+
+
+
 
 
 
