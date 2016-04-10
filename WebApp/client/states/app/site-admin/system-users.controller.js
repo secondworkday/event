@@ -157,7 +157,7 @@ app.controller('SystemUsersController', function ($scope, $state, $mdDialog, $lo
       $scope.formData = {
         appRoles: [],
         systemRoles: []
-      }
+      };
 
 
       // AppRoles and SystemRoles

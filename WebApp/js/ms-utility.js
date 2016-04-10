@@ -1233,7 +1233,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
 
 
   //** Tenant Related
-  self.tenantGroups = self.createModelItems(utilityHub.server.searchTenantGroups);
+  self.tenantGroups = self.createModelCache(utilityHub.server.searchTenantGroups);
   model.tenantGroups = self.tenantGroups;
 
 
@@ -1243,7 +1243,7 @@ app.service('utilityService', ['$rootScope', '$q', '$state', '$http', '$window',
       // After an update, freshen our authenticatedGroup
       if (model.authenticatedGroup) {
         // refresh our authenticated group (might be a no-op if nothing in our authenticatedGroup has changed)
-        model.authenticatedGroup = itemsModel.hashMap[model.authenticatedGroup.id];
+        model.authenticatedGroup = self.tenantGroups.hashMap[model.authenticatedGroup.id];
         msAuthenticated.setAuthenticatedGroup(model.authenticatedGroup);
       }
     });
