@@ -31,9 +31,6 @@
     <link rel="stylesheet" href="<%=VersionedUri.MapPath("/node_modules/normalize.css/normalize.css")%>">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-material/0.10.0-rc2/angular-material.css">
-    <!-- extra, overriding theme files -->
-    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/scripts/angular-material/themes/indigo-theme.css")%>">
-    <link rel="stylesheet" href="<%=VersionedUri.MapPath("/scripts/angular-material/themes/green-theme.css")%>">
 <% } %>
 
 
@@ -116,11 +113,15 @@
     <!-- https://github.com/urish/angular-moment -->
     <script src="<%=VersionedUri.MapPath("/Scripts/angular-moment.js")%>"></script>
 
+<%if (this.includeTagsInput) { %>
     <%-- http://mbenford.github.io/ngTagsInput/--%>
     <script src="<%=VersionedUri.MapPath("/Scripts/ng-tags-input/ng-tags-input.min.js")%>"></script>
+<% } %>
 
+<%if (this.includeXEditable) { %>
     <%-- http://vitalets.github.io/angular-xeditable/--%>
     <script src="<%=VersionedUri.MapPath("/Scripts/angular-xeditable/xeditable.min.js")%>"></script>
+<% } %>
 
     <!-- https://github.com/nervgh/angular-file-upload -->
     <script src="<%=VersionedUri.MapPath("/Scripts/angular-file-upload.min.js")%>"></script>
@@ -191,13 +192,17 @@
                 'mk.editablespan',
                 'infinite-scroll',
                 'angularMoment',
+                // Angular-Translate
+<%if (this.includeTagsInput) { %>
                 'ngTagsInput',
+<% } %>
+<%if (this.includeXEditable) { %>
                 'xeditable',
+<% } %>
                 'angularFileUpload'])
         ;
 
       app.constant('SYSTEM_INFO', <%=sysinfoObjectJson%>);
-      app.constant('SIGNIN_INFO', <%=signinPageCustomObjectJson%>);
       app.constant('USER_STATE', <%=userStateObjectJson%>);
 
     </script>

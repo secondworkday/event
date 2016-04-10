@@ -64,7 +64,7 @@ app.run(['$rootScope', '$state', '$stateParams', '$http', '$templateCache', 'uti
 
   $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
 
-
+    //!! depricated - use resolve instead
     if (toState.redirectTo) {
       event.preventDefault();
       $state.go(toState.redirectTo, toParams);
@@ -242,6 +242,12 @@ app.service('bootstrapService', ['$rootScope', '$q', 'utilityService', function 
   var bootstrapHub = $.connection.bootstrapHub; // the generated client-side hub proxy
 
   // BootstrapHub methods
+
+  this.getSqlServerLogins = function (serverName, loginName, password) {
+    return utilityService.callHub(function () {
+      return bootstrapHub.server.getSqlServerLogins(serverName, loginName, password);
+    });
+  };
 
   this.getSqlServerAccountsDatabaseNames = function (serverName, loginName, password) {
     return utilityService.callHub(function () {

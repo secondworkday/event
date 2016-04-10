@@ -385,7 +385,7 @@ namespace App.Library
 
         public static HubResult CreateTenant(UtilityDC dc, string name, dynamic data)
         {
-            HubResult hubResult = TenantGroup.CreateTenant(dc, name, data, false);
+            HubResult hubResult = TenantGroup.CreateTenant(dc, name, data);
             Debug.Assert(hubResult.StatusCode == HubResultCode.Success);
 
             if (hubResult.StatusCode == HubResultCode.Success)
@@ -401,7 +401,7 @@ namespace App.Library
 
         public static HubResult CreateGroup(UtilityDC dc, string name, int parentTenantGroupID, dynamic data)
         {
-            HubResult hubResult = TenantGroup.CreateGroup(dc, name, parentTenantGroupID, data, false);
+            HubResult hubResult = TenantGroup.CreateGroup(dc, name, parentTenantGroupID, data);
             Debug.Assert(hubResult.StatusCode == HubResultCode.Success);
 
             if (hubResult.StatusCode == HubResultCode.Success)

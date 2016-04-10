@@ -28,7 +28,8 @@ namespace WebApp
 
         public bool includeAngularTranslate = false;
 
-
+        public bool includeTagsInput = false;
+        public bool includeXEditable = false;
 
         public bool includePlayingCards = false;
 
