@@ -1,0 +1,45 @@
+<h2 class="md-title">
+  Database Log ({{totalCount}})
+</h2>
+<md-divider></md-divider>
+<section>
+  <div layout layout-padding>
+    <div flex>
+      <md-input-container style="margin-top:-1rem;">
+        <label><i class="fa fa-search"></i> Search</label>
+        <input ng-model="userSearch">
+      </md-input-container>
+    </div>
+    <div style="margin-top:1rem;">
+      <md-button ng-click="download()" class="md-icon-button" aria-label="download">
+        <md-tooltip>Download</md-tooltip>
+        <i class="fa fa-download"></i>
+      </md-button>
+    </div>
+  </div>
+  <!-- Database Log -->
+  <ms-search-view change-event="updateDatabaseLog" search="searchDatabaseLog" user-search="userSearch">
+    <table class="md-data-table u-full-width">
+     <thead>
+       <tr>
+         <th>ID</th>
+         <th class="md-data-table__cell--non-numeric">Caller</th>
+         <th class="md-data-table__cell--non-numeric">User</th>
+         <th>Duration</th>
+         <th>Database Calls</th>
+         <th>Time</th>
+       </tr>
+     </thead>
+     <tbody>
+       <tr ng-repeat="item in $displayedIndex | objectLookup:$hashMap track by item.id">
+         <td>{{item.id}}</td>
+         <td class="md-data-table__cell--non-numeric">{{item.requestName}}</td>
+         <td class="md-data-table__cell--non-numeric">{{item.authorizedByName}}</td>
+         <td>{{item.duration | durationSeconds}}s</td>
+         <td>{{item.databaseCalls.length}}</td>
+         <td><span am-time-ago="item.firstTimestamp"></span></td>
+       </tr>
+     </tbody>
+    </table>
+  </ms-search-view>
+</section>

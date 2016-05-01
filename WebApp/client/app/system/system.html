@@ -1,0 +1,137 @@
+<div class="app-wrapper u-cf">
+  <md-content class="appbar">
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <md-button ng-click="goToState('app.site-admin.menu')" ng-hide="stateData.pageTitle == 'Back'" hide-gt-xs class="md-icon-button" aria-label="Menu">
+          <i class="fa fa-bars fa-lg"></i>
+        </md-button>
+        <h2 ng-hide="stateData.pageTitle == 'Back'">
+          <span>{{stateData.pageTitle}}</span>
+        </h2>
+        <div ng-show="stateData.pageTitle == 'Back'">
+          <md-button ng-click="goBack()" aria-label="back"><i class="fa fa-chevron-left"></i> &nbsp;{{stateData.pageTitle}}</md-button>
+        </div>
+        <span flex></span>
+        <md-menu>
+          <md-button aria-label="User menu" ng-click="$mdOpenMenu()">
+            <md-tooltip>
+              {{model.authenticatedUser.displayName}} ({{model.authenticatedUser.email | lowercase}})
+            </md-tooltip>
+            <img md-menu-origin ng-show="model.authenticatedUser.profilePhotoUrl" ng-src="{{model.authenticatedUser.profilePhotoUrl}}" alt="user img" class="mini-user-img" />
+            <img ng-hide="model.authenticatedUser.profilePhotoUrl" ng-src="/images/user-img-placeholder.png" alt="user img" class="mini-user-img" />
+            <span hide-xs>{{model.authenticatedUser.displayName}} <i class="fa fa-caret-down"></i></span>
+          </md-button>
+          <md-menu-content width="4">
+            <md-menu-item>
+              <md-button disabled>
+                <i class="fa fa-user"></i> Your Account
+              </md-button>
+            </md-menu-item>
+            <md-menu-divider></md-menu-divider>
+            <md-menu-item>
+              <md-button ng-click="signOut()">
+                <i class="fa fa-sign-out"></i> Sign Out
+              </md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+        <div ms-debug-only>
+          <div ms-debug-only>
+            <span class="md-caption torq-tag moderate"><i class="fa fa-code"></i> DEBUG</span>
+          </div>
+        </div>
+        <div app-bar-more-menu></div>
+      </div>
+    </md-toolbar>
+  </md-content>
+  <div hide-xs class="pinned-sidenav u-pull-left u-cf">
+    <nav class="tiny-nav">
+      <ul ms-show="'SystemAdmin'">
+        <li ng-hide="showSiteAdminNav">
+          <a layout layout-align="start center" class="md-body-2" ng-click="showSiteAdminNav = !showSiteAdminNav">
+            <span>Site Admin</span>
+            <span flex></span>
+            <i class="fa fa-plus"></i>
+          </a>
+        </li>
+        <li ng-show="showSiteAdminNav">
+          <a layout layout-align="start center" class="md-body-2" ng-click="showSiteAdminNav = !showSiteAdminNav">
+            <span>Site Admin</span>
+            <span flex></span>
+            <i class="fa fa-minus"></i>
+          </a>
+        </li>
+        <li ng-show="showSiteAdminNav" ng-repeat="page in siteAdminPages">
+          <a layout layout-align="start center" class="md-body-2" ui-sref="{{page.uiSref}}">
+            <span ng-class="{'text-blue': page.active}" flex="20"><i class="{{page.icon}} fa-lg"></i></span>
+            <span ng-class="{'text-blue': page.active}">{{page.pageTitle}}</span>
+          </a>
+        </li>
+      </ul>
+      <ul ms-show="'OperationsAdmin'">
+        <md-divider></md-divider>
+        <li ng-hide="showOpsNav">
+          <a layout layout-align="start center" class="md-body-2" ng-click="showOpsNav = !showOpsNav">
+            <span>Ops Admin</span>
+            <span flex></span>
+            <i class="fa fa-plus"></i>
+          </a>
+        </li>
+        <li ng-show="showOpsNav">
+          <a layout layout-align="start center" class="md-body-2" ng-click="showOpsNav = !showOpsNav">
+            <span>Ops Admin</span>
+            <span flex></span>
+            <i class="fa fa-minus"></i>
+          </a>
+        </li>
+        <li ng-show="showOpsNav" ng-repeat="page in opsAdminPages">
+          <a layout layout-align="start center" class="md-body-2" ui-sref="{{page.uiSref}}">
+            <span ng-class="{'text-blue': page.active}" flex="20"><i class="{{page.icon}} fa-lg"></i></span>
+            <span ng-class="{'text-blue': page.active}">{{page.pageTitle}}</span>
+          </a>
+        </li>
+      </ul>
+      <ul ms-show="'DatabaseAdmin'">
+        <md-divider></md-divider>
+        <li ng-hide="showDatabaseNav">
+          <a layout layout-align="start center" class="md-body-2" ng-click="showDatabaseNav = !showDatabaseNav">
+            <span>Database Admin</span>
+            <span flex></span>
+            <i class="fa fa-plus"></i>
+          </a>
+        </li>
+        <li ng-show="showDatabaseNav">
+          <a layout layout-align="start center" class="md-body-2" ng-click="showDatabaseNav = !showDatabaseNav">
+            <span>Database Admin</span>
+            <span flex></span>
+            <i class="fa fa-minus"></i>
+          </a>
+        </li>
+        <li ng-show="showDatabaseNav" ng-repeat="page in databaseAdminPages">
+          <a layout layout-align="start center" class="md-body-2" ui-sref="{{page.uiSref}}">
+            <span ng-class="{'text-blue': page.active}" flex="20"><i class="{{page.icon}} fa-lg"></i></span>
+            <span ng-class="{'text-blue': page.active}">{{page.pageTitle}}</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <div class="content-canvas">
+    <div class="content" ui-view></div>
+  </div>
+</div>
+<div hide-xs layout layout-align="start center" class="footer">
+  <nav>
+    <ul>
+      <li>&copy; 2016 TORQworks &middot; v{{currentVersion}}</li>
+      <li><a class="text-support" href="">Privacy Policy</a></li>
+      <li><a class="text-support" href="">Terms of Service</a></li>
+      <li><a class="text-support" href="" ng-click="showSiteInfoDialog($event)">Site Info</a></li>
+    </ul>
+  </nav>
+  <span flex></span>
+  <!-- //!! will there be issues not using an https link??  -->
+  <a href="http://www.onetonline.org" target="_blank" class="u-sm-margin-right">
+    <img src="/images/onet_init_small.png" alt="onet image" width="50" height="22" />
+  </a>
+</div>

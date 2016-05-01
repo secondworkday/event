@@ -1,0 +1,129 @@
+<div layout>
+  <div flex>
+    <md-input-container class="md-block" flex-gt-sm>
+      <label><i class="fa fa-search"></i> Search for any text, &commat;name, or even &num;tag</label>
+      <input ng-model="searchViewOptions.userSearch">
+    </md-input-container>
+  </div>
+  <div hide-xs>
+    <md-menu md-position-mode="target-right target">
+      <md-button aria-label="Open sort menu" class="md-icon-button" ng-click="$mdOpenMenu()">
+        <i md-menu-origin class="fa fa-sort"></i>
+      </md-button>
+      <md-menu-content width="4">
+        <md-menu-item ng-repeat="sortOption in sortOptions">
+          <md-button ng-click="searchViewOptions.sort = sortOption">
+            {{sortOption.name}}
+          </md-button>
+        </md-menu-item>
+      </md-menu-content>
+    </md-menu>
+    <md-button ng-click="download()" class="md-icon-button" aria-label="download">
+      <i class="fa fa-download"></i>
+    </md-button>
+  </div>
+</div>
+
+<ms-search-view change-event="updateEventLog" search="searchEventLog" options="searchViewOptions">
+  <pre>$totalCount: {{$totalCount}}, $displayedIndex: {{$displayedIndex}} </pre>
+  <md-card ng-repeat="item in $displayedIndex | objectLookup:$hashMap track by item.id">
+
+    <!-- color headers based on item type  -->
+    <div ng-show="item.item.EventType == 'critical'" class="card-header-bar bg-red"><strong>CRITICAL</strong></div>
+    <div ng-show="item.item.EventType == 'error'" class="card-header-bar bg-yellow"><strong>ERROR</strong></div>
+    <div ng-show="item.item.EventType == 'info'" class="card-header-bar bg-blue"><strong>INFO</strong></div>
+    <div ng-show="item.item.EventType == 'usability'" class="card-header-bar bg-blue"><strong>USABILITY</strong></div>
+    <div ng-show="item.item.EventType == 'assert'" class="card-header-bar bg-green"><strong>ASSERT</strong></div>
+
+    <md-card-title>
+      <md-card-title-text>
+        <span class="md-headline">{{item.item.title || "(no description)"}}</span>
+        <div layout>
+          <div layout="column" flex>
+            <span class="md-subhead"><strong>ID: </strong>{{item.id}}</span>
+            <span class="md-subhead"><strong>Occurence Count: </strong>{{item.occurenceCount | number:0}}</span>
+          </div>
+          <div layout="column" flex>
+            <span class="md-subhead"><strong>First Occurence: </strong>{{item.firstOccurenceTimestamp | amCalendar}} (<span am-time-ago="item.firstOccurenceTimestamp"></span>)</span>
+            <span class="md-subhead"><span ng-if="item.latestReoccurenceTimestamp"><strong>Latest Occurence: </strong>{{item.latestReoccurenceTimestamp | amCalendar}} (<span am-time-ago="item.latestReoccurenceTimestamp"></span>)</span></span>
+          </div>
+        </div>
+      </md-card-title-text>
+    </md-card-title>
+    <md-card-content ng-hide="expand">
+      <div ng-bind-html="item.databaseCallsString"></div>
+      <pre>{{item.item.details | limitTo:200}}<span ng-show="item.item.details.length > 199">&hellip;</span></pre>
+      <pre>{{item.item.stackFrames.join('') | limitTo:200}}<span ng-show="item.item.stackFrames.join('').length > 199">&hellip;</span></pre>
+    </md-card-content>
+    <md-card-content ng-show="expand">
+      <div ng-bind-html="item.databaseCallsString"></div>
+      <pre>{{item.item.details}}</pre>
+      <pre>{{item.item.stackFrames.join('')}}</pre>
+    </md-card-content>
+    <md-card-actions layout="row" layout-align="end center">
+      <md-button ng-show="expand" ng-click="expand = !expand">Collapse</md-button>
+      <md-button ng-hide="expand" ng-click="expand = !expand">Expand</md-button>
+      <md-button class="md-primary">Clear</md-button>
+    </md-card-actions>
+    <div ms-debug-only><pre>item: {{item | json}}</pre></div>
+  </md-card>
+</ms-search-view>
+
+
+
+
+
+
+
+
+
+<!-- <h2 class="md-title">
+  Event Log
+</h2>
+<md-divider></md-divider>
+<section>
+  <div layout layout-padding>
+    <div flex>
+      <md-input-container style="margin-top:-1rem;">
+        <label><i class="fa fa-search"></i> Search</label>
+        <input ng-model="searchViewOptions.userSearch">
+      </md-input-container>
+    </div>
+    <div style="margin-top:1rem;">
+      <md-button ng-click="download()" class="md-icon-button" aria-label="download">
+        <md-tooltip>Download</md-tooltip>
+        <i class="fa fa-download"></i>
+      </md-button>
+    </div>
+  </div>
+  <ms-search-view change-event="updateEventLog" search="searchEventLog" options="searchViewOptions">
+    <pre>$totalCount: {{$totalCount}}, $displayedIndex: {{$displayedIndex}} </pre>
+    <md-card ng-repeat="item in $displayedIndex | objectLookup:$hashMap track by item.id">
+      <md-card-content>
+        <pre ms-debug-only>{{item | json}}</pre>
+        <div layout>
+          <div>
+            <p class="md-title">{{item.item.title || "(no description)"}}</p>
+          </div>
+          <span flex></span>
+          <div>
+            <md-button ng-click="hide(item)" class="md-warn"><i class="fa fa-eye-slash"></i> Hide</md-button>
+          </div>
+        </div>
+        <div layout>
+          <p class="md-body-1" flex>
+            <strong>ID: </strong>{{item.id}}<br/>
+            <strong>Occurence Count: </strong>{{item.occurenceCount | number:0}}
+          </p>
+          <p class="md-body-1" flex>
+            <strong>First Occurence: </strong>{{item.firstOccurenceTimestamp | amCalendar}} (<span am-time-ago="item.firstOccurenceTimestamp"></span>)<br/>
+            <span ng-if="item.latestReoccurenceTimestamp"><strong>Latest Occurence: </strong>{{item.latestReoccurenceTimestamp | amCalendar}} (<span am-time-ago="item.latestReoccurenceTimestamp"></span>)</span>
+          </p>
+        </div>
+        <div ng-bind-html="item.databaseCallsString"></div>
+        <pre>{{item.item.details}}</pre>
+        <pre>{{item.item.stackFrames.join('')}}</pre>
+      </md-card-content>
+    </md-card>
+  </ms-search-view>
+</section> -->

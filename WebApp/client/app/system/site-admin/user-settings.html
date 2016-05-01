@@ -1,0 +1,89 @@
+<div ms-debug-only><pre>user: {{user | json}}</pre></div>
+<div>
+  <div layout>
+    <div ng-click="setProfilePhotoID(user.id)">
+      <label for="files" class="actionable-ui">
+          <img src="{{user.profilePhotoUrl || '/images/user-img-placeholder.png'}}" alt="{{user.displayName}} photo" style="height:200px;width:200px;border-radius:6px;" />
+      </label>
+      <input type="file" id="files" style="display:none" nv-file-select uploader="uploader" />
+    </div>
+    <span flex="5"></span>
+    <div flex>
+      <p class="md-display-2">
+        {{user.displayName}}
+      </p>
+      <p ng-show="user.connectionState == 'Online'" class="md-body-2">
+        <i class="fa fa-circle text-green"></i> Online now
+      </p>
+      <div layout>
+        <p flex class="md-body-1">
+          Email: {{user.email || "unknown"}}<br/>
+          Phone: {{user.contactPhoneNumber || "unknown"}}<br/>
+          Last Login: {{user.lastLogin || "unknown"}}<br/>
+          Lifetime Logins: {{user.totalLogins || "unknown"}}
+        </p>
+        <p flex class="md-body-1">
+          Date Created/Invited: {{user.createdDate || "unknown"}}<br/>
+          Created/Invited By: {{user.createdBy || "unknown"}}<br/>
+          State: {{user.state}}
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="u-sm-space"></div>
+  <md-divider></md-divider>
+  <div class="u-sm-space"></div>
+  <span class="md-subhead">Actions</span>
+  <div layout>
+    <md-button ng-click="DO_SOMETHING()">Send Password Reset Email</md-button>
+    <md-button ng-click="impersonateUser(user)" class="md-warn">
+      <i class="fa fa-exclamation-triangle"></i> Impersonate
+    </md-button>
+    <md-button ng-click="showSetPasswordDialog($event)" class="md-warn">
+      <i class="fa fa-exclamation-triangle"></i> Set Password
+    </md-button>
+    <md-button ng-click="deleteUser(user)" class="md-warn">Delete User</md-button>
+  </div>
+  <div class="u-sm-space"></div>
+  <md-divider></md-divider>
+  <div class="u-sm-space"></div>
+  <section>
+    <span class="md-subhead">Roles &amp; Permissions</span>
+    <md-button ng-hide="showEditRoles" ng-click="showEditRoles = !showEditRoles"><i class="fa fa-pencil"></i> Edit Roles</md-button>
+    <md-button ng-show="showEditRoles" ng-click="showEditRoles = !showEditRoles">Close</md-button>
+    <div layout="column" ng-hide="showEditRoles">
+      <span ng-repeat="role in sampleRoles | filter:{enabled:true}"><i class="fa fa-check-circle"></i> {{role.name}}</span>
+      <div class="u-sm-space"></div>
+    </div>
+    <div layout="column" ng-show="showEditRoles">
+      <md-checkbox ng-repeat="role in sampleRoles" ng-model="role.enabled" aria-label="{{role}}">
+        {{role.name}}
+      </md-checkbox>
+    </div>
+  </section>
+  <div class="u-sm-space"></div>
+  <md-divider></md-divider>
+  <div class="u-sm-space"></div>
+  <section>
+    <h3 class="md-subhead">Activity Log</h3>
+    <div class="u-sm-space"></div>
+    <table class="md-data-table u-full-width">
+      <thead>
+        <tr>
+          <th class="md-data-table__cell--non-numeric">Activity</th>
+          <th class="md-data-table__cell--non-numeric">Category</th>
+          <th class="md-data-table__cell--non-numeric">IP Address</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="activity in sampleActivities">
+          <td class="md-data-table__cell--non-numeric">{{ activity.title }}</td>
+          <td class="md-data-table__cell--non-numeric">{{ activity.category }}</td>
+          <td class="md-data-table__cell--non-numeric">{{ activity.IPAddress }}</td>
+          <td>{{ activity.timestamp }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

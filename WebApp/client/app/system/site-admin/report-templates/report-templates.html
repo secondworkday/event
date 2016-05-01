@@ -1,0 +1,134 @@
+<div ms-debug-only><pre>reportTemplates: {{reportTemplates | json}}</pre></div>
+<section>
+  <div layout-padding layout layout-align="start center">
+    <div flex>
+      <h3 class="md-title">Résumé Templates</h3>
+    </div>
+    <div layout ng-click="setFileUploaderItemData('resume')">
+      <input type="file" nv-file-select uploader="uploader"/>
+    </div>
+  </div>
+
+  <div layout layout-align="start start" layout-padding ng-repeat="reportTemplate in reportTemplates">
+    <div>
+      <div class="text-center" style="height:330px;width:255px;background-color:#FFF;" layout layout-align="center center">
+        <span class="md-body-1 text-support">Template 1 Thumbnail Preview</span>
+      </div>
+    </div>
+    <div flex>
+      <h4 class="md-subhead">{{reportTemplate.fileName}}</h4>
+
+      <div ng-if="reportTemplate.overrideFile">
+        OVERRIDE FILE!!!!<br />
+        Full Name: {{reportTemplate.overrideFile.filePath}}<br />
+        File Size: {{reportTemplate.overrideFile.fileSize}}<br />
+        Last Modified: {{reportTemplate.overrideFile.lastWriteTimestamp}}
+        <md-button ng-click="removeReportTemplateOverrideFile(reportTemplate)" class="md-warn">Remove</md-button>
+      </div>
+
+      <div layout>
+        <md-button style="margin-left:0;" ng-click="download()" class="md-primary">Generate Report</md-button>
+        <md-button ng-click="download()" class="md-primary">Download Template</md-button>
+        <md-button ng-click="remove()" class="md-warn">Remove</md-button>
+      </div>
+      <p class="md-body-1">
+        <span class="md-body-2">Tags Used:</span><br/>
+        <span class="md-caption text-support">tag1, tag2, tag3</span>
+      </p>
+      <p class="md-body-1">
+        <span class="md-body-2">Tags Not Used:</span><br/>
+        <span class="md-caption text-support">tag4, tag5, tag6</span>
+      </p>
+    </div>
+  </div>
+
+  <div layout-padding>
+    <md-divider></md-divider>
+  </div>
+
+  <div layout layout-align="start start" layout-padding>
+    <div>
+      <div class="text-center" style="height:330px;width:255px;background-color:#FFF;" layout layout-align="center center">
+        <span class="md-body-1 text-support">Template 1 Thumbnail Preview</span>
+      </div>
+    </div>
+    <div flex>
+      <h4 class="md-subhead">resume_report_template-basic.docx</h4>
+      <div layout>
+        <md-button style="margin-left:0;" ng-click="download()" class="md-primary">Generate Report</md-button>
+        <md-button ng-click="download()" class="md-primary">Download Template</md-button>
+        <md-button ng-click="remove()" class="md-warn">Remove</md-button>
+      </div>
+      <p class="md-body-1">
+        <span class="md-body-2">Tags Used:</span><br/>
+        <span class="md-caption text-support">tag1, tag2, tag3</span>
+      </p>
+      <p class="md-body-1">
+        <span class="md-body-2">Tags Not Used:</span><br/>
+        <span class="md-caption text-support">tag4, tag5, tag6</span>
+      </p>
+    </div>
+  </div>
+  <div layout-padding>
+    <md-divider></md-divider>
+  </div>
+  <div layout layout-align="start start" layout-padding>
+    <div>
+      <div class="text-center" style="height:330px;width:255px;background-color:#FFF;" layout layout-align="center center">
+        <span class="md-body-1 text-support">Template 1 Thumbnail Preview</span>
+      </div>
+    </div>
+    <div flex>
+      <h4 class="md-subhead">resume_report_template-basic.docx</h4>
+      <div layout>
+        <md-button style="margin-left:0;" ng-click="download()" class="md-primary">Generate Report</md-button>
+        <md-button ng-click="download()" class="md-primary">Download Template</md-button>
+        <md-button ng-click="remove()" class="md-warn">Remove</md-button>
+      </div>
+      <p class="md-body-1">
+        <span class="md-body-2">Tags Used:</span><br/>
+        <span class="md-caption text-support">tag1, tag2, tag3</span>
+      </p>
+      <p class="md-body-1">
+        <span class="md-body-2">Tags Not Used:</span><br/>
+        <span class="md-caption text-support">tag4, tag5, tag6</span>
+      </p>
+    </div>
+  </div>
+  <div layout-padding>
+    <md-divider></md-divider>
+  </div>
+</section>
+<section>
+  <div layout-padding layout layout-align="start center">
+    <div flex>
+      <h3 class="md-title">Personal Employment Plan Templates</h3>
+    </div>
+    <div layout ng-click="setFileUploaderItemData('pep')">
+      <input type="file" nv-file-select uploader="uploader"/>
+    </div>
+  </div>
+  <div layout layout-align="start start" layout-padding>
+    <div>
+      <div class="text-center" style="height:330px;width:255px;background-color:#FFF;" layout layout-align="center center">
+        <span class="md-body-1 text-support">Template 1 Thumbnail Preview</span>
+      </div>
+    </div>
+    <div flex>
+      <h4 class="md-subhead">pep_report_template.docx</h4>
+      <div layout>
+        <md-button style="margin-left:0;" ng-click="download()" class="md-primary">Generate Report</md-button>
+        <md-button ng-click="download()" class="md-primary">Download Template</md-button>
+        <md-button ng-click="remove()" class="md-warn">Remove</md-button>
+      </div>
+      <p class="md-body-1">
+        <span class="md-body-2">Tags Used:</span><br/>
+        <span class="md-caption text-support">tag1, tag2, tag3</span>
+      </p>
+      <p class="md-body-1">
+        <span class="md-body-2">Tags Not Used:</span><br/>
+        <span class="md-caption text-support">tag4, tag5, tag6</span>
+      </p>
+    </div>
+  </div>
+</section>

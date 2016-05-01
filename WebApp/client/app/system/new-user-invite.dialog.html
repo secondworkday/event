@@ -1,0 +1,129 @@
+<md-dialog>
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2 class="md-title">Invite New User</h2>
+      <span flex></span>
+      <md-button ng-click="cancelDialog()" class="md-icon-button" aria-label="Cancel dialog"><i class="fa fa-times"></i></md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content class="md-padding">
+    <form name="form">
+      <div layout layout-sm="column">
+        <md-input-container flex>
+          <label>First Name</label>
+          <input ng-required="true" ng-model="formData.firstName">
+        </md-input-container>
+        <md-input-container flex>
+          <label>Last Name</label>
+          <input ng-required="true" ng-model="formData.lastName">
+        </md-input-container>
+      </div>
+      <div layout layout-sm="column">
+        <md-input-container flex>
+          <label>Email Address (required)</label>
+          <input ng-required="true" type="email" ng-model="formData.email">
+        </md-input-container>
+      </div>
+      
+      <!--show to SystemAdmins and show to TenantAdmins with multiple TenantGroups available--> 
+      <div layout layout-sm="column" 
+        ng-if="listContains(authenticatedUser.systemRoles, 'SystemAdmin') || (listContains(authenticatedUser.systemRoles, 'TenantAdmin') && tenantGroups.index.length > 1)">
+        <md-input-container flex>
+          <label>Select Tenant Group</label>
+          <md-select ng-model="formData.tenantGroupID">
+            <md-option ng-repeat="tenantGroup in tenantGroups.index | objectLookup:tenantGroups.hashMap track by tenantGroup.id" value="{{tenantGroup.id}}">
+              {{tenantGroup.name}}
+            </md-option>
+          </md-select>
+        </md-input-container>
+      </div>
+      
+      
+      <p class="md-subhead">Roles</p>      
+      
+      <!--show if user holds any system role (which include TenantAdmin)-->
+      <div 
+        ng-if="authenticatedUser.systemRoles.length > 0">
+        <md-checkbox aria-label="role"
+          ng-repeat="appRoleItem in appRoleItems"
+          ng-checked="listContains(formData.appRoles, appRoleItem.value)"
+          ng-click="toggleList(formData.appRoles, appRoleItem.value)" >
+          <span ng-if="APP_ROLE_TRANSLATION">{{APP_ROLE_TRANSLATION[appRoleItem.value] | translate}}</span>
+          <span ng-if="!APP_ROLE_TRANSLATION">{{appRoleItem.name}}</span>
+        </md-checkbox>
+        <!--special handling for TenantAdmins to assigned the 'Admin' role (really TenantAdmin)-->
+        <div 
+          ng-if="listContains(authenticatedUser.systemRoles, 'TenantAdmin') && !listContains(authenticatedUser.systemRoles, 'SystemAdmin')">
+          <md-checkbox aria-label="role"
+            ng-checked="listContains(formData.systemRoles, 'TenantAdmin')"
+            ng-click="toggleList(formData.systemRoles, 'TenantAdmin')" >
+            <span ng-if="APP_ROLE_TRANSLATION">{{APP_ROLE_TRANSLATION['Admin'] | translate}}</span>
+            <span ng-if="!APP_ROLE_TRANSLATION">Admin</span>
+          </md-checkbox>          
+        </div>
+
+        <!--show if user holds any system role (which excludes TenantAdmin)-->
+        <div
+          ng-if="systemRoleItem"
+          ng-repeat="systemRoleItem in systemRoleItems">
+         <md-checkbox aria-label="role"
+          ng-disabled="!systemRoleItem.enabled"
+          ng-checked="listContains(formData.systemRoles, systemRoleItem.value)"
+          ng-click="toggleList(formData.systemRoles, systemRoleItem.value)" >
+          {{systemRoleItem.name}}
+        </md-checkbox>          
+        </div>
+      </div>
+      
+       
+      <!--<div class="form-group" ng-if="authenticatedUser.systemRoles.length > 0">
+          <label for="roleInput">Roles</label>
+          <div class="row">
+              <div class="col-xs-6">
+                  <div ng-repeat="appRoleItem in appRoleItems">
+                      <label>
+                          <input type="checkbox"
+                                  ng-checked="listContains(formData.appRoles, appRoleItem.value)"
+                                  ng-click="toggleList(formData.appRoles, appRoleItem.value)" />
+                          <span ng-if="APP_ROLE_TRANSLATION">{{APP_ROLE_TRANSLATION[appRoleItem.value] | translate}}</span>
+                          <span ng-if="!APP_ROLE_TRANSLATION">{{appRoleItem.name}}</span>
+                      </label>
+                  </div>
+              </div>-->
+
+              <!--special handling for TenantAdmins to assigned the 'Admin' role (really TenantAdmin)--> 
+              <!--<label ng-if="listContains(authenticatedUser.systemRoles, 'TenantAdmin') && !listContains(authenticatedUser.systemRoles, 'SystemAdmin')">
+                  <input type="checkbox"
+                          ng-checked="listContains(formData.systemRoles, 'TenantAdmin')"
+                          ng-click="toggleList(formData.systemRoles, 'TenantAdmin')" />
+                <span ng-if="APP_ROLE_TRANSLATION">{{APP_ROLE_TRANSLATION['Admin'] | translate}}</span>
+                <span ng-if="!APP_ROLE_TRANSLATION">Admin</span>
+              </label>-->
+
+              <!--show if user holds any system role (which excludes TenantAdmin)--> 
+              <!--<div class="col-xs-6">
+                  <div ng-repeat="systemRoleItem in systemRoleItems">
+                      <label ng-if="systemRoleItem">
+                          <input type="checkbox"
+                                  ng-disabled="!systemRoleItem.enabled"
+                                  ng-checked="listContains(formData.systemRoles, systemRoleItem.value)"
+                                  ng-click="toggleList(formData.systemRoles, systemRoleItem.value)" />
+                          {{systemRoleItem.name}}
+                      </label>
+                  </div>
+              </div>
+          </div>
+      </div>      -->
+      
+      
+    </form>
+  </md-dialog-content>
+  <div class="md-actions" layout="row">
+    <md-button ng-click="cancelDialog()">
+      Cancel
+    </md-button>
+    <md-button ng-click="inviteUser(formData)" class="md-primary" ng-disabled="form.$invalid">
+      Send Invitation Email
+    </md-button>
+  </div>
+</md-dialog>

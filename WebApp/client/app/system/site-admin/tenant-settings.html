@@ -1,0 +1,394 @@
+<div ms-debug-only><pre>tenant: {{tenant | json}}</pre></div>
+<div>
+
+  <md-content class="md-padding">
+    <div layout layout-align="start center">
+      <div flex>
+        <span class="md-display-1">{{tenant.name}}</span>
+      </div>
+      <div>
+
+      </div>
+    </div>
+    <div class="u-md-space"></div>
+    <div layout layout-align="start center">
+      <div flex>
+        <p class="md-body-1">
+          Active Users: {{tenant.activeUsersCount | number}}<br/>
+          Tenant ID: {{tenant.id}}<br/>
+          Parent Tenant: {{tenant.parentTenantName || "N/A"}}
+        </p>
+      </div>
+      <div flex>
+        <p class="md-body-1">
+          Date Created: {{tenant.createdDate || "unknown"}}<br/>
+          Created By: {{tenant.createdBy || "unknown"}}<br/>
+          Tenant Admin: {{tenant.tenantAdmin.firstName || "unknown"}} {{tenant.tenantAdmin.lastName || "unknown"}} ({{tenant.tenantAdmin.email || "unknown"}})
+        </p>
+      </div>
+    </div>
+    <div layout>
+      <md-button ng-click="impersonateUser(user)" class="md-primary">
+        <i class="fa fa-eye"></i> View as a Tenant Admin*
+      </md-button>
+      <md-button ng-click="DO_SOMETHING()" class="md-warn">Deactivate</md-button>
+      <md-button disabled ng-click="archiveTenant(tenant)" class="md-warn">Archive</md-button>
+    </div>
+    <p class="md-caption u-sm-margin-left">
+      * Note: When you view a tenant as a Tenant Admin, other admins will be notified.
+    </p>
+  </md-content>
+
+  <div class="u-sm-space"></div>
+  <md-divider></md-divider>
+  <div class="u-sm-space"></div>
+
+  <div layout="column" layout-gt-xs="row">
+    <div flex class="u-sm-margin-right">
+      <md-content>
+        <div class="md-padding">
+          <span class="md-subhead">Settings</span>
+        </div>
+        <md-list ng-cloak>
+          <md-list-item>
+            <p> Public Tenant </p>
+            <md-switch ng-change="setTenantGroupAccountOption('isPublic', tenant.accountOptions.isPublic)" class="md-primary" ng-model="tenant.accountOptions.isPublic"></md-switch>
+          </md-list-item>
+          <md-list-item>
+            <p> SelfService Tenant </p>
+            <md-switch ng-change="setPublicTenantGroupAccountOption('isSelfServe', tenant.accountOptions.isSelfServe)" class="md-primary" ng-model="tenant.accountOptions.isSelfServe"></md-switch>
+          </md-list-item>
+          <md-list-item>
+            <p> Demo Tenant </p>
+            <md-switch ng-change="setPublicTenantGroupAccountOption('isDemo', tenant.accountOptions.isDemo)" class="md-primary" ng-model="tenant.accountOptions.isDemo"></md-switch>
+          </md-list-item>
+          <md-list-item>
+            <p> Demo Tenant </p>
+            <md-switch ng-change="setDemoTenant(tenant.accountOptions.isDemo)" class="md-primary" ng-model="tenant.accountOptions.isDemo"></md-switch>
+          </md-list-item>
+          <md-list-item ng-repeat="setting in settings">
+            <p> {{ setting.name }} </p>
+            <md-switch ng-change="toggleSetting(setting)" class="md-primary" ng-model="setting.enabled"></md-switch>
+          </md-list-item>
+        </md-list>
+      </md-content>
+    </div>
+    <div flex>
+      <md-content class="md-padding">
+        <div layout layout-align="start center">
+          <div flex>
+            <span class="md-subhead">Notes (renewal dates, important users, etc.)</span>
+          </div>
+          <div>
+            <md-button ng-hide="showEditNotes" ng-click="showEditNotes = !showEditNotes"><i class="fa fa-pencil"></i> Edit</md-button>
+            <md-button ng-show="showEditNotes" ng-click="showEditNotes = !showEditNotes" class="md-primary"><i class="fa fa-check"></i> Done Editing</md-button>
+          </div>
+        </div>
+        <p ng-hide="showEditNotes" class="md-body-1">
+          Notes will go here Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+        <md-input-container ng-show="showEditNotes" class="u-full-width">
+          <label>Notes</label>
+          <textarea ng-model="tenant.notes"></textarea>
+        </md-input-container>
+      </md-content>
+    </div>
+  </div>
+
+  <div class="u-sm-space"></div>
+  <md-divider></md-divider>
+  <div class="u-sm-space"></div>
+
+  <md-content class="md-padding">
+    <div layout layout-align="start center">
+      <div flex>
+        <span class="md-subhead">Activity Log</span>
+      </div>
+      <div>
+        <md-button ng-click="DO_SOMETHING()" class="md-primary"><i class="fa fa-download"></i> Download Full Log</md-button>
+      </div>
+    </div>
+
+    <div flex layout>
+      <div flex>
+        <md-input-container class="md-block" flex-gt-sm>
+          <label><i class="fa fa-search"></i> Search for any text, &commat;name, or even &num;tag</label>
+          <input ng-minlength="2"
+          ng-model-options="{ debounce: 250 }"
+          ng-model="searchViewOptions.userSearch">
+        </md-input-container>
+      </div>
+      <div hide-xs style="margin-top:1rem;">
+        <md-menu md-position-mode="target-right target">
+          <md-button aria-label="Open sort menu" class="md-icon-button" ng-click="$mdOpenMenu()">
+            <i md-menu-origin class="fa fa-sort"></i>
+          </md-button>
+          <md-menu-content width="4">
+            <md-menu-item ng-repeat="sortOption in sortOptions">
+              <md-button ng-click="searchViewOptions.sort = sortOption">
+                {{sortOption.name}}
+              </md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+        <md-button ng-click="download()" class="md-icon-button" aria-label="download">
+          <md-tooltip>Download</md-tooltip>
+          <i class="fa fa-download"></i>
+        </md-button>
+      </div>
+    </div>
+
+    <section>
+
+      <ms-search-view change-event="activityLogUpdated" search="activityLog.search" options="searchViewOptions" user-search="userSearch">
+
+        <div layout layout-align="center center" class="md-padding text-center" ng-hide="$displayedIndex.length > 0">
+          <div flex style="max-width:400px;margin:2rem auto;">
+            <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+            <div class="u-sm-space"></div>
+            <p class="md-headline">
+              My, you're looking nice today.
+            </p>
+            <p class="md-body-1">
+              One moment while we update your activity log&hellip;
+            </p>
+          </div>
+        </div>
+
+
+        <div class="text-support"
+             ng-repeat="activity in $displayedIndex | objectLookup:$hashMap track by activity.id"
+             ng-switch on="activity.activityType"
+             ng-init="createdByUser = demandUser(activity.createdByUserID); targetUser = demandUser(activity.targetUserID)">
+
+          <div ms-debug-only><pre>activity: {{activity | json}}</pre></div>
+
+          <span ng-switch-default>
+            <div layout layout-align="start center">
+              <div class="u-sm-margin-right">
+                <i class="fa fa-question-circle fa-lg"></i>
+              </div>
+              <div flex>
+                <span class="md-body-2">{{activity.activityType}}</span>
+              </div>
+              <div>
+                <span class="md-caption text-support">{{activity.createdTimestamp | amCalendar}}</span>
+              </div>
+            </div>
+            <div>
+              <pre>activity: {{activity | json}}</pre>
+            </div>
+          </span>
+
+          <span ng-switch-when="Invalid">
+            <div layout layout-align="start center">
+              <div class="u-sm-margin-right text-red">
+                <i class="fa fa-exclamation-traingle fa-lg"></i>
+              </div>
+              <div flex>
+                <span class="md-body-2 text-red">{{activity.activityType}}</span>
+              </div>
+              <div>
+                <span class="md-caption text-support">{{activity.createdTimestamp | amCalendar}}</span>
+              </div>
+            </div>
+            <div>
+              <pre>activity: {{activity | json}}</pre>
+            </div>
+          </span>
+
+          <span ng-switch-when="CareerStepJobOpportunityAdded">
+            <div layout layout-align="start center">
+              <div class="u-sm-margin-right text-blue">
+                <i class="fa fa-briefcase fa-lg"></i>
+              </div>
+              <div flex>
+                <span class="md-body-2 text-blue">Customer {{createdByUser.displayName}} saved a job opening</span><br/>
+                <span class="md-body-1">Career: <strong>{{activity.context.jobPosting.occupationTitle}}</strong></span><br/>
+                <span class="md-body-1">Job Opening: <strong>{{activity.context.jobPosting.title}}</strong> at <strong>{{activity.context.jobPosting.company}}</strong> in <strong>{{activity.context.jobPosting.location}}</strong></span><br/>
+                <span class="md-caption"><a href="{{activity.context.jobPosting.applyUrl}}" target="_blank"><i class="fa fa-external-link fa-lg"></i> Open job posting</a> &nbsp; <a href="" ng-hide="activity.showDetails" ng-click="activity.showDetails = !activity.showDetails">show details</a></span>
+              </div>
+              <div>
+                <span class="md-caption text-support">{{activity.createdTimestamp | amCalendar}}</span>
+              </div>
+            </div>
+            <div ng-show="activity.showDetails">
+              <pre>activity: {{activity | json}}</pre>
+            </div>
+          </span>
+
+          <span ng-switch-when="ConversationCreated">
+            <div layout layout-align="start center">
+              <div class="u-sm-margin-right text-blue">
+                <i class="fa fa-comment fa-lg"></i>
+              </div>
+              <div flex>
+                <span class="md-body-2 text-blue">New conversation</span><br/>
+                <span class="md-body-1">
+                  by {{createdByUser.displayName || "N/A"}} <span ng-show="createdByUser.email">({{createdByUser.email}})</span>
+                </span> &nbsp;
+                <span><a href="" class="md-caption" ng-hide="activity.showDetails" ng-click="activity.showDetails = !activity.showDetails">show details</a></span>
+              </div>
+              <div>
+                <span class="md-caption text-support">{{activity.createdTimestamp | amCalendar}}</span>
+              </div>
+            </div>
+            <div ng-show="activity.showDetails">
+              <pre>activity: {{activity | json}}</pre>
+            </div>
+          </span>
+
+
+          <span ng-switch-when="EmailAddressAdded">
+            <div layout layout-align="start center">
+              <div class="u-sm-margin-right text-blue">
+                <i class="fa fa-envelope fa-lg"></i>
+              </div>
+              <div flex>
+                <span class="md-body-2 text-blue">Email address added to UserID {{activity.targetID}}</span><br/>
+                <span class="md-body-1">
+                  by {{createdByUser.displayName || "N/A"}} <span ng-show="createdByUser.email">({{createdByUser.email}})</span>
+                </span> &nbsp;
+                <span><a href="" class="md-caption" ng-hide="activity.showDetails" ng-click="activity.showDetails = !activity.showDetails">show details</a></span>
+              </div>
+              <div>
+                <span class="md-caption text-support">{{activity.createdTimestamp | amCalendar}}</span>
+              </div>
+            </div>
+            <div ng-show="activity.showDetails">
+              <pre>activity: {{activity | json}}</pre>
+              <pre>createdByUser: {{createdByUser | json}}</pre>
+            </div>
+          </span>
+
+          <span ng-switch-when="ResourceAdded">
+            <div layout layout-align="start center">
+              <div class="u-sm-margin-right text-blue">
+                <i class="fa fa-plus-circle fa-lg"></i>
+              </div>
+              <div flex>
+                <span class="md-body-2 text-blue">ResourceID {{activity.contextID}} added to UserID {{activity.targetID}}</span><br/>
+                <span class="md-body-1">
+                  by {{createdByUser.displayName || "N/A"}} <span ng-show="createdByUser.email">({{createdByUser.email}})</span>
+                </span> &nbsp;
+                <span><a href="" class="md-caption" ng-hide="activity.showDetails" ng-click="activity.showDetails = !activity.showDetails">show details</a></span>
+              </div>
+              <div>
+                <span class="md-caption text-support">{{activity.createdTimestamp | amCalendar}}</span>
+              </div>
+            </div>
+            <div ng-show="activity.showDetails">
+              <pre>activity: {{activity | json}}</pre>
+            </div>
+          </span>
+
+          <span ng-switch-when="SetMemberAdded">
+            <div layout layout-align="start center">
+              <div class="u-sm-margin-right text-blue">
+                <i class="fa fa-plus-circle fa-lg"></i>
+              </div>
+              <div flex>
+                <span class="md-body-2 text-blue">Set member added to UserID {{activity.targetID}}</span><br/>
+                <span class="md-body-1">
+                  by {{createdByUser.displayName || "N/A"}} <span ng-show="createdByUser.email">({{createdByUser.email}})</span>
+                </span> &nbsp;
+                <span><a href="" class="md-caption" ng-hide="activity.showDetails" ng-click="activity.showDetails = !activity.showDetails">show details</a></span>
+              </div>
+              <div>
+                <span class="md-caption text-support">{{activity.createdTimestamp | amCalendar}}</span>
+              </div>
+            </div>
+            <div ng-show="activity.showDetails">
+              <pre>activity: {{activity | json}}</pre>
+            </div>
+          </span>
+
+          <span ng-switch-when="UserInitiatedResetPassword">
+            <div layout layout-align="start center">
+              <div class="u-sm-margin-right text-blue">
+                <i class="fa fa-lock fa-lg"></i>
+              </div>
+              <div flex>
+                <span class="md-body-2 text-blue">{{activity.activityType}}</span><br/>
+                <span class="md-body-1">{{activity.targetTable}} #{{activity.targetID}} by UserID {{activity.createdByUserID || "N/A"}}</span> &nbsp;
+                <span><a href="" class="md-caption" ng-hide="activity.showDetails" ng-click="activity.showDetails = !activity.showDetails">show details</a></span>
+              </div>
+              <div>
+                <span class="md-caption text-support">{{activity.createdTimestamp | amCalendar}}</span>
+              </div>
+            </div>
+            <div ng-show="activity.showDetails">
+              <pre>activity: {{activity | json}}</pre>
+            </div>
+          </span>
+
+          <span ng-switch-when="CategoryTagAssigned">
+            <div layout layout-align="start center">
+              <div class="u-sm-margin-right text-blue">
+                <i class="fa fa-tag fa-lg"></i>
+              </div>
+              <div flex>
+                <span class="md-body-2 text-blue">Category tag assigned to UserID {{activity.targetID}}</span><br/>
+                <span class="md-body-1">
+                  by {{createdByUser.displayName || "N/A"}} <span ng-show="createdByUser.email">({{createdByUser.email}})</span>
+                </span> &nbsp;
+                <span><a href="" class="md-caption" ng-hide="activity.showDetails" ng-click="activity.showDetails = !activity.showDetails">show details</a></span>
+              </div>
+              <div>
+                <span class="md-caption text-support">{{activity.createdTimestamp | amCalendar}}</span>
+              </div>
+            </div>
+            <div ng-show="activity.showDetails">
+              <pre>activity: {{activity | json}}</pre>
+            </div>
+          </span>
+
+          <span ng-switch-when="CategoryTagRemoved">
+            <div layout layout-align="start center">
+              <div class="u-sm-margin-right text-blue">
+                <i class="fa fa-tag fa-lg"></i>
+              </div>
+              <div flex>
+                <span class="md-body-2 text-blue">{{activity.activityType}}</span><br/>
+                <span class="md-body-1">{{activity.targetTable}} #{{activity.targetID}} by UserID {{activity.createdByUserID || "N/A"}}</span> &nbsp;
+                <span><a href="" class="md-caption" ng-hide="activity.showDetails" ng-click="activity.showDetails = !activity.showDetails">show details</a></span>
+              </div>
+              <div>
+                <span class="md-caption text-support">{{activity.createdTimestamp | amCalendar}}</span>
+              </div>
+            </div>
+            <div ng-show="activity.showDetails">
+              <pre>activity: {{activity | json}}</pre>
+            </div>
+          </span>
+
+          <span ng-switch-when="CreateUserAuthTokenEmailed">
+            <div layout layout-align="start center">
+              <div class="u-sm-margin-right text-blue">
+                <i class="fa fa-lock fa-lg"></i>
+              </div>
+              <div flex>
+                <span class="md-body-2 text-blue">{{activity.activityType}}</span><br/>
+                <span class="md-body-1">{{activity.targetTable}} #{{activity.targetID}} by UserID {{activity.createdByUserID || "N/A"}}</span> &nbsp;
+                <span><a href="" class="md-caption" ng-hide="activity.showDetails" ng-click="activity.showDetails = !activity.showDetails">show details</a></span>
+              </div>
+              <div>
+                <span class="md-caption text-support">{{activity.createdTimestamp | amCalendar}}</span>
+              </div>
+            </div>
+            <div ng-show="activity.showDetails">
+              <pre>activity: {{activity | json}}</pre>
+            </div>
+          </span>
+
+          <div class="u-sm-space"></div>
+          <md-divider></md-divider>
+          <div class="u-sm-space"></div>
+
+        </div>
+      </ms-search-view>
+
+    </section>
+
+  </md-content>
+</div>

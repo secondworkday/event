@@ -20,7 +20,12 @@ namespace WebApp
             //!! using Bundle instead of ScriptBundle because our controllers aren't coded to be minified yet
             var defaultSpaJS = new Bundle("~/bundles/defaultSpaJS", new CacheBreakTransform())
                 .IncludeDirectory("~/client/components", "*.js", true)
-                .IncludeDirectory("~/client/states/public", "*.js", true)
+
+                .IncludeDirectory("~/client/app", "*.js", false)
+                .IncludeDirectory("~/client/app/public", "*.js", true)
+                .IncludeDirectory("~/client/app/system", "*.js", true)
+                //.IncludeDirectory("~/client/states/public", "*.js", true)
+
                 .IncludeDirectory("~/client/states/app", "*.js")
                 .IncludeDirectory("~/client/states/app/user", "*.js", true)
                 .IncludeDirectory("~/client/states/app/site-admin", "*.js", true)
@@ -30,7 +35,12 @@ namespace WebApp
             // Bundle up our Angular Templates. Search for 'clientTemplates' to see where they are served.
             var defaultSpaTemplates = new NgTemplateBundle("myApp", "~/bundles/defaultSpaTemplates")
                 .IncludeDirectory("~/client/components", "*.html", true)
-                .IncludeDirectory("~/client/states/public", "*.html", true)
+
+                .IncludeDirectory("~/client/app", "*.html")
+                .IncludeDirectory("~/client/app/public", "*.html", true)
+                .IncludeDirectory("~/client/app/system", "*.html", true)
+                //.IncludeDirectory("~/client/states/public", "*.html", true)
+
                 .IncludeDirectory("~/client/states/app", "*.html")
                 .IncludeDirectory("~/client/states/app/user", "*.html", true)
                 .IncludeDirectory("~/client/states/app/site-admin", "*.html", true)
@@ -41,7 +51,10 @@ namespace WebApp
             // Add SPA-specific bundles for AppRole.EventSessionVolunteer
             var volunteerSpaJS = new Bundle("~/bundles/volunteerSpaJS", new CacheBreakTransform())
                 .IncludeDirectory("~/client/components", "*.js", true)
-                .IncludeDirectory("~/client/states/public", "*.js", true)
+
+                //.IncludeDirectory("~/client/states/public", "*.js", true)
+                .IncludeDirectory("~/client/app/public", "*.js", true)
+
                 .IncludeDirectory("~/client/states/app", "*.js")
                 .IncludeDirectory("~/client/states/app/event-session-volunteer", "*.js", true)
                 .Include("~/client/states/app/user/event-session.controller.js")
@@ -52,7 +65,10 @@ namespace WebApp
             // Bundle up our Angular Templates. Search for 'clientTemplates' to see where they are served.
             var volunteerSpaTemplates = new NgTemplateBundle("myApp", "~/bundles/volunteerSpaTemplates")
                 .IncludeDirectory("~/client/components", "*.html", true)
-                .IncludeDirectory("~/client/states/public", "*.html", true)
+
+                //.IncludeDirectory("~/client/states/public", "*.html", true)
+                .IncludeDirectory("~/client/app/public", "*.html", true)
+
                 .IncludeDirectory("~/client/states/app", "*.html")
                 .IncludeDirectory("~/client/states/app/event-session-volunteer", "*.html", true)
                 ;

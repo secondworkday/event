@@ -1,0 +1,95 @@
+<md-dialog flex-sm="95" flex-md="80" flex-gt-md="60">
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2 class="md-title">Demo Tools</h2>
+      <span flex></span>
+      <md-button ng-click="cancelDialog()" class="md-icon-button" aria-label="Cancel dialog"><i class="fa fa-times"></i></md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content>
+    <section ng-show="working">
+      <div class="u-sm-space"></div>
+      <div class="text-center">
+        <h2 class="md-subhead">Setting up your demo&hellip;</h2>
+        <div layout="row" layout-align="space-around">
+          <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+        </div>
+        <p class="md-body-1">
+          Preparing your demo, one moment please&hellip;
+        </p>
+      </div>
+      <div class="u-sm-space"></div>
+    </section>
+    <section ng-show="showNewDemoTenantSettings">
+      <form name="newDemoTenantForm" class="md-padding">
+        <span class="md-headline">Create a new demo tenant</span>
+        <div layout="row">
+          <md-input-container flex>
+            <label>Tenant name</label>
+            <input ng-model="newTenantName" required>
+          </md-input-container>
+          <md-input-container flex>
+            <label>Select a demo scenario</label>
+            <md-select ng-model="scenario" required>
+              <md-option value="scenario1">
+                Blank Slate
+              </md-option>
+              <md-option value="scenario2">
+                Tammy Demo
+              </md-option>
+            </md-select>
+          </md-input-container>
+        </div>
+      </form>
+    </section>
+    <section ng-hide="working || showNewDemoTenantSettings" layout-xs="column" layout-gt-xs="row">
+      <div flex-xs flex-gt-xs="30" style="border-right: 1px solid #eee;">
+        <md-list ng-hide="showNewDemoTenantSettings">
+          <md-subheader class="md-no-sticky">Demo Tenants</md-subheader>
+          <md-list-item class="md-3-line"
+            ng-repeat="tenant in demoTenants | orderBy:'-id'"
+            ng-click="setDemoTenant(tenant.id)">
+            <div class="md-list-item-text" layout="column">
+              <h3>{{tenant.name}}</h3>
+              <h4>{{tenant.users.length}} users</h4>
+              <p>ID: {{tenant.id}}</p>
+            </div>
+          </md-list-item>
+        </md-list>
+      </div>
+      <div flex>
+        <h2 class="md-headline u-sm-margin-left">{{demoTenant.name}}</h2>
+        <div layout="column" layout-gt-xs="row">
+          
+          <div hide-gt-xs>
+            <md-button ng-click="createDemoUser(role.Value)" class="md-primary" ng-repeat="role in ROLES.Demo"><i class="fa fa-plus"></i> New {{role.translateToken | translate}}</md-button>
+          </div>
+
+          <div flex ng-repeat="role in ROLES.Demo">
+            <md-list>
+              <md-subheader class="md-no-sticky">{{role.translateToken | translate}}</md-subheader>
+              <md-list-item ng-click="signInAsDemoUser(user)" ng-repeat="user in demoTenant.users | filter: role.demoFilter">
+                <img ng-show="user.profilePhotoUrl" ng-src="{{user.profilePhotoUrl}}" alt="user img" class="mini-user-img" />
+                <img ng-hide="user.profilePhotoUrl" ng-src="/images/user-img-placeholder.png" alt="user img" class="mini-user-img" />
+                <p>{{user.firstName}} {{user.lastName}}</p>
+              </md-list-item>
+            </md-list>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </md-dialog-content>
+  <md-dialog-actions hide-xs layout="row" ng-hide="working">
+    <md-button ng-hide="showNewDemoTenantSettings" ng-click="showNewDemoTenantSettings = !showNewDemoTenantSettings" class="md-primary"><i class="fa fa-plus"></i> New Demo Tenant</md-button>
+    <span flex></span>
+    <span ng-hide="showNewDemoTenantSettings">
+      <span flex></span>
+      <md-button ng-click="createDemoUser(role.Value)" class="md-primary" ng-repeat="role in ROLES.Demo"><i class="fa fa-plus"></i> New {{role.translateToken | translate}}</md-button>
+    </span>
+    <span ng-show="showNewDemoTenantSettings">
+      <md-button ng-click="showNewDemoTenantSettings = !showNewDemoTenantSettings">Cancel</md-button>
+      <md-button ng-disabled="newDemoTenantForm.$invalid" ng-click="createDemoTenant()" class="md-primary">Create</md-button>
+    </span>
+  </md-dialog-actions>
+</md-dialog>

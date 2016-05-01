@@ -1,0 +1,60 @@
+<h2 class="md-title">
+  Site Settings
+</h2>
+<md-divider></md-divider>
+<md-content class="md-padding">
+  <div>
+    <p class="md-body-1"><i class="fa fa-warning"></i> You are currently using SITE_NAME, version VERSION_NUMBER which was last updated on LAST_UPDATED</p>
+  </div>
+  <div class="u-sm-space"></div>
+  <md-divider></md-divider>
+  <div class="u-sm-space"></div>
+  <div layout>
+    <div flex>
+      <h2 class="md-headline">
+        Site Settings
+      </h2>
+      <md-list ng-cloak>
+        <md-list-item ng-repeat="setting in settings">
+          <p> {{ setting.name }} </p>
+          <md-switch class="md-primary" ng-model="setting.enabled"></md-switch>
+        </md-list-item>
+      </md-list>
+    </div>
+    <span flex="5"></span>
+    <div flex>
+      <h2 class="md-headline">
+        TORQ Settings
+      </h2>
+      <h3 class="md-subhead">
+        Job Board Settings
+      </h3>
+      <div ng-repeat="jobBoard in jobBoards">
+        <div ng-show="!$first" class="u-sm-space"></div>
+        <md-divider></md-divider>
+        <div class="u-sm-space"></div>
+        <div layout layout-align="start center">
+          <div flex>
+            <span class="md-body-2"> {{ jobBoard.name }} </span>
+          </div>
+          <div flex>
+            <md-radio-group layout ng-model="jobBoard.availability">
+              <md-radio-button value="off" class="md-primary">Off</md-radio-button>
+              <md-radio-button value="optional" class="md-primary">Optional</md-radio-button>
+              <md-radio-button value="on" class="md-primary">On</md-radio-button>
+            </md-radio-group>
+          </div>
+        </div>
+      </div>
+      <div class="u-md-space"></div>
+      <h3 class="md-subhead">
+        Autocoder Settings
+      </h3>
+      <md-input-container style="min-width:250px;">
+        <label>Set Autocoder Bottom Limit</label>
+        <input type="number" ng-model="autocoderBottomLimit">
+      </md-input-container>
+    </div>
+  </div>
+
+</md-content>

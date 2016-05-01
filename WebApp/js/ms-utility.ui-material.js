@@ -42,9 +42,21 @@
   };
 
 
+  self.showModalDialog = function (optionsOrPreset) {
 
+    var mdDialogOptions;
 
+    if (angular.isObject(optionsOrPreset)) {
+      mdDialogOptions = {
+        clickOutsideToClose: true
+      };
+      angular.extend(mdDialogOptions, optionsOrPreset);
+    } else {
+      mdDialogOptions = optionsOrPreset;
+    }
 
+    return $mdDialog.show(mdDialogOptions);
+  };
 
 
   //** Conversation related

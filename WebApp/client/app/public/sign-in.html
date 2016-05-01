@@ -1,0 +1,56 @@
+<div layout layout-align="center center">
+  <div flex>
+    <div class="text-center">
+      <img src="/images/torq_logo_color.png" height="100">
+    </div>
+    <md-card>
+      <form name="signInForm">
+      <md-card-content>
+        <div ng-show="working">
+          <div class="text-center">
+            <h2 class="md-subhead">One moment while we sign you in...</h2>
+          </div>
+          <div class="u-sm-space"></div>
+          <div layout="row" layout-align="space-around">
+            <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+          </div>
+        </div>
+        <div ng-hide="working">
+          <div class="text-center">
+            <h2 class="md-subhead">Sign in to your TORQ account</h2>
+          </div>
+          <div layout="column">
+            <md-input-container flex>
+              <label>Email Address</label>
+              <input ng-model="formData.emailAddress" type="email">
+            </md-input-container>
+            <md-input-container flex>
+              <label>Password</label>
+              <input ng-model="formData.password" type="password">
+            </md-input-container>
+            <span ng-if="failureData" style="border-left:3px solid red; padding:1rem;margin-bottom:1rem;background-color:rgba(215,44,44,0.15);">
+              {{failureData.errorMessage}}
+            </span>
+          </div>
+        </div>
+      </md-card-content>
+      <md-card-actions ng-hide="working" layout="row" layout-align="end center">
+        <md-button type="submit" ng-click="signIn(formData)" class="md-primary">Sign In</md-button>
+      </md-card-actions>
+      </form>
+    </md-card>
+    <div ng-hide="working">
+      <div class="u-sm-space"></div>
+      <div layout>
+        <span class="md-caption"><a href="" ng-click="sendPasswordResetEmail(formData.emailAddress)">Forgot password?</a></span>
+        <span flex></span>
+        <span class="md-caption">New to TORQ? <a ui-sref="public.job-seeker-create-account">Create an account</a></span>
+      </div>
+      <div class="u-sm-space"></div>
+      <div class="u-sm-space"></div>
+      <div>
+        <span class="md-caption"><a href="" ng-click="showDemoToolsDialog()">Demo Tools</a></span>
+      </div>
+    </div>
+  </div>
+</div>

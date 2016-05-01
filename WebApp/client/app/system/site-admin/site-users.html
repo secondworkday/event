@@ -1,0 +1,155 @@
+<div layout ng-hide="showFilters">
+  <div flex>
+    <md-input-container class="md-block" flex-gt-sm>
+      <label><i class="fa fa-search"></i> Search for any text, &commat;name, or even &num;tag</label>
+      <input ng-model="searchViewOptions.userSearch">
+    </md-input-container>
+  </div>
+  <div hide-xs>
+    <md-menu md-position-mode="target-right target">
+      <md-button aria-label="Open sort menu" class="md-icon-button" ng-click="$mdOpenMenu()">
+        <i md-menu-origin class="fa fa-sort"></i>
+      </md-button>
+      <md-menu-content width="4">
+        <md-menu-item ng-repeat="sortOption in sortOptions">
+          <md-button ng-click="searchViewOptions.sort = sortOption">
+            {{sortOption.name}}
+          </md-button>
+        </md-menu-item>
+      </md-menu-content>
+    </md-menu>
+    <md-button ng-click="download()" class="md-icon-button" aria-label="download">
+      <i class="fa fa-download"></i>
+    </md-button>
+    <md-button ng-click="showFilters = !showFilters"><i class="fa fa-sliders"></i> Filters</md-button>
+    <md-menu>
+      <md-button ng-click="$mdOpenMenu($event)" class="md-primary md-raised" aria-label="Open add customer menu">
+        <i class="fa fa-plus"></i> User
+      </md-button>
+      <md-menu-content>
+        <md-menu-item>
+          <md-button ng-click="showInviteUserDialog($event)" aria-label="invite new user">
+            <i md-menu-align-target class="fa fa-envelope"></i>
+            Invite New User
+          </md-button>
+        </md-menu-item>
+        <md-menu-item>
+          <md-button ng-click="showNewUserDialog($event)" aria-label="create new user">
+            <i md-menu-align-target class="fa fa-plus"></i>
+            Create User
+          </md-button>
+        </md-menu-item>
+      </md-menu-content>
+    </md-menu>    
+  </div>
+</div>
+
+<div ng-show="showFilters">
+  <md-content class="md-padding">
+    <div layout layout-align="start center">
+      <div flex>
+        <p class="md-headline">
+          Filters
+        </p>
+      </div>
+      <div>
+        <md-button style="margin-top:0;" ng-click="DO_SOMETHING()"><i class="fa fa-undo"></i> Reset to default </md-button>
+        <md-button style="margin-top:0;" ng-click="showFilters = !showFilters"><i class="fa fa-times"></i> Close</md-button>
+      </div>
+    </div>
+    <md-divider></md-divider>
+    <div class="u-sm-space"></div>
+    <section layout>
+      <div flex layout="column">
+        <p class="md-body-2 text-support">
+          Filter by role
+        </p>
+        <md-checkbox ng-model="filters.roleName1" aria-label="roleName1">
+          Standard
+        </md-checkbox>
+        <md-checkbox ng-model="filters.roleName2" aria-label="roleName1">
+          Tenant Admin
+        </md-checkbox>
+        <md-checkbox ng-model="filters.roleName3" aria-label="roleName1">
+          Database Admin
+        </md-checkbox>
+        <md-checkbox ng-model="filters.roleName4" aria-label="roleName1">
+          Site Admin
+        </md-checkbox>
+      </div>
+      <div flex layout="column">
+        <p class="md-body-2 text-support">
+          Filter by status
+        </p>
+        <md-checkbox ng-model="filters.roleName5" aria-label="roleName1">
+          Active
+        </md-checkbox>
+        <md-checkbox ng-model="filters.roleName6" aria-label="roleName1">
+          Deactivated
+        </md-checkbox>
+      </div>
+      <div flex layout="column">
+        <p class="md-body-2 text-support">
+          Active in the last...
+        </p>
+        <md-radio-group ng-model="data.group1">
+          <md-radio-button value="1" class="md-primary"> 3 days </md-radio-button>
+          <md-radio-button value="2" class="md-primary"> 2 weeks </md-radio-button>
+          <md-radio-button value="3" class="md-primary"> 8 weeks </md-radio-button>
+        </md-radio-group>
+      </div>
+      <div flex layout="column">
+        <p class="md-body-2 text-support">
+          NOT active in the last...
+        </p>
+        <md-radio-group ng-model="data.group2">
+          <md-radio-button value="2" class="md-primary"> 2 weeks </md-radio-button>
+          <md-radio-button value="3" class="md-primary"> 8 weeks </md-radio-button>
+          <md-radio-button value="4" class="md-primary"> 16 weeks </md-radio-button>
+          <md-radio-button value="5" class="md-primary"> 32 weeks </md-radio-button>
+          <md-radio-button value="6" class="md-primary"> Year </md-radio-button>
+        </md-radio-group>
+      </div>
+    </section>
+
+  </md-content>
+  <div class="u-sm-space"></div>
+</div>
+
+<ms-search-view change-event="updateUsers" search="searchUsers" options="searchViewOptions" user-search="userSearch">
+  <table class="md-data-table u-full-width">
+    <thead>
+      <tr>
+        <th class="md-data-table__cell--non-numeric" ms-debug-only>Debug</th>
+        <th class="md-data-table__cell--non-numeric">User</th>
+        <th></th>
+        <th>UserID</th>
+        <th>TenantID</th>
+        <th>AppRoles</th>
+        <th>SystemRoles</th>
+        <th class="md-data-table__cell--non-numeric">Online</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="user in $displayedIndex | objectLookup:$hashMap track by user.id" ui-sref="app.system.site-admin.user-settings({userID:user.id})" style="cursor:pointer;">
+        <td class="md-data-table__cell--non-numeric" ms-debug-only><pre>{{ user | json }}</pre></td>
+        <td class="md-data-table__cell--non-numeric">
+          <img ng-src="{{user.profilePhotoUrl || '/images/user-img-placeholder.png'}}" class="mini-user-img" style="margin-bottom:1rem;"/>
+        </td>
+        <td class="md-data-table__cell--non-numeric">
+          <strong>{{ user.displayName }}</strong><br/>
+          <span class="md-caption">{{ user.emailAddress }}</span><br />
+        </td>
+        <td>{{ user.id }}</td>
+        <td>{{ user.tenantID }}</td>
+        <td>
+          <span style ="display:block" ng-repeat="appRole in user.appRoles">{{appRole}}</span>
+        </td>
+        <td>
+          <span style ="display:block" ng-repeat="systemRole in user.systemRoles">{{systemRole}}</span>
+        </td>
+        <td class="md-data-table__cell--non-numeric"><i ng-show="user.connectionState=='Online'" class="fa fa-circle text-green"></i></td>
+      </tr>
+    </tbody>
+  </table>
+</ms-search-view>

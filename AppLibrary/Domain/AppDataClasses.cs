@@ -46,7 +46,9 @@ namespace App.Library
 
         static AppDC()
         {
-            DataContextFactory = new LinqAttributeDataContextFactory<AppDC>(onDatabaseCreated, DataContextBase.CreateInitialUser, anonymizeDatabase, runDatabaseMigration, runDatabaseDiagnostics);
+            //DataContextFactory = LinqMapDataContextFactory<AppDC>.Load(linqMapReferenceTablePrefix, fullLinqMap, onDatabaseCreated, DataContextBase.CreateInitialUser, anonymizeDatabase, runDatabaseMigration, runDatabaseUpgrade, runDatabaseDiagnostics);
+
+            DataContextFactory = new LinqAttributeDataContextFactory<AppDC>(onDatabaseCreated, DataContextBase.CreateInitialUser, anonymizeDatabase, runDatabaseMigration, runDatabaseUpgrade, runDatabaseDiagnostics);
         }
 
         private static void onDatabaseCreated(UtilityContext utilityContext, AppDC dc, string importDatabaseConnectionString)
@@ -89,6 +91,11 @@ namespace App.Library
             Debug.Assert(utilityContext != null);
             Debug.Assert(dc != null);
         }
+
+        private static void runDatabaseUpgrade(UtilityContext utilityContext, AppDC dc)
+        {
+        }
+
 
         private static void runDatabaseDiagnostics(UtilityContext utilityContext, AppDC dc)
         {

@@ -8,6 +8,9 @@ using System.IO;
 using System.Text;
 using System.Data.SqlClient;
 
+//using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 
 using MS.Utility;
 using MS.WebUtility;
@@ -42,9 +45,9 @@ namespace WebApp
                     return HubResult.CreateError("No credentials provided.");
                 }
 
-                dynamic body = bodyString.FromJson();
+                JObject data = bodyString.FromJson() as JObject;
 
-                if (body == null)
+                if (data == null)
                 {
                     context.Response.SubStatusCode = 3;
                     return HubResult.CreateError("No credentials provided.");
@@ -52,18 +55,18 @@ namespace WebApp
 
                 try
                 {
-                    string authCodeValue = body.authCode;
+                    string authCodeValue = data.Value<string>("authCode");
                     if (!string.IsNullOrEmpty(authCodeValue))
                     {
                         var authCode = AuthCode.FromValue(authCodeValue);
-                        var hubResult = AuthTemplate.Redeem(authCode, body);
+                        var hubResult = AuthTemplate.Redeem(authCode, data);
                         return hubResult;
                     }
 
-
-                    string userName = body.email;
-                    string password = body.password;
-                    bool rememberMe = ((bool?)body.rememberMe) ?? false;
+                    Debug.Assert(data.Value<string>("emailAddress") != null);
+                    string userName = data.Value<string>("emailAddress") ?? data.Value<string>("email");
+                    string password = data.Value<string>("password");
+                    bool rememberMe = data.Value<bool?>("rememberMe") ?? false;
 
                     if (string.IsNullOrEmpty(userName))
                     {
