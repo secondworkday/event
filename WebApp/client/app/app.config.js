@@ -44,11 +44,17 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
           } else if (utilityService.listContains(identity.systemRoles, "DatabaseAdmin")) {
             $state.go('app.system.database-admin.dashboard');
           } else if (utilityService.listContains(identity.appRoles, "Admin")) {
-            $state.go('app.counselor.home');
-          } else if (utilityService.listContains(identity.appRoles, "JobCounselor")) {
-            $state.go('app.counselor.home');
+            $state.go('app.user.events');
+          } else if (utilityService.listContains(identity.appRoles, "EventPlanner")) {
+            $state.go('app.user.events');
+          } else if (utilityService.listContains(identity.appRoles, "EventSessionManager")) {
+            $state.go('app.user.events');
+
+          } else if (utilityService.listContains(identity.appRoles, "EventSessionVolunteer")) {
+            // Note: VolunteerSpa
+            $state.go('app.spa-landing');
           } else {
-            $state.go('app.job-seeker.career-step.home');
+            $state.go('app.spa-landing');
           }
         }]
       }

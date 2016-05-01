@@ -21,14 +21,10 @@ namespace WebApp
             var defaultSpaJS = new Bundle("~/bundles/defaultSpaJS", new CacheBreakTransform())
                 .IncludeDirectory("~/client/components", "*.js", true)
 
-                .IncludeDirectory("~/client/app", "*.js", false)
+                .IncludeDirectory("~/client/app", "*.js")
                 .IncludeDirectory("~/client/app/public", "*.js", true)
                 .IncludeDirectory("~/client/app/system", "*.js", true)
-                //.IncludeDirectory("~/client/states/public", "*.js", true)
-
-                .IncludeDirectory("~/client/states/app", "*.js")
-                .IncludeDirectory("~/client/states/app/user", "*.js", true)
-                .IncludeDirectory("~/client/states/app/site-admin", "*.js", true)
+                .IncludeDirectory("~/client/app/user", "*.js", true)
                 ;
             bundles.Add(defaultSpaJS);
 
@@ -39,11 +35,7 @@ namespace WebApp
                 .IncludeDirectory("~/client/app", "*.html")
                 .IncludeDirectory("~/client/app/public", "*.html", true)
                 .IncludeDirectory("~/client/app/system", "*.html", true)
-                //.IncludeDirectory("~/client/states/public", "*.html", true)
-
-                .IncludeDirectory("~/client/states/app", "*.html")
-                .IncludeDirectory("~/client/states/app/user", "*.html", true)
-                .IncludeDirectory("~/client/states/app/site-admin", "*.html", true)
+                .IncludeDirectory("~/client/app/user", "*.html", true)
                 ;
             bundles.Add(defaultSpaTemplates);
 
@@ -52,13 +44,12 @@ namespace WebApp
             var volunteerSpaJS = new Bundle("~/bundles/volunteerSpaJS", new CacheBreakTransform())
                 .IncludeDirectory("~/client/components", "*.js", true)
 
-                //.IncludeDirectory("~/client/states/public", "*.js", true)
+                .IncludeDirectory("~/client/app", "*.js")
                 .IncludeDirectory("~/client/app/public", "*.js", true)
 
-                .IncludeDirectory("~/client/states/app", "*.js")
-                .IncludeDirectory("~/client/states/app/event-session-volunteer", "*.js", true)
-                .Include("~/client/states/app/user/event-session.controller.js")
-                .Include("~/client/states/app/user/event-participants.controller.js")
+                .IncludeDirectory("~/client/app/event-session-volunteer", "*.js", true)
+                .Include("~/client/app/user/event-session.controller.js")
+                .Include("~/client/app/user/event-participants.controller.js")
                 ;
             bundles.Add(volunteerSpaJS);
 
@@ -66,11 +57,9 @@ namespace WebApp
             var volunteerSpaTemplates = new NgTemplateBundle("myApp", "~/bundles/volunteerSpaTemplates")
                 .IncludeDirectory("~/client/components", "*.html", true)
 
-                //.IncludeDirectory("~/client/states/public", "*.html", true)
+                .IncludeDirectory("~/client/app", "*.html")
                 .IncludeDirectory("~/client/app/public", "*.html", true)
-
-                .IncludeDirectory("~/client/states/app", "*.html")
-                .IncludeDirectory("~/client/states/app/event-session-volunteer", "*.html", true)
+                .IncludeDirectory("~/client/app/event-session-volunteer", "*.html", true)
                 ;
             bundles.Add(volunteerSpaTemplates);
 
