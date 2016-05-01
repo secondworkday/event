@@ -127,7 +127,8 @@ app.config(['$stateProvider', 'AUTHORIZATION_ROLES', function ($stateProvider, A
       tenant: function ($stateParams, utilityService) {
         // careful - might be an invalid or unauthorized tenantID
         var tenantID = $stateParams.tenantID;
-        return utilityService.ensureTenantGroup(tenantID);
+        //!! should we use ensureTenant here - to rely on cached info if we've got it?
+        return utilityService.tenantGroups.ensure(tenantID);
       }
     },
     data: {

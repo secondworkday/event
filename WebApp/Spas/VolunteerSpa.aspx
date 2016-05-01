@@ -25,6 +25,89 @@
             tenantLogoResourceID: "<%=MS.Utility.EPCategory.TenantLogoResource.ID%>",
         });
 
+
+
+
+
+
+      angular
+        .module('myApp')
+        .constant('ROLES', (function () {
+          // Define your variable
+          var roles = {
+
+            //System : [ ],
+            //App: [],
+            //Authentication: [],
+
+
+            // Other
+            Anonymous: { name: "Anonymous" },
+            Authenticated: { name: "Authenticated" },
+
+            // SystemRoles
+            SecurityAdmin: { name: "SecurityAdmin" },
+            OperationsAdmin: { name: "OperationsAdmin" },
+            SystemAdmin: { name: "SystemAdmin" },
+            TenantAdmin: { name: "TenantAdmin" },
+
+            // AppRoles
+            Admin: {
+              name: "Admin",
+              demoFilter: { appRoles: 'Admin' },
+              translateToken: 'TENANT_ADMIN_ROLE'
+            },
+            EventPlanner: {
+              name: "Planner",
+              value: "EventPlanner",
+              demoFilter: { appRoles: 'EventPlanner' },
+              translateToken: 'EVENT_PLANNER_ROLE'
+            },
+            EventSessionManager: {
+              name: "Manager",
+              value: "EventSessionManager",
+              demoFilter: { appRoles: 'EventSessionManager' },
+              translateToken: 'SESSION_MANAGER_ROLE'
+            },
+            EventSessionVolunteer: {
+              name: "Volunteer",
+              value: "EventSessionVolunteer",
+              demoFilter: { appRoles: 'EventSessionVolunteer' },
+              translateToken: 'SESSION_VOLUNTEER_ROLE'
+            }
+
+
+            //accountAdmin: "AccountAdmin",
+            //groupAdmin: "GroupAdmin",
+          };
+
+          roles.System = [roles.SecurityAdmin, roles.OperationsAdmin, roles.SystemAdmin, roles.TenantAdmin];
+          roles.Demo = [roles.Admin, roles.EventPlanner, roles.EventSessionManager, roles.EventSessionVolunteer];
+          //System : [ ],
+          //App: [],
+          //Authentication: [],
+
+
+
+          return roles;
+
+        })());
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       app.constant('APP_ROLE_TRANSLATION', {
         Admin: 'TENANT_ADMIN_ROLE',
         EventPlanner: 'EVENT_PLANNER_ROLE',
